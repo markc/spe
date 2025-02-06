@@ -97,43 +97,6 @@ echo new class {
         <meta name="author" content="Mark Constable">
         <title>' . $this->out['doc'] . '</title>
         <link rel="icon" href="favicon.ico">
-        <style>
-            :root {
-                color-scheme: light dark;
-            }
-
-            body {
-                max-width: 50rem;
-                margin: auto;
-                text-align: center;
-                padding: 0 1rem;
-                line-height: 1.5;
-            }
-
-            nav ul li a {
-                text-decoration: none;
-                padding: 0.5rem;
-                transition: color 0.2s;
-            }
-
-            nav ul li a:hover,
-            nav ul li a:focus {
-                color: #0066cc;
-            }
-
-            ul {
-                list-style-type: none;
-                display: flex;
-                justify-content: center;
-                gap: 2rem;
-            }
-
-            @media (prefers-reduced-motion: reduce) {
-                * {
-                transition: none !important;
-            }
-            }
-        </style>
     </head>
     <body>' . $this->out['head'] . $this->out['main'] . $this->out['foot'] . '
     </body>
