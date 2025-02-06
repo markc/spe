@@ -1,4 +1,4 @@
-# SPE/01-Simple: The First Step in PHP Micro-Framework Evolution
+# SPE/01-Simple: The First Step in a PHP Micro-Framework
 
 **2025-02-06** -- _Copyright (C) 2015-2025 Mark Constable (AGPL-3.0)_
 
@@ -6,15 +6,21 @@ Welcome to the starting point of our PHP micro-framework journey! This single-fi
 
 ## How It Works
 
-Let me walk you through how this elegant single-file application works. The entire application is built around an anonymous class in index.php, leveraging PHP 8.4's modern features like readonly properties and strict typing. It follows a clean MVC-like pattern, all neatly packaged in a single file.
+Let me walk you through how this single-file application works. The entire application is built around an anonymous class in index.php, leveraging PHP 8.4's modern features like readonly properties and strict typing. It follows a clean MVC-like pattern, all neatly packaged in a single file.
 
-When a request comes in, the magic starts in the constructor. First, it sets up the navigation menu items. Then it looks at the URL parameters (either 'm' or 'p') and makes sure they're properly sanitized - we don't want any nasty surprises! Based on these parameters, it dynamically figures out which page to show and puts everything together using various component methods.
+When a request comes in, the logic starts in the constructor. First, it sets up the navigation menu items. Then it looks at the URL parameters ('m') and makes sure they're properly sanitized - we don't want any nasty surprises! Based on these parameters, it dynamically figures out which page to show and puts everything together using various component methods.
 
-The application is built around several key components working together seamlessly. The routing system watches for 'm' or 'p' parameters in your URL to decide which page to display. Navigation is generated dynamically using some clever array mapping. The layout is broken down into modular pieces - nav, head, main, and foot - which are then assembled into clean, semantic HTML.
+The application is built around several key components working together seamlessly. The routing system watches for the 'm' parameter ('m' is for which page 'method' to display) in your URL to decide which page to display. Navigation is generated dynamically using some simple array mapping. The layout is broken down into modular pieces - nav, head, main, and foot - which are then assembled into clean, semantic HTML.
 
-What makes this particularly interesting is how it uses modern PHP features. We've got strict typing enabled right from the start with declare(strict_types=1). Properties are marked as readonly where they shouldn't change, and we're using those neat arrow functions for concise array mapping. The constructor property promotion feature keeps our code clean and readable.
+What makes this particularly interesting is how it uses modern PHP features. We've got strict typing enabled right from the start with `declare(strict_types=1)`. Properties are marked as readonly where they shouldn't change, and we're using those neat arrow functions for concise array mapping. The constructor property promotion feature keeps our code clean and readable.
 
 Security hasn't been forgotten either. URL parameters are carefully sanitized, the HTML structure is properly escaped, and we maintain strict type checking throughout. The URL structure is clean and user-friendly, making it both secure and pleasant to use.
+
+A note about the **Template Method Pattern** design pattern which describes how the collection of `nav()`, `head()`, `main()` and `foot()` partial rendering methods implements a classic object-oriented design approach. The abstract algorithm `html()` serves as the template that defines the foundational page construction process, while delegating specific implementations to its constituent methods. This pattern enables consistent page structure while allowing flexibility in component implementation.
+
+The `html()` method provides a **Composite View Pattern** in the systematic decomposition of the page into discrete functional components including navigation, header, main content, and footer sections. These atomic units are subsequently recomposed into a cohesive HTML document through a hierarchical assembly process. This architectural pattern provides clear separation of concerns while maintaining the relationships between composite elements.
+
+These **Template Methods** always **return** strings so they can be added anywhere in the code base whereas **echo** statments have to be strictly ordered or else mayhem ensues.
 
 ## Key Features
 
@@ -54,13 +60,14 @@ Security hasn't been forgotten either. URL parameters are carefully sanitized, t
 
 This is the easiest way to display and develop this project...
 
+```bash
     bash -c "$(curl -fsSL https://php.new/install/linux)"
     [[ ! -d ~/Dev ]] && mkdir ~/Dev
     cd ~/Dev
     git clone https://github.com/markc/spe
     cd spe
     php -S localhost:8000 -t 01-Simple
-
+```
 ## Technical Details
 
 - Uses PHP 8.4's readonly properties for immutable state
