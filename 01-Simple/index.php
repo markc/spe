@@ -1,44 +1,38 @@
 <?php declare(strict_types=1);
 
-// index.php 20150101 - 20210101
-// Copyright (C) 2015-2021 Mark Constable <markc@renta.net> (AGPL-3.0)
+// Created: 20150101 - Updated: 20250206
+// Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 echo new class {
+    private const DEFAULT_PAGE = 'home';
+    
+    private readonly array $nav;
 
-    private array $in = [
-        'm' => 'home',
-    ];
-
-    private $out = [
-        'doc' => 'SPE::01',
-        'nav' => '',
-        'head' => 'Simple',
-        'main' => '<p>Error: missing page!</p>',
-        'foot' => 'Copyright (C) 2015-2021 Mark Constable (AGPL-3.0)',
-    ];
-
-    private $nav = [
-        ['Home', 'home'],
-        ['About', 'about'],
-        ['Contact', 'contact']
+    private array $out = [
+        'doc'   => 'SPE::01',
+        'nav'   => '',
+        'head'  => 'Simple PHP Example',
+        'main'  => '<p>Error: missing page!</p>',
+        'foot'  => 'Copyright © 2015-2025 Mark Constable (AGPL-3.0)',
     ];
 
     public function __construct()
     {
-        $m = $_REQUEST['m'] ?? ($_REQUEST['p'] ?? '');
+        $this->nav = [
+            ['Home', 'home'],
+            ['About', 'about'],
+            ['Contact', 'contact']
+        ];
         
-        $m = filter_var(trim($m, '/'), FILTER_SANITIZE_URL);
-
-        if (empty($m)) {
-            $m = $this->in['m'];
-        }
+        $page = filter_var(trim($_REQUEST['m'] ?? $_REQUEST['p'] ?? '', '/'), FILTER_SANITIZE_URL);
+        $method = empty($page) ? self::DEFAULT_PAGE : $page;
         
-        if (method_exists($this, $m)) {
-            $this->out['main'] = $this->{$m}();
-        }
-
-        foreach ($this->out as $k => $v) {
-            $this->out[$k] = method_exists($this, $k) ? $this->{$k}() : $v;
+        $this->out['main'] = method_exists($this, $method) ? $this->{$method}() : $this->out['main'];
+        
+        foreach ($this->out as $key => $value) {
+            if (method_exists($this, $key)) {
+                $this->out[$key] = $this->{$key}();
+            }
         }
     }
 
@@ -47,69 +41,126 @@ echo new class {
         return $this->html();
     }
 
-    private function nav(): string
+    private function nav(): string 
     {
+        $links = array_map(
+            fn($n) => '            <li><a href="' . 
+                (isset($_REQUEST['p']) ? $n[1] : '?m=' . $n[1]) . '" rel="noopener">' . 
+                $n[0] . '</a></li>',
+            $this->nav
+        );
         return '
-      <nav>' . join('', array_map(function ($n) {
-            $url = (!isset($_REQUEST['p'])) ? "?m=$n[1]" : "$n[1]";
-            return '
-        <a href="' . $url . '">' . $n[0] . '</a>';
-        }, $this->nav)) . '
-      </nav>';
+            <nav aria-label="Main navigation">
+                <ul>
+        ' . implode('
+        ', $links) . '
+                </ul>
+            </nav>';
     }
 
     private function head(): string
     {
         return '
-    <header>
-      <h1>' . $this->out['head'] . '</h1>' . $this->out['nav'] . '
-    </header>';
+        <header>
+            <h1>' . $this->out['head'] . '</h1>' . $this->out['nav'] . '
+        </header>';
     }
 
     private function main(): string
     {
         return '
-    <main>' . $this->out['main'] . '
-    </main>';
+
+        <main>
+            ' . $this->out['main'] . '
+        </main>';
     }
 
     private function foot(): string
     {
         return '
-    <footer>
-      <p><em><small>' . $this->out['foot'] . '</small></em></p>
-    </footer>';
+
+        <footer>
+            <p>
+                <small>' . $this->out['foot'] . '</small>    
+            </p>
+        </footer>';
     }
 
-    private function html(): string
+    private function html(): string 
     {
-        extract($this->out, EXTR_SKIP);
-
         return '<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>' . $doc . '</title>
-  </head>
-  <body>' . $head . $main . $foot . '
-  </body>
-</html>
-';
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Simple PHP Example">
+        <meta name="author" content="Mark Constable">
+        <title>' . $this->out['doc'] . '</title>
+        <link rel="icon" href="favicon.ico">
+        <style>
+            :root {
+                color-scheme: light dark;
+            }
+
+            body {
+                max-width: 50rem;
+                margin: auto;
+                text-align: center;
+                padding: 0 1rem;
+                line-height: 1.5;
+            }
+
+            nav ul li a {
+                text-decoration: none;
+                padding: 0.5rem;
+                transition: color 0.2s;
+            }
+
+            nav ul li a:hover,
+            nav ul li a:focus {
+                color: #0066cc;
+            }
+
+            ul {
+                list-style-type: none;
+                display: flex;
+                justify-content: center;
+                gap: 2rem;
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                * {
+                transition: none !important;
+            }
+            }
+        </style>
+    </head>
+    <body>' . $this->out['head'] . $this->out['main'] . $this->out['foot'] . '
+    </body>
+</html>';
     }
 
     private function home(): string
     {
-        return '<h2>Home Page</h2><p>Lorem ipsum home.</p>';
+        return '<h2>Home Page</h2>
+            <p>
+                Lorem ipsum home.
+            </p>';
     }
 
     private function about(): string
     {
-        return '<h2>About Page</h2><p>Lorem ipsum about.</p>';
+        return '<h2>About Page</h2>
+            <p>
+                Lorem ipsum about.
+            </p>';
     }
 
     private function contact(): string
     {
-        return '<h2>Contact Page</h2><p>Lorem ipsum contact.</p>';
+        return '<h2>Contact Page</h2>
+            <p>
+                Lorem ipsum contact.
+            </p>';
     }
 };
