@@ -30,7 +30,7 @@ Security hasn't been forgotten either. URL parameters are carefully sanitized, t
 ### Core Components
 
 1. **Routing System**
-   - URL parameter handling via `?m=` or `?p=` query strings
+   - Simple URL parameter handling via `?m=` query string
    - Default page fallback to 'home'
    - Dynamic method calling based on URL parameters
 
@@ -75,6 +75,176 @@ This is the easiest way to display and develop this project...
 - HTML5 security headers
 - Strict type checking
 - XSS prevention measures
+
+## HTML Output
+
+Let's break down the clean, semantic HTML structure that our application generates:
+
+1. **Document Setup**
+   - Modern HTML5 doctype and language declaration
+   - Proper meta tags for character encoding and viewport settings
+   - SEO-friendly description and authorship metadata
+   - Favicon link for browser tab icon
+
+2. **Header Section**
+   - Main title wrapped in `<h1>` for proper document hierarchy
+   - Semantic `<nav>` element with ARIA label for accessibility
+   - Clean, unordered list structure for navigation links
+   - Simple `?m=` parameter routing for page navigation
+
+3. **Main Content**
+   - Semantic `<main>` element containing the page content
+   - Proper heading hierarchy with `<h2>` for page title
+   - Clean paragraph structure for content
+
+4. **Footer Section**
+   - Copyright information wrapped in `<small>` for proper semantics
+   - Clean paragraph structure for footer content
+
+Here's the actual output:
+
+```html
+    <!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta name="description" content="Simple PHP Example">
+            <meta name="author" content="Mark Constable">
+            <title>SPE::01</title>
+            <link rel="icon" href="favicon.ico">
+        </head>
+        <body>
+            <header>
+                <h1>Simple PHP Example</h1>
+                <nav aria-label="Main navigation">
+                    <ul>
+                        <li>
+                            <a href="?m=home" rel="noopener">Home</a>
+                        </li>
+                        <li>
+                            <a href="?m=about" rel="noopener">About</a>
+                        </li>
+                        <li>
+                            <a href="?m=contact" rel="noopener">Contact</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+
+            <main>
+                <h2>Home Page</h2>
+                <p>
+                    Lorem ipsum home.
+                </p>
+            </main>
+
+            <footer>
+                <p>
+                    <small>Copyright © 2015-2025 Mark Constable (AGPL-3.0)</small>    
+                </p>
+            </footer>
+        </body>
+    </html>
+```
+
+## Method-by-Method Breakdown
+
+Let's walk through each method in the application and see how they work together:
+
+### Core Methods
+
+#### `__construct()`
+```php
+public function __construct()
+```
+The constructor is where everything begins. It:
+1. Initializes the navigation array with page links
+2. Processes the URL parameter (`m`) to determine which page to show
+3. Dynamically calls the appropriate page method
+4. Assembles the final output by calling component methods
+
+#### `__toString()`
+```php
+public function __toString(): string
+```
+This magic method is called when the class instance is treated as a string. It:
+1. Returns the final HTML output by calling `html()`
+2. Enables the elegant one-line instantiation and echo: `echo new class { ... }`
+
+### Layout Methods
+
+#### `nav()`
+```php
+private function nav(): string
+```
+Generates the navigation menu by:
+1. Using array_map to transform the nav array into HTML list items
+2. Creating links with the `?m=` parameter for routing
+3. Wrapping everything in semantic nav tags with ARIA labels
+
+#### `head()`
+```php
+private function head(): string
+```
+Builds the header section by:
+1. Creating the main title with h1 tag
+2. Incorporating the navigation menu
+3. Wrapping everything in a semantic header tag
+
+#### `main()`
+```php
+private function main(): string
+```
+Handles the main content area by:
+1. Wrapping the current page content in a main tag
+2. Maintaining proper HTML structure and indentation
+
+#### `foot()`
+```php
+private function foot(): string
+```
+Creates the footer section by:
+1. Wrapping the copyright notice in appropriate tags
+2. Using the small tag for secondary content
+
+#### `html()`
+```php
+private function html(): string
+```
+Assembles the final HTML document by:
+1. Adding the DOCTYPE and HTML5 structure
+2. Including all necessary meta tags
+3. Combining head, main, and foot sections
+4. Ensuring proper viewport and character encoding
+
+### Page Content Methods
+
+#### `home()`, `about()`, `contact()`
+```php
+private function home(): string
+private function about(): string
+private function contact(): string
+```
+These content methods:
+1. Return the specific content for each page
+2. Maintain consistent structure with h2 headings
+3. Are called dynamically based on the URL parameter
+
+## Code Flow
+
+1. When a request comes in, PHP creates an instance of our anonymous class
+2. The constructor initializes navigation and processes the URL
+3. Based on the URL parameter, the appropriate page method is called
+4. The layout methods assemble the page structure:
+   - `nav()` creates the navigation menu
+   - `head()` wraps the title and navigation
+   - `main()` includes the page-specific content
+   - `foot()` adds the footer
+5. `html()` combines everything into a complete HTML document
+6. `__toString()` outputs the final result
+
+This modular approach makes the code easy to understand and maintain, while keeping everything neatly organized in a single file.
 
 ## License
 

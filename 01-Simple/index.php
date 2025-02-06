@@ -24,7 +24,7 @@ echo new class {
             ['Contact', 'contact']
         ];
         
-        $page = filter_var(trim($_REQUEST['m'] ?? $_REQUEST['p'] ?? '', '/'), FILTER_SANITIZE_URL);
+        $page = filter_var(trim($_REQUEST['m'] ?? '', '/'), FILTER_SANITIZE_URL);
         $method = empty($page) ? self::DEFAULT_PAGE : $page;
         
         $this->out['main'] = method_exists($this, $method) ? $this->{$method}() : $this->out['main'];
@@ -44,9 +44,9 @@ echo new class {
     private function nav(): string 
     {
         $links = array_map(
-            fn($n) => '            <li><a href="' . 
-                (isset($_REQUEST['p']) ? $n[1] : '?m=' . $n[1]) . '" rel="noopener">' . 
-                $n[0] . '</a></li>',
+            fn($n) => '            <li>
+                        <a href="?m=' . $n[1] . '" rel="noopener">' . $n[0] . '</a>
+                    </li>',
             $this->nav
         );
         return '
