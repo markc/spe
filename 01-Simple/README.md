@@ -68,6 +68,7 @@ This is the easiest way to display and develop this project...
     cd spe
     php -S localhost:8000 -t 01-Simple
 ```
+
 ## Technical Details
 
 - Uses PHP 8.4's readonly properties for immutable state

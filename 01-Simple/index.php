@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 // Created: 20150101 - Updated: 20250206
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
