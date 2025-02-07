@@ -1,32 +1,6 @@
-<?php
-// index.php 20150101 - 20170304
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
-
-echo new Init(new class
-{
-    public
-    $email = 'markc@renta.net',
-    $in = [
-        'l'     => '',      // Log (message)
-        'm'     => 'read',  // Method (action)
-        'o'     => 'home',  // Object (content)
-        'x'     => '',      // XHR (request)
-    ],
-    $out = [
-        'doc'   => 'SPE::03',
-        'css'   => '',
-        'log'   => '',
-        'nav1'  => '',
-        'head'  => 'Plugins',
-        'main'  => 'Error: missing page!',
-        'foot'  => 'Copyright (C) 2015 Mark Constable (AGPL-3.0)',
-    ],
-    $nav1 = [
-        ['Home', '?o=home'],
-        ['About', '?o=about'],
-        ['Contact', '?o=contact'],
-    ];
-});
+<?php declare(strict_types=1);
+// Created: 20150101 - Updated: 20250206
+// Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Init
 {
@@ -305,3 +279,29 @@ function mailform(form) {
       </script>';
     }
 }
+
+echo new Init(new class
+{
+    public
+    $email = 'markc@renta.net',
+    $in = [
+        'l'     => '',      // Log (message)
+        'm'     => 'read',  // Method (action)
+        'o'     => 'home',  // Object (content)
+        'x'     => '',      // XHR (request)
+    ],
+    $out = [
+        'doc'   => 'SPE::03',
+        'css'   => '',
+        'log'   => '',
+        'nav1'  => '',
+        'head'  => 'Plugins',
+        'main'  => 'Error: missing page!',
+        'foot'  => 'Copyright (C) 2015 Mark Constable (AGPL-3.0)',
+    ],
+    $nav1 = [
+        ['Home', '?o=home'],
+        ['About', '?o=about'],
+        ['Contact', '?o=contact'],
+    ];
+});
