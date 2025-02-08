@@ -21,7 +21,7 @@ class Config
             'css'   => '',
             'log'   => '',
             'nav1'  => '',
-            'head'  => 'Plugin PHP Example',
+            'head'  => 'Plugins PHP Example',
             'main'  => 'Error: missing plugin!',
             'foot'  => 'Copyright (C) 2015-2025 Mark Constable (AGPL-3.0)',
             'js'    => '',
@@ -315,7 +315,7 @@ structure for further experimental development with both the framework
 design and some of the new features of PHP8.4.
                     </p>
                     <form method="post">
-                            <div class="d-flex flex-column flex-sm-row gap-2 mb-4">
+                        <div class="d-flex flex-column flex-sm-row gap-2 mb-4">
                             <button type="button" class="btn btn-success flex-fill" onclick="showToast(\'Everything is working great!\', \'success\');">Success Message</button>
                             <button type="button" class="btn btn-danger flex-fill" onclick="showToast(\'Something went wrong!\', \'danger\');">Danger Message</button>
                         </div>
