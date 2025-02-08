@@ -1,16 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 // Created: 20150101 - Updated: 20250206
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 echo new class {
     private const DEFAULT_PAGE = 'home';
-    
+
     private readonly array $nav;
 
     private array $out = [
         'doc'   => 'SPE::01',
         'nav'   => '',
-        'head'  => 'Simple PHP Example',
+        'head'  => 'Simplest PHP Example',
         'main'  => '<p>Error: missing page!</p>',
         'foot'  => 'Copyright © 2015-2025 Mark Constable (AGPL-3.0)',
     ];
@@ -22,14 +24,16 @@ echo new class {
             ['About', 'about'],
             ['Contact', 'contact']
         ];
-        
+
         $page = filter_var(trim($_REQUEST['m'] ?? '', '/'), FILTER_SANITIZE_URL);
         $method = empty($page) ? self::DEFAULT_PAGE : $page;
-        
+
         $this->out['main'] = method_exists($this, $method) ? $this->{$method}() : $this->out['main'];
-        
-        foreach ($this->out as $key => $value) {
-            if (method_exists($this, $key)) {
+
+        foreach ($this->out as $key => $value)
+        {
+            if (method_exists($this, $key))
+            {
                 $this->out[$key] = $this->{$key}();
             }
         }
@@ -40,7 +44,7 @@ echo new class {
         return $this->html();
     }
 
-    private function nav(): string 
+    private function nav(): string
     {
         $links = array_map(
             fn($n) => '            <li>
@@ -61,7 +65,9 @@ echo new class {
     {
         return '
         <header>
-            <h1>' . $this->out['head'] . '</h1>' . $this->out['nav'] . '
+            <h1>
+                <a href="../" title="Back to parent directory">« ' . $this->out['head'] . '</a>
+            </h1>' . $this->out['nav'] . '
         </header>';
     }
 
@@ -85,17 +91,24 @@ echo new class {
         </footer>';
     }
 
-    private function html(): string 
+    private function html(): string
     {
         return '<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="Content-Security-Policy" content="default-src \'self\'; style-src \'self\' \'unsafe-inline\'">
+        <meta name="color-scheme" content="light dark">
+        <title>' . $this->out['doc'] . '</title>
         <meta name="description" content="Simple PHP Example">
         <meta name="author" content="Mark Constable">
-        <title>' . $this->out['doc'] . '</title>
         <link rel="icon" href="favicon.ico">
+        <style>
+            a {
+                text-decoration: none;
+            }
+        </style>
     </head>
     <body>' . $this->out['head'] . $this->out['main'] . $this->out['foot'] . '
     </body>

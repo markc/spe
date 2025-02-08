@@ -1,7 +1,7 @@
 <?php
 // about.php 20151015 (C) 2015 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-return '
+return <<<EOT
       <h2>About</h2>
       <p>
 This is an example of a simple PHP7 "framework" to provide the core
@@ -9,10 +9,9 @@ structure for further experimental development with both the framework
 design and some of the new features of PHP7.
       </p>
       <form method="post">
-        <p>'.$t->button('Success', 'submit', 'success', 'l', 'success:Howdy, all is okay.')
-            .$t->button('Danger', 'submit', 'danger', 'l', 'danger:Houston, we have a problem.')
-            .$t->button('API Debug', 'button', 'default', '', '', ' onclick="ajax()"').'
-        </p>
+        <p>{$t->button('Success', 'submit', 'success', 'l', 'success:Howdy, all is okay.')}
+{$t->button('Danger', 'submit', 'danger', 'l', 'danger:Houston, we have a problem.')}
+{$t->button('API Debug', 'button', 'default', '', '', ' onclick="ajax()"')}</p>
       </form>
       <pre id="dbg"></pre>
       <script>
@@ -27,11 +26,12 @@ function ajax() {
           .replace(/</g,"&lt;")
           .replace(/>/g,"&gt;")
           .replace(/\\\n/g,"\n")
-          .replace(/\\\/g,"");
+          .replace(/\\/g,"");
     }}
     x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     x.send("o=home&x=main");
     return false;
   }
 }
-      </script>';
+      </script>
+EOT;

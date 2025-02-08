@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 // Created: 20150101 - Updated: 20250206
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
@@ -14,7 +16,7 @@ echo new class {
         'doc'   => 'SPE::02',
         'css'   => '',
         'nav'   => '',
-        'head'  => 'Styled PHP Example',
+        'head'  => '« Styled PHP Example',
         'main'  => 'Error: missing page!',
         'foot'  => 'Copyright © 2025 Mark Constable (AGPL-3.0)',
         'js'    => ''
@@ -28,18 +30,21 @@ echo new class {
 
     public function __construct()
     {
-        foreach ($this->in as $key => $default) {
+        foreach ($this->in as $key => $default)
+        {
             $this->in[$key] = filter_var(
                 trim($_REQUEST[$key] ?? $default, '/'),
                 FILTER_SANITIZE_URL
             ) ?: $default;
         }
-        
-        if (method_exists($this, $this->in['m'])) {
+
+        if (method_exists($this, $this->in['m']))
+        {
             $this->out['main'] = $this->{$this->in['m']}();
         }
 
-        foreach ($this->out as $k => $v) {
+        foreach ($this->out as $k => $v)
+        {
             $this->out[$k] = method_exists($this, $k) ? $this->{$k}() : $v;
         }
     }
@@ -63,7 +68,7 @@ echo new class {
         <link rel="icon" href="favicon.ico">
         <title>' . $doc . '</title>' . $css . '
     </head>
-    <body>' . $head . $main . $foot . $js .'
+    <body>' . $head . $main . $foot . $js . '
     </body>
 </html>
 ';
@@ -77,14 +82,15 @@ echo new class {
 
     private function nav(): string
     {
-        $a = join('', array_map(function ($n) {
+        $a = join('', array_map(function ($n)
+        {
             $url = str_starts_with($n[1], 'http') ? $n[1] : "?m=$n[1]";
             $c = $this->in['m'] === $n[1] ? ' active" aria-current="page"' : '"';
             return '
                         <li class="nav-item">
                             <a class="nav-link' . $c . ' href="' . $url . '">' . $n[0] . '</a>
                         </li>';
-                }, $this->nav));
+        }, $this->nav));
 
         return '
         <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
