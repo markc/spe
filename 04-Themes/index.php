@@ -6,15 +6,12 @@ declare(strict_types=1);
 
 define('DBG', true);
 
-class Config
+// Dynamic writable global context/state properties
+class Ctx
 {
     public function __construct(
-        public string $str = '',    // Global string buffer
+        public string $buf = '',    // Global string buffer
         public array $ary = [],     // Plugin CRUDL return array
-        public array $cfg = [       // Misc config properties
-            'email' => 'markc@renta.net',
-            'self'  => '/',
-        ],
         public array $in = [        // Input URI variables
             'l' => '',              // Log (alert)
             'm' => 'read',          // Method (action)
@@ -33,6 +30,18 @@ class Config
             'foot'  => 'Copyright (C) 2015-2025 Mark Constable (AGPL-3.0)',
             'js'    => '',
         ],
+    )
+    {
+        Util::elog(__METHOD__);
+    }
+}
+
+// Static read-only global config properties
+readonly class Cfg
+{
+    public function __construct(
+        public string $email = 'markc@renta.net',
+        public string $self  = '',
         public array $nav1 = [
             ['Home',        '?o=home'],
             ['About',       '?o=about'],
@@ -52,138 +61,159 @@ class Config
 readonly class Init
 {
     public function __construct(
-        private Config $config
+        private Cfg $cfg,
+        private Ctx $ctx
     )
     {
         Util::elog(__METHOD__);
 
-        $this->config->cfg['self'] = str_replace('index.php', '', $_SERVER['PHP_SELF']);
-
         // Process input parameters
-        foreach ($this->config->in as $k => $v)
+        foreach ($this->ctx->in as $k => $v)
         {
-            $this->config->in[$k] = $_REQUEST[$k] ?? $v;
+            $this->ctx->in[$k] = $_REQUEST[$k] ?? $v;
             if (isset($_REQUEST[$k]))
             {
-                $this->config->in[$k] = htmlentities(trim($_REQUEST[$k]));
+                $this->ctx->in[$k] = htmlentities(trim($_REQUEST[$k]));
             }
         }
 
-        // Handle plugin execution (o=plugin object/class, m=action method)
-        $object = $this->config->in['o'];
-        $method = $this->config->in['m'];
+        // Handle plugin execution
+        $o = $this->ctx->in['o']; // o=plugin object/class
+        $m = $this->ctx->in['m']; // m=action method
 
-        $this->config->out['main'] = match (true)
+        match (true)
         {
-            !class_exists($object) => "Error: no plugin object!",
-            !method_exists($object, $method) => "Error: no plugin method!",
-            default => (new $object($this->config))->$method()
+            !class_exists($o) => $this->ctx->out['main'] = "Error: no plugin object!",
+            !method_exists($o, $m) => $this->ctx->out['main'] = "Error: no plugin method!",
+            default => (new $o($this->cfg, $this->ctx))->$m()
         };
 
-        if ($this->config->in['x'])
+        // Set main content from plugin array data if available
+        if (!empty($this->ctx->ary['content']))
         {
-            $xhr = $this->config->out[$this->config->in['x']] ?? '';
+            $this->ctx->out['main'] = $this->ctx->ary['content'];
+        }
+
+        if ($this->ctx->in['x'])
+        {
+            $xhr = $this->ctx->out[$this->ctx->in['x']] ?? '';
             if ($xhr) return $xhr;
             header('Content-Type: application/json');
-            return json_encode($this->config->out, JSON_PRETTY_PRINT);
+            return json_encode($this->ctx->out, JSON_PRETTY_PRINT);
         }
 
         // Dynamically select the theme based on the 't' parameter
-        $themeClass = match ($this->config->in['t'])
+        $t = match ($this->ctx->in['t'])
         {
             'TopNavTheme' => TopNavTheme::class,
             'SideBarTheme' => SideBarTheme::class,
-            default => SimpleTheme::class, // Use SimpleTheme as default instead of abstract Theme
+            default => SimpleTheme::class,
         };
 
-        $theme = new $themeClass($this->config);
+        $theme = new $t($this->cfg, $this->ctx);
 
-        foreach ($this->config->out as $k => $v)
+        foreach ($this->ctx->out as $k => $v)
         {
             if (method_exists($theme, $k))
             {
-                $this->config->out[$k] = $theme->$k();
+                $this->ctx->out[$k] = $theme->$k();
             }
         }
 
-        Util::elog(__METHOD__ . ' ' . var_export($this->config->out, true));
+        //Util::elog(__METHOD__ . ' ' . var_export($this->ctx->out, true));
 
-        $this->config->str = $theme->html();
+        $this->ctx->buf = $theme->html();
     }
 
     public function __toString(): string
     {
         Util::elog(__METHOD__);
 
-        return $this->config->str;
+        return $this->ctx->buf;
     }
 }
 
+// Base Plugin class with CRUDL methods
 abstract class Plugin
 {
-    protected string $buf = '';
-
     public function __construct(
-        protected readonly Config $config
+        protected Cfg $cfg,
+        protected Ctx $ctx
     )
     {
         Util::elog(__METHOD__);
     }
 
-    public function __toString(): string
+    public function create(): void
     {
         Util::elog(__METHOD__);
 
-        return $this->buf;
+        $this->ctx->ary = [
+            'status' => 'Success',
+            'content' => "Plugin::create() not implemented yet!"
+        ];
     }
 
-    abstract public function read(): string;
-
-    public function create(): string
+    public function read(): void
     {
         Util::elog(__METHOD__);
 
-        return "Plugin::create() not implemented yet!";
+        $this->ctx->ary = [
+            'status' => 'Success',
+            'content' => "Plugin::read() not implemented yet!"
+        ];
     }
 
-    public function update(): string
+    public function update(): void
     {
         Util::elog(__METHOD__);
 
-        return "Plugin::update() not implemented yet!";
+        $this->ctx->ary = [
+            'status' => 'Success',
+            'content' => "Plugin::update() not implemented yet!"
+        ];
     }
 
-    public function delete(): string
+    public function delete(): void
     {
         Util::elog(__METHOD__);
 
-        return "Plugin::delete() not implemented yet!";
+        $this->ctx->ary = [
+            'status' => 'Success',
+            'content' => "Plugin::delete() not implemented yet!"
+        ];
     }
 
-    public function list(): string
+    public function list(): void
     {
         Util::elog(__METHOD__);
 
-        return "Plugin::list() not implemented yet!";
+        $this->ctx->ary = [
+            'status' => 'Success',
+            'content' => "Plugin::list() not implemented yet!"
+        ];
     }
 }
 
 abstract class Theme
 {
-    protected Config $config;
+    protected Cfg $cfg;
+    protected Ctx $ctx;
 
-    public function __construct(Config $config)
+    public function __construct(Cfg $cfg, Ctx $ctx)
     {
-        $this->config = $config;
         Util::elog(__METHOD__);
+
+        $this->cfg = $cfg;
+        $this->ctx = $ctx;
     }
 
     public function __toString(): string
     {
         Util::elog(__METHOD__);
+
         return $this->html();
     }
-
 
     public function css(): string
     {
@@ -248,11 +278,10 @@ abstract class Theme
     public function log(): string
     {
         Util::elog(__METHOD__);
-        //Util::elog(__METHOD__ . ' ' . var_export($this->config, true));
 
-        if ($this->config->in['l'])
+        if ($this->ctx->in['l'])
         {
-            [$lvl, $msg] = explode(':', $this->config->in['l']);
+            [$lvl, $msg] = explode(':', $this->ctx->in['l']);
             $bgClass = $lvl === 'success' ? 'bg-success' : 'bg-danger';
             return '
         <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1500">
@@ -272,7 +301,8 @@ abstract class Theme
     {
         Util::elog(__METHOD__);
 
-        $o = '?o=' . $this->config->in['o'];
+        $o = '?o=' . $this->ctx->in['o'];
+
         $links = join('', array_map(function ($n) use ($o)
         {
             $url = str_starts_with($n[1], 'http') ? $n[1] : $n[1];
@@ -281,42 +311,12 @@ abstract class Theme
                         <li class="nav-item">
                             <a class="nav-link' . $c . '" href="' . $url . '"' . ($c ? ' aria-current="page"' : '') . '>' . $n[0] . '</a>
                         </li>';
-        }, $this->config->nav1));
+        }, $this->cfg->nav1));
 
         return '
         <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
             <div class="container">
-                <a class="navbar-brand" href="/">« ' . $this->config->out['head'] . '</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">' . $links . '</ul>
-                </div>
-            </div>
-        </nav>';
-    }
-
-
-    public function nav2(): string
-    {
-        Util::elog(__METHOD__);
-
-        $o = '?o=' . $this->config->in['o'];
-        $links = join('', array_map(function ($n) use ($o)
-        {
-            $url = str_starts_with($n[1], 'http') ? $n[1] : $n[1];
-            $c = $o === $url ? ' active' : '';
-            return '
-                        <li class="nav-item">
-                            <a class="nav-link' . $c . '" href="' . $url . '"' . ($c ? ' aria-current="page"' : '') . '>' . $n[0] . '</a>
-                        </li>';
-        }, $this->config->nav2));
-
-        return '
-        <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-            <div class="container">
-                <a class="navbar-brand" href="/">« ' . $this->config->out['head'] . '</a>
+                <a class="navbar-brand" href="/">« ' . $this->ctx->out['head'] . '</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -331,7 +331,7 @@ abstract class Theme
     {
         Util::elog(__METHOD__);
 
-        return $this->config->out['nav2'];
+        return $this->ctx->out['nav1'];
     }
 
     public function main(): string
@@ -339,7 +339,7 @@ abstract class Theme
         Util::elog(__METHOD__);
 
         return '
-        <main class="container py-4">' . $this->config->out['main'] . '</main>';
+        <main class="container py-4">' . $this->ctx->out['main'] . '</main>';
     }
 
     public function foot(): string
@@ -349,7 +349,7 @@ abstract class Theme
         return '
         <footer class="bg-light text-center py-3 mt-auto">
             <div class="container">
-                <p class="text-muted mb-0"><small>' . $this->config->out['foot'] . '</small></p>
+                <p class="text-muted mb-0"><small>' . $this->ctx->out['foot'] . '</small></p>
             </div>
         </footer>';
     }
@@ -358,7 +358,7 @@ abstract class Theme
     {
         Util::elog(__METHOD__);
 
-        extract($this->config->out, EXTR_SKIP);
+        extract($this->ctx->out, EXTR_SKIP);
         return '<!DOCTYPE html>
 <html lang="en">
     <head>
@@ -412,15 +412,17 @@ abstract class Theme
 
 final class Home extends Plugin
 {
-    public function read(): string
+    public function read(): void
     {
         Util::elog(__METHOD__);
 
-        return '
+        $this->ctx->ary = [
+            'status' => 'Success',
+            'content' => '
             <div class="px-4 py-5 bg-light rounded-3 border">
                 <div class="row d-flex justify-content-center">
                 <div class="col-lg-8 col-md-10 col-sm-12">
-                    <h1 class="display-5 fw-bold text-center">' . $this->config->out['head'] . '</h1>
+                    <h1 class="display-5 fw-bold text-center">' . $this->ctx->out['head'] . '</h1>
                     <p class="lead mb-4">
 This is an example of a simple PHP8.4 "framework" to provide the core
 structure for further experimental development with both the framework
@@ -435,125 +437,78 @@ design and some of the new features of PHP8.4.
                     <pre id="dbg" class="text-start overflow-auto"></pre>
                 </div>
                 </div>
-            </div>';
+            </div>'
+        ];
     }
 }
 
 final class About extends Plugin
 {
-    public function read(): string
+    public function read(): void
     {
         Util::elog(__METHOD__);
 
-        return '<h1 class="text-center">This is the About page</h1>';
+        $this->ctx->ary = [
+            'status' => 'Success',
+            'content' => '<h1 class="text-center">This is the About page</h1>'
+        ];
     }
 }
 
 final class Contact extends Plugin
 {
-    public function read(): string
+    public function read(): void
     {
         Util::elog(__METHOD__);
 
-        return '<h1 class="text-center">This is the Contact page</h1>';
+        $this->ctx->ary = [
+            'status' => 'Success',
+            'content' => '<h1 class="text-center">This is the Contact page</h1>'
+        ];
     }
 }
 
 class SimpleTheme extends Theme
 {
-    public function __construct(protected Config $config)
+    public function __construct(Cfg $cfg, Ctx $ctx)
     {
         Util::elog(__METHOD__);
 
-        parent::__construct($config);
-    }
-
-    public function html(): string
-    {
-        Util::elog(__METHOD__);
-
-        extract($this->config->out, EXTR_SKIP);
-        return '<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>SimpleTheme ' . $doc . '</title>' . $css . '
-  </head>
-  <body>' . $head . $main . $foot . $js . '
-  </body>
-</html>';
+        parent::__construct($cfg, $ctx);
     }
 }
 
 class TopNavTheme extends Theme
 {
-    public function __construct(protected Config $config)
+    public function __construct(Cfg $cfg, Ctx $ctx)
     {
         Util::elog(__METHOD__);
 
-        parent::__construct($config);
-    }
-
-    public function html(): string
-    {
-        Util::elog(__METHOD__);
-
-        extract($this->config->out, EXTR_SKIP);
-        return '<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>TopNavTheme ' . $doc . '</title>' . $css . '
-  </head>
-  <body>' . $nav1 . $head . $main . $foot . $js . '
-  </body>
-</html>';
+        parent::__construct($cfg, $ctx);
     }
 }
 
 class SideBarTheme extends Theme
 {
-    public function __construct(protected Config $config)
+    public function __construct(Cfg $cfg, Ctx $ctx)
     {
         Util::elog(__METHOD__);
 
-        parent::__construct($config);
+        parent::__construct($cfg, $ctx);
     }
-    /*
-    public function html(): string
-    {
-        Util::elog(__METHOD__);
-
-        extract($this->config->out, EXTR_SKIP);
-        return '<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Simple PHP Example with Plugins">
-        <meta name="author" content="Mark Constable">
-        <link rel="icon" href="favicon.ico">
-        <title>SideBarTheme ' . $doc . '</title>' . $css . '
-    </head>
-    <body class="d-flex flex-column min-vh-100">' . $nav2 . $head . $main . $foot . $js . '
-    </body>
-</html>';
-    }
-    */
 }
 
 final class Util
 {
-    public static function elog(string $content): void
+    public static function elog(string $msg): void
     {
         if (defined('DBG') && DBG)
         {
-            error_log($content);
+            error_log($msg);
         }
     }
 }
 
 // Bootstrap the application
-echo new Init(new Config());
+$self = str_replace('index.php', '', $_SERVER['PHP_SELF']);
+echo new Init(new Cfg(self: $self), new Ctx());
