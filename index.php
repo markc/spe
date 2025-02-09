@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-// Created: 20150101 - Updated: 20250208
+// Created: 20150101 - Updated: 20250209
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 echo new class
@@ -23,7 +23,7 @@ echo new class
             ['02-Styled',   '02-Styled'],
             ['03-Plugins',  '03-Plugins'],
             ['04-Themes',   '04-Themes'],
-            ['05-Autoload', '05-Autoload'],
+            ['05-Autoload', '05-Autoload/public'],
             ['06-Session',  '06-Session'],
             ['07-PDO',      '07-PDO'],
             ['08-Users',    '08-Users'],

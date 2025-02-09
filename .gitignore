@@ -1,1 +1,7 @@
-*/lib/.ht*
+.ht*
+*kate-swp
+.php-cs-fixer.cache
+composer.lock
+vendor/*
+public/php_error.log
+cache/*
