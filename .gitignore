@@ -1,8 +1,7 @@
 all.php
 .ht*
-*kate-swp
-.php-cs-fixer.cache
 composer.lock
 vendor/*
-public/php_error.log
+public/php_errors.log
 cache/*
+**/*.db

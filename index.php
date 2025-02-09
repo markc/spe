@@ -25,7 +25,7 @@ echo new class
             ['04-Themes',   '04-Themes'],
             ['05-Autoload', '05-Autoload/public'],
             ['06-Session',  '06-Session/public'],
-            ['07-PDO',      '07-PDO'],
+            ['07-PDO',      '07-PDO/public'],
             ['08-Users',    '08-Users'],
             ['09-Auth',     '09-Auth'],
             ['10-Files',    '10-Files'],
