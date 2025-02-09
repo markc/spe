@@ -4,11 +4,11 @@ declare(strict_types=1);
 // Created: 20150101 - Updated: 20250208
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-namespace SPE\Themes;
+namespace SPE\Session\Themes;
 
-use SPE\Core\Cfg;
-use SPE\Core\Ctx;
-use SPE\Core\Util;
+use SPE\Session\Core\Cfg;
+use SPE\Session\Core\Ctx;
+use SPE\Session\Core\Util;
 
 abstract class Base
 {
@@ -98,7 +98,7 @@ abstract class Base
         {
             [$lvl, $msg] = explode(':', $this->ctx->in['l']);
             $bgClass = $lvl === 'success' ? 'bg-success' : 'bg-danger';
-            $_SESSION['l'] = '';
+            isset($_SESSION['l']) && $_SESSION['l'] = '';
             return '
         <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1500">
             <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">

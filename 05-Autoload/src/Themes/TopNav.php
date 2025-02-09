@@ -1,14 +1,14 @@
 <?php
 
 declare(strict_types=1);
-// Created: 20150101 - Updated: 20250208
+// Created: 20150101 - Updated: 20250209
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-namespace SPE\Themes;
+namespace SPE\Autoload\Themes;
 
-use SPE\Core\Cfg;
-use SPE\Core\Ctx;
-use SPE\Core\Util;
+use SPE\Autoload\Core\Cfg;
+use SPE\Autoload\Core\Ctx;
+use SPE\Autoload\Core\Util;
 
 class TopNav extends Base
 {

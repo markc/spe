@@ -4,11 +4,11 @@ declare(strict_types=1);
 // Created: 20150101 - Updated: 20250208
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-namespace SPE\Themes;
+namespace SPE\Session\Themes;
 
-use SPE\Core\Cfg;
-use SPE\Core\Ctx;
-use SPE\Core\Util;
+use SPE\Session\Core\Cfg;
+use SPE\Session\Core\Ctx;
+use SPE\Session\Core\Util;
 
 class Simple extends Base
 {

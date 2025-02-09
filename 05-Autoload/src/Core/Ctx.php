@@ -4,7 +4,7 @@ declare(strict_types=1);
 // Created: 20150101 - Updated: 20250209
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-namespace SPE\Core;
+namespace SPE\Autoload\Core;
 
 // Dynamic writable global context/state properties
 class Ctx
@@ -20,7 +20,7 @@ class Ctx
             'x' => '',              // XHR (request)
         ],
         public array $out = [       // Theme Method partials
-            'doc'   => 'SPE::05',
+            'doc'   => 'SPE::05 Autoload',
             'css'   => '',
             'log'   => '',
             'nav1'  => '',

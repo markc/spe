@@ -7,9 +7,9 @@ declare(strict_types=1);
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 // Use namespaced classes
-use SPE\Core\Init;
-use SPE\Core\Cfg;
-use SPE\Core\Ctx;
+use SPE\Autoload\Core\Init;
+use SPE\Autoload\Core\Cfg;
+use SPE\Autoload\Core\Ctx;
 
 define('DBG', true);
 

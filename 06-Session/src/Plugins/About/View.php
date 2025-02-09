@@ -4,10 +4,10 @@ declare(strict_types=1);
 // Created: 20150101 - Updated: 20250209
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-namespace SPE\Plugins\About;
+namespace SPE\Session\Plugins\About;
 
-use SPE\Core\Util;
-use SPE\Themes\Base;
+use SPE\Session\Themes\Base;
+use SPE\Session\Core\Util;
 
 final class View extends Base
 {

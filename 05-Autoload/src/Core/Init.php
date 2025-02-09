@@ -4,11 +4,11 @@ declare(strict_types=1);
 // Created: 20150101 - Updated: 20250208
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-namespace SPE\Core;
+namespace SPE\Autoload\Core;
 
-use SPE\Themes\TopNav;
-use SPE\Themes\SideBar;
-use SPE\Themes\Simple;
+use SPE\Autoload\Themes\TopNav;
+use SPE\Autoload\Themes\SideBar;
+use SPE\Autoload\Themes\Simple;
 
 readonly class Init
 {
@@ -30,7 +30,7 @@ readonly class Init
         }
 
         // Handle plugin execution
-        $plugin = 'SPE\\Plugins\\' . $this->ctx->in['o'] . '\\Model'; // Full plugin class path
+        $plugin = 'SPE\\Autoload\\Plugins\\' . $this->ctx->in['o'] . '\\Model'; // Full plugin class path
 
         Util::elog(var_export($plugin, true));
 
