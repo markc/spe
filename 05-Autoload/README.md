@@ -2,12 +2,6 @@
 
 _Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)_
 
-I'll help you create a detailed `README.md` for your project based on the files you've shared. Here's a comprehensive overview:
-
-# Simple PHP Example (SPE)
-
-A lightweight PHP framework with plugin and theme support.
-
 ## Overview
 
 This is a modular PHP framework that demonstrates a plugin-based architecture with multiple themes. It includes:
