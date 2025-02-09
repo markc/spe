@@ -19,6 +19,20 @@ readonly class Init
     {
         Util::elog(__METHOD__);
 
+        if (session_status() !== PHP_SESSION_ACTIVE)
+        {
+            session_start();
+        }
+
+        Util::ses('GET=' . var_export($_GET, true));
+        Util::ses('POST=' . var_export($_POST, true));
+        Util::ses('SESSION=' . var_export($_SESSION, true));
+
+        // Store session values
+        Util::ses('o');
+        Util::ses('m');
+        Util::ses('l');
+
         // Process input parameters
         foreach ($this->ctx->in as $k => $v)
         {
@@ -87,11 +101,12 @@ readonly class Init
     public function __toString(): string
     {
         Util::elog(__METHOD__);
+        Util::elog('SESSION=' . var_export($_SESSION, true));
 
         return $this->ctx->buf;
     }
 
-    public function __destruct()
+    public function __destruct(): void
     {
         Util::elog(__METHOD__);
         Util::elog($_SERVER['REMOTE_ADDR'] . ' ' . round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']), 4));
