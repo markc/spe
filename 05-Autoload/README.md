@@ -141,4 +141,4 @@ To use the framework:
    - `/o=Contact`
 
 The framework will automatically load the appropriate theme and plugin based on the request parameters.
-```
+
