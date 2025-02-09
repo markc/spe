@@ -22,13 +22,12 @@ final class Util
 
         if (isset($_REQUEST[$k]))
         {
-            $_SESSION[$k] = is_array($_REQUEST[$k]) ? $_REQUEST[$k] : self::enc($_REQUEST[$k]);
+            $_SESSION[$k] = is_array($_REQUEST[$k]) ? $_REQUEST[$k] : trim($_REQUEST[$k]);
         }
         elseif (!isset($_SESSION[$k]))
         {
             $_SESSION[$k] = $x ?? $v;
         }
-
         return $_SESSION[$k];
     }
 

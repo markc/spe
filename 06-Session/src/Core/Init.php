@@ -19,28 +19,23 @@ readonly class Init
     {
         Util::elog(__METHOD__);
 
-        if (session_status() !== PHP_SESSION_ACTIVE)
+        // Handle session initialization before any output
+        if (session_status() === PHP_SESSION_NONE)
         {
             session_start();
         }
 
-        Util::ses('GET=' . var_export($_GET, true));
-        Util::ses('POST=' . var_export($_POST, true));
-        Util::ses('SESSION=' . var_export($_SESSION, true));
-
-        // Store session values
-        Util::ses('o');
-        Util::ses('m');
-        Util::ses('l');
+        // Store core session values
+        Util::ses('o', $this->ctx->in['o']);
+        Util::ses('m', $this->ctx->in['m']);
+        Util::ses('t', $this->ctx->in['t']);
 
         // Process input parameters
         foreach ($this->ctx->in as $k => $v)
         {
-            $this->ctx->in[$k] = $_REQUEST[$k] ?? $v;
-            if (isset($_REQUEST[$k]))
-            {
-                $this->ctx->in[$k] = htmlentities(trim($_REQUEST[$k]));
-            }
+            $this->ctx->in[$k] = isset($_REQUEST[$k])
+                ? htmlentities(trim($_REQUEST[$k]))
+                : $v;
         }
 
         // Handle plugin execution
@@ -101,14 +96,15 @@ readonly class Init
     public function __toString(): string
     {
         Util::elog(__METHOD__);
-        Util::elog('SESSION=' . var_export($_SESSION, true));
 
         return $this->ctx->buf;
     }
 
-    public function __destruct(): void
+    public function __destruct()
     {
-        Util::elog(__METHOD__);
-        Util::elog($_SERVER['REMOTE_ADDR'] . ' ' . round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']), 4));
+        //Util::elog(__METHOD__);
+
+        Util::elog(__METHOD__ . ' SESSION=' . var_export($_SESSION, true));
+        //Util::elog($_SERVER['REMOTE_ADDR'] . ' ' . round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']), 4));
     }
 }

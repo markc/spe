@@ -98,6 +98,7 @@ abstract class Base
         {
             [$lvl, $msg] = explode(':', $this->ctx->in['l']);
             $bgClass = $lvl === 'success' ? 'bg-success' : 'bg-danger';
+            $_SESSION['l'] = '';
             return '
         <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1500">
             <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">

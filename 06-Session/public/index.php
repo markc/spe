@@ -6,13 +6,10 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-// Use namespaced classes
 use SPE\Core\Init;
 use SPE\Core\Cfg;
 use SPE\Core\Ctx;
 
-// Define debug constant in global scope
 define('DBG', true);
 
-// Bootstrap the application
 echo new Init(new Cfg(), new Ctx());
