@@ -16,6 +16,28 @@ final class View extends Base
         return '<footer class="text-center">THE ALTERNATE NEWS FOOTER EXAMPLE</footer>';
     }
 
+    private function deleteModal(): string
+    {
+        return '
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete this news item?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-success" id="confirmDelete">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>';
+    }
+
     private function modalForm(array $data = []): string
     {
         $id = $data['id'] ?? '';
@@ -23,24 +45,30 @@ final class View extends Base
         $content = htmlspecialchars($data['content'] ?? '');
         $action = $id ? "?o=News&m=update&i=$id" : "?o=News&m=create";
         $heading = $id ? 'Edit News Item' : 'Create News Item';
+        $modalId = $id ? "editModal" : "createModal";
 
         return '
-        <div class="container py-4">
-            <div class="card shadow-sm mx-auto" style="max-width: 800px;">
-                <div class="card-body">
-                    <h2 class="card-title mb-4">' . $heading . '</h2>
-                    <form method="post" action="' . $action . '">
-                        <div class="mb-3">
-                            <label for="title" class="form-label">Title:</label>
-                            <input type="text" id="title" name="title" value="' . $title . '" required class="form-control">
+        <div class="modal fade" id="' . $modalId . '" tabindex="-1" aria-labelledby="' . $modalId . 'Label" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="' . $modalId . 'Label">' . $heading . '</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form class="news-form" method="post" action="' . $action . '">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Title:</label>
+                                <input type="text" id="title" name="title" value="' . $title . '" required class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label for="content" class="form-label">Content:</label>
+                                <textarea id="content" name="content" required class="form-control" rows="10">' . $content . '</textarea>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="content" class="form-label">Content:</label>
-                            <textarea id="content" name="content" required class="form-control" rows="10">' . $content . '</textarea>
-                        </div>
-                        <div class="d-flex gap-2">
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-primary">' . ($id ? 'Update' : 'Create') . '</button>
-                            <a href="?o=News" class="btn btn-secondary">Cancel</a>
                         </div>
                     </form>
                 </div>
@@ -48,13 +76,86 @@ final class View extends Base
         </div>';
     }
 
+    private function formScript(): string
+    {
+        return '
+        <script>
+        // Handle delete confirmation
+        document.addEventListener("DOMContentLoaded", function() {
+            const deleteModal = document.getElementById("deleteModal");
+            if (deleteModal) {
+                const confirmBtn = deleteModal.querySelector("#confirmDelete");
+                if (confirmBtn) {
+                    confirmBtn.addEventListener("click", function() {
+                        const postId = this.getAttribute("data-post-id");
+                        if (postId) {
+                            fetch("?o=News&m=delete&i=" + postId, {
+                                method: "POST"
+                            })
+                            .then(() => {
+                                showToast("News item deleted successfully", "success");
+                                setTimeout(() => {
+                                    window.location.href = "?o=News&m=list";
+                                }, 1000);
+                            })
+                            .catch(error => console.error("Error:", error));
+                        }
+                    });
+                }
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Handle all news forms
+            document.querySelectorAll(".news-form").forEach(form => {
+                form.addEventListener("submit", function(e) {
+                    e.preventDefault();
+                    fetch(this.action, {
+                        method: "POST",
+                        body: new FormData(this)
+                    })
+                    .then(response => response.text())
+                    .then(() => {
+                        // Find the parent modal and hide it
+                        const modalEl = this.closest(".modal");
+                        if (modalEl) {
+                            const modal = bootstrap.Modal.getInstance(modalEl);
+                            if (modal) modal.hide();
+                        }
+                        // Redirect back to news list
+                        // Show appropriate toast message based on form action
+                        const isUpdate = this.action.includes("m=update");
+                        showToast(
+                            isUpdate ? "News item updated successfully" : "News item created successfully",
+                            "success"
+                        );
+                        // Delay redirect to allow toast to show
+                        setTimeout(() => {
+                            window.location.href = "?o=News&m=list";
+                        }, 1000);
+                    })
+                    .catch(error => console.error("Error:", error));
+                });
+            });
+        });
+        </script>';
+    }
+
     public function create(): string
     {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST')
+        {
+            return ''; // Return empty for AJAX POST requests
+        }
         return $this->modalForm();
     }
 
     public function update(): string
     {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST')
+        {
+            return ''; // Return empty for AJAX POST requests
+        }
         return $this->modalForm($this->ctx->ary);
     }
 
@@ -88,7 +189,8 @@ final class View extends Base
                     </a>' : '') . '
                 </div>
             </form>
-            <a href="?o=News&m=create" class="btn btn-primary">Create New Article</a>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">Create New Article</button>
+            ' . $this->modalForm() . '
         </div>';
 
         // Display news items in a 3-column grid
@@ -165,7 +267,7 @@ final class View extends Base
             $html .= '</ul></nav>';
         }
 
-        $html .= '</div></div>';
+        $html .= '</div></div>' . $this->formScript();
         return $html;
     }
 
@@ -188,12 +290,24 @@ final class View extends Base
                         ' . Util::nlbr($content) . '
                     </div>
                     <div class="d-flex justify-content-between align-items-center pt-4 border-top">
-                        <a href="?o=News&m=list" class="btn btn-primary">Return to List</a>
-                        <small class="text-muted">Post ID: ' . $id . '</small>
-                        <a href="?o=News&m=update&i=' . $id . '" class="btn btn-primary">Edit Post</a>
+                        <div>
+                            <small class="text-muted">Post ID: ' . $id . '</small>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                                onclick="document.getElementById(\'confirmDelete\').setAttribute(\'data-post-id\', \'' . $id . '\')">
+                                Delete
+                            </button>
+                            <a href="?o=News&m=list" class="btn btn-secondary me-2">Cancel</a>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal">
+                                Edit
+                            </button>
+                        </div>
+                        ' . $this->modalForm(['id' => $id, 'title' => $title, 'content' => $content]) . '
+                        ' . $this->deleteModal() . '
                     </div>
                 </div>
             </article>
-        </div>';
+        </div>' . $this->formScript();
     }
 }
