@@ -103,8 +103,8 @@ general documentation for each project.
 [03-Plugins]:  https://github.com/markc/spe/tree/master/03-Plugins/README.md
 [04-Themes]:   https://github.com/markc/spe/tree/master/04-Themes/README.md
 [05-Autoload]: https://github.com/markc/spe/tree/master/05-Autoload/README.md
-[06-Session]: https://github.com/markc/spe/tree/master/06-Session/README.md
-[07-PDO]: https://github.com/markc/spe/tree/master/07-PDO/README.md
-[08-Users]: https://github.com/markc/spe/tree/master/08-Users/README.md
-[09-Auth]: https://github.com/markc/spe/tree/master/09-Auth/README.md
-[10-Files]: https://github.com/markc/spe/tree/master/10-Files/README.md
+[06-Session]:  https://github.com/markc/spe/tree/master/06-Session/README.md
+[07-PDO]:      https://github.com/markc/spe/tree/master/07-PDO/README.md
+[08-Users]:    https://github.com/markc/spe/tree/master/08-Users/README.md
+[09-Auth]:     https://github.com/markc/spe/tree/master/09-Auth/README.md
+[10-Files]:    https://github.com/markc/spe/tree/master/10-Files/README.md
