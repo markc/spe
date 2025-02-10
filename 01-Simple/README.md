@@ -1,4 +1,4 @@
-# SPE::01 Simple: The First Step in a PHP Micro-Framework
+# SPE::01 Simple - The First Step in a PHP Micro-Framework
 
 **2025-02-11** -- _Copyright (C) 2015-2025 Mark Constable (AGPL-3.0)_
 
@@ -259,7 +259,6 @@ Here's an optimized version of the script, along with explanations of the change
 <?php
 
 declare(strict_types=1);
-
 // Created: 20150101 - Updated: 20250206
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
@@ -403,11 +402,10 @@ This optimized version provides a significant performance boost by streamlining 
 Most of this README, and the optimized example code, is courtesy of Googles Gemini but
 it is also based on my own original input along with some tweaks from Claude 3.5 via
 the Cline extension for VScode (on linux). Claude did most of the work refactoring
-the original old PHP 7 example script to this current version, which is slightly smaller
-than Geminis optimized version, so I will stick to the current PHP 8.4 tested version.
-However, the optimized version has some valid points so I've included it here but in
-followup examples the added complexity of the `$this->out` to accumulate rendered page
-partials does make sense.
+the original old PHP 7 example script to this current version, which is only slightly larger than Geminis optimized version (140 lines vs 115 lines), so I will stick to the
+current PHP 8.4 tested version. However, the optimized version has some valid points so
+I've included it here but in followup examples the added complexity of the `$this->out`
+array to accumulate rendered page partials does make sense.
 
 ## License
 

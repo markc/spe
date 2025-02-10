@@ -1,16 +1,15 @@
 <?php
 
 declare(strict_types=1);
-// Created: 20150101 - Updated: 20250206
+// Created: 20150101 - Updated: 20250211
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-echo new class {
+echo new class
+{
     private const DEFAULT_PAGE = 'home';
-
     private readonly array $nav;
-
     private array $out = [
-        'doc'   => 'SPE::01',
+        'doc'   => 'SPE::01 Simple',
         'nav'   => '',
         'head'  => 'Simplest PHP Example',
         'main'  => '<p>Error: missing page!</p>',
