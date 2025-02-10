@@ -2,13 +2,28 @@
 
 _Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)_
 
-A very simple PHP8.4 "framework" that will be expanded to include more small
-project examples building on the first very lean foundation and incorporating
-additional functionality in each successive example. This is not a repository
-of all the attributes of PHP8+, there are already many other great projects
-and pages that provide excellent PHP8 guides, but rather a series of examples
-that are fully developed under PHP8.4 and taking advantage of any new PHP8.4
-constructs where it makes sense.
+This is a very simple PHP8.4 "framework" that will be expanded to include more
+small project examples building on the first very lean foundation and
+incorporating additional functionality in each successive example. This is not
+a repository of all the attributes of PHP8+, there are already many other great
+projects and pages that provide excellent PHP8 guides, but rather a series of
+examples that are fully developed under PHP8.4 and taking advantage of any new
+PHP8.4 constructs where it makes sense.
+
+## Quick Start
+
+This is the easiest way to display and develop this project...
+
+```bash
+    bash -c "$(curl -fsSL https://php.new/install/linux)"
+    [[ ! -d ~/Dev ]] && mkdir ~/Dev
+    cd ~/Dev
+    git clone https://github.com/markc/spe
+    cd spe
+    php -S localhost:8000 -t 01-Simple
+```
+
+## The Examples
 
 Each folder will contain a more comprehensive example of a working, and
 hopefully useful, sub-project with a README.md explaining each example. This
