@@ -24,15 +24,16 @@ final class Model extends Plugin
      * - perpage: Items per page for list pagination
      */
     private const REQUIRED_FIELDS = ['title', 'content'];
-    private const OPTIONAL_FIELDS = ['id', 'created', 'updated'];
-    private const DEFAULT_PER_PAGE = 10;
+    private const OPTIONAL_FIELDS = ['id', 'created', 'updated', 'author'];
+    private const DEFAULT_PER_PAGE = 5;
 
     private ?Db $dbh = null;
 
     public function __construct(Cfg $cfg, Ctx $ctx)
     {
         parent::__construct($cfg, $ctx);
-        Util::elog(__METHOD__ . ' ' . var_export($this, true));
+
+        Util::elog(__METHOD__ . ' this->ctx->in=' . var_export($this->ctx->in, true));
 
         if (is_null($this->dbh))
         {
@@ -67,10 +68,19 @@ final class Model extends Plugin
 
             $data['updated'] = date('Y-m-d H:i:s');
             $data['created'] = date('Y-m-d H:i:s');
+            $data['author'] = 'admin'; // Set default author
 
             $lid = $this->dbh->create('news', $data);
             Util::elog(__METHOD__ . ' ' . var_export($lid, true));
-            Util::ses('p', '', '1');
+
+            // After create, redirect to read view of the new article
+            Util::ses('m', 'read');
+            Util::ses('i', $lid);
+
+            // Perform redirect to clear request parameters
+            $baseUrl = dirname($_SERVER['PHP_SELF']);
+            header("Location: {$baseUrl}?o=News&m=read&i={$lid}");
+            exit();
         }
     }
 
@@ -95,6 +105,10 @@ final class Model extends Plugin
         {
             throw new \RuntimeException("Record not found: $id");
         }
+
+        // Set session variables for proper view handling
+        Util::ses('m', 'read');
+        Util::ses('i', $id);
     }
 
     public function update(): void
@@ -112,7 +126,18 @@ final class Model extends Plugin
             throw new \InvalidArgumentException("Invalid record ID format");
         }
 
-        if ($_POST)
+        // If not a POST request, fetch the current data for the form
+        if (!$_POST)
+        {
+            $this->ctx->ary = $this->dbh->read('news', '*', 'id = :id', ['id' => $id], QueryType::One);
+            if (!$this->ctx->ary)
+            {
+                throw new \RuntimeException("Record not found: $id");
+            }
+            return;
+        }
+
+        // Handle POST request for update
         {
             // Validate required fields
             foreach (self::REQUIRED_FIELDS as $field)
@@ -132,7 +157,14 @@ final class Model extends Plugin
             $data['updated'] = date('Y-m-d H:i:s');
 
             $this->dbh->update('news', $data, 'id = :id', ['id' => $id]);
-            Util::ses('p', '', '1');
+            // After update, redirect to read view of the updated article
+            Util::ses('m', 'read');
+            Util::ses('i', $id);
+
+            // Perform redirect to clear request parameters
+            $baseUrl = dirname($_SERVER['PHP_SELF']);
+            header("Location: {$baseUrl}?o=News&m=read&i={$id}");
+            exit();
         }
     }
 
@@ -160,7 +192,7 @@ final class Model extends Plugin
         Util::elog(__METHOD__);
 
         // Get pagination parameters
-        $page = filter_var($this->ctx->in['page'] ?? 1, FILTER_VALIDATE_INT) ?: 1;
+        $page = filter_var($this->ctx->in['p'] ?? 1, FILTER_VALIDATE_INT) ?: 1;
         $perPage = filter_var($this->ctx->in['perpage'] ?? self::DEFAULT_PER_PAGE, FILTER_VALIDATE_INT) ?: self::DEFAULT_PER_PAGE;
 
         // Calculate offset
@@ -179,10 +211,10 @@ final class Model extends Plugin
                 QueryType::All
             ),
             'pagination' => [
-                'page' => $page,
-                'perPage' => $perPage,
-                'total' => $total,
-                'pages' => ceil($total / $perPage)
+                'p'      => $page,
+                'perPage'   => $perPage,
+                'total'     => $total,
+                'pages'     => ceil($total / $perPage)
             ]
         ];
     }

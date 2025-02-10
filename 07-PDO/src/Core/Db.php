@@ -110,9 +110,6 @@ class Db extends PDO
 
 /* Usage examples
 
-use Db\Database;
-use Db\QueryType;
-
 $config = [
     'type' => 'mysql',
     'host' => 'localhost',
@@ -122,7 +119,7 @@ $config = [
     'pass' => 'password',
 ];
 
-$db = new Database($config);
+$db = new Db($config);
 
 // Create
 $db->create('users', [

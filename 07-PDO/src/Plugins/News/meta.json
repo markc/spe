@@ -1,6 +1,6 @@
 {
-    "name": "Home",
-    "icon": "bi bi-house",
-    "order": 1,
+    "name": "News",
+    "icon": "bi bi-newspaper",
+    "order": 3,
     "group": ""
 }

@@ -1,0 +1,17 @@
+[
+    [
+        "Home",
+        "?o=Home",
+        "bi bi-house"
+    ],
+    [
+        "About",
+        "?o=About",
+        "bi bi-house"
+    ],
+    [
+        "Contact",
+        "?o=Contact",
+        "bi bi-house"
+    ]
+]

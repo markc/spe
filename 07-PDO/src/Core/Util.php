@@ -37,4 +37,11 @@ final class Util
 
         return htmlentities(trim($v), ENT_QUOTES, 'UTF-8');
     }
+
+    public static function nlbr(string $text): string
+    {
+        self::elog(__METHOD__ . "({$text})");
+
+        return nl2br(htmlspecialchars($text, ENT_QUOTES, 'UTF-8'));
+    }
 }

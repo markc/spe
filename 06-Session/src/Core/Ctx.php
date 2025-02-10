@@ -12,6 +12,7 @@ class Ctx
     public function __construct(
         public string $buf = '',    // Global string buffer
         public array $ary = [],     // Plugin CRUDL return array
+        public array $nav = [],     // PluginNav array
         public array $in = [        // Input URI variables
             'l' => '',              // Log (alert)
             'm' => 'read',          // Method (action)

@@ -1,6 +1,6 @@
 {
     "name": "Contact",
-    "icon": "bi bi-house",
-    "order": 3,
+    "icon": "bi-person-rolodex",
+    "order": 4,
     "group": ""
 }

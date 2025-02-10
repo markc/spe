@@ -127,7 +127,7 @@ abstract class Base
                         <li class="nav-item">
                             <a class="nav-link' . $c . '" href="' . $url . '"' . ($c ? ' aria-current="page"' : '') . '>' . $n[0] . '</a>
                         </li>';
-        }, $this->cfg->nav1));
+        }, $this->ctx->nav));
 
         return '
         <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">

@@ -25,8 +25,13 @@ readonly class Init
             session_start();
         }
 
-        // Store core session values
-        Util::ses('o', $this->ctx->in['o']);
+        // Initialize plugin navigation
+        $this->ctx->nav = (new PluginNav(__DIR__ . '/../Plugins'))->scanPlugins();
+
+        //Util::elog(__METHOD__ . ' this->ctx->nav=' . var_export($this->ctx->nav, true));
+
+        // Store core session values, using session override for 'o'
+        $this->ctx->in['o'] = Util::ses('o', $this->ctx->in['o'], $_SESSION['o'] ?? null);
         Util::ses('m', $this->ctx->in['m']);
         Util::ses('t', $this->ctx->in['t']);
 

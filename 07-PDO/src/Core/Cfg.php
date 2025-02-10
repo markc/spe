@@ -13,10 +13,10 @@ readonly class Cfg
         public string $email = 'markc@renta.net',
         public string $self  = '/',
         public array $nav1 = [
-            ['Home',        '?o=Home'],
-            ['About',       '?o=About'],
-            ['News',        '?o=News'],
-            ['Contact',     '?o=Contact'],
+            ['Home',        '?o=Home',      'bi-home'],
+            ['About',       '?o=About',     'bi-question-circle'],
+            ['News',        '?o=News',      'bi-newspaper'],
+            ['Contact',     '?o=Contact',   'bi-person-rolodex'],
         ],
         public array $nav2 = [
             ['Simple',      '?t=Simple'],

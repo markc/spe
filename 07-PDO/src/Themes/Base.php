@@ -36,6 +36,7 @@ abstract class Base
 
         return '
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
         <style>
             body { padding-top: 4.5rem; }
         </style>';
@@ -123,11 +124,12 @@ abstract class Base
         {
             $url = str_starts_with($n[1], 'http') ? $n[1] : $n[1];
             $c = $o === $url ? ' active' : '';
+            $icon = isset($n[2]) ? '<i class="' . $n[2] . ' me-1"></i>' : '';
             return '
                         <li class="nav-item">
-                            <a class="nav-link' . $c . '" href="' . $url . '"' . ($c ? ' aria-current="page"' : '') . '>' . $n[0] . '</a>
+                            <a class="nav-link' . $c . '" href="' . $url . '"' . ($c ? ' aria-current="page"' : '') . '>' . $icon . $n[0] . '</a>
                         </li>';
-        }, $this->cfg->nav1));
+        }, $this->ctx->nav));
 
         return '
         <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
@@ -176,7 +178,7 @@ abstract class Base
 
     public function html(): string
     {
-        Util::elog(__METHOD__);
+        Util::elog(__METHOD__) . ' ' . var_export($this->ctx->out, true);
 
         extract($this->ctx->out, EXTR_SKIP);
         return '<!DOCTYPE html>
