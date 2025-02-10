@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-// Created: 20150101 - Updated: 20250209
+// Created: 20150101 - Updated: 20250210
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 namespace SPE\PDO\Plugins\News;
@@ -25,7 +25,7 @@ final class Model extends Plugin
      */
     private const REQUIRED_FIELDS = ['title', 'content'];
     private const OPTIONAL_FIELDS = ['id', 'created', 'updated', 'author'];
-    private const DEFAULT_PER_PAGE = 5;
+    private const DEFAULT_PER_PAGE = 6;
 
     private ?Db $dbh = null;
 
@@ -33,7 +33,7 @@ final class Model extends Plugin
     {
         parent::__construct($cfg, $ctx);
 
-        Util::elog(__METHOD__ . ' this->ctx->in=' . var_export($this->ctx->in, true));
+        Util::elog(__METHOD__);
 
         if (is_null($this->dbh))
         {
@@ -198,16 +198,31 @@ final class Model extends Plugin
         // Calculate offset
         $offset = ($page - 1) * $perPage;
 
+        // Handle search query from $_GET since it's not in ctx->in
+        $searchQuery = trim($_GET['q'] ?? '');
+        $where = '1=1';
+        $params = [];
+
+        if ($searchQuery !== '')
+        {
+            $where = '(title LIKE :search OR content LIKE :search)';
+            $params['search'] = '%' . $searchQuery . '%';
+        }
+
         // Get total count for pagination
-        $total = $this->dbh->read('news', 'COUNT(*)', '1=1', [], QueryType::Column);
+        $total = $this->dbh->read('news', 'COUNT(*)', $where, $params, QueryType::Column);
+
+        // Add pagination parameters
+        $params['limit'] = $perPage;
+        $params['offset'] = $offset;
 
         // Get paginated results
         $this->ctx->ary = [
             'items' => $this->dbh->read(
                 'news',
                 '*',
-                '1=1 ORDER BY updated DESC, created DESC LIMIT :limit OFFSET :offset',
-                ['limit' => $perPage, 'offset' => $offset],
+                $where . ' ORDER BY updated DESC, created DESC LIMIT :limit OFFSET :offset',
+                $params,
                 QueryType::All
             ),
             'pagination' => [
