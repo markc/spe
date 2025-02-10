@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-// Created: 20150101 - Updated: 20250209
+// Created: 20150101 - Updated: 20250210
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 namespace SPE\PDO\Plugins\Contact;
@@ -11,7 +11,7 @@ use SPE\PDO\Core\Util;
 
 final class View extends Base
 {
-    public function read(): string
+    public function list(): string
     {
         Util::elog(__METHOD__);
 
