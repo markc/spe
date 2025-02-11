@@ -27,7 +27,7 @@ echo new class
             ['06-Session',  '06-Session/public'],
             ['07-PDO',      '07-PDO/public'],
             ['08-Users',    '08-Users/public'],
-            ['09-Auth',     '09-Auth/'],
+            ['09-Auth',     '09-Auth/public'],
             ['10-Files',    '10-Files/'],
         ];
     }
