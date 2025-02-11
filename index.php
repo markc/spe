@@ -26,9 +26,9 @@ echo new class
             ['05-Autoload', '05-Autoload/public'],
             ['06-Session',  '06-Session/public'],
             ['07-PDO',      '07-PDO/public'],
-            ['08-Users',    '08-Users'],
-            ['09-Auth',     '09-Auth'],
-            ['10-Files',    '10-Files'],
+            ['08-Users',    '08-Users/public'],
+            ['09-Auth',     '09-Auth/'],
+            ['10-Files',    '10-Files/'],
         ];
     }
 

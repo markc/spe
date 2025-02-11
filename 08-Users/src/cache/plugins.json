@@ -1,0 +1,27 @@
+[
+    [
+        "Home",
+        "?o=Home",
+        "bi bi-house-door"
+    ],
+    [
+        "About",
+        "?o=About",
+        "bi-question-circle"
+    ],
+    [
+        "News",
+        "?o=News",
+        "bi bi-newspaper"
+    ],
+    [
+        "Users",
+        "?o=Users",
+        "bi bi-people"
+    ],
+    [
+        "Contact",
+        "?o=Contact",
+        "bi-person-rolodex"
+    ]
+]
