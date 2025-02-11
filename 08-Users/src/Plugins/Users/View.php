@@ -214,12 +214,71 @@ final class View extends Base
 
         $html = '<div class="container py-4">';
 
-        // Add Create New button
+        // Add Create New button and search
         $html .= '
-        <div class="d-flex justify-content-end mb-4">
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">Create New User</button>
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+            <button type="button" class="btn btn-primary w-100 w-sm-auto" style="max-width: 200px;" data-bs-toggle="modal" data-bs-target="#createModal">Create New User</button>
+            <div class="d-flex align-items-center gap-2 w-100" style="max-width: 400px;">
+                <input type="text" id="userSearch" class="form-control form-control-sm" placeholder="Search...">
+                <select id="entriesPerPage" class="form-select form-select-sm" style="width: auto;">
+                    <option value="5">5 entries</option>
+                    <option value="10" selected>10 entries</option>
+                    <option value="25">25 entries</option>
+                    <option value="50">50 entries</option>
+                    <option value="100">100 entries</option>
+                </select>
+            </div>
             ' . $this->modalForm() . '
         </div>';
+
+        // Add search and entries per page functionality script
+        $html .= '
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchInput = document.getElementById("userSearch");
+            const entriesSelect = document.getElementById("entriesPerPage");
+            const table = document.querySelector("table");
+            const rows = table.querySelectorAll("tbody tr");
+            
+            // Initialize entries per page from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentEntries = urlParams.get("perpage") || "10";
+            entriesSelect.value = currentEntries;
+            
+            searchInput.addEventListener("keyup", function() {
+                const searchText = this.value.toLowerCase();
+                
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchText) ? "" : "none";
+                });
+            });
+
+            entriesSelect.addEventListener("change", function() {
+                const entries = this.value;
+                const url = new URL(window.location.href);
+                const currentParams = new URLSearchParams(window.location.search);
+                
+                // Preserve only sort parameters
+                const sort = currentParams.get("sort");
+                const dir = currentParams.get("dir");
+                if (sort) url.searchParams.set("sort", sort);
+                if (dir) url.searchParams.set("dir", dir);
+                
+                url.searchParams.set("perpage", entries);
+                // Only reset page if entries per page is changed to a smaller number
+                const currentEntries = parseInt(currentParams.get("perpage") || "10");
+                const newEntries = parseInt(entries);
+                if (newEntries < currentEntries) {
+                    url.searchParams.delete("p"); // Reset to first page when showing fewer entries
+                } else {
+                    const currentPage = currentParams.get("p");
+                    if (currentPage) url.searchParams.set("p", currentPage);
+                }
+                window.location.href = url.toString();
+            });
+        });
+        </script>';
 
         // Display users table with mobile-friendly scrolling
         $html .= '
@@ -228,15 +287,16 @@ final class View extends Base
                 <thead>
                     <tr>';
 
-        // Get current sort parameters
+        // Get current parameters
         $currentSort = $_GET['sort'] ?? 'updated';
         $currentDir = strtoupper($_GET['dir'] ?? 'DESC');
+        $currentPerPage = $_GET['perpage'] ?? $pagination['perPage'];
 
         // Helper function to generate sort URL
-        $getSortUrl = function ($field) use ($currentSort, $currentDir)
+        $getSortUrl = function ($field) use ($currentSort, $currentDir, $currentPerPage)
         {
             $newDir = ($field === $currentSort && $currentDir === 'ASC') ? 'DESC' : 'ASC';
-            return '?o=Users&m=list&sort=' . $field . '&dir=' . $newDir;
+            return '?o=Users&m=list&sort=' . $field . '&dir=' . $newDir . '&perpage=' . $currentPerPage;
         };
 
         // Helper function to get sort icon
@@ -255,10 +315,10 @@ final class View extends Base
         $columns = [
             'id' => 'ID',
             'login' => 'Login',
-            'fname' => 'First Name',
-            'lname' => 'Last Name',
-            'created' => 'Created',
-            'updated' => 'Updated'
+            'fname' => 'First&nbsp;Name',
+            'lname' => 'Last&nbsp;Name',
+            'created' => 'Created&nbsp;At',
+            'updated' => 'Updated&nbsp;At'
         ];
 
         // Generate sortable column headers
@@ -288,8 +348,8 @@ final class View extends Base
                     </td>
                     <td>' . htmlspecialchars($item['fname']) . '</td>
                     <td>' . htmlspecialchars($item['lname']) . '</td>
-                    <td>' . $item['created'] . '</td>
-                    <td>' . $item['updated'] . '</td>
+                    <td style="white-space: nowrap;">' . $item['created'] . '</td>
+                    <td style="white-space: nowrap;">' . $item['updated'] . '</td>
                     <td>
                         <button type="button" class="btn btn-link p-0 me-2" data-bs-toggle="modal" data-bs-target="#editModal' . $item['id'] . '">
                             <i class="bi bi-pencil-square text-primary" style="font-size: 1.2rem;"></i>
@@ -326,7 +386,7 @@ final class View extends Base
         {
             $currentPage = $pagination['p'];
             $totalPages = $pagination['pages'];
-            $recordsPerPage = 10;
+            $recordsPerPage = $pagination['perPage'];
             $startRecord = (($currentPage - 1) * $recordsPerPage) + 1;
             $endRecord = min($startRecord + $recordsPerPage - 1, $pagination['total']);
 
@@ -347,7 +407,7 @@ final class View extends Base
             // Previous button
             $prevDisabled = $currentPage <= 1 ? ' disabled' : '';
             $html .= '<li class="page-item' . $prevDisabled . '">
-                <a class="page-link" href="?o=Users&m=list&p=' . ($currentPage - 1) . '" tabindex="-1">Previous</a>
+                <a class="page-link" href="?o=Users&m=list&p=' . ($currentPage - 1) . '&perpage=' . $pagination['perPage'] . '&sort=' . $currentSort . '&dir=' . $currentDir . '" tabindex="-1">Previous</a>
             </li>';
 
             // Page numbers
@@ -355,14 +415,14 @@ final class View extends Base
             {
                 $active = $i === $currentPage ? ' active' : '';
                 $html .= '<li class="page-item' . $active . '">
-                    <a class="page-link" href="?o=Users&m=list&p=' . $i . '">' . $i . '</a>
+                    <a class="page-link" href="?o=Users&m=list&p=' . $i . '&perpage=' . $pagination['perPage'] . '&sort=' . $currentSort . '&dir=' . $currentDir . '">' . $i . '</a>
                 </li>';
             }
 
             // Next button
             $nextDisabled = $currentPage >= $totalPages ? ' disabled' : '';
             $html .= '<li class="page-item' . $nextDisabled . '">
-                <a class="page-link" href="?o=Users&m=list&p=' . ($currentPage + 1) . '">Next</a>
+                <a class="page-link" href="?o=Users&m=list&p=' . ($currentPage + 1) . '&perpage=' . $pagination['perPage'] . '&sort=' . $currentSort . '&dir=' . $currentDir . '">Next</a>
             </li>';
 
             $html .= '</ul></nav></div>';

@@ -220,10 +220,9 @@ final class Model extends Plugin
 
         // Get pagination parameters
         $page = filter_var($this->ctx->in['p'] ?? 1, FILTER_VALIDATE_INT) ?: 1;
-        // If perpage is explicitly set, use it, otherwise use a large number to show all
-        $perPage = isset($this->ctx->in['perpage'])
-            ? (filter_var($this->ctx->in['perpage'], FILTER_VALIDATE_INT) ?: self::DEFAULT_PER_PAGE)
-            : self::DEFAULT_PER_PAGE;
+        // Get perpage from URL if available
+        $perPage = filter_var($_GET['perpage'] ?? $this->ctx->in['perpage'] ?? self::DEFAULT_PER_PAGE, FILTER_VALIDATE_INT) ?: self::DEFAULT_PER_PAGE;
+        Util::elog(__METHOD__ . " perpage=$perPage");
 
         // Calculate offset
         $offset = ($page - 1) * $perPage;
@@ -242,25 +241,24 @@ final class Model extends Plugin
         // Get total count for pagination
         $total = $this->dbh->read('users', 'COUNT(*)', $where, $params, QueryType::Column);
 
-        // Add pagination parameters
-        $params['limit'] = $perPage;
-        $params['offset'] = $offset;
-
         // Handle sorting
         $sortField = $_GET['sort'] ?? 'updated';
         $sortDir = strtoupper($_GET['dir'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
         $validSortFields = ['id', 'login', 'fname', 'lname', 'created', 'updated'];
         $sortField = in_array($sortField, $validSortFields) ? $sortField : 'updated';
 
+        // Build the SQL query
+        $sql = $where . ' ORDER BY ' . $sortField . ' ' . $sortDir;
+
+        // Get all results first
+        $allResults = $this->dbh->read('users', '*', $sql, $params, QueryType::All);
+
+        // Then slice the results based on pagination
+        $paginatedResults = array_slice($allResults, $offset, $perPage);
+
         // Get paginated results
         $this->ctx->ary = [
-            'items' => $this->dbh->read(
-                'users',
-                '*',
-                $where . ' ORDER BY ' . $sortField . ' ' . $sortDir . ' LIMIT :limit OFFSET :offset',
-                $params,
-                QueryType::All
-            ),
+            'items' => $paginatedResults,
             'pagination' => [
                 'p'      => $page,
                 'perPage'   => $perPage,
