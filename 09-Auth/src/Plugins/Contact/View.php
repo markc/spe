@@ -6,10 +6,9 @@ declare(strict_types=1);
 
 namespace SPE\Auth\Plugins\Contact;
 
-use SPE\Auth\Themes\Base;
-use SPE\Auth\Core\Util;
+use SPE\Auth\Core\{Theme, Util};
 
-final class View extends Base
+final class View extends Theme
 {
     public function list(): string
     {

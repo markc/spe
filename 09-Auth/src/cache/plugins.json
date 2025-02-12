@@ -25,6 +25,11 @@
         "bi-person-rolodex"
     ],
     [
+        "Auth",
+        "?o=Auth",
+        "bi bi-people"
+    ],
+    [
         "Example2",
         "?o=Example",
         "bi bi-house"

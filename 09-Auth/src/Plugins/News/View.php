@@ -1,16 +1,19 @@
 <?php
 
 declare(strict_types=1);
-// Created: 20150101 - Updated: 20250208
+// Created: 20150101 - Updated: 20250212
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 namespace SPE\Auth\Plugins\News;
 
-use SPE\Auth\Core\Util;
-use SPE\Auth\Themes\Base;
+use SPE\Auth\Core\{Cfg, Ctx, Util};
 
-final class View extends Base
+class View
 {
+    public function __construct(private Cfg $cfg, private Ctx $ctx)
+    {
+    }
+
     public function foot(): string
     {
         return '<footer class="text-center">THE ALTERNATE NEWS FOOTER EXAMPLE</footer>';
@@ -40,10 +43,23 @@ final class View extends Base
 
     private function modalForm(array $data = []): string
     {
+        // Data from database needs to be decoded first, then re-encoded for form display
         $id = $data['id'] ?? '';
-        $title = htmlspecialchars($data['title'] ?? '');
-        $content = htmlspecialchars($data['content'] ?? '');
-        $action = $id ? "?o=News&m=update&i=$id" : "?o=News&m=create";
+        $title = $data['title'] ?? '';
+        $content = $data['content'] ?? '';
+
+        if ($id)
+        { // If editing existing content (from database)
+            $title = htmlspecialchars(html_entity_decode($title, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            $content = htmlspecialchars(html_entity_decode($content, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        }
+        else
+        { // If new content (from form)
+            $title = htmlspecialchars($title);
+            $content = htmlspecialchars($content);
+        }
+
+        $action = $id ? "?o=News&m=update&id=$id" : "?o=News&m=create";
         $heading = $id ? 'Edit News Item' : 'Create News Item';
         $modalId = $id ? "editModal" : "createModal";
 
@@ -89,7 +105,7 @@ final class View extends Base
                     confirmBtn.addEventListener("click", function() {
                         const postId = this.getAttribute("data-post-id");
                         if (postId) {
-                            fetch("?o=News&m=delete&i=" + postId, {
+                            fetch("?o=News&m=delete&id=" + postId, {
                                 method: "POST"
                             })
                             .then(() => {
@@ -163,7 +179,13 @@ final class View extends Base
     {
         Util::elog(__METHOD__);
 
-        extract($this->ctx->ary, EXTR_SKIP);
+        // Decode HTML entities in all array values before extraction
+        $decoded_ary = array_map(function ($val)
+        {
+            return is_string($val) ? html_entity_decode($val, ENT_QUOTES | ENT_HTML5, 'UTF-8') : $val;
+        }, $this->ctx->ary);
+
+        extract($decoded_ary, EXTR_SKIP);
 
         $html = '<div class="container py-4">';
 
@@ -197,22 +219,26 @@ final class View extends Base
         $html .= '<div class="row row-cols-1 row-cols-md-3 g-4">';
         foreach ($items as $item)
         {
+            // Decode database values for display
+            $decodedTitle = html_entity_decode($item['title'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $decodedContent = html_entity_decode($item['content'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
             $html .= '
             <div class="col">
                 <article class="card shadow-sm h-100">
                     <div class="card-body d-flex flex-column">
                         <h2 class="h5 card-title">
-                            <a href="?o=News&m=read&i=' . $item['id'] . '" class="text-decoration-none">' .
-                htmlspecialchars($item['title']) . '</a>
+                            <a href="?o=News&m=read&id=' . $item['id'] . '" class="text-decoration-none">' .
+                htmlspecialchars($decodedTitle) . '</a>
                         </h2>
                         <div class="text-muted small mb-3 d-flex flex-column">
                             <span>Published: ' . $item['created'] . '</span>
                             <span>Last updated: ' . $item['updated'] . '</span>
                         </div>
                         <div class="card-text mb-3 flex-grow-1">
-                            ' . substr(strip_tags($item['content']), 0, 150) . '...
+                            ' . substr(strip_tags($decodedContent), 0, 150) . '...
                         </div>
-                        <a href="?o=News&m=read&i=' . $item['id'] . '" class="btn btn-primary btn-sm">Read more</a>
+                        <a href="?o=News&m=read&id=' . $item['id'] . '" class="btn btn-primary btn-sm">Read more</a>
                     </div>
                 </article>
             </div>';
@@ -273,9 +299,16 @@ final class View extends Base
 
     public function read(): string
     {
-        Util::elog(__METHOD__ . ' ' . var_export($this->ctx->out['foot'], true));
+        Util::elog(__METHOD__);
 
-        extract($this->ctx->ary, EXTR_SKIP);
+        // Decode HTML entities in all array values before extraction
+        $decoded_ary = array_map(function ($val)
+        {
+            return is_string($val) ? html_entity_decode($val, ENT_QUOTES | ENT_HTML5, 'UTF-8') : $val;
+        }, $this->ctx->ary);
+
+        extract($decoded_ary, EXTR_SKIP);
+
         return '
         <div class="container py-4">
             <article class="card shadow-sm mx-auto" style="max-width: 800px;">

@@ -4,62 +4,49 @@ declare(strict_types=1);
 // Created: 20250201 - Updated: 20250212
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-namespace HCP\Plugins\Example;
+namespace SPE\Auth\Plugins\Example;
 
-use SPE\Auth\Core\Util;
+use SPE\Auth\Core\{Cfg, Ctx, Theme, Util};
 
+//class View extends Theme
 class View
 {
-    public function html(array $output = []): string
+    public function __construct(private Cfg $cfg, private Ctx $ctx)
     {
-        Util::elog(__METHOD__);
-        //Util::elog(var_export($output, true));
-        extract($output, EXTR_SKIP);
-
-        return '<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>' . $doc . '</title>' . $css . '
-    </head>
-    <body>' . $head . $log . $main . $foot . $js . '
-    </body>
-</html>
-';
+        //parent::__construct($cfg, $ctx);
     }
 
     // Plugin Actions Views
 
-    public function create(array $in = []): string
+    public function create(): string
     {
         Util::elog(__METHOD__);
 
         return __METHOD__;
     }
 
-    public function read(array $in = []): string
+    public function read(): string
     {
         Util::elog(__METHOD__);
 
         return __METHOD__;
     }
 
-    public function update(array $in = []): string
+    public function update(): string
     {
         Util::elog(__METHOD__);
 
         return __METHOD__;
     }
 
-    public function delete(array $in = []): string
+    public function delete(): string
     {
         Util::elog(__METHOD__);
 
         return __METHOD__;
     }
 
-    public function list(array $in = []): string
+    public function list(): string
     {
         Util::elog(__METHOD__);
 
@@ -68,14 +55,34 @@ class View
 
     // HTML Partial Views
 
-    public function doc(array $in = []): string
+    public function html(): string
+    {
+        Util::elog(__METHOD__);
+
+        extract($this->ctx->out, EXTR_SKIP);
+
+        return '<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>' . $doc . '</title>' . $css . '
+    </head>
+    <body>
+        <a href="?o=Home">Home</a>' . $head . $log . $main . $foot . $js . '
+    </body>
+</html>
+';
+    }
+
+    public function doc(): string
     {
         Util::elog(__METHOD__);
 
         return __METHOD__;
     }
 
-    public function css(array $in = []): string
+    public function css(): string
     {
         Util::elog(__METHOD__);
 
@@ -108,7 +115,7 @@ class View
         </style>';
     }
 
-    public function log(array $in = []): string
+    public function log(): string
     {
         Util::elog(__METHOD__);
 
@@ -119,28 +126,28 @@ class View
         </div>';
     }
 
-    public function nav1(array $in = []): string
+    public function nav1(): string
     {
         Util::elog(__METHOD__);
 
         return __METHOD__;
     }
 
-    public function nav2(array $in = []): string
+    public function nav2(): string
     {
         Util::elog(__METHOD__);
 
         return __METHOD__;
     }
 
-    public function nav3(array $in = []): string
+    public function nav3(): string
     {
         Util::elog(__METHOD__);
 
         return __METHOD__;
     }
 
-    public function head(array $in = []): string
+    public function head(): string
     {
         Util::elog(__METHOD__);
 
@@ -155,7 +162,7 @@ class View
         </header>';
     }
 
-    public function main(array $in = []): string
+    public function main(): string
     {
         Util::elog(__METHOD__);
 
@@ -166,7 +173,7 @@ class View
         </main>';
     }
 
-    public function foot(array $in = []): string
+    public function foot(): string
     {
         Util::elog(__METHOD__);
 
@@ -177,7 +184,7 @@ class View
         </footer>';
     }
 
-    public function js(array $in = []): string
+    public function js(): string
     {
         Util::elog(__METHOD__);
 

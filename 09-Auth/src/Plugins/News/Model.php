@@ -6,34 +6,40 @@ declare(strict_types=1);
 
 namespace SPE\Auth\Plugins\News;
 
-use SPE\Auth\Core\Plugin;
-use SPE\Auth\Core\Util;
-use SPE\Auth\Core\Db;
-use SPE\Auth\Core\QueryType;
-use SPE\Auth\Core\Cfg;
-use SPE\Auth\Core\Ctx;
+use SPE\Auth\Core\{Plugin, Util, Db, QueryType, Cfg, Ctx};
 
 final class Model extends Plugin
 {
     /**
      * Expected URI/Form Variables:
-     * - i: Record ID for read/update/delete operations
+     * - id: Record ID for read/update/delete operations
      * - title: News item title (create/update)
      * - content: News item content (create/update)
      * - page: Page number for list pagination
      * - perpage: Items per page for list pagination
      */
-    private const REQUIRED_FIELDS = ['title', 'content'];
-    private const OPTIONAL_FIELDS = ['id', 'created', 'updated', 'author'];
     private const DEFAULT_PER_PAGE = 6;
 
     private ?Db $dbh = null;
+    private array $in = [
+        'id' => 1,
+        'title' => null,
+        'content' => null,
+        'author' => null,
+        'created' => null,
+        'updated' => null
+    ];
 
     public function __construct(Cfg $cfg, Ctx $ctx)
     {
         parent::__construct($cfg, $ctx);
 
-        Util::elog(__METHOD__);
+        foreach (array_keys($this->in) as $key)
+        {
+            $this->in[$key] = isset($_REQUEST[$key])
+                ? htmlspecialchars($_REQUEST[$key], ENT_QUOTES | ENT_HTML5, 'UTF-8')
+                : null;
+        }
 
         if (is_null($this->dbh))
         {
@@ -51,35 +57,29 @@ final class Model extends Plugin
 
         if ($_POST)
         {
-            // Validate required fields
-            foreach (self::REQUIRED_FIELDS as $field)
+            if (empty($this->in['title']) || empty($this->in['content']))
             {
-                if (empty($this->ctx->in[$field]))
-                {
-                    throw new \InvalidArgumentException("Missing required field: $field");
-                }
+                throw new \InvalidArgumentException("Title and content are required");
             }
 
-            // Only include valid fields
-            $data = array_intersect_key(
-                $this->ctx->in,
-                array_flip(array_merge(self::REQUIRED_FIELDS, self::OPTIONAL_FIELDS))
-            );
+            // Input is already encoded by constructor, safe to store in database
+            $lid = $this->dbh->create('news', [
+                'title' => $this->in['title'],
+                'content' => $this->in['content'],
+                'updated' => date('Y-m-d H:i:s'),
+                'created' => date('Y-m-d H:i:s'),
+                'author' => 'admin'
+            ]);
 
-            $data['updated'] = date('Y-m-d H:i:s');
-            $data['created'] = date('Y-m-d H:i:s');
-            $data['author'] = 'admin'; // Set default author
-
-            $lid = $this->dbh->create('news', $data);
-            Util::elog(__METHOD__ . ' ' . var_export($lid, true));
+            Util::elog(__METHOD__ . ' lid=' . var_export($lid, true));
 
             // After create, redirect to read view of the new article
             Util::ses('m', 'read');
-            Util::ses('i', $lid);
+            Util::ses('id', $lid);
 
             // Perform redirect to clear request parameters
             $baseUrl = dirname($_SERVER['PHP_SELF']);
-            header("Location: {$baseUrl}?o=News&m=read&i={$lid}");
+            header("Location: {$baseUrl}?o=News&m=read&id={$lid}");
             exit();
         }
     }
@@ -88,39 +88,42 @@ final class Model extends Plugin
     {
         Util::elog(__METHOD__);
 
-        if (empty($this->ctx->in['i']))
+        if (empty($this->in['id']))
         {
-            throw new \InvalidArgumentException("Missing required parameter: i (record ID)");
+            throw new \InvalidArgumentException("Missing required parameter: id (record ID)");
         }
 
-        $id = filter_var($this->ctx->in['i'], FILTER_VALIDATE_INT);
+        $id = filter_var($this->in['id'], FILTER_VALIDATE_INT);
+        Util::elog(__METHOD__ . ' id=' . $id);
         if ($id === false)
         {
             throw new \InvalidArgumentException("Invalid record ID format");
         }
 
-        $this->ctx->ary = $this->dbh->read('news', '*', 'id = :id', ['id' => $id], QueryType::One);
+        $result = $this->dbh->read('news', '*', 'id = :id', ['id' => $id], QueryType::One);
 
-        if (!$this->ctx->ary)
+        if (!$result)
         {
             throw new \RuntimeException("Record not found: $id");
         }
 
+        $this->ctx->ary = $result;
+
         // Set session variables for proper view handling
         Util::ses('m', 'read');
-        Util::ses('i', $id);
+        Util::ses('id', $id);
     }
 
     public function update(): void
     {
         Util::elog(__METHOD__);
 
-        if (empty($this->ctx->in['i']))
+        if (empty($this->in['id']))
         {
-            throw new \InvalidArgumentException("Missing required parameter: i (record ID)");
+            throw new \InvalidArgumentException("Missing required parameter: id (record ID)");
         }
 
-        $id = filter_var($this->ctx->in['i'], FILTER_VALIDATE_INT);
+        $id = filter_var($this->in['id'], FILTER_VALIDATE_INT);
         if ($id === false)
         {
             throw new \InvalidArgumentException("Invalid record ID format");
@@ -140,30 +143,26 @@ final class Model extends Plugin
         // Handle POST request for update
         {
             // Validate required fields
-            foreach (self::REQUIRED_FIELDS as $field)
+            if (empty($this->in['title']) || empty($this->in['content']))
             {
-                if (empty($this->ctx->in[$field]))
-                {
-                    throw new \InvalidArgumentException("Missing required field: $field");
-                }
+                throw new \InvalidArgumentException("Title and content are required");
             }
 
-            // Only include valid fields
-            $data = array_intersect_key(
-                $this->ctx->in,
-                array_flip(array_merge(self::REQUIRED_FIELDS, self::OPTIONAL_FIELDS))
-            );
-
-            $data['updated'] = date('Y-m-d H:i:s');
+            // Input is already encoded by constructor, safe to store in database
+            $data = [
+                'title' => $this->in['title'],
+                'content' => $this->in['content'],
+                'updated' => date('Y-m-d H:i:s')
+            ];
 
             $this->dbh->update('news', $data, 'id = :id', ['id' => $id]);
             // After update, redirect to read view of the updated article
             Util::ses('m', 'read');
-            Util::ses('i', $id);
+            Util::ses('id', $id);
 
             // Perform redirect to clear request parameters
             $baseUrl = dirname($_SERVER['PHP_SELF']);
-            header("Location: {$baseUrl}?o=News&m=read&i={$id}");
+            header("Location: {$baseUrl}?o=News&m=read&id={$id}");
             exit();
         }
     }
@@ -172,19 +171,19 @@ final class Model extends Plugin
     {
         Util::elog(__METHOD__);
 
-        if (empty($this->ctx->in['i']))
+        if (empty($this->in['id']))
         {
-            throw new \InvalidArgumentException("Missing required parameter: i (record ID)");
+            throw new \InvalidArgumentException("Missing required parameter: id (record ID)");
         }
 
-        $id = filter_var($this->ctx->in['i'], FILTER_VALIDATE_INT);
+        $id = filter_var($this->in['id'], FILTER_VALIDATE_INT);
         if ($id === false)
         {
             throw new \InvalidArgumentException("Invalid record ID format");
         }
 
         $this->dbh->delete('news', 'id = :id', ['id' => $id]);
-        Util::ses('p', '', '1');
+        //Util::ses('p', '', '1');
     }
 
     public function list(): void
@@ -192,8 +191,8 @@ final class Model extends Plugin
         Util::elog(__METHOD__);
 
         // Get pagination parameters
-        $page = filter_var($this->ctx->in['p'] ?? 1, FILTER_VALIDATE_INT) ?: 1;
-        $perPage = filter_var($this->ctx->in['perpage'] ?? self::DEFAULT_PER_PAGE, FILTER_VALIDATE_INT) ?: self::DEFAULT_PER_PAGE;
+        $page = filter_var($this->in['p'] ?? 1, FILTER_VALIDATE_INT) ?: 1;
+        $perPage = filter_var($this->in['perpage'] ?? self::DEFAULT_PER_PAGE, FILTER_VALIDATE_INT) ?: self::DEFAULT_PER_PAGE;
 
         // Calculate offset
         $offset = ($page - 1) * $perPage;

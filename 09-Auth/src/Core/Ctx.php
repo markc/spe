@@ -10,16 +10,21 @@ namespace SPE\Auth\Core;
 class Ctx
 {
     public function __construct(
+        public string $email = 'markc@renta.net',
+        public string $admpw = 'admin123',
+        public string $self = '/',
         public string $buf = '',    // Global string buffer
         public array $ary = [],     // Plugin CRUDL return array
         public array $nav = [],     // PluginNav array
         public array $in = [        // Input URI variables
-            'i' => 1,               // Item/ID
+            'a' => '',              // API credentials
+            'c' => '',              // ??? Category
+            'g' => '',              // ??? Group
             'l' => '',              // Log (alert)
             'm' => 'list',          // Method (action)
             'o' => 'Home',          // Object (plugin)
             'p' => '1',             // Page (current)
-            't' => 'Simple',        // Theme (current)
+            't' => 'TopNav',        // Theme (current)
             'x' => '',              // XHR (request)
         ],
         public array $out = [       // Theme Method partials

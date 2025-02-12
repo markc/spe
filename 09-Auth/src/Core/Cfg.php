@@ -12,6 +12,8 @@ readonly class Cfg
     public function __construct(
         public string $email = 'markc@renta.net',
         public string $self  = '/',
+        public string $admpw = '',
+        public string $host  = '',
         public array $nav1 = [
             ['Home',        '?o=Home',      'bi-home'],
             ['About',       '?o=About',     'bi-question-circle'],

@@ -4,10 +4,9 @@ declare(strict_types=1);
 // Created: 20250201 - Updated: 20250212
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-namespace HCP\Plugins\Example;
+namespace SPE\Auth\Plugins\Example;
 
-use SPE\Auth\Core\Plugin;
-use SPE\Auth\Core\Util;
+use SPE\Auth\Core\{Plugin, Util};
 
 class Model extends Plugin
 {

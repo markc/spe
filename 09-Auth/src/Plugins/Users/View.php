@@ -1,15 +1,14 @@
 <?php
 
 declare(strict_types=1);
-// Created: 20150101 - Updated: 20250211
+// Created: 20150101 - Updated: 20250212
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 namespace SPE\Auth\Plugins\Users;
 
-use SPE\Auth\Core\Util;
-use SPE\Auth\Themes\Base;
+use SPE\Auth\Core\{Theme, Util};
 
-final class View extends Base
+final class View extends Theme
 {
     /*
     public function foot(): string
