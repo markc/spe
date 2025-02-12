@@ -6,32 +6,17 @@ declare(strict_types=1);
 
 namespace SPE\Auth\Plugins\Users;
 
-use SPE\Auth\Core\Plugin;
-use SPE\Auth\Core\Util;
-use SPE\Auth\Core\Db;
-use SPE\Auth\Core\QueryType;
-use SPE\Auth\Core\Cfg;
-use SPE\Auth\Core\Ctx;
+use SPE\Auth\Core\{Ctx, Db, Plugin, Util, QueryType};
 
 final class Model extends Plugin
 {
-    /**
-     * Expected URI/Form Variables:
-     * - i: Record ID for read/update/delete operations
-     * - title: User title (create/update)
-     * - content: User item content (create/update)
-     * - page: Page number for list pagination
-     * - perpage: Items per page for list pagination
-     */
-    private const REQUIRED_FIELDS = ['title', 'content'];
-    private const OPTIONAL_FIELDS = ['id', 'created', 'updated', 'author'];
-    private const DEFAULT_PER_PAGE = 10; // Default number of records per page for server-side pagination
+    private const DEFAULT_PER_PAGE = 10;
 
     private ?Db $dbh = null;
 
-    public function __construct(Cfg $cfg, Ctx $ctx)
+    public function __construct(Ctx $ctx)
     {
-        parent::__construct($cfg, $ctx);
+        parent::__construct($ctx);
 
         Util::elog(__METHOD__);
 
@@ -132,8 +117,6 @@ final class Model extends Plugin
 
         // Set session variables for proper view handling
         Util::ses('m', 'read');
-        // Set session variables for proper view handling
-        Util::ses('m', 'read');
         Util::ses('i', $id);
     }
 
@@ -220,9 +203,11 @@ final class Model extends Plugin
 
         // Get pagination parameters
         $page = filter_var($this->ctx->in['p'] ?? 1, FILTER_VALIDATE_INT) ?: 1;
+
         // Get perpage from URL if available
         $perPage = filter_var($_GET['perpage'] ?? $this->ctx->in['perpage'] ?? self::DEFAULT_PER_PAGE, FILTER_VALIDATE_INT) ?: self::DEFAULT_PER_PAGE;
-        Util::elog(__METHOD__ . " perpage=$perPage");
+
+        //Util::elog(__METHOD__ . " perpage=$perPage");
 
         // Calculate offset
         $offset = ($page - 1) * $perPage;

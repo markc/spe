@@ -6,18 +6,15 @@ declare(strict_types=1);
 
 namespace SPE\Auth\Core;
 
-use SPE\Auth\Core\{Cfg, Ctx, Util};
+use SPE\Auth\Core\{Ctx, Util};
 
 abstract class Theme
 {
-    protected Cfg $cfg;
     protected Ctx $ctx;
 
-    public function __construct(Cfg $cfg, Ctx $ctx)
+    public function __construct(Ctx $ctx)
     {
         Util::elog(__METHOD__);
-
-        $this->cfg = $cfg;
         $this->ctx = $ctx;
     }
 

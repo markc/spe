@@ -8,10 +8,7 @@ namespace SPE\Auth\Core;
 
 readonly class Init
 {
-    public function __construct(
-        private Cfg $cfg,
-        private Ctx $ctx
-    )
+    public function __construct(private Ctx $ctx)
     {
         Util::elog(__METHOD__);
 
@@ -21,7 +18,14 @@ readonly class Init
         {
             session_start();
         }
-        //$_SESSION = [];
+
+        $_SESSION = [];
+
+        // Initialize session if not set
+        if (!isset($_SESSION['usr']))
+        {
+            $_SESSION['usr'] = null;
+        }
         $this->ctx->nav = (new PluginNav(__DIR__ . '/../Plugins'))->scanPlugins();
 
         array_map(
@@ -39,16 +43,16 @@ readonly class Init
         {
             !class_exists($pm) => $this->ctx->out['main'] = "Error: no plugin object!",
             !method_exists($pm, $m) => $this->ctx->out['main'] = "Error: no plugin method!",
-            default => (new $pm($this->cfg, $this->ctx))->$m()
+            default => (new $pm($this->ctx))->$m()
         };
 
         if (class_exists($t1) && method_exists($t1, $m))
         {
-            $this->ctx->out['main'] = (new $t1($this->cfg, $this->ctx))->$m($this->ctx->in);
+            $this->ctx->out['main'] = (new $t1($this->ctx))->$m($this->ctx->in);
         }
 
-        $theme1 = class_exists($t1) ? new $t1($this->cfg, $this->ctx) : null;
-        $theme2 = class_exists($t2) ? new $t2($this->cfg, $this->ctx) : null;
+        $theme1 = class_exists($t1) ? new $t1($this->ctx) : null;
+        $theme2 = class_exists($t2) ? new $t2($this->ctx) : null;
 
         foreach ($this->ctx->out as $k => $v)
         {

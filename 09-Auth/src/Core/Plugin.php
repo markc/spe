@@ -10,7 +10,6 @@ namespace SPE\Auth\Core;
 abstract class Plugin
 {
     public function __construct(
-        protected Cfg $cfg,
         protected Ctx $ctx
     )
     {

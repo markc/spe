@@ -1,4 +1,4 @@
-# SPE::05 Autoload
+# SPE::09 Auth
 
 _Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)_
 
@@ -23,9 +23,9 @@ This is a modular PHP framework that demonstrates a plugin-based architecture wi
 
 ## Requirements
 
-- PHP 8.0+
+- PHP 8.4+
 - Composer for autoloading
-- Bootstrap 5.x (loaded via CDN)
+- Bootstrap 5.3+ (loaded via CDN)
 
 ## Installation
 
@@ -35,33 +35,6 @@ This is a modular PHP framework that demonstrates a plugin-based architecture wi
 composer install
 ```
 3. Set up your web server to point to the `index.php` file
-
-## Configuration
-
-The application configuration is managed through the `Cfg` class. You can modify:
-
-- Email address
-- Navigation menu items
-- Theme selection
-- Debug logging
-
-Example configuration:
-```php
-new Cfg(
-    email: 'your@email.com',
-    self: '/',
-    nav1: [
-        ['Home', '?o=Home'],
-        ['About', '?o=About'],
-        ['Contact', '?o=Contact']
-    ],
-    nav2: [
-        ['Simple', '?t=Simple'],
-        ['TopNav', '?t=TopNav'],
-        ['Sidebar', '?t=Sidebar']
-    ]
-)
-```
 
 ## Themes
 
@@ -120,12 +93,6 @@ This project is licensed under the AGPL-3.0 License. See the [LICENSE](LICENSE) 
 - Email: markc@renta.net
 - Year: 2015-2025
 
-## Changelog
-
-- 2025-02-08: Updated to PHP 8.0+ compatibility
-- 2025-02-09: Improved theme system
-- 2025-02-08: Enhanced logging capabilities
-
 ## Example Usage
 
 To use the framework:
@@ -133,12 +100,12 @@ To use the framework:
 1. Access the base URL
 2. Choose a theme:
    - `/?t=Simple`
-   - `/t=TopNav`
-   - `/t=Sidebar`
+   - `/?t=TopNav`
+   - `/?t=Sidebar`
 3. Access plugins:
-   - `/o=Home`
-   - `/o=About`
-   - `/o=Contact`
+   - `/?o=Home`
+   - `/?o=About`
+   - `/?o=Contact`
 
 The framework will automatically load the appropriate theme and plugin based on the request parameters.
 

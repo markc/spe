@@ -7,9 +7,8 @@ declare(strict_types=1);
 require_once __DIR__ . '/../../vendor/autoload.php';  // Ensure vendor exists in parent dir
 
 use SPE\Auth\Core\Init;
-use SPE\Auth\Core\Cfg;
 use SPE\Auth\Core\Ctx;
 
 define('DBG', true);
 
-echo new Init(new Cfg(), new Ctx());
+echo new Init(new Ctx());

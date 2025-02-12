@@ -6,7 +6,7 @@ declare(strict_types=1);
 
 namespace SPE\Auth\Plugins\Auth;
 
-use SPE\Auth\Core\{Plugin, Util, Db, QueryType, Cfg, Ctx};
+use SPE\Auth\Core\{Plugin, Util, Db, QueryType, Ctx};
 
 class Model extends Plugin
 {
@@ -27,9 +27,9 @@ class Model extends Plugin
         'passwd2'   => '',
     ];
 
-    public function __construct(Cfg $cfg, Ctx $ctx)
+    public function __construct(Ctx $ctx)
     {
-        parent::__construct($cfg, $ctx);
+        parent::__construct($ctx);
 
         if (is_null($this->dbh))
         {
@@ -65,7 +65,7 @@ class Model extends Plugin
                     if ($usr['acl'] != 9)
                     {
                         $newpass = Util::genpw(self::OTP_LENGTH);
-                        if ($this->mail_forgotpw($u, $newpass, 'From: ' . $this->cfg->email))
+                        if ($this->mail_forgotpw($u, $newpass, 'From: ' . $this->ctx->email))
                         {
                             $this->dbh->update('accounts', [
                                 'otp' => $newpass,
@@ -75,7 +75,7 @@ class Model extends Plugin
                             $this->ctx->ary = [
                                 'status' => 'success',
                                 'message' => 'Password reset email sent',
-                                'redirect' => $this->cfg->self . '?plugin=Auth&action=list'
+                                'redirect' => $this->ctx->self . '?plugin=Auth&action=list'
                             ];
                             return;
                         }
@@ -141,28 +141,6 @@ class Model extends Plugin
         $u = (string)$this->in['login'];
         $p = (string)$this->in['webpw'];
 
-        if (!empty($this->cfg->email) && !empty($this->cfg->admpw))
-        {
-            $_SESSION['usr'] = [
-                'id' => 0,
-                'grp' => 0,
-                'acl' => 0,
-                'login' => $this->cfg->email,
-                'fname' => 'Admin',
-                'lname' => 'User'
-            ];
-            $_SESSION['adm'] = 0;
-            Util::log($u . ' is now logged in', 'success');
-            $_SESSION['m'] = 'list';
-            Util::redirect($this->cfg->self);
-            $this->ctx->ary = [
-                'status' => 'success',
-                'message' => 'Logged in successfully',
-                'redirect' => true
-            ];
-            return;
-        }
-
         if ($u)
         {
             if ($usr = $this->dbh->read('accounts', 'id,grp,acl,login,fname,lname,webpw,cookie', 'login = :login', ['login' => $u], QueryType::One))
@@ -186,7 +164,11 @@ class Model extends Plugin
                         Util::log($login . ' is now logged in', 'success');
                         if ($acl === 0) $_SESSION['adm'] = $id;
                         $_SESSION['m'] = 'list';
-                        Util::redirect($this->cfg->self);
+                        // Only redirect if we're not already on the home page
+                        if ($_SERVER['REQUEST_URI'] !== $this->ctx->self)
+                        {
+                            Util::redirect($this->ctx->self);
+                        }
                         $this->ctx->ary = [
                             'status' => 'success',
                             'message' => 'Logged in successfully',
@@ -251,7 +233,7 @@ class Model extends Plugin
             $this->ctx->ary = [
                 'status' => 'error',
                 'message' => 'Session expired',
-                'redirect' => $this->cfg->self . '?plugin=Auth'
+                'redirect' => $this->ctx->self . '?plugin=Auth'
             ];
             return;
         }
@@ -284,7 +266,7 @@ class Model extends Plugin
                                     $this->ctx->ary = [
                                         'status' => 'success',
                                         'message' => 'Password updated successfully',
-                                        'redirect' => $this->cfg->self
+                                        'redirect' => $this->ctx->self
                                     ];
                                     return;
                                 }
@@ -294,7 +276,7 @@ class Model extends Plugin
                                     $this->ctx->ary = [
                                         'status' => 'success',
                                         'message' => 'Password reset successfully',
-                                        'redirect' => $this->cfg->self . '?plugin=Auth'
+                                        'redirect' => $this->ctx->self . '?plugin=Auth'
                                     ];
                                     return;
                                 }
@@ -384,7 +366,7 @@ class Model extends Plugin
             $this->ctx->ary = [
                 'status' => 'success',
                 'message' => 'Logged out successfully',
-                'redirect' => $this->cfg->self
+                'redirect' => $this->ctx->self
             ];
             return;
         }
@@ -392,7 +374,7 @@ class Model extends Plugin
         $this->ctx->ary = [
             'status' => 'error',
             'message' => 'Not logged in',
-            'redirect' => $this->cfg->self
+            'redirect' => $this->ctx->self
         ];
     }
 
@@ -437,7 +419,7 @@ class Model extends Plugin
                         $this->ctx->ary = [
                             'status' => 'error',
                             'message' => 'Access denied',
-                            'redirect' => $this->cfg->self
+                            'redirect' => $this->ctx->self
                         ];
                         return;
                     }
@@ -448,7 +430,7 @@ class Model extends Plugin
                     $this->ctx->ary = [
                         'status' => 'error',
                         'message' => 'Password reset key expired',
-                        'redirect' => $this->cfg->self
+                        'redirect' => $this->ctx->self
                     ];
                     return;
                 }
@@ -459,7 +441,7 @@ class Model extends Plugin
                 $this->ctx->ary = [
                     'status' => 'error',
                     'message' => 'Invalid reset key',
-                    'redirect' => $this->cfg->self
+                    'redirect' => $this->ctx->self
                 ];
                 return;
             }
@@ -470,7 +452,7 @@ class Model extends Plugin
             $this->ctx->ary = [
                 'status' => 'error',
                 'message' => 'Invalid reset key',
-                'redirect' => $this->cfg->self
+                'redirect' => $this->ctx->self
             ];
             return;
         }
@@ -481,11 +463,11 @@ class Model extends Plugin
         Util::elog(__METHOD__);
 
         $host = $_SERVER['REQUEST_SCHEME'] . '://'
-            . $this->cfg->host
-            . $this->cfg->self;
+            . $this->ctx->host
+            . $this->ctx->self;
         return mail(
             $email,
-            'Reset password for ' . $this->cfg->host,
+            'Reset password for ' . $this->ctx->host,
             'Here is your new OTP (one time password) key that is valid for one hour.
 
 Please click on the link below and continue with reseting your password.

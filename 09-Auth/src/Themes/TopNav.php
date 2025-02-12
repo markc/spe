@@ -6,15 +6,15 @@ declare(strict_types=1);
 
 namespace SPE\Auth\Themes;
 
-use SPE\Auth\Core\{Cfg, Ctx, Theme, Util};
+use SPE\Auth\Core\{Ctx, Theme, Util};
 
 class TopNav extends Theme
 {
-    public function __construct(Cfg $cfg, Ctx $ctx)
+    public function __construct(Ctx $ctx)
     {
         Util::elog(__METHOD__);
 
-        parent::__construct($cfg, $ctx);
+        parent::__construct($ctx);
     }
 
     public function html(): string

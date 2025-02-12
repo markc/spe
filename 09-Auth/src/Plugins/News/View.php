@@ -6,11 +6,11 @@ declare(strict_types=1);
 
 namespace SPE\Auth\Plugins\News;
 
-use SPE\Auth\Core\{Cfg, Ctx, Util};
+use SPE\Auth\Core\{Ctx, Util};
 
 class View
 {
-    public function __construct(private Cfg $cfg, private Ctx $ctx)
+    public function __construct(private Ctx $ctx)
     {
     }
 

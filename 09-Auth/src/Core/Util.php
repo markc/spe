@@ -155,7 +155,7 @@ final class Util
         string $msg = ''
     ): never
     {
-        self::elog(__METHOD__);
+        self::elog(__METHOD__ . ' url=' . $url);
 
         match ($method)
         {

@@ -10,9 +10,10 @@ namespace SPE\Auth\Core;
 class Ctx
 {
     public function __construct(
-        public string $email = 'markc@renta.net',
-        public string $admpw = 'admin123',
+        public string $email = '',
+        public string $admpw = '',
         public string $self = '/',
+        public string $host = '',
         public string $buf = '',    // Global string buffer
         public array $ary = [],     // Plugin CRUDL return array
         public array $nav = [],     // PluginNav array

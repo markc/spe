@@ -6,7 +6,7 @@ declare(strict_types=1);
 
 namespace SPE\Auth\Plugins\News;
 
-use SPE\Auth\Core\{Plugin, Util, Db, QueryType, Cfg, Ctx};
+use SPE\Auth\Core\{Plugin, Util, Db, QueryType, Ctx};
 
 final class Model extends Plugin
 {
@@ -30,9 +30,9 @@ final class Model extends Plugin
         'updated' => null
     ];
 
-    public function __construct(Cfg $cfg, Ctx $ctx)
+    public function __construct(Ctx $ctx)
     {
-        parent::__construct($cfg, $ctx);
+        parent::__construct($ctx);
 
         foreach (array_keys($this->in) as $key)
         {
