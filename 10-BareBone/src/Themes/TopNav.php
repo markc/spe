@@ -24,14 +24,22 @@ class TopNav extends Theme
         extract($this->ctx->out, EXTR_SKIP);
 
         return '<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="auto">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Simple PHP Example with Plugins">
+        <meta name="color-scheme" content="dark light">
+        <meta name="description" content="Simple PHP Examples">
         <meta name="author" content="Mark Constable">
         <link rel="icon" href="favicon.ico">
-        <title>[TopNav] ' . $doc . '</title>' . $css . '
+        <title>[TopNav] ' . $doc . '</title>
+        <script>
+            if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                document.documentElement.setAttribute("data-bs-theme", "dark");
+            } else {
+                document.documentElement.setAttribute("data-bs-theme", "light");
+            }
+        </script>' . $css . '
     </head>
     <body class="d-flex flex-column min-vh-100">' . $head . $log . $main . $foot . $js . '
     </body>
@@ -44,9 +52,9 @@ class TopNav extends Theme
 
         return '
 
-        <footer class="bg-light text-center py-3 mt-auto">
+        <footer class="text-center py-3 mt-auto">
             <div class="container">
-                <p class="text-muted mb-0"><small>[TopNav] ' . $this->ctx->out['foot'] . '</small></p>
+                <p class="text-muted mb-0"><small>&#x2699;  ' . $this->ctx->out['foot'] . '</small></p>
             </div>
         </footer>';
     }

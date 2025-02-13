@@ -1,6 +1,6 @@
 {
     "name": "Example",
-    "icon": "bi bi-house",
+    "icon": "bi bi-gear",
     "order": 100,
     "group": ""
 }

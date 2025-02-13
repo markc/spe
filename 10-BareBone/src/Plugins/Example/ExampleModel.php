@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-// Created: 20250201 - Updated: 20250213
+// Created: 20250201 - Updated: 20250214
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 namespace SPE\BareBone\Plugins\Example;
@@ -14,49 +14,34 @@ class ExampleModel extends Plugin
     {
         Util::elog(__METHOD__);
 
-        return [
-            'status' => 'success',
-            'message' => 'Create operation'
-        ];
+        return ['msg' => __METHOD__];
     }
 
     public function read(): array
     {
         Util::elog(__METHOD__);
 
-        return [
-            'status' => 'success',
-            'message' => 'Read operation'
-        ];
+        return ['msg' => __METHOD__];
     }
 
     public function update(): array
     {
         Util::elog(__METHOD__);
 
-        return [
-            'status' => 'success',
-            'message' => 'Update operation'
-        ];
+        return ['msg' => __METHOD__];
     }
 
     public function delete(): array
     {
         Util::elog(__METHOD__);
 
-        return [
-            'status' => 'success',
-            'message' => 'Delete operation'
-        ];
+        return ['msg' => __METHOD__];
     }
 
     public function list(): array
     {
         Util::elog(__METHOD__);
 
-        return [
-            'status' => 'success',
-            'message' => 'List operation'
-        ];
+        return ['msg' => __METHOD__];
     }
 }

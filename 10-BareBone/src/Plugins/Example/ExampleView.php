@@ -154,8 +154,8 @@ class ExampleView
         <header>
             ' . __METHOD__ . '
             <nav>
-                ' . $this->nav1() . ' |
-                ' . $this->nav2() . ' |
+                ' . $this->nav1() . '<br>
+                ' . $this->nav2() . '<br>
                 ' . $this->nav3() . '
             </nav>
         </header>';
@@ -168,7 +168,9 @@ class ExampleView
         return '
 
         <main>
-            ' . __METHOD__ . '
+            ' . __METHOD__ . '<br>
+            ' . $this->ctx->ary['msg'] . ' (action)<br>
+            Overriding the ' . $this->ctx->in['t'] . ' theme
         </main>';
     }
 

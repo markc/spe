@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-// Created: 20150101 - Updated: 20250213
+// Created: 20150101 - Updated: 20250214
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 namespace SPE\BareBone\Core;
@@ -12,10 +12,9 @@ use SPE\BareBone\Core\Util;
 class Ctx
 {
     public function __construct(
-        public string $email = '',
-        public string $admpw = '',
-        public string $self = '/',
-        public string $host = '',
+        public string $email = '',  // Auto login and outgoing mail
+        public string $admpw = '',  // Trigger auto login for devel
+        public string $host = '',   // Outgoing forgot_passwd email
         public string $buf = '',    // Global string buffer
         public array $ary = [],     // Plugin CRUDL return array
         public array $nav = [],     // PluginNav array
@@ -40,6 +39,10 @@ class Ctx
             'main'  => 'Error: missing plugin!',
             'foot'  => 'Copyright (C) 2015-2025 Mark Constable (AGPL-3.0)',
             'js'    => '',
+        ],
+        public array $nav1 = [
+            ['Home',    '?o=home',      'bi bi-house-door'],
+            ['Example', '?o=example',   'bi bi-gear'],
         ],
     )
     {
