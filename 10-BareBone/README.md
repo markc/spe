@@ -83,3 +83,45 @@ Let me break down the exact flow for both demo plugins:
 - Complex plugins that need custom rendering
 - Theme system for consistent layouts
 - Mix-and-match of plugin views and theme partials
+
+## Degug Trace Example
+
+Below is how a debug trace looks for the Home plugin when DBG=true in `public/index.php`.
+
+```
+[Thu Feb 13 16:28:04 2025] [::1]:34246 Accepted
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Ctx::__construct
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Init::__construct
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\PluginNav::__construct
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\PluginNav::scanPlugins
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\PluginNav::isCacheValid
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\PluginNav::loadCache
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Util::ses(a, '', '')
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Util::ses(c, '', '')
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Util::ses(g, '', '')
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Util::ses(l, '', '')
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Util::ses(m, 'list', 'list')
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Util::ses(o, 'Home', 'Home')
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Util::ses(p, '1', '1')
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Util::ses(t, 'TopNav', 'TopNav')
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Util::ses(x, '', '')
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Plugin::__construct
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Plugins\Home\Model::list
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Theme::__construct
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Plugins\Home\View::list
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Theme::__construct
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Themes\TopNav::__construct
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Theme::__construct
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Theme::css
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Theme::log
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Theme::nav1
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Theme::head
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Theme::main
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Theme::foot
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Theme::js
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Theme::html
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Init::__toString
+[Thu Feb 13 16:28:04 2025] SPE\BareBone\Core\Init::__destruct
+[Thu Feb 13 16:28:04 2025] [::1]:34246 [200]: GET /10-BareBone/public?o=Home
+[Thu Feb 13 16:28:04 2025] [::1]:34246 Closing
+```

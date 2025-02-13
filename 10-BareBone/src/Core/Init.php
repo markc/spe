@@ -63,8 +63,6 @@ readonly class Init
             }
         }
 
-        Util::elog('this->ctx->out[main]=' . $this->ctx->out['main']);
-
         // Initialize themes
         $theme1 = class_exists($t1) ? new $t1($this->ctx) : null;
         $theme2 = class_exists($t2) ? new $t2($this->ctx) : null;

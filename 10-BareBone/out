@@ -1,0 +1,78 @@
+./src/Plugins/Example/Model.php:        $this->ctx->ary = [
+./src/Plugins/Example/Model.php:        $this->ctx->ary = [
+./src/Plugins/Example/Model.php:        $this->ctx->ary = [
+./src/Plugins/Example/Model.php:        $this->ctx->ary = [
+./src/Plugins/Example/Model.php:        $this->ctx->ary = [
+./src/Plugins/Example/View.php:        extract($this->ctx->out, EXTR_SKIP);
+./src/Plugins/Example/View.php:                ' . $this->nav1() . ' |
+./src/Plugins/Example/View.php:                ' . $this->nav2() . ' |
+./src/Plugins/Example/View.php:                ' . $this->nav3() . '
+./src/Plugins/Home/Model.php:        $this->ctx->ary = [
+./src/Plugins/Home/View.php:                    <h1 class="display-5 fw-bold text-center">' . $this->ctx->ary['status'] . '</h1>
+./src/Plugins/Home/View.php:                    <p class="lead mb-4">' . $this->ctx->ary['content'] . '</p>
+./src/Core/PluginNav.php:        $this->pluginsDir = $baseDir ?? dirname(__DIR__) . '/Plugins';
+./src/Core/PluginNav.php:        $this->cacheFile = dirname(__DIR__) . '/cache/plugins.json';
+./src/Core/PluginNav.php:        if ($this->isCacheValid())
+./src/Core/PluginNav.php:            return $this->loadCache();
+./src/Core/PluginNav.php:        $navigation = $this->performScan();
+./src/Core/PluginNav.php:        $this->saveCache($navigation);
+./src/Core/PluginNav.php:        if (!file_exists($this->cacheFile))
+./src/Core/PluginNav.php:        $cacheTime = filemtime($this->cacheFile);
+./src/Core/PluginNav.php:        if (time() - $cacheTime > $this->cacheExpiry)
+./src/Core/PluginNav.php:        $directories = glob($this->pluginsDir . '/*');
+./src/Core/PluginNav.php:        $cache = json_decode(file_get_contents($this->cacheFile), true);
+./src/Core/PluginNav.php:        return $this->performScan();
+./src/Core/PluginNav.php:        $cacheDir = dirname($this->cacheFile);
+./src/Core/PluginNav.php:        file_put_contents($this->cacheFile, json_encode($data, JSON_PRETTY_PRINT));
+./src/Core/PluginNav.php:        $directories = glob($this->pluginsDir . '/*');
+./src/Core/PluginNav.php:            $meta = $this->getPluginMeta($dir);
+./src/Core/Db.php:        $stmt = $this->prepare($sql);
+./src/Core/Db.php:        $this->bindValues($stmt, $data);
+./src/Core/Db.php:        $id = $this->lastInsertId();
+./src/Core/Db.php:        $stmt = $this->prepare($sql);
+./src/Core/Db.php:        if ($params) $this->bindValues($stmt, $params);
+./src/Core/Db.php:        $stmt = $this->prepare($sql);
+./src/Core/Db.php:        $this->bindValues($stmt, array_merge($data, $params));
+./src/Core/Db.php:        $stmt = $this->prepare($sql);
+./src/Core/Db.php:        $this->bindValues($stmt, $params);
+./src/Core/Plugin.php:        $this->ctx->ary = [
+./src/Core/Plugin.php:        $this->ctx->ary = [
+./src/Core/Plugin.php:        $this->ctx->ary = [
+./src/Core/Plugin.php:        $this->ctx->ary = [
+./src/Core/Plugin.php:        $this->ctx->ary = [
+./src/Core/Init.php:        $this->ctx->self = $_SERVER['PHP_SELF'];
+./src/Core/Init.php:        $this->ctx->nav = (new PluginNav(__DIR__ . '/../Plugins'))->scanPlugins();
+./src/Core/Init.php:            fn($k) => $this->ctx->in[$k] = Util::ses($k, $this->ctx->in[$k], $_SESSION[$k] ?? $this->ctx->in[$k]),
+./src/Core/Init.php:            array_keys($this->ctx->in)
+./src/Core/Init.php:        extract($this->ctx->in, EXTR_SKIP);
+./src/Core/Init.php:            $this->ctx->out['main'] = "Error: no plugin object!";
+./src/Core/Init.php:            $plugin = new $pm($this->ctx);
+./src/Core/Init.php:                $this->ctx->out['main'] = "Error: no plugin method!";
+./src/Core/Init.php:                    $view = new $t1($this->ctx);
+./src/Core/Init.php:                        $this->ctx->out['main'] = $view->$m();
+./src/Core/Init.php:        Util::elog('this->ctx->out[main]=' . $this->ctx->out['main']);
+./src/Core/Init.php:        $theme1 = class_exists($t1) ? new $t1($this->ctx) : null;
+./src/Core/Init.php:        $theme2 = class_exists($t2) ? new $t2($this->ctx) : null;
+./src/Core/Init.php:            $this->ctx->buf = 'Error: No theme available';
+./src/Core/Init.php:        foreach ($this->ctx->out as $k => $v)
+./src/Core/Init.php:                $this->ctx->out[$k] = $theme1->$k();
+./src/Core/Init.php:                $this->ctx->out[$k] = $theme2->$k();
+./src/Core/Init.php:            $this->ctx->buf = $theme1->html();
+./src/Core/Init.php:            $this->ctx->buf = $theme2->html();
+./src/Core/Init.php:        if ($this->ctx->in['x'])
+./src/Core/Init.php:            $xhr = $this->ctx->out[$this->ctx->in['x']] ?? '';
+./src/Core/Init.php:            return json_encode($this->ctx->out, JSON_PRETTY_PRINT);
+./src/Core/Init.php:        return $this->ctx->buf;
+./src/Core/Theme.php:        $this->ctx = $ctx;
+./src/Core/Theme.php:        return $this->html();
+./src/Core/Theme.php:        extract($this->ctx->out, EXTR_SKIP);
+./src/Core/Theme.php:        if ($this->ctx->in['l'])
+./src/Core/Theme.php:            [$lvl, $msg] = explode(':', $this->ctx->in['l']);
+./src/Core/Theme.php:        $o = '?o=' . $this->ctx->in['o'];
+./src/Core/Theme.php:        }, $this->ctx->nav));
+./src/Core/Theme.php:                <a class="navbar-brand" href="/">« ' . $this->ctx->out['head'] . '</a>
+./src/Core/Theme.php:        return $this->ctx->out['nav1'];
+./src/Core/Theme.php:        <main class="container py-4">' . $this->ctx->out['main'] . '
+./src/Core/Theme.php:                <p class="text-muted mb-0"><small>' . $this->ctx->out['foot'] . '</small></p>
+./src/Themes/TopNav.php:        extract($this->ctx->out, EXTR_SKIP);
+./src/Themes/TopNav.php:                <p class="text-muted mb-0"><small>[TopNav] ' . $this->ctx->out['foot'] . '</small></p>
