@@ -1,14 +1,12 @@
-# SPE::09 Auth
+# SPE::10 BareBone
 
 _Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)_
 
-## TODO: has to be completely rewritten
-
 ## Overview
 
-This is a modular PHP framework that demonstrates a plugin-based architecture with multiple themes. It includes aPlugin system with CRUDL (Create, Read, Update, Delete, List) operations and a Theme system with multiple layouts (Simple, TopNav, Sidebar).
+This is a modular PHP framework that demonstrates a plugin-based architecture with multiple themes. It includes a Plugin system with CRUDL (Create, Read, Update, Delete, List) operations and a Theme system with multiple layouts (only a Bootstrap5 TopNav for now). This BareBone sub-project only has the Core classes plus two simply plugins; Home and Example. The purpose of this sub-project is to be able to start a fresh project from a simple baseline and add whatever plugins you care to following the guide below and the two simple demo Plugins.
 
-Let me break down the exact flow for both plugins in excruciating detail:
+Let me break down the exact flow for both demo plugins:
 
 ## Example Plugin Flow
 
