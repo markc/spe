@@ -4,11 +4,7 @@ _Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)_
 
 This is a very simple PHP8.4 "framework" that will be expanded to include more
 small project examples building on the first very lean foundation and
-incorporating additional functionality in each successive example. This is not
-a repository of all the attributes of PHP8+, there are already many other great
-projects and pages that provide excellent PHP8 guides, but rather a series of
-examples that are fully developed under PHP8.4 and taking advantage of any new
-PHP8.4 constructs where it makes sense.
+incorporating additional functionality in each successive example.
 
 ## Quick Start
 
@@ -20,19 +16,19 @@ This is the easiest way to display and develop this project...
     cd ~/Dev
     git clone https://github.com/markc/spe
     cd spe
-    php -S localhost:8000 -t 01-Simple
+    export PATH=$PATH:~/.config/herd-lite/bin
+    composer install
+    php -S localhost:8000
 ```
 
 ## The Examples
 
 Each folder will contain a more comprehensive example of a working, and
-hopefully useful, sub-project with a README.md explaining each example. This
-README will provide an overview and index of all examples and some hints that
-apply to all the sub-project examples.
+hopefully useful, sub-projects with a README.md explaining each example.
 
 - [01-Simple]
 
-  At 100 LOC this is about the simplest 3 page example of this particular
+  At 140 LOC this is about the simplest 3 page example of this particular
   framework style I could come up with. It is a self-contained single script
   with all code encapsulated within a single anonymous class and one `echo`.
 
