@@ -15,96 +15,61 @@ readonly class Init
         Util::elog(__METHOD__);
 
         $this->ctx->self = $_SERVER['PHP_SELF'];
-
-        if (session_status() === PHP_SESSION_NONE)
-        {
-            session_start();
-        }
-
+        session_status() === PHP_SESSION_NONE && session_start();
         $this->ctx->nav = (new PluginNav(__DIR__ . '/../Plugins'))->scanPlugins();
 
-        array_map(
-            fn($k) => $this->ctx->in[$k] = Util::ses($k, $this->ctx->in[$k], $_SESSION[$k] ?? $this->ctx->in[$k]),
-            array_keys($this->ctx->in)
-        );
+        foreach (array_keys($this->ctx->in) as $k)
+        {
+            $this->ctx->in[$k] = Util::ses($k, $this->ctx->in[$k]);
+        }
 
         extract($this->ctx->in, EXTR_SKIP);
 
-        $pm = 'SPE\\BareBone\\Plugins\\' . $o . '\\Model';  // plugin model
-        $t1 = 'SPE\\BareBone\\Plugins\\' . $o . '\\View';   // plugin view theme
-        $t2 = 'SPE\\BareBone\\Themes\\' . $t;               // current theme extends Theme
-
-        // Handle plugin action
-        if (!class_exists($pm))
+        // Define the plugin and theme names to call
+        if (__NAMESPACE__)
         {
-            $this->ctx->out['main'] = "Error: no plugin object!";
+            $pm = "SPE\\BareBone\\Plugins\\{$o}\\{$o}Model";
+            $t1 = "SPE\\BareBone\\Plugins\\{$o}\\{$o}View";
+            $t2 = "SPE\\BareBone\\Themes\\{$t}";
         }
         else
         {
-            $plugin = new $pm($this->ctx);
-            if (!method_exists($plugin, $m))
-            {
-                $this->ctx->out['main'] = "Error: no plugin method!";
-            }
-            else
-            {
-                // Execute plugin model method to populate ctx->ary
-                $plugin->$m();
-
-                // Get view to render the model data
-                if (class_exists($t1))
-                {
-                    $view = new $t1($this->ctx);
-                    if (method_exists($view, $m))
-                    {
-                        $this->ctx->out['main'] = $view->$m();
-                    }
-                }
-            }
+            $pm = "{$o}Model";
+            $t1 = "{$o}View";
+            $t2 = "{$t}";
         }
 
-        // Initialize themes
+        // Call the Plugin modal action method and save the results to a global array
+        $this->ctx->ary = class_exists($pm) ? (new $pm($this->ctx))?->$m() : null;
+
+        // Instantiate the view and theme, leveraging null coalescing for brevity
         $theme1 = class_exists($t1) ? new $t1($this->ctx) : null;
         $theme2 = class_exists($t2) ? new $t2($this->ctx) : null;
 
-        // Apply theme methods to output sections
-        if (!$theme2)
+        $render = function (?object $theme, string $method): ?string
         {
-            $this->ctx->buf = 'Error: No theme available';
-            return;
-        }
+            return ($theme && method_exists($theme, $method)) ? $theme->$method() : null;
+        };
+
+        $this->ctx->out['main'] = $render($theme1, $m)
+            ?? $render($theme2, $m)
+            ?? $this->ctx->out['main'];
 
         // For each output section, try plugin view first, then fall back to theme
-        foreach ($this->ctx->out as $k => $v)
+        foreach ($this->ctx->out as $k => &$v)
         {
-            if ($theme1 && method_exists($theme1, $k))
-            {
-                $this->ctx->out[$k] = $theme1->$k();
-            }
-            elseif (method_exists($theme2, $k))
-            {
-                $this->ctx->out[$k] = $theme2->$k();
-            }
+            $v = $render($theme1, $k) ?? $render($theme2, $k) ?? $v;
         }
 
-        // For final HTML rendering, try plugin view first, then fall back to theme
-        if ($theme1 && method_exists($theme1, 'html'))
-        {
-            $this->ctx->buf = $theme1->html();
-        }
-        else
-        {
-            $this->ctx->buf = $theme2->html();
-        }
+        $this->ctx->buf = $render($theme1, 'html') ?? $render($theme2, 'html') ?? '';
     }
 
     public function __toString(): string
     {
         Util::elog(__METHOD__);
-
-        if ($this->ctx->in['x'])
+        if ($x = $this->ctx->in['x'])
         {
-            $xhr = $this->ctx->out[$this->ctx->in['x']] ?? '';
+            $xhr = $this->ctx->out[$x] ?? '';
             if ($xhr) return $xhr;
             header('Content-Type: application/json');
             return json_encode($this->ctx->out, JSON_PRETTY_PRINT);
@@ -114,9 +79,6 @@ readonly class Init
 
     public function __destruct()
     {
-        Util::elog(__METHOD__);
-
-        //Util::elog(__METHOD__ . ' SESSION=' . var_export($_SESSION, true));
-        //Util::elog($_SERVER['REMOTE_ADDR'] . ' ' . round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']), 4));
+        Util::elog($_SERVER['REMOTE_ADDR'] . ' ' . round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']), 4));
     }
 }

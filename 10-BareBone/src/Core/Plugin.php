@@ -6,7 +6,7 @@ declare(strict_types=1);
 
 namespace SPE\BareBone\Core;
 
-// Base Plugin class with CRUDL methods
+// Base Plugin class with CRUDL action methods
 abstract class Plugin
 {
     public function __construct(
@@ -16,51 +16,51 @@ abstract class Plugin
         Util::elog(__METHOD__);
     }
 
-    public function create(): void
+    public function create(): array
     {
         Util::elog(__METHOD__);
 
-        $this->ctx->ary = [
+        return [
             'status' => 'Success',
             'content' => "Plugin::create() not implemented yet!"
         ];
     }
 
-    public function read(): void
+    public function read(): array
     {
         Util::elog(__METHOD__);
 
-        $this->ctx->ary = [
+        return [
             'status' => 'Success',
             'content' => "Plugin::read() not implemented yet!"
         ];
     }
 
-    public function update(): void
+    public function update(): array
     {
         Util::elog(__METHOD__);
 
-        $this->ctx->ary = [
+        return [
             'status' => 'Success',
             'content' => "Plugin::update() not implemented yet!"
         ];
     }
 
-    public function delete(): void
+    public function delete(): array
     {
         Util::elog(__METHOD__);
 
-        $this->ctx->ary = [
+        return [
             'status' => 'Success',
             'content' => "Plugin::delete() not implemented yet!"
         ];
     }
 
-    public function list(): void
+    public function list(): array
     {
         Util::elog(__METHOD__);
 
-        $this->ctx->ary = [
+        return [
             'status' => 'Success',
             'content' => "Plugin::list() not implemented yet!"
         ];

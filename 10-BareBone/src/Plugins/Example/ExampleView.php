@@ -8,11 +8,11 @@ namespace SPE\BareBone\Plugins\Example;
 
 use SPE\BareBone\Core\{Ctx, Util};
 
-class View
+class ExampleView
 {
     public function __construct(private Ctx $ctx)
     {
-        //parent::__construct($ctx); // Hmm, maybe not needed
+        Util::elog(__METHOD__);
     }
 
     // Plugin Actions Views

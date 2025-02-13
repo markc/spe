@@ -8,53 +8,53 @@ namespace SPE\BareBone\Plugins\Example;
 
 use SPE\BareBone\Core\{Plugin, Util};
 
-class Model extends Plugin
+class ExampleModel extends Plugin
 {
-    public function create(): void
+    public function create(): array
     {
         Util::elog(__METHOD__);
 
-        $this->ctx->ary = [
+        return [
             'status' => 'success',
             'message' => 'Create operation'
         ];
     }
 
-    public function read(): void
+    public function read(): array
     {
         Util::elog(__METHOD__);
 
-        $this->ctx->ary = [
+        return [
             'status' => 'success',
             'message' => 'Read operation'
         ];
     }
 
-    public function update(): void
+    public function update(): array
     {
         Util::elog(__METHOD__);
 
-        $this->ctx->ary = [
+        return [
             'status' => 'success',
             'message' => 'Update operation'
         ];
     }
 
-    public function delete(): void
+    public function delete(): array
     {
         Util::elog(__METHOD__);
 
-        $this->ctx->ary = [
+        return [
             'status' => 'success',
             'message' => 'Delete operation'
         ];
     }
 
-    public function list(): void
+    public function list(): array
     {
         Util::elog(__METHOD__);
 
-        $this->ctx->ary = [
+        return [
             'status' => 'success',
             'message' => 'List operation'
         ];

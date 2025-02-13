@@ -19,14 +19,6 @@ abstract class Theme
         $this->ctx = $ctx;
     }
 
-    public function __toString(): string
-    {
-        Util::elog(__METHOD__);
-
-        return $this->html();
-    }
-
-    //abstract public function html(): string;
     public function html(): string
     {
         Util::elog(__METHOD__);
