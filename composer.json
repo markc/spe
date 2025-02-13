@@ -23,7 +23,6 @@
             "SPE\\PDO\\": "07-PDO/src",
             "SPE\\Users\\": "08-Users/src",
             "SPE\\Auth\\": "09-Auth/src",
-            "SPE\\Files\\": "10-Files/src"
         }
     },
     "minimum-stability": "stable"
