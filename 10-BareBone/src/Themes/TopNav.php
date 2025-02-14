@@ -39,6 +39,49 @@ class TopNav extends Theme
 </html>';
     }
 
+    public function css(): string
+    {
+        Util::elog(__METHOD__);
+
+        return '
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script>
+            function setTheme(theme) {
+                const htmlElement = document.documentElement;
+                htmlElement.setAttribute("data-bs-theme", theme);
+                localStorage.setItem("theme", theme);
+                updateThemeIcon(theme);
+            }
+            function toggleTheme() {
+                const currentTheme = document.documentElement.getAttribute("data-bs-theme");
+                setTheme(currentTheme === "dark" ? "light" : "dark");
+            }
+            function updateThemeIcon(theme) {
+                const icon = document.getElementById("theme-icon");
+                if (icon) {
+                    icon.className = theme === "dark" ? "bi bi-moon-fill" : "bi bi-sun-fill";
+                }
+            }
+            const storedTheme = localStorage.getItem("theme");
+            if (storedTheme) {
+                setTheme(storedTheme);
+            } else {
+                const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                setTheme(prefersDark ? "dark" : "light");
+            }
+        </script>
+        <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+        <style>
+            body { padding-top: 4.5rem; }
+        </style>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>';
+    }
+
+
     public function foot(): string
     {
         Util::elog(__METHOD__);
