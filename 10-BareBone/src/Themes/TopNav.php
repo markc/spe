@@ -32,14 +32,7 @@ class TopNav extends Theme
         <meta name="description" content="Simple PHP Examples">
         <meta name="author" content="Mark Constable">
         <link rel="icon" href="favicon.ico">
-        <title>[TopNav] ' . $doc . '</title>
-        <script>
-            if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-                document.documentElement.setAttribute("data-bs-theme", "dark");
-            } else {
-                document.documentElement.setAttribute("data-bs-theme", "light");
-            }
-        </script>' . $css . '
+        <title>[TopNav] ' . $doc . '</title>' . $css . '
     </head>
     <body class="d-flex flex-column min-vh-100">' . $head . $log . $main . $foot . $js . '
     </body>

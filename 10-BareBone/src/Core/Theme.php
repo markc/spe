@@ -45,7 +45,32 @@ abstract class Theme
         Util::elog(__METHOD__);
 
         return '
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script>
+            function setTheme(theme) {
+                const htmlElement = document.documentElement;
+                htmlElement.setAttribute("data-bs-theme", theme);
+                localStorage.setItem("theme", theme);
+                updateThemeIcon(theme);
+            }
+            function toggleTheme() {
+                const currentTheme = document.documentElement.getAttribute("data-bs-theme");
+                setTheme(currentTheme === "dark" ? "light" : "dark");
+            }
+            function updateThemeIcon(theme) {
+                const icon = document.getElementById("theme-icon");
+                if (icon) {
+                    icon.className = theme === "dark" ? "bi bi-moon-fill" : "bi bi-sun-fill";
+                }
+            }
+            const storedTheme = localStorage.getItem("theme");
+            if (storedTheme) {
+                setTheme(storedTheme);
+            } else {
+                const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                setTheme(prefersDark ? "dark" : "light");
+            }
+        </script>
         <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
         <link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
@@ -62,48 +87,7 @@ abstract class Theme
         Util::elog(__METHOD__);
 
         return '
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                const toastElList = document.querySelectorAll(".toast");
-                toastElList.forEach(function(toastEl) {
-                    const toast = new bootstrap.Toast(toastEl, {
-                        autohide: true,
-                        delay: 3000
-                    });
-                    toast.show();
-                });
-            });
-            function showToast(message, type) {
-                const toastContainer = document.createElement("div");
-                toastContainer.setAttribute("aria-live", "polite");
-                toastContainer.setAttribute("aria-atomic", "true");
-                toastContainer.style.position = "fixed";
-                toastContainer.style.top = "20px";
-                toastContainer.style.right = "20px";
-                toastContainer.style.zIndex = "1050";
-
-                toastContainer.innerHTML = 
-                    \'<div class="toast align-items-center text-white bg-\' + type + \' border-0" role="alert" aria-live="assertive" aria-atomic="true">\' +
-                        \'<div class="d-flex">\' +
-                            \'<div class="toast-body">\' + message + \'</div>\' +
-                            \'<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>\' +
-                        \'</div>\' +
-                    \'</div>\';
-
-                document.body.appendChild(toastContainer);
-                const toastElement = toastContainer.querySelector(".toast");
-                const toast = new bootstrap.Toast(toastElement, {
-                    autohide: true,
-                    delay: 3000
-                });
-                toast.show();
-
-                toastElement.addEventListener("hidden.bs.toast", () => {
-                    toastContainer.remove();
-                });
-            }    
-        </script>';
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>';
     }
 
     public function log(): string
@@ -136,7 +120,7 @@ abstract class Theme
 
         $o = '?o=' . $this->ctx->in['o'];
 
-        $links = join('', array_map(function ($n) use ($o)
+        return join('', array_map(function ($n) use ($o)
         {
             $url = is_string($n[1]) ? $n[1] : '';
             $c = $o === $url ? ' active' : '';
@@ -146,27 +130,32 @@ abstract class Theme
                             <a class="nav-link' . $c . '" href="' . $url . '"' . ($c ? ' aria-current="page"' : '') . '>' . $icon . $n[0] . '</a>
                         </li>';
         }, $this->ctx->nav));
-
-        return '
-        <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-            <div class="container">
-                <a class="navbar-brand" href="/">« ' . $this->ctx->out['head'] . '</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">' . $links . '
-                    </ul>
-                </div>
-            </div>
-        </nav>';
     }
 
     public function head(): string
     {
         Util::elog(__METHOD__);
 
-        return $this->ctx->out['nav1'];
+        return '
+        <nav class="navbar navbar-expand-md fixed-top">
+            <div class="container">
+                <a class="navbar-brand" href="/">« ' . $this->ctx->out['head'] . '</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="toggleTheme(); return false;">
+                                <i id="theme-icon" class="bi bi-sun-fill"></i>
+                            </a>
+                        </li>' . $this->ctx->out['nav1'] . '
+                    </ul>
+                </div>
+            </div>
+        </nav>';
+
+        //return $this->ctx->out['nav1'];
     }
 
     public function main(): string
