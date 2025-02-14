@@ -79,7 +79,8 @@ echo new class {
     {
         return '
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+            <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/fonts/bootstrap-icons.woff2" as="font" type="font/woff2" crossorigin>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
             <script>
             function setTheme(theme) {
                 const htmlElement = document.documentElement;
@@ -125,7 +126,7 @@ echo new class {
     private function head(): string
     {
         return '
-        <nav class="navbar navbar-expand-md bg-body-secondary fixed-top">
+        <nav class="navbar navbar-expand-md bg-body-secondary fixed-top border-bottom shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="/">' . $this->out['head'] . '</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -156,7 +157,7 @@ echo new class {
     {
         return '
 
-        <footer class="container-fluid text-center py-3 mt-auto bg-body-secondary">
+        <footer class="container-fluid text-center py-3 mt-auto bg-body-secondary border-top shadow-sm">
             <div class="container">
                 <p class="text-muted mb-0"><small>' . $this->out['foot'] . '</small></p>
             </div>
@@ -172,19 +173,50 @@ echo new class {
     private function home(): string
     {
         return '
-    <div class="px-4 py-5 rounded-3 border">
+    <div class="px-4 py-5 rounded-3 border bg-body-tertiary">
         <div class="row d-flex justify-content-center">
             <div class="col-lg-8 col-md-10 col-sm-12">
-                <h1 class="display-5 fw-bold text-center">&#x2699; Home Page</h1>
-                <p class="lead mb-4">
-This is an ultra simple single-file PHP8 plus Bootstrap 5 framework and
-template system example. Comments and pull requests are most welcome via the
-Issue Tracker link.
-                </p>  
-                <p class="text-center">
-                    <a class="btn btn-primary mx-2" href="https://github.com/markc/spe">&#x2699; SPE Project Page</a>
-                    <a class="btn btn-primary mx-2" href="https://github.com/markc/spe/issues">&#x2699; SPE Issue Tracker</a>
+                <h1 class="display-5 fw-bold text-center"><i class="bi bi-gear"></i> Home Page</h1>
+                <p class="lead mb-4 text-center">
+This is an ultra simple single-file PHP8 plus Bootstrap 5 framework implementing
+the <strong>Method Template</strong> design pattern...
                 </p>
+                <div class="card mt-4 mb-4 bg-body-secondary">
+                    <div class="card-body px-4">
+                        <p>
+The Method Template Pattern in PHP provides a framework for defining a
+rendering system while allowing specific steps to be deferred to 
+subclasses. At its core, it establishes a base template method that controls the 
+overall structure and flow of content generation, while individual methods 
+handle specific rendering tasks. This approach enables a clean separation 
+between the structural aspects of content generation and the actual 
+implementation details.
+                        </p>
+                        <p>
+What makes this pattern particularly powerful is its return-based nature, where 
+each method returns content rather than directly outputting it. This fundamental 
+characteristic allows rendered content to be collected, transformed, and 
+manipulated before final output. Methods can be called from anywhere in the 
+codebase without concern for output ordering, and the resulting content can be 
+buffered, cached, or modified as needed. This flexibility, combined with PHP 
+8.4\'s enhanced type system, creates a robust and maintainable approach to 
+content rendering that naturally supports component-based architecture while 
+enabling sophisticated content transformation pipelines.
+                        </p>
+                    </div>
+                </div>
+                <div class="container my-4">
+                    <div class="d-flex flex-column flex-md-row gap-4 justify-content-center">
+                        <button class="btn btn-primary d-flex align-items-center justify-content-center gap-2 w-100 w-md-auto">
+                            <i class="bi bi-github"></i>
+                            SPE Project Page
+                        </button>
+                        <button class="btn btn-primary d-flex align-items-center justify-content-center gap-2 w-100 w-md-auto">
+                            <i class="bi bi-git"></i>
+                            SPE Issue Tracker
+                        </button>
+                    </div>
+                </div>
                 <footer class="mb-4 text-center">' . __METHOD__ . '</footer>
             </div>
         </div>
@@ -194,10 +226,10 @@ Issue Tracker link.
     private function about(): string
     {
         return '
-        <div class="px-4 py-5 rounded-3 border">
+        <div class="px-4 py-5 rounded-3 border bg-body-tertiary">
             <div class="row d-flex justify-content-center">
                 <div class="col-lg-8 col-md-10 col-sm-12">
-                    <h1 class="display-5 fw-bold text-center">&#x2699; About Page</h1>
+                    <h1 class="display-5 fw-bold text-center"><i class="bi bi-gear"></i> About Page</h1>
                     <p class="lead mb-4">
 This is an experimental PHP8 framework intended to provide a minimal, yet
 functional, structure for exploring framework design principles and the new
@@ -207,16 +239,28 @@ they can benefit from features like union types, match expressions, and
 constructor property promotion. Key components include a simple routing
 mechanism, a basic dependency injection system, and an event dispatcher.
                     </p>
-                    <p class="text-center fw-light fst-italic">
+                        <div class="card mt-4 mb-4 bg-body-secondary">
+                            <div class="card-body px-4">
+                    <p class="text-center fw-semi-bold fst-italic">
 The code is available on <a href="https://github.com/markc/spe">GitHub</a>,
 and contributions are most welcome. Feel free to contact me at
 <a href="mailto:' . $this->email . '">' . $this->email . '</a> or via the
 Issue Tracker below with any questions or suggestions.
-                    </p>  
-                    <p class="text-center">
-                        <a class="btn btn-primary mx-2" href="https://github.com/markc/spe">&#x2699; SPE Project Page</a>
-                        <a class="btn btn-primary mx-2" href="https://github.com/markc/spe/issues">&#x2699; SPE Issue Tracker</a>
                     </p>
+                    </div>
+                    </div>
+                    <div class="container my-4">
+                        <div class="d-flex flex-column flex-md-row gap-4 justify-content-center">
+                            <button class="btn btn-primary d-flex align-items-center justify-content-center gap-2 w-100 w-md-auto">
+                                <i class="bi bi-github"></i>
+                                SPE Project Page
+                            </button>
+                            <button class="btn btn-primary d-flex align-items-center justify-content-center gap-2 w-100 w-md-auto">
+                                <i class="bi bi-git"></i>
+                                SPE Issue Tracker
+                            </button>
+                        </div>
+                    </div>
                     <footer class="mb-4 text-center">' . __METHOD__ . '</footer>
                 </div>
             </div>
@@ -226,21 +270,16 @@ Issue Tracker below with any questions or suggestions.
     private function contact(): string
     {
         return '
-            <div class="px-4 py-5 rounded-3 border">
+            <div class="px-4 py-5 rounded-3 border bg-body-tertiary">
                 <div class="row d-flex justify-content-center">
                     <div class="col-lg-8 col-md-10 col-sm-12">
-                        <h1 class="display-5 fw-bold text-center">⚙ Contact Page</h1>
+                        <h1 class="display-5 fw-bold text-center"><i class="bi bi-gear"></i> Contact Page</h1>
                         <p class="lead mb-4">
-                            This is an ultra simple single-file PHP8 plus Bootstrap 5 framework implementing the <strong>Method Template</strong> design pattern. This pattern:
-                        </p>  
-                        <ul>
-                            <li>Defines the skeleton of an algorithm where some steps can be deferred to subclasses</li>
-                            <li>Each method can render specific HTML content that gets wrapped in appropriate HTML tags</li>
-                            <li>Methods act as templates that control the rendering flow while being extensible</li>
-                            <li>Enables clean separation between structural HTML elements and dynamic content</li>
-                            <li>Combines PHP8\'s modern features with Bootstrap 5\'s responsive design system</li>
-                        </ul>
-                        <div class="card mt-4 mb-4">
+This is an ultra simple single-file PHP8 plus Bootstrap 5 framework and
+template system example. Comments and pull requests are most welcome via the
+Issue Tracker link.
+                        </p>                          
+                        <div class="card mt-4 mb-4 bg-body-secondary">
                             <div class="card-body px-4">
                                 <form method="post" onsubmit="return mailform(this);">
                                     <div class="mb-3">
@@ -257,10 +296,18 @@ Issue Tracker below with any questions or suggestions.
                                 </form>
                             </div>
                         </div>
-                        <p class="text-center">
-                            <a class="btn btn-primary mx-2" href="https://github.com/markc/spe">⚙ SPE Project Page</a>
-                            <a class="btn btn-primary mx-2" href="https://github.com/markc/spe/issues">⚙ SPE Issue Tracker</a>
-                        </p>
+                        <div class="container my-4">
+                            <div class="d-flex flex-column flex-md-row gap-4 justify-content-center">
+                                <button class="btn btn-primary d-flex align-items-center justify-content-center gap-2 w-100 w-md-auto">
+                                    <i class="bi bi-github"></i>
+                                    SPE Project Page
+                                </button>
+                                <button class="btn btn-primary d-flex align-items-center justify-content-center gap-2 w-100 w-md-auto">
+                                    <i class="bi bi-git"></i>
+                                    SPE Issue Tracker
+                                </button>
+                            </div>
+                        </div>
                         <footer class="mb-4 text-center">' . __METHOD__ . '</footer>
                     </div>
                 </div>
