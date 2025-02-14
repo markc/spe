@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-// Created: 20150101 - Updated: 20250206
+// Created: 20150101 - Updated: 20250214
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 echo new class {
@@ -77,12 +77,12 @@ echo new class {
     private function css(): string
     {
         return '
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">';
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">';
     }
 
     private function nav(): string
     {
-        $a = join('', array_map(function ($n)
+        return join('', array_map(function ($n)
         {
             $url = str_starts_with($n[1], 'http') ? $n[1] : "?m=$n[1]";
             $c = $this->in['m'] === $n[1] ? ' active" aria-current="page"' : '"';
@@ -91,6 +91,11 @@ echo new class {
                             <a class="nav-link' . $c . ' href="' . $url . '">' . $n[0] . '</a>
                         </li>';
         }, $this->nav));
+    }
+
+    private function head(): string
+    {
+        //return $this->out['nav'];
 
         return '
         <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
@@ -100,16 +105,11 @@ echo new class {
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">' . $a . '
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">' . $this->out['nav'] . '
                     </ul>
                 </div>
             </div>
         </nav>';
-    }
-
-    private function head(): string
-    {
-        return $this->out['nav'];
     }
 
     private function main(): string
