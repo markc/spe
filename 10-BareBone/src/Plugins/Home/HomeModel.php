@@ -15,9 +15,9 @@ final class HomeModel extends Plugin
         Util::elog(__METHOD__);
 
         return [
-            'head' => 'BareBone Plugin Example',
+            'head' => 'SPE::10 BareBone Example',
             'main' => 'This BareBone sub-project only has the Core classes plus two simple plugins; Home and Example. The purpose of this sub-project is to be able to start a fresh project from a simple baseline and add whatever plugins you care to following the guide at <a href="https://github.com/markc/spe/tree/master/10-BareBone">10-BareBone</a> and the two simple demo Plugins.',
-            'foot' => __METHOD__
+            'foot' => __METHOD__ . ' (action)<br>Using the ' . $this->ctx->in['t'] . ' theme'
         ];
     }
 }

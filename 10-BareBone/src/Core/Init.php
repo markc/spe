@@ -22,7 +22,7 @@ readonly class Init
 
         foreach ($this->ctx->in as $k => &$v) $v = Util::ses($k, $v);
 
-        extract($this->ctx->in);
+        extract($this->ctx->in, EXTR_SKIP);
 
         $pm = $ns ? "{$ns}\\Plugins\\{$o}\\{$o}Model" : "{$o}Model";
         $t1 = $ns ? "{$ns}\\Plugins\\{$o}\\{$o}View" : "{$o}View";
