@@ -23,9 +23,9 @@ echo new class {
     ];
 
     private $nav = [
-        ['Home', 'home'],
-        ['About', 'about'],
-        ['Contact', 'contact']
+        ['Home', 'home', 'bi bi-house-door'],
+        ['About', 'about', 'bi bi-question-octagon'],
+        ['Contact', 'contact', 'bi bi-person-rolodex']
     ];
 
     public function __construct()
@@ -106,16 +106,18 @@ echo new class {
             }
         </script>';
     }
-
-    private function nav(): string
+    public function nav(): string
     {
-        return join('', array_map(function ($n)
+        $o = '?m=' . $this->in['m'];
+
+        return join('', array_map(function ($n) use ($o)
         {
-            $url = str_starts_with($n[1], 'http') ? $n[1] : "?m=$n[1]";
-            $c = $this->in['m'] === $n[1] ? ' active" aria-current="page"' : '"';
+            $url = is_string($n[1]) ? "?m=$n[1]" : '';
+            $c = $o === $url ? ' active' : '';
+            $icon = isset($n[2]) ? '<i class="' . $n[2] . ' me-1"></i>' : '';
             return '
                         <li class="nav-item">
-                            <a class="nav-link' . $c . ' href="' . $url . '">' . $n[0] . '</a>
+                            <a class="nav-link' . $c . '" href="' . $url . '"' . ($c ? ' aria-current="page"' : '') . '>' . $icon . $n[0] . '</a>
                         </li>';
         }, $this->nav));
     }
@@ -180,8 +182,8 @@ template system example. Comments and pull requests are most welcome via the
 Issue Tracker link.
                 </p>  
                 <p class="text-center">
-                    <a class="btn btn-primary" href="https://github.com/markc/spe">&#x2699; SPE Project Page</a>
-                    <a class="btn btn-primary" href="https://github.com/markc/spe/issues">&#x2699; SPE Issue Tracker</a>
+                    <a class="btn btn-primary mx-2" href="https://github.com/markc/spe">&#x2699; SPE Project Page</a>
+                    <a class="btn btn-primary mx-2" href="https://github.com/markc/spe/issues">&#x2699; SPE Issue Tracker</a>
                 </p>
                 <footer class="mb-4 text-center">' . __METHOD__ . '</footer>
             </div>
@@ -212,8 +214,8 @@ and contributions are most welcome. Feel free to contact me at
 Issue Tracker below with any questions or suggestions.
                     </p>  
                     <p class="text-center">
-                        <a class="btn btn-primary" href="https://github.com/markc/spe">&#x2699; SPE Project Page</a>
-                        <a class="btn btn-primary" href="https://github.com/markc/spe/issues">&#x2699; SPE Issue Tracker</a>
+                        <a class="btn btn-primary mx-2" href="https://github.com/markc/spe">&#x2699; SPE Project Page</a>
+                        <a class="btn btn-primary mx-2" href="https://github.com/markc/spe/issues">&#x2699; SPE Issue Tracker</a>
                     </p>
                     <footer class="mb-4 text-center">' . __METHOD__ . '</footer>
                 </div>
@@ -256,8 +258,8 @@ Issue Tracker below with any questions or suggestions.
                             </div>
                         </div>
                         <p class="text-center">
-                            <a class="btn btn-primary" href="https://github.com/markc/spe">⚙ SPE Project Page</a>
-                            <a class="btn btn-primary" href="https://github.com/markc/spe/issues">⚙ SPE Issue Tracker</a>
+                            <a class="btn btn-primary mx-2" href="https://github.com/markc/spe">⚙ SPE Project Page</a>
+                            <a class="btn btn-primary mx-2" href="https://github.com/markc/spe/issues">⚙ SPE Issue Tracker</a>
                         </p>
                         <footer class="mb-4 text-center">' . __METHOD__ . '</footer>
                     </div>
