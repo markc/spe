@@ -302,34 +302,46 @@ abstract class Plugin
         return $this->buf;
     }
 
-    abstract public function read(): string;
+    // abstract public function create(): string;
+    // abstract public function read(): string;
+    // abstract public function update(): string;
+    // abstract public function delete(): string;
+    // abstract public function list(): string;
 
     public function create(): string
     {
         Util::elog(__METHOD__);
 
-        return "Plugin::create() not implemented yet!";
+        return __METHOD__ . " not implemented yet!";
+    }
+
+
+    public function read(): string
+    {
+        Util::elog(__METHOD__);
+
+        return __METHOD__ . " not implemented yet!";
     }
 
     public function update(): string
     {
         Util::elog(__METHOD__);
 
-        return "Plugin::update() not implemented yet!";
+        return __METHOD__ . " not implemented yet!";
     }
 
     public function delete(): string
     {
         Util::elog(__METHOD__);
 
-        return "Plugin::delete() not implemented yet!";
+        return __METHOD__ . " not implemented yet!";
     }
 
     public function list(): string
     {
         Util::elog(__METHOD__);
 
-        return "Plugin::list() not implemented yet!";
+        return __METHOD__ . " not implemented yet!";
     }
 }
 
