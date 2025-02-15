@@ -1,12 +1,12 @@
 <?php
 
 declare(strict_types=1);
-// Created: 20150101 - Updated: 20250207
+// Created: 20150101 - Updated: 20250215
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 define('DBG', true);
 
-class Config
+class Ctx
 {
     public function __construct(
         public string $email = 'markc@renta.net',
@@ -17,7 +17,7 @@ class Config
             'x' => '',      // XHR (request)
         ],
         public array $out = [
-            'doc'   => 'SPE::03',
+            'doc'   => 'SPE::03 Plugins',
             'css'   => '',
             'log'   => '',
             'nav1'  => '',
@@ -27,9 +27,9 @@ class Config
             'js'    => '',
         ],
         public array $nav1 = [
-            ['Home', '?o=home'],
-            ['About', '?o=about'],
-            ['Contact', '?o=contact'],
+            ['Home', 'home', 'bi bi-house-door'],
+            ['About', 'about', 'bi bi-question-octagon'],
+            ['Contact', 'contact', 'bi bi-person-rolodex']
         ]
     )
     {
@@ -40,37 +40,37 @@ class Config
 readonly class Init
 {
     public function __construct(
-        private Config $config
+        private Ctx $ctx
     )
     {
         Util::elog(__METHOD__);
 
         // Process input parameters
-        foreach ($this->config->in as $k => $v)
+        foreach ($this->ctx->in as $k => $v)
         {
-            $this->config->in[$k] = $_REQUEST[$k] ?? $v;
+            $this->ctx->in[$k] = $_REQUEST[$k] ?? $v;
             if (isset($_REQUEST[$k]))
             {
-                $this->config->in[$k] = htmlentities(trim($_REQUEST[$k]));
+                $this->ctx->in[$k] = htmlentities(trim($_REQUEST[$k]));
             }
         }
 
         // Handle plugin execution (o=plugin object/class, m=action method)
-        $object = $this->config->in['o'];
-        $method = $this->config->in['m'];
-        $this->config->out['main'] = match (true)
+        $object = $this->ctx->in['o'];
+        $method = $this->ctx->in['m'];
+        $this->ctx->out['main'] = match (true)
         {
             !class_exists($object) => "Error: no plugin object!",
             !method_exists($object, $method) => "Error: no plugin method!",
-            default => (new $object($this->config))->$method()
+            default => (new $object($this->ctx))->$method()
         };
 
         // Process output components
-        foreach ($this->config->out as $k => $v)
+        foreach ($this->ctx->out as $k => $v)
         {
             if (method_exists($this, $k))
             {
-                $this->config->out[$k] = $this->$k();
+                $this->ctx->out[$k] = $this->$k();
             }
         }
     }
@@ -79,14 +79,37 @@ readonly class Init
     {
         Util::elog(__METHOD__);
 
-        if ($this->config->in['x'])
+        if ($this->ctx->in['x'])
         {
-            $xhr = $this->config->out[$this->config->in['x']] ?? '';
+            $xhr = $this->ctx->out[$this->ctx->in['x']] ?? '';
             if ($xhr) return $xhr;
             header('Content-Type: application/json');
-            return json_encode($this->config->out, JSON_PRETTY_PRINT);
+            return json_encode($this->ctx->out, JSON_PRETTY_PRINT);
         }
         return $this->html();
+    }
+
+    private function html(): string
+    {
+        Util::elog(__METHOD__);
+
+        extract($this->ctx->out, EXTR_SKIP);
+
+        return '<!DOCTYPE html>
+<html lang="en" data-bs-theme="auto">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="color-scheme" content="dark light">
+        <meta name="description" content="Simple PHP Example">
+        <meta name="author" content="Mark Constable">
+        <link rel="icon" href="favicon.ico">
+        <title>' . $doc . '</title>' . $css . '
+    </head>
+    <body class="d-flex flex-column min-vh-100">' . $head . $main . $foot . $js . '
+    </body>
+</html>
+';
     }
 
     private function css(): string
@@ -94,10 +117,34 @@ readonly class Init
         Util::elog(__METHOD__);
 
         return '
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-        <style>
-            body { padding-top: 4.5rem; }
-        </style>';
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+            <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/fonts/bootstrap-icons.woff2" as="font" type="font/woff2" crossorigin>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+            <script>
+            function setTheme(theme) {
+                const htmlElement = document.documentElement;
+                htmlElement.setAttribute("data-bs-theme", theme);
+                localStorage.setItem("theme", theme);
+                updateThemeIcon(theme);
+            }
+            function toggleTheme() {
+                const currentTheme = document.documentElement.getAttribute("data-bs-theme");
+                setTheme(currentTheme === "dark" ? "light" : "dark");
+            }
+            function updateThemeIcon(theme) {
+                const icon = document.getElementById("theme-icon");
+                if (icon) {
+                    icon.className = theme === "dark" ? "bi bi-moon-fill" : "bi bi-sun-fill";
+                }
+            }
+            const storedTheme = localStorage.getItem("theme");
+            if (storedTheme) {
+                setTheme(storedTheme);
+            } else {
+                const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                setTheme(prefersDark ? "dark" : "light");
+            }
+        </script>';
     }
 
     private function js(): string
@@ -105,7 +152,7 @@ readonly class Init
         Util::elog(__METHOD__);
 
         return '
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
             <script>
                 document.addEventListener("DOMContentLoaded", function() {
                     const toastElList = document.querySelectorAll(".toast");
@@ -149,14 +196,14 @@ readonly class Init
             </script>';
     }
 
-    public function log(): string
+    private function log(): string
     {
         Util::elog(__METHOD__);
-        //Util::elog(__METHOD__ . ' ' . var_export($this->config, true));
+        //Util::elog(__METHOD__ . ' ' . var_export($this->ctx, true));
 
-        if ($this->config->in['l'])
+        if ($this->ctx->in['l'])
         {
-            [$lvl, $msg] = explode(':', $this->config->in['l']);
+            [$lvl, $msg] = explode(':', $this->ctx->in['l']);
             $bgClass = $lvl === 'success' ? 'bg-success' : 'bg-danger';
             return '
         <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1500">
@@ -176,36 +223,41 @@ readonly class Init
     {
         Util::elog(__METHOD__);
 
-        $o = '?o=' . $this->config->in['o'];
-        $links = join('', array_map(function ($n) use ($o)
+        $o = '?o=' . $this->ctx->in['o'];
+        return join('', array_map(function ($n) use ($o)
         {
-            $url = str_starts_with($n[1], 'http') ? $n[1] : $n[1];
+            $url = is_string($n[1]) ? "?o=$n[1]" : '';
             $c = $o === $url ? ' active' : '';
+            $icon = isset($n[2]) ? '<i class="' . $n[2] . ' me-1"></i>' : '';
             return '
                         <li class="nav-item">
-                            <a class="nav-link' . $c . '" href="' . $url . '"' . ($c ? ' aria-current="page"' : '') . '>' . $n[0] . '</a>
+                            <a class="nav-link' . $c . '" href="' . $url . '"' . ($c ? ' aria-current="page"' : '') . '>' . $icon . $n[0] . '</a>
                         </li>';
-        }, $this->config->nav1));
-
-        return '
-        <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-            <div class="container">
-                <a class="navbar-brand" href="/">« ' . $this->config->out['head'] . '</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">' . $links . '</ul>
-                </div>
-            </div>
-        </nav>';
+        }, $this->ctx->nav1));
     }
 
     private function head(): string
     {
         Util::elog(__METHOD__);
 
-        return $this->config->out['nav1'];
+        return '
+        <nav class="navbar navbar-expand-md bg-body-secondary fixed-top border-bottom shadow-sm">
+            <div class="container">
+                <a class="navbar-brand" href="/">« ' . $this->ctx->out['head'] . '</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="toggleTheme(); return false;">
+                                <i id="theme-icon" class="bi bi-sun-fill"></i>
+                            </a>
+                        </li>' . $this->ctx->out['nav1'] . '
+                    </ul>
+                </div>
+            </div>
+        </nav>';
     }
 
     private function main(): string
@@ -213,7 +265,9 @@ readonly class Init
         Util::elog(__METHOD__);
 
         return '
-        <main class="container py-4">' . $this->config->out['main'] . '</main>';
+
+        <main class="container py-5 mt-5">' . $this->ctx->out['main'] . '
+        </main>';
     }
 
     private function foot(): string
@@ -221,31 +275,12 @@ readonly class Init
         Util::elog(__METHOD__);
 
         return '
-        <footer class="bg-light text-center py-3 mt-auto">
+
+        <footer class="container-fluid text-center py-3 mt-auto bg-body-secondary border-top shadow-sm">
             <div class="container">
-                <p class="text-muted mb-0"><small>' . $this->config->out['foot'] . '</small></p>
+                <p class="text-muted mb-0"><small>' . $this->ctx->out['foot'] . '</small></p>
             </div>
         </footer>';
-    }
-
-    private function html(): string
-    {
-        Util::elog(__METHOD__);
-
-        extract($this->config->out, EXTR_SKIP);
-        return '<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Simple PHP Example with Plugins">
-        <meta name="author" content="Mark Constable">
-        <link rel="icon" href="favicon.ico">
-        <title>' . $doc . '</title>' . $css . '
-    </head>
-    <body class="d-flex flex-column min-vh-100">' . $head . $log . $main . $foot . $js . '
-    </body>
-</html>';
     }
 }
 
@@ -254,7 +289,7 @@ abstract class Plugin
     protected string $buf = '';
 
     public function __construct(
-        protected readonly Config $config
+        protected readonly Ctx $ctx
     )
     {
         Util::elog(__METHOD__);
@@ -305,10 +340,73 @@ final class Home extends Plugin
         Util::elog(__METHOD__);
 
         return '
+    <div class="px-4 py-5 rounded-3 border bg-body-tertiary">
+        <div class="row d-flex justify-content-center">
+            <div class="col-lg-8 col-md-10 col-sm-12">
+                <h1 class="display-5 fw-bold text-center"><i class="bi bi-gear"></i> Home Page</h1>
+                <p class="lead mb-4 text-center">
+This is an ultra simple single-file PHP8 plus Bootstrap 5 framework implementing
+the <strong>Method Template</strong> design pattern...
+                </p>
+                <div class="card mt-4 mb-4 bg-body-secondary">
+                    <div class="card-body px-4">
+                        <p>
+The Method Template Pattern in PHP provides a framework for defining a
+rendering system while allowing specific steps to be deferred to 
+subclasses. At its core, it establishes a base template method that controls the 
+overall structure and flow of content generation, while individual methods 
+handle specific rendering tasks. This approach enables a clean separation 
+between the structural aspects of content generation and the actual 
+implementation details.
+                        </p>
+                        <p>
+What makes this pattern particularly powerful is its return-based nature, where 
+each method returns content rather than directly outputting it. This fundamental 
+characteristic allows rendered content to be collected, transformed, and 
+manipulated before final output. Methods can be called from anywhere in the 
+codebase without concern for output ordering, and the resulting content can be 
+buffered, cached, or modified as needed. This flexibility, combined with PHP 
+8.4\'s enhanced type system, creates a robust and maintainable approach to 
+content rendering that naturally supports component-based architecture while 
+enabling sophisticated content transformation pipelines.
+                        </p>
+                    </div>
+                </div>
+                <div class="container my-4">
+                    <div class="d-flex flex-column flex-md-row gap-4 justify-content-center">
+                        <button class="btn btn-primary d-flex align-items-center justify-content-center gap-2 w-100 w-md-auto">
+                            <i class="bi bi-github"></i>
+                            SPE Project Page
+                        </button>
+                        <button class="btn btn-primary d-flex align-items-center justify-content-center gap-2 w-100 w-md-auto">
+                            <i class="bi bi-git"></i>
+                            SPE Issue Tracker
+                        </button>
+                    </div>
+                    <form method="post">
+                        <div class="d-flex flex-column flex-sm-row gap-4 justify-content-center my-4">
+                            <button type="button" class="btn btn-success flex-fill" onclick="showToast(\'Everything is working great!\', \'success\');">Success Message</button>
+                            <button type="button" class="btn btn-danger flex-fill" onclick="showToast(\'Something went wrong!\', \'danger\');">Danger Message</button>
+                        </div>
+                    </form>
+                    <pre id="dbg" class="text-start overflow-auto"></pre>
+                </div>
+                <footer class="mb-4 text-center">' . __METHOD__ . '</footer>
+            </div>
+        </div>
+    </div>';
+    }
+
+
+    public function read2(): string
+    {
+        Util::elog(__METHOD__);
+
+        return '
             <div class="px-4 py-5 bg-light rounded-3 border">
                 <div class="row d-flex justify-content-center">
                 <div class="col-lg-8 col-md-10 col-sm-12">
-                    <h1 class="display-5 fw-bold text-center">' . $this->config->out['head'] . '</h1>
+                    <h1 class="display-5 fw-bold text-center">' . $this->ctx->out['head'] . '</h1>
                     <p class="lead mb-4">
 This is an example of a simple PHP8.4 "framework" to provide the core
 structure for further experimental development with both the framework
@@ -333,7 +431,46 @@ final class About extends Plugin
     {
         Util::elog(__METHOD__);
 
-        return '<h1 class="text-center">This is the About page</h1>';
+        return '
+        <div class="px-4 py-5 rounded-3 border bg-body-tertiary">
+            <div class="row d-flex justify-content-center">
+                <div class="col-lg-8 col-md-10 col-sm-12">
+                    <h1 class="display-5 fw-bold text-center"><i class="bi bi-gear"></i> About Page</h1>
+                    <p class="lead mb-4">
+This is an experimental PHP8 framework intended to provide a minimal, yet
+functional, structure for exploring framework design principles and the new
+features of PHP8.  The aim is to create a learn-by-doing environment for
+developers interested in understanding how frameworks are built and how
+they can benefit from features like union types, match expressions, and
+constructor property promotion. Key components include a simple routing
+mechanism, a basic dependency injection system, and an event dispatcher.
+                    </p>
+                        <div class="card mt-4 mb-4 bg-body-secondary">
+                            <div class="card-body px-4">
+                    <p class="text-center fw-semi-bold fst-italic">
+The code is available on <a href="https://github.com/markc/spe">GitHub</a>,
+and contributions are most welcome. Feel free to contact me at
+<a href="mailto:' . $this->ctx->email . '">' . $this->ctx->email . '</a> or via the
+Issue Tracker below with any questions or suggestions.
+                    </p>
+                    </div>
+                    </div>
+                    <div class="container my-4">
+                        <div class="d-flex flex-column flex-md-row gap-4 justify-content-center">
+                            <button class="btn btn-primary d-flex align-items-center justify-content-center gap-2 w-100 w-md-auto">
+                                <i class="bi bi-github"></i>
+                                SPE Project Page
+                            </button>
+                            <button class="btn btn-primary d-flex align-items-center justify-content-center gap-2 w-100 w-md-auto">
+                                <i class="bi bi-git"></i>
+                                SPE Issue Tracker
+                            </button>
+                        </div>
+                    </div>
+                    <footer class="mb-4 text-center">' . __METHOD__ . '</footer>
+                </div>
+            </div>
+        </div>';
     }
 }
 
@@ -343,7 +480,60 @@ final class Contact extends Plugin
     {
         Util::elog(__METHOD__);
 
-        return '<h1 class="text-center">This is the Contact page</h1>';
+        return '
+        <div class="px-4 py-5 rounded-3 border bg-body-tertiary">
+            <div class="row d-flex justify-content-center">
+                <div class="col-lg-8 col-md-10 col-sm-12">
+                    <h1 class="display-5 fw-bold text-center"><i class="bi bi-gear"></i> Contact Page</h1>
+                    <p class="lead mb-4">
+This is an ultra simple single-file PHP8 plus Bootstrap 5 framework and
+template system example. Comments and pull requests are most welcome via the
+Issue Tracker link.
+                    </p>
+                    <div class="card mt-4 mb-4 bg-body-secondary">
+                        <div class="card-body px-4">
+                            <form method="post" onsubmit="return mailform(this);">
+                                <div class="mb-3">
+                                    <label for="subject" class="form-label">Subject</label>
+                                    <input type="text" class="form-control form-control-lg" id="subject" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="message" class="form-label">Message</label>
+                                    <textarea class="form-control form-control-lg" id="message" rows="4" required></textarea>
+                                </div>
+                                <div class="mb-3 text-end">
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="container my-4">
+                        <div class="d-flex flex-column flex-md-row gap-4 justify-content-center">
+                            <button class="btn btn-primary d-flex align-items-center justify-content-center gap-2 w-100 w-md-auto">
+                                <i class="bi bi-github"></i>
+                                SPE Project Page
+                            </button>
+                            <button class="btn btn-primary d-flex align-items-center justify-content-center gap-2 w-100 w-md-auto">
+                                <i class="bi bi-git"></i>
+                                SPE Issue Tracker
+                            </button>
+                        </div>
+                    </div>
+                    <footer class="mb-4 text-center">' . __METHOD__ . '</footer>
+                </div>
+            </div>
+        </div>
+        <script>
+function mailform(form) {
+location.href = "mailto:' . $this->ctx->email . '"
+    + "?subject=" + encodeURIComponent(form.subject.value)
+    + "&body=" + encodeURIComponent(form.message.value);
+form.subject.value = "";
+form.message.value = "";
+alert("Thank you for your message. We will get back to you as soon as possible.");
+return false;
+}
+        </script>';
     }
 }
 
@@ -359,4 +549,4 @@ final class Util
 }
 
 // Bootstrap the application
-echo new Init(new Config());
+echo new Init(new Ctx());
