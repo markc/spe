@@ -118,8 +118,6 @@ abstract class Theme
                 </div>
             </div>
         </nav>';
-
-        //return $this->ctx->out['nav1'];
     }
 
     public function main(): string
