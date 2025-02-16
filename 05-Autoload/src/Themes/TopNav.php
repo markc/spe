@@ -41,53 +41,13 @@ class TopNav extends Theme
 ';
     }
 
-    //<link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/fonts/bootstrap-icons.woff2" as="font" type="font/woff2" crossorigin>
     public function css(): string
     {
         Util::elog(__METHOD__);
 
         return '
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
-            <style>
-                [data-bs-theme="light"] .nav-link {
-                    color: #333333 !important;
-                }
-                [data-bs-theme="light"] .nav-link:hover {
-                    color: #000000 !important;
-                }
-                [data-bs-theme="dark"] .nav-link {
-                    color: #e0e0e0 !important;
-                }
-                [data-bs-theme="dark"] .nav-link:hover {
-                    color: #ffffff !important;
-                }
-            </style>
-            <script>
-            function setTheme(theme) {
-                const htmlElement = document.documentElement;
-                htmlElement.setAttribute("data-bs-theme", theme);
-                localStorage.setItem("theme", theme);
-                updateThemeIcon(theme);
-            }
-            function toggleTheme() {
-                const currentTheme = document.documentElement.getAttribute("data-bs-theme");
-                setTheme(currentTheme === "dark" ? "light" : "dark");
-            }
-            function updateThemeIcon(theme) {
-                const icon = document.getElementById("theme-icon");
-                if (icon) {
-                    icon.className = theme === "dark" ? "bi bi-moon-fill" : "bi bi-sun-fill";
-                }
-            }
-            const storedTheme = localStorage.getItem("theme");
-            if (storedTheme) {
-                setTheme(storedTheme);
-            } else {
-                const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-                setTheme(prefersDark ? "dark" : "light");
-            }
-        </script>';
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">';
     }
 
     public function js(): string
@@ -96,47 +56,7 @@ class TopNav extends Theme
 
         return '
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-            <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                    const toastElList = document.querySelectorAll(".toast");
-                    toastElList.forEach(function(toastEl) {
-                        const toast = new bootstrap.Toast(toastEl, {
-                            autohide: true,
-                            delay: 3000
-                        });
-                        toast.show();
-                    });
-                });
-                function showToast(message, type) {
-                    const toastContainer = document.createElement("div");
-                    toastContainer.setAttribute("aria-live", "polite");
-                    toastContainer.setAttribute("aria-atomic", "true");
-                    toastContainer.style.position = "fixed";
-                    toastContainer.style.top = "20px";
-                    toastContainer.style.right = "20px";
-                    toastContainer.style.zIndex = "1050";
-
-                    toastContainer.innerHTML = 
-                        \'<div class="toast align-items-center text-white bg-\' + type + \' border-0" role="alert" aria-live="assertive" aria-atomic="true">\' +
-                            \'<div class="d-flex">\' +
-                                \'<div class="toast-body">\' + message + \'</div>\' +
-                                \'<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>\' +
-                            \'</div>\' +
-                        \'</div>\';
-
-                    document.body.appendChild(toastContainer);
-                    const toastElement = toastContainer.querySelector(".toast");
-                    const toast = new bootstrap.Toast(toastElement, {
-                        autohide: true,
-                        delay: 3000
-                    });
-                    toast.show();
-
-                    toastElement.addEventListener("hidden.bs.toast", () => {
-                        toastContainer.remove();
-                    });
-                }    
-            </script>';
+            <script src="public/js/TopNav.js"></script>';
     }
 
     public function log(): string
