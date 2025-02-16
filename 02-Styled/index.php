@@ -107,6 +107,7 @@ echo new class {
             }
         </script>';
     }
+
     public function nav(): string
     {
         $o = '?m=' . $this->in['m'];
