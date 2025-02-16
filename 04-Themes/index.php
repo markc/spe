@@ -636,6 +636,20 @@ class TopNav extends Theme
         return '
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
             <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+            <style>
+                [data-bs-theme="light"] .nav-link {
+                    color: #333333 !important;
+                }
+                [data-bs-theme="light"] .nav-link:hover {
+                    color: #000000 !important;
+                }
+                [data-bs-theme="dark"] .nav-link {
+                    color: #e0e0e0 !important;
+                }
+                [data-bs-theme="dark"] .nav-link:hover {
+                    color: #ffffff !important;
+                }
+            </style>
             <script>
             function setTheme(theme) {
                 const htmlElement = document.documentElement;
@@ -824,6 +838,20 @@ class SideBar extends Theme
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
             <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
             <style>
+                [data-bs-theme="light"] .nav-link {
+                    color: #333333 !important;
+                }
+                [data-bs-theme="light"] .nav-link:hover {
+                    color: #000000 !important;
+                }
+                [data-bs-theme="dark"] .nav-link {
+                    color: #e0e0e0 !important;
+                }
+                [data-bs-theme="dark"] .nav-link:hover {
+                    color: #ffffff !important;
+                }
+            </style>
+            <style>
             .fw {
   width: 1em;
   display: inline-block;
@@ -852,8 +880,6 @@ body {
 }
 .sidebar {
   width: 300px;
-  background-color: #343a40;
-  color: #fff;
   padding-top: 20px;
   position: fixed;
   height: calc(100vh - 56px);
@@ -874,13 +900,15 @@ body {
   margin-right: -300px;
 }
 .sidebar .nav-link {
-  color: #fff;
   padding: 10px 20px;
   display: flex;
   align-items: center;
+  color: var(--bs-nav-link-color);
+  text-decoration: none;
 }
 .sidebar .nav-link:hover {
-  background-color: #495057;
+  background-color: var(--bs-nav-link-hover-bg);
+  color: var(--bs-nav-link-hover-color);
 }
 .main-content {
   margin-left: 300px;
@@ -906,7 +934,14 @@ body {
 }
 .submenu {
   padding-left: 20px;
-  background-color: #2c3136;
+  background-color: var(--bs-tertiary-bg);
+}
+.submenu .nav-link {
+  color: var(--bs-nav-link-color);
+}
+.submenu .nav-link:hover {
+  background-color: var(--bs-nav-link-hover-bg);
+  color: var(--bs-nav-link-hover-color);
 }
 .submenu .nav-link {
   padding: 8px 20px;
@@ -937,7 +972,7 @@ body {
     position: fixed;
     top: 56px;
     bottom: 0;
-    background-color: #343a40;
+    background-color: var(--bs-tertiary-bg);
     z-index: 1030;
     width: 80%;
     max-width: 300px;
@@ -992,13 +1027,8 @@ body {
     right: 0.5rem;
   }
 
-  /* Ensure sidebar content is visible */
-  .sidebar .nav-link {
-    color: #fff !important;
-  }
-
   .submenu {
-    background-color: #2c3136 !important;
+    background-color: var(--bs-secondary-bg);
   }
 }
 
@@ -1021,6 +1051,31 @@ body {
         return '
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
             <script>
+         // Theme initialization
+         function setTheme(theme) {
+           const htmlElement = document.documentElement;
+           htmlElement.setAttribute("data-bs-theme", theme);
+           localStorage.setItem("theme", theme);
+           updateThemeIcon(theme);
+         }
+         function toggleTheme() {
+           const currentTheme = document.documentElement.getAttribute("data-bs-theme");
+           setTheme(currentTheme === "dark" ? "light" : "dark");
+         }
+         function updateThemeIcon(theme) {
+           const icon = document.getElementById("theme-icon");
+           if (icon) {
+             icon.className = theme === "dark" ? "bi bi-moon-fill" : "bi bi-sun-fill";
+           }
+         }
+         const storedTheme = localStorage.getItem("theme");
+         if (storedTheme) {
+           setTheme(storedTheme);
+         } else {
+           const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+           setTheme(prefersDark ? "dark" : "light");
+         }
+
          document.addEventListener("DOMContentLoaded", function () {
   // Sidebar elements
   const leftSidebar = document.getElementById("leftSidebar");
@@ -1119,14 +1174,9 @@ body {
   async function loadContent(url) {
     try {
       showLoading();
-      const csrfToken = document.querySelector(
-        \'meta[name="csrf-token"]\'
-      ).content;
       const response = await fetch(url, {
         headers: {
-          "X-Requested-With": "XMLHttpRequest",
-          "X-CSRF-TOKEN": csrfToken,
-          "X-CSRF-Token": csrfToken, // Add both variations for compatibility
+          "X-Requested-With": "XMLHttpRequest"
         },
       });
 
@@ -1144,12 +1194,12 @@ body {
       updateURL(url);
 
       // Update active states in navigation
-      const currentPath = new URL(url).searchParams.get("plugin") || "Home";
+      const currentPath = new URL(url).searchParams.get("o") || "Home";
       document.querySelectorAll("#leftSidebar .nav-link").forEach((link) => {
         link.classList.remove("active");
         if (
           link.href &&
-          new URL(link.href).searchParams.get("plugin")?.toLowerCase() ===
+          new URL(link.href).searchParams.get("o")?.toLowerCase() ===
             currentPath.toLowerCase()
         ) {
           link.classList.add("active");
@@ -1167,6 +1217,15 @@ body {
           script.parentNode.replaceChild(newScript, script);
         }
       );
+
+      // Re-initialize theme after content load
+      const storedTheme = localStorage.getItem("theme");
+      if (storedTheme) {
+        setTheme(storedTheme);
+      } else {
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        setTheme(prefersDark ? "dark" : "light");
+      }
 
       if (window.innerWidth <= 768) {
         leftSidebar.classList.remove("show");
@@ -1326,6 +1385,38 @@ body {
             </script>';
     }
 
+    public function doc(): string
+    {
+        Util::elog(__METHOD__);
+
+        return $this->ctx->out['head'];
+    }
+
+    public function head(): string
+    {
+        Util::elog(__METHOD__);
+
+        return '
+            <nav class="navbar navbar-height navbar-expand-md bg-body-tertiary fixed-top border-bottom shadow-sm">
+                <div class="container-fluid d-flex align-items-center">
+                    <button class="btn" id="leftSidebarToggle" type="button">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <a class="navbar-brand mx-auto" href="/">
+                        « ' . $this->ctx->out['doc'] . '
+                    </a>
+                    <div class="d-flex align-items-center">
+                        <a class="nav-link" href="#" onclick="toggleTheme(); return false;">
+                            <i id="theme-icon" class="bi bi-sun-fill"></i>
+                        </a>
+                        <button class="btn" id="rightSidebarToggle" type="button">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                    </div>
+                </div>
+            </nav>';
+    }
+
     public function main(): string
     {
         Util::elog(__METHOD__);
@@ -1334,23 +1425,10 @@ body {
         $rhsNav = $this->renderPluginNav($this->ctx->nav2 ?? []);
 
         return '
-            <nav class="navbar navbar-dark bg-dark fixed-top navbar-height">
-                <div class="container-fluid">
-                    <button class="btn btn-dark" id="leftSidebarToggle" type="button">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <a class="navbar-brand" href="/">
-                        ' . $this->ctx->out['doc'] . '
-                    </a>
-                    <button class="btn btn-dark" id="rightSidebarToggle" type="button">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                </div>
-            </nav>
-            <div class="sidebar left" id="leftSidebar">
+            <div class="sidebar left bg-body-tertiary" id="leftSidebar">
                 ' . $lhsNav . '
             </div>
-            <div class="sidebar right" id="rightSidebar">
+            <div class="sidebar right bg-body-tertiary" id="rightSidebar">
                 ' . $rhsNav . '
             </div>
             <div class="main-content" id="main">
@@ -1368,7 +1446,7 @@ body {
 
         return '
 
-        <footer class="bg-light text-center py-3 mt-auto">
+        <footer class="bg-body-tertiary text-center py-3 mt-auto">
             <div class="container">
                 <p class="text-muted mb-0"><small>[SideBar] ' . $this->ctx->out['foot'] . '</small></p>
             </div>
@@ -1395,18 +1473,18 @@ body {
 
     private function renderDropdown(array $section): string
     {
-        $currentPlugin = $this->g->input['object'] ?? 'Home';
-        $icon = isset($section[2]) ? '<i class="' . $section[2] . '"></i> ' : '';
+        $currentPlugin = $this->ctx->in['o'] ?? 'Home';
+        $icon = isset($section[2]) ? '<i class="' . $section[2] . ' fw"></i> ' : '';
 
         $submenuItems = array_map(
             function ($item) use ($currentPlugin)
             {
                 $isActive = strtolower($currentPlugin) === strtolower($item[0]) ? ' active' : '';
-                $itemIcon = isset($item[2]) ? '<i class="' . $item[2] . '"></i> ' : '';
+                $itemIcon = isset($item[2]) ? '<i class="' . $item[2] . ' fw"></i> ' : '';
 
                 return '
                         <li class="nav-item">
-                            <a class="nav-link' . $isActive . '" href="' . $item[1] . '">' .
+                            <a class="nav-link' . $isActive . ' fw" href="' . $item[1] . '">' .
                     $itemIcon . $item[0] .
                     '</a>
                         </li>';
@@ -1432,7 +1510,7 @@ body {
 
     private function renderSingleNav(array $item): string
     {
-        $currentPlugin = $this->g->input['object'] ?? 'Home';
+        $currentPlugin = $this->ctx->in['o'] ?? 'Home';
         $isActive = $currentPlugin === $item[1] ? ' active' : '';
         $icon = isset($item[2]) ? '<i class="' . $item[2] . '"></i> ' : '';
 
