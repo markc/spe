@@ -1,115 +1,145 @@
 <?php
 
 declare(strict_types=1);
-// Created: 20150101 - Updated: 20250208
+// Created: 20150101 - Updated: 20250213
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 namespace SPE\Session\Core;
 
-use SPE\Session\Themes\TopNav;
-use SPE\Session\Themes\SideBar;
-use SPE\Session\Themes\Simple;
+use SPE\Session\Core\{Ctx, Util, PluginNav};
 
 readonly class Init
 {
-    public function __construct(
-        private Cfg $cfg,
-        private Ctx $ctx
-    )
+    public function __construct(private Ctx $ctx)
     {
         Util::elog(__METHOD__);
 
-        // Handle session initialization before any output
-        if (session_status() === PHP_SESSION_NONE)
-        {
-            session_start();
-        }
+        $ns = __NAMESPACE__ ? substr(__NAMESPACE__, 0, strrpos(__NAMESPACE__, '\\')) : '';
 
-        // Initialize plugin navigation
-        $this->ctx->nav = (new PluginNav(__DIR__ . '/../Plugins'))->scanPlugins();
+        session_status() === PHP_SESSION_NONE && session_start();
+        $_SESSION = [];
+        foreach ($this->ctx->in as $k => &$v) $v = Util::ses($k, $v);
 
-        //Util::elog(__METHOD__ . ' this->ctx->nav=' . var_export($this->ctx->nav, true));
+        extract($this->ctx->in, EXTR_SKIP);
 
-        // Store core session values, using session override for 'o'
-        $this->ctx->in['o'] = Util::ses('o', $this->ctx->in['o'], $_SESSION['o'] ?? null);
-        Util::ses('m', $this->ctx->in['m']);
-        Util::ses('t', $this->ctx->in['t']);
+        $pm = $ns ? "{$ns}\\Plugins\\{$o}\\{$o}Model" : "{$o}Model";
+        $t1 = $ns ? "{$ns}\\Plugins\\{$o}\\{$o}View" : "{$o}View";
+        $t2 = $ns ? "{$ns}\\Themes\\{$t}" : "{$t}";
 
-        // Process input parameters
-        foreach ($this->ctx->in as $k => $v)
-        {
-            $this->ctx->in[$k] = isset($_REQUEST[$k])
-                ? htmlentities(trim($_REQUEST[$k]))
-                : $v;
-        }
+        $this->ctx->ary = class_exists($pm) ? (new $pm($this->ctx))->$m() : [];
 
-        // Handle plugin execution
-        $plugin = 'SPE\\Session\\Plugins\\' . $this->ctx->in['o'] . '\\Model'; // Full plugin class path
+        //Util::elog(var_export($this->ctx->ary, true));
 
-        Util::elog(var_export($plugin, true));
+        $theme1 = class_exists($t1) ? new $t1($this->ctx) : null;
+        $theme2 = class_exists($t2) ? new $t2($this->ctx) : null;
 
-        $m = $this->ctx->in['m']; // m=action method
+        $render = fn(?object $o, string $m) => ($o && method_exists($o, $m))
+            ? $o->$m() : null;
 
-        Util::elog(var_export($m, true));
+        $this->ctx->out['main'] = $render($theme1, $m)
+            ?? $render($theme2, $m) ?? $this->ctx->out['main'];
 
-        // Execute Model
-        match (true)
-        {
-            !class_exists($plugin) => $this->ctx->out['main'] = "Error: no plugin object!",
-            !method_exists($plugin, $m) => $this->ctx->out['main'] = "Error: no plugin method!",
-            default => (new $plugin($this->cfg, $this->ctx))->$m()
-        };
+        //Util::elog(var_export($this->ctx->out, true));
 
-        // Execute View
-        $view = str_replace('Model', 'View', $plugin);
-        if (class_exists($view) && method_exists($view, $m))
-        {
-            $this->ctx->out['main'] = (new $view($this->cfg, $this->ctx))->$m();
-        }
+        foreach ($this->ctx->out as $k => &$v)
+            $v = $render($theme1, $k) ?? $render($theme2, $k) ?? $v;
 
-        if ($this->ctx->in['x'])
-        {
-            $xhr = $this->ctx->out[$this->ctx->in['x']] ?? '';
-            if ($xhr) return $xhr;
-            header('Content-Type: application/json');
-            return json_encode($this->ctx->out, JSON_PRETTY_PRINT);
-        }
+        //Util::elog(var_export($this->ctx->out, true));
 
-        // Dynamically select the theme based on the 't' parameter
-        $t = match ($this->ctx->in['t'])
-        {
-            'TopNav' => TopNav::class,
-            'SideBar' => SideBar::class,
-            default => Simple::class,
-        };
+        $this->ctx->buf = $render($theme1, 'html') ?? $render($theme2, 'html') ?? '';
 
-        $theme = new $t($this->cfg, $this->ctx);
-
-        foreach ($this->ctx->out as $k => $v)
-        {
-            if (method_exists($theme, $k))
-            {
-                $this->ctx->out[$k] = $theme->$k();
-            }
-        }
-
-        //Util::elog(__METHOD__ . ' ' . var_export($this->ctx->out, true));
-
-        $this->ctx->buf = $theme->html();
+        //Util::elog(var_export($this->ctx->buf, true));
     }
 
     public function __toString(): string
     {
         Util::elog(__METHOD__);
 
+        $x = $this->ctx->in['x'] ?? null;
+
+        $_SESSION['x'] = '';
+
+        return match ($x)
+        {
+            'text' => preg_replace('/^\h*\v+/m', '', strip_tags($this->ctx->out['main'])),
+            'json' => (function ()
+            {
+                header('Content-Type: application/json');
+                return $this->ctx->out['main'];
+            })(),
+            default => $this->ctx->out[$x] ?? $this->ctx->buf,
+        };
+    }
+
+    public function __destruct()
+    {
+        Util::elog(var_export($_SESSION, true));
+        Util::elog($_SERVER['REMOTE_ADDR'] . ' ' . round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']), 4));
+    }
+}
+
+readonly class Init2
+{
+    public function __construct(private Ctx $ctx)
+    {
+        Util::elog(__METHOD__);
+
+        $this->ctx->self = $_SERVER['PHP_SELF'];
+        session_status() === PHP_SESSION_NONE && session_start();
+        $this->ctx->nav = (new PluginNav(__DIR__ . '/../Plugins'))->scanPlugins();
+        Util::elog(dirname(__NAMESPACE__));
+        foreach (array_keys($this->ctx->in) as $k)
+        {
+            $this->ctx->in[$k] = Util::ses($k, $this->ctx->in[$k]);
+        }
+
+        extract($this->ctx->in, EXTR_SKIP);
+
+        // Define the plugin and theme names to call
+        $pm = __NAMESPACE__ ? "SPE\\BareBone\\Plugins\\{$o}\\{$o}Model" : "{$o}Model";
+        $t1 = __NAMESPACE__ ? "SPE\\BareBone\\Plugins\\{$o}\\{$o}View" : "{$o}View";
+        $t2 = __NAMESPACE__ ? "SPE\\BareBone\\Themes\\{$t}" : "{$t}";
+
+        // Call the Plugin modal action method and save the results to a global array
+        $this->ctx->ary = class_exists($pm) ? (new $pm($this->ctx))?->$m() : null;
+
+        // Instantiate the view and theme, leveraging null coalescing for brevity
+        $theme1 = class_exists($t1) ? new $t1($this->ctx) : null;
+        $theme2 = class_exists($t2) ? new $t2($this->ctx) : null;
+
+        $render = function (?object $theme, string $method): ?string
+        {
+            return ($theme && method_exists($theme, $method)) ? $theme->$method() : null;
+        };
+
+        $this->ctx->out['main'] = $render($theme1, $m)
+            ?? $render($theme2, $m)
+            ?? $this->ctx->out['main'];
+
+        // For each output section, try plugin view first, then fall back to theme
+        foreach ($this->ctx->out as $k => &$v)
+        {
+            $v = $render($theme1, $k) ?? $render($theme2, $k) ?? $v;
+        }
+
+        $this->ctx->buf = $render($theme1, 'html') ?? $render($theme2, 'html') ?? '';
+    }
+
+    public function __toString(): string
+    {
+        Util::elog(__METHOD__);
+        if ($x = $this->ctx->in['x'])
+        {
+            $xhr = $this->ctx->out[$x] ?? '';
+            if ($xhr) return $xhr;
+            header('Content-Type: application/json');
+            return json_encode($this->ctx->out, JSON_PRETTY_PRINT);
+        }
         return $this->ctx->buf;
     }
 
     public function __destruct()
     {
-        //Util::elog(__METHOD__);
-
-        Util::elog(__METHOD__ . ' SESSION=' . var_export($_SESSION, true));
-        //Util::elog($_SERVER['REMOTE_ADDR'] . ' ' . round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']), 4));
+        Util::elog($_SERVER['REMOTE_ADDR'] . ' ' . round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']), 4));
     }
 }

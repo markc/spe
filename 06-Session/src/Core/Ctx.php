@@ -1,27 +1,29 @@
 <?php
 
 declare(strict_types=1);
-// Created: 20150101 - Updated: 20250209
+// Created: 20150101 - Updated: 20250216
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 namespace SPE\Session\Core;
+
+use SPE\Session\Core\Util;
 
 // Dynamic writable global context/state properties
 class Ctx
 {
     public function __construct(
+        public string $email = 'markc@renta.net',
         public string $buf = '',    // Global string buffer
         public array $ary = [],     // Plugin CRUDL return array
-        public array $nav = [],     // PluginNav array
         public array $in = [        // Input URI variables
             'l' => '',              // Log (alert)
             'm' => 'read',          // Method (action)
             'o' => 'Home',          // Object (plugin)
-            't' => 'Simple',        // Theme (current)
+            't' => 'TopNav',        // Theme (current)
             'x' => '',              // XHR (request)
         ],
         public array $out = [       // Theme Method partials
-            'doc'   => 'SPE::06 Session',
+            'doc'   => 'SPE::05 Session',
             'css'   => '',
             'log'   => '',
             'nav1'  => '',
@@ -31,6 +33,16 @@ class Ctx
             'foot'  => 'Copyright (C) 2015-2025 Mark Constable (AGPL-3.0)',
             'js'    => '',
         ],
+        public array $nav1 = ['Pages',      [
+            ['Home',        '?o=Home',      'bi bi-house-door'],
+            ['About',       '?o=About',     'bi bi-question-octagon'],
+            ['Contact',     '?o=Contact',   'bi bi-person-rolodex']
+        ], 'bi bi-list'],
+        public array $nav2 = ['Themes',     [
+            ['Simple',      '?t=Simple',    'bi bi-gear'],
+            ['TopNav',      '?t=TopNav',    'bi bi-gear'],
+            ['Sidebar',     '?t=SideBar',   'bi bi-gear'],
+        ], 'bi bi-list'],
     )
     {
         Util::elog(__METHOD__);
