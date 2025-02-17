@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const leftSidebar = document.getElementById("leftSidebar");
     const rightSidebar = document.getElementById("rightSidebar");
     const mainContent = document.getElementById("main");
-    const contentSection = document.getElementById("content-section");
     const isMobile = window.innerWidth <= 768;
 
     // Handle left sidebar toggle
@@ -102,137 +101,6 @@ document.addEventListener("DOMContentLoaded", function () {
             location.reload();
         }
     });
-
-    // AJAX Functions
-    function showLoading() {
-        contentSection.innerHTML =
-            '<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
-    }
-
-    function handleError(error) {
-        contentSection.innerHTML =
-            '<div class="alert alert-danger" role="alert">' +
-            "Error loading content: " +
-            error.message +
-            "</div>";
-    }
-
-    function updateURL(url) {
-        history.pushState({}, "", url);
-    }
-
-    async function loadContent(url) {
-        try {
-            showLoading();
-            const response = await fetch(url, {
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest"
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error("HTTP error! status: " + response.status);
-            }
-
-            const data = await response.text();
-
-            // Clear existing content first
-            contentSection.innerHTML = "";
-
-            // Update content
-            contentSection.innerHTML = data;
-            updateURL(url);
-
-            // Update active states in navigation
-            const currentPath = new URL(url).searchParams.get("o") || "Home";
-            document.querySelectorAll("#leftSidebar .nav-link").forEach((link) => {
-                link.classList.remove("active");
-                if (
-                    link.href &&
-                    new URL(link.href).searchParams.get("o")?.toLowerCase() ===
-                        currentPath.toLowerCase()
-                ) {
-                    link.classList.add("active");
-                }
-            });
-
-            // Execute any inline scripts in the new content
-            Array.from(contentSection.getElementsByTagName("script")).forEach(
-                (script) => {
-                    const newScript = document.createElement("script");
-                    Array.from(script.attributes).forEach((attr) => {
-                        newScript.setAttribute(attr.name, attr.value);
-                    });
-                    newScript.textContent = script.textContent;
-                    script.parentNode.replaceChild(newScript, script);
-                }
-            );
-
-            // Re-initialize theme after content load
-            const storedTheme = localStorage.getItem("theme");
-            if (storedTheme) {
-                setTheme(storedTheme);
-            } else {
-                const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-                setTheme(prefersDark ? "dark" : "light");
-            }
-
-            if (window.innerWidth <= 768) {
-                leftSidebar.classList.remove("show");
-            }
-        } catch (error) {
-            handleError(error);
-        }
-    }
-
-    // Intercept left sidebar link clicks
-    leftSidebar.addEventListener("click", function (event) {
-        const link = event.target.closest("a");
-
-        // If no link was clicked, exit early
-        if (!link) return;
-
-        // If the link is a collapse toggle, let it handle naturally
-        if (link.getAttribute("data-bs-toggle") === "collapse") {
-            return;
-        }
-
-        // At this point, we know it's a navigation link
-        event.preventDefault();
-        event.stopPropagation();
-
-        // Check if we have a valid URL
-        if (link.href) {
-            loadContent(link.href);
-
-            // Close mobile sidebar if needed
-            if (window.innerWidth <= 768) {
-                leftSidebar.classList.remove("show");
-            }
-
-            // If this is inside a collapse menu, keep it open
-            const parentCollapse = link.closest(".collapse");
-            if (parentCollapse) {
-                parentCollapse.classList.add("show");
-            }
-        }
-    });
-
-    // Handle browser back/forward buttons
-    window.addEventListener("popstate", function (event) {
-        loadContent(window.location.href);
-    });
-
-    // Handle doc links in main content area
-    document
-        .getElementById("content-section")
-        .addEventListener("click", function (event) {
-            const docLink = event.target.closest(".doc-link");
-            if (docLink) {
-                event.preventDefault();
-                loadContent(docLink.href);
-            }
-        });
 
     // Handle host form submission
     document.addEventListener("click", function (event) {
@@ -307,8 +175,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         document.getElementById("hostModal")
                     );
                     modal.hide();
-                    // Reload the content to show updated host list
-                    loadContent(window.location.href);
+                    // Reload the page to show updated host list
+                    window.location.reload();
                 })
                 .catch((error) => {
                     console.error("Error saving host:", error);
