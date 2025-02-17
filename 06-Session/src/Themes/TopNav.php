@@ -35,7 +35,9 @@ class TopNav extends Theme
         <link rel="icon" href="favicon.ico">
         <title>' . $doc . '</title>' . $css . '
     </head>
-    <body class="d-flex flex-column min-vh-100">' . $head . $main . $foot . $js . '
+    <body class="d-flex flex-column min-vh-100">' . $head . '
+        <main class="container py-5 mt-5" id="ajaxhere">' . $main . '
+        </main>' . $foot . $js . '
     </body>
 </html>
 ';
@@ -46,8 +48,8 @@ class TopNav extends Theme
         Util::elog(__METHOD__);
 
         return '
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">';
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">';
     }
 
     public function js(): string
@@ -55,8 +57,10 @@ class TopNav extends Theme
         Util::elog(__METHOD__);
 
         return '
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-            <script src="public/js/TopNav.js"></script>';
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="public/js/AjaxLoader.js"></script>
+        <script src="public/js/ThemeSwitcher.js"></script>
+        <script src="public/js/ShowToast.js"></script>';
     }
 
     public function log(): string
@@ -113,10 +117,7 @@ class TopNav extends Theme
     {
         Util::elog(__METHOD__);
 
-        return '
-
-        <main class="container py-5 mt-5">' . $this->ctx->out['main'] . '
-        </main>';
+        return  $this->ctx->out['main'];
     }
 
     public function foot(): string

@@ -68,7 +68,11 @@ class Simple extends Theme
         <title>' . $doc . '</title>' . $css . '
     </head>
     <body>
-        <a href="?o=Home">Home</a>' . $head . $log . $main . $foot . $js . '
+        <a href="?o=Home">Home</a>
+        <a href="?o=About">About</a>
+        <a href="?o=Contact">Contact</a>
+        <a href="?t=SideBar">SideBar</a>
+        <a href="?t=TopNav">TopNav</a>' . $head . $log . $main . $foot . $js . '
     </body>
 </html>
 ';

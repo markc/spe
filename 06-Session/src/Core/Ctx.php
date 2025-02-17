@@ -34,14 +34,14 @@ class Ctx
             'js'    => '',
         ],
         public array $nav1 = ['Pages',      [
-            ['Home',        '?o=Home',      'bi bi-house-door'],
-            ['About',       '?o=About',     'bi bi-question-octagon'],
-            ['Contact',     '?o=Contact',   'bi bi-person-rolodex']
+            ['Home',        '?o=Home',      'bi bi-house-door',         'ajax-link'],
+            ['About',       '?o=About',     'bi bi-question-octagon',   'ajax-link'],
+            ['Contact',     '?o=Contact',   'bi bi-person-rolodex',     'ajax-link']
         ], 'bi bi-list'],
         public array $nav2 = ['Themes',     [
-            ['Simple',      '?t=Simple',    'bi bi-gear'],
-            ['TopNav',      '?t=TopNav',    'bi bi-gear'],
-            ['Sidebar',     '?t=SideBar',   'bi bi-gear'],
+            ['Simple',      '?t=Simple',    'bi bi-gear',   ''],
+            ['TopNav',      '?t=TopNav',    'bi bi-gear',   ''],
+            ['Sidebar',     '?t=SideBar',   'bi bi-gear',   ''],
         ], 'bi bi-list'],
     )
     {

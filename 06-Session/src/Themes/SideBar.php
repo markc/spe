@@ -32,10 +32,36 @@ class SideBar extends Theme
         <link rel="icon" href="favicon.ico">
         <title>' . $doc . '</title>' . $css . '
     </head>
-    <body class="d-flex flex-column min-vh-100">' . $head . $main . $foot . $js . '
+    <body class="d-flex flex-column min-vh-100">' . $head . '
+        <div class="sidebar left bg-body-tertiary" id="leftSidebar">
+            ' . $nav1 . '
+        </div>
+        <div class="sidebar right bg-body-tertiary" id="rightSidebar">
+            ' . $nav2 . '
+        </div>
+        <div class="main-content" id="main">
+            <div class="container-fluid">
+                <main class="content-section" id="ajaxhere">' . $main . '
+                </main>
+            </div>
+        </div>' . $foot . $js . '
     </body>
 </html>
 ';
+    }
+
+    public function nav1(): string
+    {
+        Util::elog(__METHOD__);
+
+        return $this->renderPluginNav($this->ctx->nav1 ?? []);
+    }
+
+    public function nav2(): string
+    {
+        Util::elog(__METHOD__);
+
+        return $this->renderPluginNav($this->ctx->nav2 ?? []);
     }
 
     public function css(): string
@@ -54,6 +80,9 @@ class SideBar extends Theme
 
         return '
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="public/js/ThemeSwitcher.js"></script>
+            <script src="public/js/AjaxLoader.js"></script>
+            <script src="public/js/ShowToast.js"></script>
             <script src="public/js/SideBar.js"></script>';
     }
 
@@ -93,6 +122,9 @@ class SideBar extends Theme
     {
         Util::elog(__METHOD__);
 
+        return $this->ctx->out['main'];
+
+        /*
         $lhsNav = $this->renderPluginNav($this->ctx->nav1 ?? []);
         $rhsNav = $this->renderPluginNav($this->ctx->nav2 ?? []);
 
@@ -110,6 +142,7 @@ class SideBar extends Theme
                     </main>
                 </div>
             </div>';
+    */
     }
 
     public function foot(): string
@@ -132,65 +165,65 @@ class SideBar extends Theme
             return '';
         }
 
-        // Since plugins use a fixed structure [section_name, items_array, icon],
-        // we treat it as a dropdown
-        return $this->renderDropdown(
-            [
-                $navData[0],  // Section name (e.g., "Plugins")
-                $navData[1],  // Array of plugin items
-                $navData[2]   // Section icon
-            ]
-        );
+        return $this->renderDropdown($navData);
     }
 
     private function renderDropdown(array $section): string
     {
-        $currentPlugin = $this->ctx->in['o'] ?? 'Home';
-        $icon = isset($section[2]) ? '<i class="' . $section[2] . ' fw"></i> ' : '';
+        $sectionName = $section[0];
+        $items = $section[1];
+        $iconClass = $section[2] ?? ''; //Section Icon
 
-        $submenuItems = array_map(
-            function ($item) use ($currentPlugin)
-            {
-                $isActive = strtolower($currentPlugin) === strtolower($item[0]) ? ' active' : '';
-                $itemIcon = isset($item[2]) ? '<i class="' . $item[2] . ' fw"></i> ' : '';
+        //Unique ID generation.
+        $submenuId = str_replace(' ', '', $sectionName) . 'Submenu';
 
-                return '
-                        <li class="nav-item">
-                            <a class="nav-link' . $isActive . ' fw" href="' . $item[1] . '">' .
-                    $itemIcon . $item[0] .
-                    '</a>
-                        </li>';
-            },
-            $section[1]
+        $submenuItems = array_map(function ($item)
+        {
+            $name = $item[0];
+            $url = $item[1];
+            $itemIconClass = $item[2] ?? '';
+            $linkClass = $item[3] ?? '';  // Use the provided class or an empty string
+            $ajaxClass = $item[4] ?? '';
+            $itemIcon = !empty($itemIconClass) ? '<i class="' . htmlspecialchars($itemIconClass) . ' fw"></i> ' : '';
+
+            $xmain = $ajaxClass ? '&x=main' : '';
+
+            return sprintf(
+                '<li class="nav-item">
+                    <a class="nav-link %s fw %s" href="%s%s">%s%s</a>
+                </li>',
+                htmlspecialchars($linkClass),
+                htmlspecialchars($ajaxClass),
+                htmlspecialchars($url),
+                htmlspecialchars($xmain),
+                $itemIcon,
+                htmlspecialchars($name),
+            );
+        }, $items);
+        //If the sub menu is empty.
+
+
+        $html = sprintf(
+            '<ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link no-underline" data-bs-toggle="collapse" href="#%s" role="button" aria-expanded="false" aria-controls="%s">
+                        <i class="%s fw"></i> %s <i class="bi bi-chevron-right chevron-icon fw ms-auto"></i>
+                    </a>
+                    <div class="collapse submenu" id="%s">
+                        <ul class="nav flex-column">
+                            %s
+                        </ul>
+                    </div>
+                </li>
+            </ul>',
+            htmlspecialchars($submenuId),
+            htmlspecialchars($submenuId),
+            htmlspecialchars($iconClass),
+            htmlspecialchars($sectionName),
+            htmlspecialchars($submenuId),
+            implode('', $submenuItems)
         );
 
-        return '
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#' . $section[0] . 'Submenu" 
-                   role="button" aria-expanded="false" aria-controls="' . $section[0] . 'Submenu">' .
-            $icon . $section[0] . ' <i class="bi bi-chevron-right chevron-icon fw ms-auto"></i>
-                </a>
-                <div class="collapse submenu" id="' . $section[0] . 'Submenu">
-                    <ul class="nav flex-column">' .
-            implode('', $submenuItems) . '
-                    </ul>
-                </div>
-            </li>
-        </ul>';
-    }
-
-    private function renderSingleNav(array $item): string
-    {
-        $currentPlugin = $this->ctx->in['o'] ?? 'Home';
-        $isActive = $currentPlugin === $item[1] ? ' active' : '';
-        $icon = isset($item[2]) ? '<i class="' . $item[2] . '"></i> ' : '';
-
-        return '
-        <ul class="nav flex-column">
-            <li class="nav-item' . $isActive . '">
-                <a class="nav-link" href="' . $item[1] . '">' . $icon . $item[0] . '</a>
-            </li>
-        </ul>';
+        return $html;
     }
 }
