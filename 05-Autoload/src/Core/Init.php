@@ -58,6 +58,27 @@ readonly class Init
     {
         Util::elog(__METHOD__);
 
-        return $this->ctx->buf;
+        $x = $this->ctx->in['x'] ?? null;
+
+        $_SESSION['x'] = '';
+
+        $return = match ($x)
+        {
+            'text' => preg_replace('/^\h*\v+/m', '', strip_tags($this->ctx->out['main'])),
+            'json' => (function ()
+            {
+                header('Content-Type: application/json');
+                return $this->ctx->out['main'];
+            })(),
+            default => $this->ctx->out[$x] ?? $this->ctx->buf,
+        };
+        //Util::elog(var_export($return, true));
+        return $return;
+    }
+
+    public function __destruct()
+    {
+        Util::elog(__METHOD__ . ' SESSION=' . var_export($_SESSION, true));
+        //Util::elog($_SERVER['REMOTE_ADDR'] . ' ' . round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']), 4));
     }
 }

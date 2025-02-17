@@ -37,7 +37,7 @@ class NavRenderer
     {
         return implode('', array_map(fn($item) => '
                                 <li>
-                                    <a class="dropdown-item" href="' . $item[1] . '">
+                                    <a class="dropdown-item ' . $item[3] . '" href="' . $item[1] . '">
                                         <i class="' . $item[2] . '"></i> ' . $item[0] . '
                                     </a>
                                 </li>', $items));
@@ -47,7 +47,7 @@ class NavRenderer
     {
         return '
                                 <li class="nav-item">
-                                    <a class="nav-link" href="' . $nav[1] . '">
+                                    <a class="nav-link ' . $nav[3] . '" href="' . $nav[1] . '">
                                         <i class="' . $nav[2] . '"></i> ' . $nav[0] . '
                                     </a>
                                 </li>';

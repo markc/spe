@@ -32,7 +32,19 @@ class SideBar extends Theme
         <link rel="icon" href="favicon.ico">
         <title>' . $doc . '</title>' . $css . '
     </head>
-    <body class="d-flex flex-column min-vh-100">' . $head . $main . $foot . $js . '
+    <body class="d-flex flex-column min-vh-100">' . $head . '
+        <div class="sidebar left bg-body-tertiary" id="leftSidebar">
+            ' . $nav1 . '
+        </div>
+        <div class="sidebar right bg-body-tertiary" id="rightSidebar">
+            ' . $nav2 . '
+        </div>
+        <div class="main-content" id="main">
+            <div class="container-fluid">
+                <main class="content-section" id="ajaxhere">' . $main . '
+                </main>
+            </div>
+        </div>' . $foot . $js . '
     </body>
 </html>
 ';
@@ -54,6 +66,7 @@ class SideBar extends Theme
 
         return '
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="public/js/AjaxLoader.js"></script>
             <script src="public/js/SideBar.js"></script>';
     }
 
@@ -89,27 +102,25 @@ class SideBar extends Theme
             </nav>';
     }
 
+    public function nav1(): string
+    {
+        Util::elog(__METHOD__);
+
+        return $this->renderPluginNav($this->ctx->nav1 ?? []);
+    }
+
+    public function nav2(): string
+    {
+        Util::elog(__METHOD__);
+
+        return $this->renderPluginNav($this->ctx->nav2 ?? []);
+    }
+
     public function main(): string
     {
         Util::elog(__METHOD__);
 
-        $lhsNav = $this->renderPluginNav($this->ctx->nav1 ?? []);
-        $rhsNav = $this->renderPluginNav($this->ctx->nav2 ?? []);
-
-        return '
-            <div class="sidebar left bg-body-tertiary" id="leftSidebar">
-                ' . $lhsNav . '
-            </div>
-            <div class="sidebar right bg-body-tertiary" id="rightSidebar">
-                ' . $rhsNav . '
-            </div>
-            <div class="main-content" id="main">
-                <div class="container-fluid">
-                    <main class="content-section" id="content-section">
-                        ' . $this->ctx->out['main'] . '
-                    </main>
-                </div>
-            </div>';
+        return $this->ctx->out['main'];
     }
 
     public function foot(): string
@@ -153,10 +164,11 @@ class SideBar extends Theme
             {
                 $isActive = strtolower($currentPlugin) === strtolower($item[0]) ? ' active' : '';
                 $itemIcon = isset($item[2]) ? '<i class="' . $item[2] . ' fw"></i> ' : '';
+                $ajax = $item[3] ?? '';
 
                 return '
                         <li class="nav-item">
-                            <a class="nav-link' . $isActive . ' fw" href="' . $item[1] . '">' .
+                            <a class="nav-link ' . $ajax . $isActive . ' fw" href="' . $item[1] . '">' .
                     $itemIcon . $item[0] .
                     '</a>
                         </li>';
@@ -185,10 +197,11 @@ class SideBar extends Theme
         $currentPlugin = $this->ctx->in['o'] ?? 'Home';
         $isActive = $currentPlugin === $item[1] ? ' active' : '';
         $icon = isset($item[2]) ? '<i class="' . $item[2] . '"></i> ' : '';
+        $ajax = $item[3] ?? '';
 
         return '
         <ul class="nav flex-column">
-            <li class="nav-item' . $isActive . '">
+            <li class="nav-item ' . $ajax . $isActive . '">
                 <a class="nav-link" href="' . $item[1] . '">' . $icon . $item[0] . '</a>
             </li>
         </ul>';
