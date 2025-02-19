@@ -1,6 +1,8 @@
 {
     "name": "Contact",
     "icon": "bi-person-rolodex",
+    "href": "?o=Contact",
+    "ajax": "ajax-link",
     "order": 4,
-    "group": ""
+    "group": "OtherPages"
 }

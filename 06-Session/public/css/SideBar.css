@@ -1,231 +1,205 @@
-[data-bs-theme="light"] .nav-link {
-    color: #333333 !important;
-}
-
-[data-bs-theme="light"] .nav-link:hover {
-    color: #000000 !important;
-}
-
-[data-bs-theme="dark"] .nav-link {
-    color: #e0e0e0 !important;
-}
-
-[data-bs-theme="dark"] .nav-link:hover {
-    color: #ffffff !important;
-}
-
-.fw {
-    width: 1em;
-    display: inline-block;
-    text-align: center;
-    margin-right: 0.5rem;
-}
-
-[aria-expanded="true"] .chevron-icon {
-    transform: rotate(90deg);
-    transition: transform 0.2s ease-in-out;
-}
-
-[aria-expanded="false"] .chevron-icon {
-    transform: rotate(0deg);
-    transition: transform 0.2s ease-in-out;
-}
-
+/* SideBar.css - Base styles */
 body {
-    min-height: 100vh;
-    padding-top: 56px;
+    padding-top: var(--navbar-height, 56px);
+    overflow-x: hidden;
 }
 
 .navbar-height {
-    height: 56px;
-}
-
-.wrapper {
-    display: flex;
-    min-height: calc(100vh - 56px);
+    height: var(--navbar-height, 56px);
 }
 
 .sidebar {
-    width: 300px;
-    padding-top: 20px;
     position: fixed;
-    height: calc(100vh - 56px);
+    top: var(--navbar-height, 56px);
+    bottom: 0;
+    z-index: 100;
+    padding: 0;
+    overflow-x: hidden;
     overflow-y: auto;
-    transition: margin-left 0.3s ease-in-out, margin-right 0.3s ease-in-out;
-    z-index: 1000;
+    width: 260px;
+    transition: transform 0.3s ease;
 }
 
 .sidebar.left {
     left: 0;
+    transform: translateX(-100%);
 }
 
 .sidebar.right {
     right: 0;
+    transform: translateX(100%);
 }
 
-.sidebar.collapsed {
-    margin-left: -300px;
+.sidebar.left.show {
+    transform: translateX(0);
 }
 
-.sidebar.right.collapsed {
-    margin-right: -300px;
-}
-
-.sidebar .nav-link {
-    padding: 10px 20px;
-    display: flex;
-    align-items: center;
-    color: var(--bs-nav-link-color);
-    text-decoration: none;
-}
-
-.sidebar .nav-link:hover {
-    background-color: var(--bs-nav-link-hover-bg);
-    color: var(--bs-nav-link-hover-color);
+.sidebar.right.show {
+    transform: translateX(0);
 }
 
 .main-content {
-    margin-left: 300px;
-    margin-right: 300px;
-    flex-grow: 1;
-    padding: 1rem;
-    width: calc(100% - 600px);
-    transition: margin-left 0.3s ease-in-out, margin-right 0.3s ease-in-out,
-        width 0.3s ease-in-out;
+    padding-top: 1rem;
+    transition: padding 0.3s ease;
+    min-height: calc(100vh - var(--navbar-height, 56px) - 56px);
+    /* Set up container query context */
+    container-type: inline-size;
+    container-name: main-container;
 }
 
-.main-content.expanded-left {
-    margin-left: 0;
-    width: calc(100% - 300px);
+.main-content.left-sidebar-active {
+    padding-left: 280px;
 }
 
-.main-content.expanded-right {
-    margin-right: 0;
-    width: calc(100% - 300px);
+.main-content.right-sidebar-active {
+    padding-right: 280px;
 }
 
-.main-content.expanded-both {
-    margin-left: 0;
-    margin-right: 0;
+/* Responsive behavior based on container width */
+.container-responsive {
     width: 100%;
+    margin: 0 auto;
 }
 
-.submenu {
-    padding-left: 20px;
+/* Container queries for responsive content */
+@container main-container (max-width: 600px) {
+    .container-responsive h1 {
+        font-size: 1.75rem !important;
+    }
+    
+    .container-responsive .lead {
+        font-size: 1rem !important;
+    }
+    
+    .container-responsive .card-body {
+        padding: 1rem !important;
+    }
+    
+    .container-responsive .display-5 {
+        font-size: 1.8rem !important;
+    }
+}
+
+@container main-container (min-width: 601px) and (max-width: 900px) {
+    .container-responsive h1 {
+        font-size: 2.25rem !important;
+    }
+    
+    .container-responsive .display-5 {
+        font-size: 2.2rem !important;
+    }
+    
+    .container-responsive .card-body {
+        padding: 1.25rem !important;
+    }
+}
+
+@container main-container (min-width: 901px) {
+    .container-responsive {
+        max-width: 90%;
+    }
+}
+
+/* Sidebar nav styles */
+.sidebar .nav-link {
+    padding: 0.5rem 1rem;
+    color: var(--bs-body-color);
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link:focus {
     background-color: var(--bs-tertiary-bg);
 }
 
+.chevron-icon {
+    transition: transform 0.3s;
+}
+
+.nav-link[aria-expanded="true"] .chevron-icon {
+    transform: rotate(90deg);
+}
+
+.submenu {
+    padding-left: 1rem;
+}
+
 .submenu .nav-link {
-    color: var(--bs-nav-link-color);
+    padding-left: 1.5rem;
 }
 
-.submenu .nav-link:hover {
-    background-color: var(--bs-nav-link-hover-bg);
-    color: var(--bs-nav-link-hover-color);
+.no-underline {
+    text-decoration: none !important;
 }
 
-.submenu .nav-link {
-    padding: 8px 20px;
-    font-size: 0.9rem;
+.fw {
+    min-width: 20px;
 }
 
-.sidebar .nav-link svg {
-    width: 1em;
-    height: 1em;
-    margin-right: 0.5em;
-    fill: currentColor;
+/* Indicators to show current container width - for demonstration */
+/*
+.container-width-indicator {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0,0,0,0.2);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    z-index: 1000;
+}
+*/
+@container main-container (max-width: 600px) {
+    .container-width-indicator::after {
+        content: "Container: Small (≤600px)";
+    }
 }
 
-.sidebar-toggle {
-    padding: 0.25rem 0.75rem;
+@container main-container (min-width: 601px) and (max-width: 900px) {
+    .container-width-indicator::after {
+        content: "Container: Medium (601-900px)";
+    }
 }
 
-#leftSidebarToggle {
-    margin-right: 1rem;
+@container main-container (min-width: 901px) {
+    .container-width-indicator::after {
+        content: "Container: Large (≥901px)";
+    }
 }
 
-#rightSidebarToggle {
-    margin-left: 1rem;
+.container-width-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: rgba(220, 53, 69, 0.9); /* Bright red background */
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    z-index: 9999; /* Very high z-index */
+    border: 2px solid white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
-/* Mobile-Friendly CSS */
+[data-bs-theme="dark"] .container-width-indicator {
+    border-color: #333;
+    box-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
+
+/* Media queries for small screens - these are still needed as fallbacks */
 @media (max-width: 768px) {
-    .navbar-brand {
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .sidebar {
-        position: fixed;
-        top: 56px;
-        bottom: 0;
-        background-color: var(--bs-tertiary-bg);
-        z-index: 1030;
-        width: 80%;
-        max-width: 300px;
-    }
-
-    .sidebar.left {
-        left: -100%;
-        transition: left 0.3s ease-in-out;
-        margin-left: 0;
-    }
-
-    .sidebar.right {
-        right: -100%;
-        transition: right 0.3s ease-in-out;
-        margin-right: 0;
-    }
-
-    .sidebar.left.show {
-        left: 0;
-    }
-
+    .sidebar.left.show,
     .sidebar.right.show {
-        right: 0;
+        width: 60%;
     }
-
-    /* Main content adjustments */
-    .main-content {
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        width: 100% !important;
-        padding: 10px;
-        transition: none;
-    }
-
-    #leftSidebarToggle,
-    #rightSidebarToggle {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 1031;
-        padding: 0.25rem 0.75rem;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    #leftSidebarToggle {
-        left: 0.5rem;
-    }
-
-    #rightSidebarToggle {
-        right: 0.5rem;
-    }
-
-    .submenu {
-        background-color: var(--bs-secondary-bg);
-    }
-}
-
-/* Non-mobile styles */
-@media (min-width: 769px) {
-    /* Show sidebars by default on larger screens */
-    .sidebar.left:not(.collapsed),
-    .sidebar.right:not(.collapsed) {
-        margin-left: 0;
-        margin-right: 0;
+    
+    .main-content.left-sidebar-active,
+    .main-content.right-sidebar-active {
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 }

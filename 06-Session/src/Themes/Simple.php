@@ -196,7 +196,7 @@ class Simple extends Theme
         return '
 
         <script>
-            document.write("<div>' . addslashes(__METHOD__) . '</div>")
+            document.write("<div>[Simple] ' . addslashes(__METHOD__) . '</div>")
         </script>';
     }
 }

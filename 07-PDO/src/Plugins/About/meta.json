@@ -1,6 +1,8 @@
 {
     "name": "About",
     "icon": "bi-question-circle",
+    "href": "?o=About",
+    "ajax": "ajax-link",
     "order": 2,
-    "group": ""
+    "group": "Pages"
 }

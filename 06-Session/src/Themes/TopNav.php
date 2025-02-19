@@ -36,7 +36,7 @@ class TopNav extends Theme
         <title>' . $doc . '</title>' . $css . '
     </head>
     <body class="d-flex flex-column min-vh-100">' . $head . '
-        <main class="container py-5 mt-5" id="ajaxhere">' . $main . '
+        <main class="container py-5 mt-4" id="ajaxhere">' . $main . '
         </main>' . $foot . $js . '
     </body>
 </html>
@@ -128,7 +128,7 @@ class TopNav extends Theme
 
         <footer class="container-fluid text-center py-3 mt-auto bg-body-secondary border-top shadow-sm">
             <div class="container">
-                <p class="text-muted mb-0"><small>' . $this->ctx->out['foot'] . '</small></p>
+                <p class="text-muted mb-0"><small>[TopNav] ' . $this->ctx->out['foot'] . '</small></p>
             </div>
         </footer>';
     }

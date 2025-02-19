@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-// Created: 20150101 - Updated: 20250216
+// Created: 20150101 - Updated: 20250218
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 namespace SPE\Session\Themes;
@@ -33,18 +33,20 @@ class SideBar extends Theme
         <title>' . $doc . '</title>' . $css . '
     </head>
     <body class="d-flex flex-column min-vh-100">' . $head . '
-        <div class="sidebar left bg-body-tertiary" id="leftSidebar">
+        <aside class="sidebar left bg-body-tertiary border-end shadow-sm" id="leftSidebar">
             ' . $nav1 . '
-        </div>
-        <div class="sidebar right bg-body-tertiary" id="rightSidebar">
+        </aside>
+        <aside class="sidebar right bg-body-tertiary border-start shadow-sm" id="rightSidebar">
             ' . $nav2 . '
-        </div>
-        <div class="main-content" id="main">
+        </aside>
+
+        <main class="main-content" id="main">
             <div class="container-fluid">
-                <main class="content-section" id="ajaxhere">' . $main . '
-                </main>
+                <div class="content-section" id="ajaxhere">' . $main . '
+                </div>
             </div>
-        </div>' . $foot . $js . '
+        </main>
+        ' . $foot . $js . '
     </body>
 </html>
 ';
@@ -123,26 +125,6 @@ class SideBar extends Theme
         Util::elog(__METHOD__);
 
         return $this->ctx->out['main'];
-
-        /*
-        $lhsNav = $this->renderPluginNav($this->ctx->nav1 ?? []);
-        $rhsNav = $this->renderPluginNav($this->ctx->nav2 ?? []);
-
-        return '
-            <div class="sidebar left bg-body-tertiary" id="leftSidebar">
-                ' . $lhsNav . '
-            </div>
-            <div class="sidebar right bg-body-tertiary" id="rightSidebar">
-                ' . $rhsNav . '
-            </div>
-            <div class="main-content" id="main">
-                <div class="container-fluid">
-                    <main class="content-section" id="content-section">
-                        ' . $this->ctx->out['main'] . '
-                    </main>
-                </div>
-            </div>';
-    */
     }
 
     public function foot(): string
@@ -151,7 +133,7 @@ class SideBar extends Theme
 
         return '
 
-        <footer class="bg-body-tertiary text-center py-3 mt-auto">
+        <footer class="bg-body-tertiary text-center py-3 mt-auto border-top shadow-sm">
             <div class="container">
                 <p class="text-muted mb-0"><small>[SideBar] ' . $this->ctx->out['foot'] . '</small></p>
             </div>

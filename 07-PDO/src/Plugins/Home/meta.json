@@ -1,6 +1,8 @@
 {
     "name": "Home",
     "icon": "bi bi-house-door",
+    "href": "?o=Home",
+    "ajax": "ajax-link",
     "order": 1,
     "group": ""
 }

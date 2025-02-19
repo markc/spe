@@ -22,13 +22,13 @@ final class ContactView
         Util::elog(__METHOD__);
 
         return '
-    <div class="px-4 py-5 my-2 rounded-3 border bg-body-tertiary">
-        <div class="row d-flex justify-content-center">
-            <h1 class="display-5 fw-bold text-center"><i class="bi bi-gear"></i> ' . $this->ctx->ary['head'] . '</h1>
-            <div class="col-lg-8 col-md-10 col-sm-12">' . $this->ctx->ary['main'] . '
-                <footer class="mb-4 text-center">' . $this->ctx->ary['foot'] . '</footer>
-            </div>
-        </div>
-    </div>';
+                    <div class="px-4 py-5 my-2 rounded-3 border bg-body-tertiary">
+                        <div class="row d-flex justify-content-center">
+                            <h1 class="display-5 fw-bold text-center"><i class="bi bi-gear"></i> ' . $this->ctx->ary['head'] . '</h1>
+                            <div class="col-md-10 col-sm-12">' . $this->ctx->ary['main'] . '
+                                <footer class="mb-4 text-center">' . $this->ctx->ary['foot'] . '</footer>
+                            </div>
+                        </div>
+                    </div>';
     }
 }

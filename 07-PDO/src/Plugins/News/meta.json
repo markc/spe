@@ -1,6 +1,8 @@
 {
     "name": "News",
     "icon": "bi bi-newspaper",
+    "href": "?o=News",
+    "ajax": "ajax-link",
     "order": 3,
-    "group": ""
+    "group": "Pages"
 }

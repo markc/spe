@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const r = await fetch(u);
                 if (!r.ok) throw new Error(`HTTP error! Status: ${r.status}`);
-                t.innerHTML = `<p class="text-danger">Load failed: ${r.statusText}</p>`;
                 const h = await r.text();
                 t.innerHTML = h;
             } catch (e) {

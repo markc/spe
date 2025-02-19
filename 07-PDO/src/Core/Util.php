@@ -1,10 +1,12 @@
 <?php
 
 declare(strict_types=1);
-// Created: 20150101 - Updated: 20250208
+// Created: 20150101 - Updated: 20250216
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 namespace SPE\PDO\Core;
+
+//use InvalidArgumentException as IAE;
 
 final class Util
 {
@@ -14,6 +16,11 @@ final class Util
         {
             error_log($msg);
         }
+    }
+
+    public static function esc(string $str): string
+    {
+        return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
     }
 
     public static function ses(string $k, mixed $v = '', mixed $x = null): mixed
@@ -29,13 +36,6 @@ final class Util
             $_SESSION[$k] = $x ?? $v;
         }
         return $_SESSION[$k];
-    }
-
-    public static function enc(string $v): string
-    {
-        self::elog(__METHOD__ . "({$v})");
-
-        return htmlentities(trim($v), ENT_QUOTES, 'UTF-8');
     }
 
     public static function nlbr(string $text): string
