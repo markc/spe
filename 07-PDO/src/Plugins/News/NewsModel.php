@@ -10,39 +10,26 @@ use SPE\PDO\Core\{Db, Ctx, Plugin, QueryType, Util};
 
 final class NewsModel extends Plugin
 {
-    /**
-     * Expected URI/Form Variables:
-     * - i: Record ID for read/update/delete operations
-     * - title: News item title (create/update)
-     * - content: News item content (create/update)
-     * - page: Page number for list pagination
-     * - perpage: Items per page for list pagination
-     */
-    //private const REQUIRED_FIELDS = ['title', 'content'];
-    //private const OPTIONAL_FIELDS = ['id', 'created', 'updated', 'author'];
     private const DEFAULT_PER_PAGE = 6;
 
     private ?Db $dbh = null;
+
     private $in = [
-        'id' => 1,
+        'id' => 0,
         'title' => '',
         'content' => '',
         'author' => '',
         'created' => null,
         'updated' => null,
-        'page' => 0,
-        'perpage' => 6
     ];
 
     public function __construct(protected Ctx $ctx)
     {
-        parent::__construct($ctx);
-
         Util::elog(__METHOD__);
 
-        foreach ($this->in as $k => &$v) $v = Util::ses($k, $v);
+        //parent::__construct($ctx);
 
-        //Util::elog(__METHOD__ . ' this->in=' . var_export($this->in, true));
+        foreach ($this->in as $k => &$v) $v = Util::ses($k, $v);
 
         if (is_null($this->dbh))
         {
@@ -60,55 +47,29 @@ final class NewsModel extends Plugin
 
         if ($_POST)
         {
-            $in = [
-                'title' => '',
-                'content' => '',
-            ];
+            // Remove id for new records since it's auto-increment
+            $data = $this->in;
+            unset($data['id']);
 
-            foreach ($in as $k => $v)
-            {
-                $data[$k] = $_POST[$k] ?? $v;
-                if (isset($_POST[$k]))
-                {
-                    $data[$k] = htmlentities(trim($_POST[$k]));
-                }
-            }
-
-            $data['updated'] = date('Y-m-d H:i:s');
             $data['created'] = date('Y-m-d H:i:s');
-            $data['author'] = 'admin'; // Set default author
+            $data['updated'] = date('Y-m-d H:i:s');
+            $data['author'] = 'admin';
 
             $lid = $this->dbh->create('news', $data);
-            Util::elog(__METHOD__ . ' ' . var_export($lid, true));
-
-            // After create, redirect to read view of the new article
-            Util::ses('m', 'read');
             Util::ses('id', $lid);
-
-            // Perform redirect to clear request parameters
-            $baseUrl = dirname($_SERVER['PHP_SELF']);
-            header("Location: {$baseUrl}?o=News&m=read&id={$lid}");
-            exit();
         }
-        return [];
+        Util::ses('m', 'list');
+        header('Access-Control-Expose-Headers: X-Redirect-Method');
+        header('X-Redirect-Method: list');
+        return []; // Return empty array to trigger client-side redirect
     }
 
     public function read(): array
     {
         Util::elog(__METHOD__);
 
-        //Util::elog(__METHOD__ . ' this->in=' . var_export($this->in, true));
-
         $id = filter_var($this->in['id'], FILTER_VALIDATE_INT);
-
-        $result = $this->dbh->read('news', '*', 'id = :id', ['id' => $id], QueryType::One);
-
-        // Set session variables for proper view handling
-        //Util::ses('m', 'read');
-        //Util::ses('id', $id);
-        //Util::elog(__METHOD__ . ' result=' . var_export($result, true));
-
-        return $result;
+        return $this->dbh->read('news', '*', 'id = :id', ['id' => $id], QueryType::One);
     }
 
     public function update(): array
@@ -117,57 +78,30 @@ final class NewsModel extends Plugin
 
         if ($_POST)
         {
-            $in = [
-                'id' => 0,
-                'title' => '',
-                'content' => '',
-            ];
+            $id = filter_var($this->in['id'], FILTER_VALIDATE_INT);
+            $this->in['created'] = date('Y-m-d H:i:s');
+            $this->in['updated'] = date('Y-m-d H:i:s');
+            $this->in['author'] = 'admin';
 
-            foreach ($in as $k => $v)
-            {
-                $data[$k] = $_POST[$k] ?? $v;
-                if (isset($_POST[$k]))
-                {
-                    $data[$k] = htmlentities(trim($_POST[$k]));
-                }
-            }
-
-            $data['updated'] = date('Y-m-d H:i:s');
-
-            Util::elog(__METHOD__ . ' data=' . var_export($data, true));
-
-            $this->dbh->update('news', $data, 'id = :id', ['id' => $data['id']]);
-            // After update, redirect to read view of the updated article
-            Util::ses('m', 'read');
-            Util::ses('id', $data['id']);
-
-            // Perform redirect to clear request parameters
-            $baseUrl = dirname($_SERVER['PHP_SELF']);
-            Util::elog(__METHOD__ . ' redirect=' . "Location: {$baseUrl}?o=News&m=read&id={$data['id']}");
-            header("Location: {$baseUrl}?o=News&m=read&id={$data['id']}");
-            exit();
+            $this->dbh->update('news', $this->in, 'id = :id', ['id' => $id]);
         }
-        return [];
+        Util::ses('m', 'read');
+        header('Access-Control-Expose-Headers: X-Redirect-Method');
+        header('X-Redirect-Method: read');
+        return []; // Return empty array to trigger client-side redirect
     }
 
     public function delete(): array
     {
         Util::elog(__METHOD__);
 
-        if (empty($this->in['id']))
-        {
-            throw new \InvalidArgumentException("Missing required parameter: id (record ID)");
-        }
-
         $id = filter_var($this->in['id'], FILTER_VALIDATE_INT);
-        if ($id === false)
-        {
-            throw new \InvalidArgumentException("Invalid record ID format");
-        }
-
         $this->dbh->delete('news', 'id = :id', ['id' => $id]);
         Util::ses('page', '', '1');
-        return [];
+        Util::ses('m', 'list');
+        header('Access-Control-Expose-Headers: X-Redirect-Method');
+        header('X-Redirect-Method: list');
+        return []; // Return empty array to trigger client-side redirect
     }
 
     public function list(): array
@@ -175,8 +109,8 @@ final class NewsModel extends Plugin
         Util::elog(__METHOD__);
 
         // Get pagination parameters
-        $page = filter_var($this->in['page'] ?? 1, FILTER_VALIDATE_INT) ?: 1;
-        $perPage = filter_var($this->in['perpage'] ?? self::DEFAULT_PER_PAGE, FILTER_VALIDATE_INT) ?: self::DEFAULT_PER_PAGE;
+        $page = filter_var($_REQUEST['page'] ?? 1, FILTER_VALIDATE_INT) ?: 1;
+        $perPage = filter_var($_REQUEST['perpage'] ?? self::DEFAULT_PER_PAGE, FILTER_VALIDATE_INT) ?: self::DEFAULT_PER_PAGE;
 
         // Calculate offset
         $offset = ($page - 1) * $perPage;

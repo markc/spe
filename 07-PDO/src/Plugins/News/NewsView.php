@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-// Created: 20150101 - Updated: 20250219
+// Created: 20150101 - Updated: 20250220
 // Copyright (C) 2015-2025 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 namespace SPE\PDO\Plugins\News;
@@ -19,6 +19,8 @@ final class NewsView extends Theme
 
     public function create(): string
     {
+        Util::elog(__METHOD__);
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST')
         {
             return ''; // Return empty for AJAX POST requests
@@ -49,17 +51,16 @@ final class NewsView extends Theme
                             <small class="text-muted">Post ID: ' . $id . '</small>
                         </div>
                         <div>
-                            <button type="button" class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#deleteModal" 
-                                onclick="document.getElementById(\'confirmDelete\').setAttribute(\'data-post-id\', \'' . $id . '\')">
+                            <button type="button" class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#deleteModal">
                                 Delete
                             </button>
-                            <a href="?o=News&m=list" class="btn btn-secondary me-2">Cancel</a>
+                            <a href="?o=News&m=list" class="btn btn-secondary me-2 ajax-link">Cancel</a>
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal">
                                 Edit
                             </button>
                         </div>
                         ' . $this->modalForm(['id' => $id, 'title' => $title, 'content' => $content]) . '
-                        ' . $this->deleteModal() . '
+                        ' . $this->deleteModal($id) . '
                     </div>
                 </div>
             </article>
@@ -68,6 +69,8 @@ final class NewsView extends Theme
 
     public function update(): string
     {
+        Util::elog(__METHOD__);
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST')
         {
             return ''; // Return empty for AJAX POST requests
@@ -97,7 +100,7 @@ final class NewsView extends Theme
                         </svg>
                     </button>' .
             (isset($_GET['q']) && $_GET['q'] !== '' ? '
-                    <a href="?o=News" class="btn btn-outline-secondary" title="Clear search">
+                    <a href="?o=News" class="btn btn-outline-secondary ajax-link" title="Clear search">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">
                             <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
                             <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
@@ -118,7 +121,7 @@ final class NewsView extends Theme
                 <article class="card shadow-sm h-100">
                     <div class="card-body d-flex flex-column">
                         <h2 class="h5 card-title">
-                            <a href="?o=News&m=read&id=' . $item['id'] . '" class="text-decoration-none">' .
+                            <a href="?o=News&m=read&id=' . $item['id'] . '" class="text-decoration-none ajax-link">' .
                 htmlspecialchars($item['title']) . '</a>
                         </h2>
                         <div class="text-muted small mb-3 d-flex flex-column">
@@ -128,7 +131,7 @@ final class NewsView extends Theme
                         <div class="card-text mb-3 flex-grow-1">
                             ' . substr(strip_tags($item['content']), 0, 150) . '...
                         </div>
-                        <a href="?o=News&m=read&id=' . $item['id'] . '" class="btn btn-primary btn-sm">Read more</a>
+                        <a href="?o=News&m=read&id=' . $item['id'] . '" class="btn btn-primary btn-sm ajax-link">Read more</a>
                     </div>
                 </article>
             </div>';
@@ -155,7 +158,7 @@ final class NewsView extends Theme
             if ($pagination['page'] > 1)
             {
                 $html .= '<li class="page-item">
-                    <a class="page-link" href="?o=News&m=list&page=' . ($pagination['page'] - 1) . $searchQuery . '">&laquo; Previous</a>
+                    <a class="page-link ajax-link" href="?o=News&m=list&page=' . ($pagination['page'] - 1) . $searchQuery . '">&laquo; Previous</a>
                 </li>';
             }
 
@@ -168,7 +171,7 @@ final class NewsView extends Theme
                 }
                 else
                 {
-                    $html .= '<li class="page-item"><a class="page-link" href="?o=News&m=list&page=' . $i . $searchQuery . '">' . $i . '</a></li>';
+                    $html .= '<li class="page-item"><a class="page-link ajax-link" href="?o=News&m=list&page=' . $i . $searchQuery . '">' . $i . '</a></li>';
                 }
             }
 
@@ -176,7 +179,7 @@ final class NewsView extends Theme
             if ($pagination['page'] < $pagination['pages'])
             {
                 $html .= '<li class="page-item">
-                    <a class="page-link" href="?o=News&m=list&page=' . ($pagination['page'] + 1) . $searchQuery . '">Next &raquo;</a>
+                    <a class="page-link ajax-link" href="?o=News&m=list&page=' . ($pagination['page'] + 1) . $searchQuery . '">Next &raquo;</a>
                 </li>';
             }
 
@@ -187,8 +190,10 @@ final class NewsView extends Theme
         return $html;
     }
 
-    private function deleteModal(): string
+    private function deleteModal($id): string
     {
+        Util::elog(__METHOD__ . ' id=' . $id);
+
         return '
         <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -198,11 +203,11 @@ final class NewsView extends Theme
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        Are you sure you want to delete this news item?
+                        Are you sure you want to delete this news item (' . $id . ')?
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-success" id="confirmDelete">OK</button>
+                        <a href="?o=News&m=delete&id=' . $id . '" class="btn btn-success ajax-link delete-action">OK</a>
                     </div>
                 </div>
             </div>
@@ -211,6 +216,8 @@ final class NewsView extends Theme
 
     private function modalForm(array $data = []): string
     {
+        Util::elog(__METHOD__);
+
         $id = $data['id'] ?? 0;
         $title = htmlspecialchars($data['title'] ?? '');
         $content = htmlspecialchars($data['content'] ?? '');
@@ -240,7 +247,7 @@ final class NewsView extends Theme
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary">' . ($id ? 'Update' : 'Create') . '</button>
+                            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">' . ($id ? 'Update' : 'Create') . '</button>
                         </div>
                     </form>
                 </div>
@@ -250,33 +257,10 @@ final class NewsView extends Theme
 
     private function formScript(): string
     {
+        Util::elog(__METHOD__);
+
         return '
         <script>
-        // Handle delete confirmation
-        document.addEventListener("DOMContentLoaded", function() {
-            const deleteModal = document.getElementById("deleteModal");
-            if (deleteModal) {
-                const confirmBtn = deleteModal.querySelector("#confirmDelete");
-                if (confirmBtn) {
-                    confirmBtn.addEventListener("click", function() {
-                        const postId = this.getAttribute("data-post-id");
-                        if (postId) {
-                            fetch("?o=News&m=delete&i=" + postId, {
-                                method: "POST"
-                            })
-                            .then(() => {
-                                showToast("News item deleted successfully", "success");
-                                setTimeout(() => {
-                                    window.location.href = "?o=News&m=list";
-                                }, 1000);
-                            })
-                            .catch(error => console.error("Error:", error));
-                        }
-                    });
-                }
-            }
-        });
-
         // Just handle modal closing and toast message
         document.addEventListener("DOMContentLoaded", function() {
             document.querySelectorAll(".news-form").forEach(form => {

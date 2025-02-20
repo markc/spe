@@ -107,7 +107,7 @@ class TopNav extends Theme
                                 <i id="theme-icon" class="bi bi-sun-fill"></i>
                             </a>
                         </li>'
-            . $this->navTopNav->render($this->ctx->nav1)
+            . $this->navTopNav->render($this->ctx->nav)
             . $this->navTopNav->render($this->ctx->nav2) . '
                     </ul>
                 </div>

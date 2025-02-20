@@ -1,7 +1,7 @@
 {
     "name": "About",
     "icon": "bi-question-circle",
-    "href": "?o=About",
+    "href": "?o=About&m=list",
     "ajax": "ajax-link",
     "order": 2,
     "group": "Pages"

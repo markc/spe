@@ -60,9 +60,7 @@ class SideBar extends Theme
     {
         Util::elog(__METHOD__);
 
-        $return = $this->navSideBar->render($this->ctx->nav);
-        Util::elog("return=$return");
-        return $return;
+        return $this->navSideBar->render($this->ctx->nav);
     }
 
     public function nav2(): string

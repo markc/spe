@@ -25,7 +25,7 @@ readonly class Init
 
         $this->ctx->nav = (new NavPlugin(__DIR__ . '/../Plugins'))->scanPlugins();
 
-        Util::elog(__METHOD__ . ' this->ctx->nav=' . var_export($this->ctx->nav, true));
+        //Util::elog(__METHOD__ . ' this->ctx->nav=' . var_export($this->ctx->nav, true));
 
         foreach ($this->ctx->in as $k => &$v) $v = Util::ses($k, $v);
 
@@ -47,16 +47,10 @@ readonly class Init
         $this->ctx->out['main'] = $render($theme1, $m)
             ?? $render($theme2, $m) ?? $this->ctx->out['main'];
 
-        //Util::elog(var_export($this->ctx->out['main'], true));
-
         foreach ($this->ctx->out as $k => &$v)
             $v = $render($theme1, $k) ?? $render($theme2, $k) ?? $v;
 
-        //Util::elog(var_export($this->ctx->out, true));
-
         $this->ctx->buf = $render($theme1, 'html') ?? $render($theme2, 'html') ?? '';
-
-        //Util::elog(var_export($this->ctx->buf, true));
     }
 
     public function __toString(): string
@@ -67,7 +61,7 @@ readonly class Init
 
         $_SESSION['x'] = '';
 
-        $return = match ($x)
+        return match ($x)
         {
             'text' => preg_replace('/^\h*\v+/m', '', strip_tags($this->ctx->out['main'])),
             'json' => (function ()
@@ -77,12 +71,12 @@ readonly class Init
             })(),
             default => $this->ctx->out[$x] ?? $this->ctx->buf,
         };
-        //Util::elog(var_export($return, true));
-        return $return;
     }
 
     public function __destruct()
     {
+        //Util::elog(__METHOD__);
+
         Util::elog(__METHOD__ . ' SESSION=' . var_export($_SESSION, true));
         //Util::elog($_SERVER['REMOTE_ADDR'] . ' ' . round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']), 4));
     }

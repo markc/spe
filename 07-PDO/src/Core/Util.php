@@ -23,6 +23,11 @@ final class Util
         return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
     }
 
+    public static function req(array $ary): array
+    {
+        return array_map([self::class, 'esc'], $ary);
+    }
+
     public static function ses(string $k, mixed $v = '', mixed $x = null): mixed
     {
         self::elog(__METHOD__ . "({$k}, " . var_export($v, true) . ", " . var_export($x, true) . ")");
@@ -40,7 +45,7 @@ final class Util
 
     public static function nlbr(string $text): string
     {
-        self::elog(__METHOD__ . "({$text})");
+        self::elog(__METHOD__);
 
         return nl2br(htmlspecialchars($text, ENT_QUOTES, 'UTF-8'));
     }
