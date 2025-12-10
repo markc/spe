@@ -1,0 +1,15 @@
+{
+    "name": "TopNav",
+    "description": "Bootstrap theme with top navigation",
+    "version": "1.0.0",
+    "icon": "bi bi-palette",
+    "emoji": "🎨",
+    "href": "?t=TopNav",
+    "method": "list",
+    "ajax": false,
+    "order": 2,
+    "group": "themes",
+    "auth": false,
+    "admin": false,
+    "enabled": true
+}

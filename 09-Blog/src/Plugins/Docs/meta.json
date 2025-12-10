@@ -1,0 +1,15 @@
+{
+    "name": "Docs",
+    "description": "Documentation browser",
+    "version": "1.0.0",
+    "icon": "bi bi-book",
+    "emoji": "📚",
+    "href": "?o=Docs",
+    "method": "list",
+    "ajax": false,
+    "order": 50,
+    "group": "admin",
+    "auth": true,
+    "admin": false,
+    "enabled": true
+}

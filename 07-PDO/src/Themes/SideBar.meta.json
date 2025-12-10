@@ -1,0 +1,9 @@
+{
+    "name": "SideBar",
+    "description": "Sidebar navigation layout",
+    "version": "1.0.0",
+    "icon": "bi bi-layout-sidebar",
+    "emoji": "🎨",
+    "order": 3,
+    "enabled": true
+}

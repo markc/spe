@@ -1,0 +1,7 @@
+all.php
+.ht*
+composer.lock
+vendor/*
+public/php_errors.log
+cache/*
+**/*.db

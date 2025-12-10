@@ -1,0 +1,15 @@
+{
+    "name": "Home",
+    "description": "Landing page (now served from database)",
+    "version": "1.0.0",
+    "icon": "bi bi-house-door",
+    "emoji": "🏠",
+    "href": "?p=home",
+    "method": "list",
+    "ajax": false,
+    "order": 1,
+    "group": "main",
+    "auth": false,
+    "admin": false,
+    "enabled": false
+}

@@ -1,0 +1,205 @@
+/* SideBar.css - Base styles */
+body {
+    padding-top: var(--navbar-height, 56px);
+    overflow-x: hidden;
+}
+
+.navbar-height {
+    height: var(--navbar-height, 56px);
+}
+
+.sidebar {
+    position: fixed;
+    top: var(--navbar-height, 56px);
+    bottom: 0;
+    z-index: 100;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 260px;
+    transition: transform 0.3s ease;
+}
+
+.sidebar.left {
+    left: 0;
+    transform: translateX(-100%);
+}
+
+.sidebar.right {
+    right: 0;
+    transform: translateX(100%);
+}
+
+.sidebar.left.show {
+    transform: translateX(0);
+}
+
+.sidebar.right.show {
+    transform: translateX(0);
+}
+
+.main-content {
+    padding-top: 1rem;
+    transition: padding 0.3s ease;
+    min-height: calc(100vh - var(--navbar-height, 56px) - 56px);
+    /* Set up container query context */
+    container-type: inline-size;
+    container-name: main-container;
+}
+
+.main-content.left-sidebar-active {
+    padding-left: 280px;
+}
+
+.main-content.right-sidebar-active {
+    padding-right: 280px;
+}
+
+/* Responsive behavior based on container width */
+.container-responsive {
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Container queries for responsive content */
+@container main-container (max-width: 600px) {
+    .container-responsive h1 {
+        font-size: 1.75rem !important;
+    }
+    
+    .container-responsive .lead {
+        font-size: 1rem !important;
+    }
+    
+    .container-responsive .card-body {
+        padding: 1rem !important;
+    }
+    
+    .container-responsive .display-5 {
+        font-size: 1.8rem !important;
+    }
+}
+
+@container main-container (min-width: 601px) and (max-width: 900px) {
+    .container-responsive h1 {
+        font-size: 2.25rem !important;
+    }
+    
+    .container-responsive .display-5 {
+        font-size: 2.2rem !important;
+    }
+    
+    .container-responsive .card-body {
+        padding: 1.25rem !important;
+    }
+}
+
+@container main-container (min-width: 901px) {
+    .container-responsive {
+        max-width: 90%;
+    }
+}
+
+/* Sidebar nav styles */
+.sidebar .nav-link {
+    padding: 0.5rem 1rem;
+    color: var(--bs-body-color);
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link:focus {
+    background-color: var(--bs-tertiary-bg);
+}
+
+.chevron-icon {
+    transition: transform 0.3s;
+}
+
+.nav-link[aria-expanded="true"] .chevron-icon {
+    transform: rotate(90deg);
+}
+
+.submenu {
+    padding-left: 1rem;
+}
+
+.submenu .nav-link {
+    padding-left: 1.5rem;
+}
+
+.no-underline {
+    text-decoration: none !important;
+}
+
+.fw {
+    min-width: 20px;
+}
+
+/* Indicators to show current container width - for demonstration */
+/*
+.container-width-indicator {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0,0,0,0.2);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    z-index: 1000;
+}
+*/
+@container main-container (max-width: 600px) {
+    .container-width-indicator::after {
+        content: "Container: Small (≤600px)";
+    }
+}
+
+@container main-container (min-width: 601px) and (max-width: 900px) {
+    .container-width-indicator::after {
+        content: "Container: Medium (601-900px)";
+    }
+}
+
+@container main-container (min-width: 901px) {
+    .container-width-indicator::after {
+        content: "Container: Large (≥901px)";
+    }
+}
+
+.container-width-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: rgba(220, 53, 69, 0.9); /* Bright red background */
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    z-index: 9999; /* Very high z-index */
+    border: 2px solid white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+[data-bs-theme="dark"] .container-width-indicator {
+    border-color: #333;
+    box-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
+
+/* Media queries for small screens - these are still needed as fallbacks */
+@media (max-width: 768px) {
+    .sidebar.left.show,
+    .sidebar.right.show {
+        width: 60%;
+    }
+    
+    .main-content.left-sidebar-active,
+    .main-content.right-sidebar-active {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
