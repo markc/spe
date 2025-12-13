@@ -2,11 +2,11 @@
 
 _Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)_
 
-A progressive PHP 8.5 micro-framework tutorial in 9 chapters. Each chapter builds on the previous, demonstrating modern PHP features and design patterns. **No Bootstrap** - uses custom minimal CSS.
+A progressive PHP 8.5 micro-framework tutorial in 10 chapters. Each chapter builds on the previous, demonstrating modern PHP features and design patterns. **No Bootstrap** - uses custom minimal CSS.
 
 ## Video Tutorials
 
-**[Watch the complete tutorial series on YouTube](https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B)** - 9 chapters with AI narration covering all framework features.
+**[Watch the complete tutorial series on YouTube](https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B)** - 10 chapters with AI narration covering all framework features.
 
 ## Requirements
 
@@ -42,6 +42,7 @@ cd 09-Blog/public && php -S localhost:8080
 | 07 | [PDO](07-PDO/README.md) | Database access | SQLite + QueryType enum |
 | 08 | [Users](08-Users/README.md) | User management | Full CRUDL operations |
 | 09 | [Blog](09-Blog/README.md) | Complete CMS | Auth, Blog, Docs, Categories |
+| 10 | [YouTube](10-YouTube/README.md) | YouTube Manager | OAuth, API, Shared Services |
 
 ## PHP 8.x Features
 
@@ -140,12 +141,14 @@ $nav = $pages
 
 ## Shared Assets
 
-All chapters 02-09 use shared CSS/JS from the project root:
+All chapters 02-10 use shared CSS/JS from the project root:
 
 - `/spe.css` - Complete styling with CSS variables
 - `/spe.js` - Theme toggle, toast notifications, dropdown handling
 
 Chapter 01-Simple has no external dependencies (inline minimal styles only).
+
+Chapter 10-YouTube requires Google API credentials in `~/.config/google/client_secret.json`.
 
 ## License
 
