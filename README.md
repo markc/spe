@@ -4,6 +4,10 @@ _Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)_
 
 A progressive PHP 8.5 micro-framework tutorial in 9 chapters. Each chapter builds on the previous, demonstrating modern PHP features and design patterns. **No Bootstrap** - uses custom minimal CSS.
 
+## Video Tutorials
+
+**[Watch the complete tutorial series on YouTube](https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B)** - 9 chapters with AI narration covering all framework features.
+
 ## Requirements
 
 - PHP 8.5+ (for pipe operator `|>`)
