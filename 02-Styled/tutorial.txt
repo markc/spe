@@ -1,50 +1,42 @@
 # Chapter 02: Styled - Narration Script
 # Format: duration|URL|text|action (action is optional)
+# Pronunciation: Use spaces for acronyms (P H P, S P E), ellipsis for pauses
 
 # --- Hook ---
-4|http://localhost:8080/02-Styled|From plain HTML to polished interface. Chapter Two adds style.
+5|http://localhost:8080/02-Styled|From plain H T M L... to polished interface. Chapter Two adds style.
 
 # --- Introduction ---
-6|http://localhost:8080/02-Styled|Building on Chapter One, we add external CSS, JavaScript, and theme switching.
+6|http://localhost:8080/02-Styled|Building on Chapter One, we add external C S S, JavaScript, and theme switching.
 
 # --- Demo: Pages ---
 5|http://localhost:8080/02-Styled|Same three pages as before. Home, About, Contact. Now with card layout and icons.
-3|http://localhost:8080/02-Styled?m=about|The About page with emoji icon.
-3|http://localhost:8080/02-Styled?m=contact|Contact page, same clean design.
+4|http://localhost:8080/02-Styled?m=about|The About page... with emoji icon.
+4|http://localhost:8080/02-Styled?m=contact|Contact page. Same clean design.
 
 # --- Demo: Theme Toggle ---
 5|http://localhost:8080/02-Styled|See the moon icon in the corner? Click it for dark mode.|click:.theme-toggle
-5|http://localhost:8080/02-Styled|Colors invert. The theme saves to local storage automatically.|click:.theme-toggle
+5|http://localhost:8080/02-Styled|Colors invert instantly. The theme saves to local storage.|click:.theme-toggle
 
 # --- Demo: Toast Notifications ---
-5|http://localhost:8080/02-Styled|Notice the Success and Danger buttons below. Click Success.|click:.btn-success
+5|http://localhost:8080/02-Styled|Notice the Success and Danger buttons. Click Success.|click:.btn-success
 5|http://localhost:8080/02-Styled|A green toast notification slides in. Now try Danger.|click:.btn-danger
-4|http://localhost:8080/02-Styled|Red for errors. These toasts auto-dismiss after three seconds.
-
-# --- Pause before code ---
-2|https://github.com/markc/spe/blob/main/02-Styled/index.php|
+5|http://localhost:8080/02-Styled|Red for errors. Toasts auto-dismiss after three seconds.
 
 # --- Code: What's New ---
-6|https://github.com/markc/spe/blob/main/02-Styled/index.php#L53|One new line links the external stylesheet. Shared CSS across all chapters.
-6|https://github.com/markc/spe/blob/main/02-Styled/index.php#L7-L11|Pages array gains emoji icons and separate title and content fields.
-5|https://github.com/markc/spe/blob/main/02-Styled/index.php#L71-L74|Toast buttons call the showToast function from our shared JavaScript.
+6|https://github.com/markc/spe/blob/main/02-Styled/index.php#L53|One new line links the external stylesheet. Shared C S S across all chapters.
+6|https://github.com/markc/spe/blob/main/02-Styled/index.php#L7-L11|Pages array gains emoji icons... and separate title and content fields.
+5|https://github.com/markc/spe/blob/main/02-Styled/index.php#L71-L74|Toast buttons call the show Toast function from our shared JavaScript.
 5|https://github.com/markc/spe/blob/main/02-Styled/index.php#L80|JavaScript loaded at the bottom. Best practice for page performance.
 
-# --- Pause before CSS ---
-2|https://github.com/markc/spe/blob/main/spe.css|
-
 # --- Code: CSS Custom Properties ---
-6|https://github.com/markc/spe/blob/main/spe.css#L1-L15|CSS custom properties define the color palette. Change one variable, update everywhere.
-6|https://github.com/markc/spe/blob/main/spe.css#L17-L27|The prefers-color-scheme query detects system dark mode preference.
-
-# --- Pause before JS ---
-2|https://github.com/markc/spe/blob/main/spe.js|
+6|https://github.com/markc/spe/blob/main/spe.css#L1-L15|C S S custom properties define the color palette. Change one variable, update everywhere.
+6|https://github.com/markc/spe/blob/main/spe.css#L17-L27|The prefers color scheme query... detects system dark mode preference.
 
 # --- Code: JavaScript ---
-6|https://github.com/markc/spe/blob/main/spe.js#L6-L27|Theme management. Checks local storage first, then system preference.
-6|https://github.com/markc/spe/blob/main/spe.js#L39-L52|The showToast function creates temporary notification elements.
+6|https://github.com/markc/spe/blob/main/spe.js#L6-L27|Theme management. Checks local storage first... then system preference.
+6|https://github.com/markc/spe/blob/main/spe.js#L39-L52|The show Toast function creates temporary notification elements.
 
 # --- Conclusion ---
-2|https://github.com/markc/spe/blob/main/02-Styled/index.php|
-6|http://localhost:8080/02-Styled|That's Chapter Two. External assets, CSS variables, dark mode, and toast notifications.
-4|http://localhost:8080/02-Styled|Next chapter introduces the plugin architecture.
+6|http://localhost:8080/02-Styled|That's Chapter Two. External assets, C S S variables, dark mode, and toast notifications.
+4|http://localhost:8080/02-Styled|Next chapter... introduces the plugin architecture.
+
