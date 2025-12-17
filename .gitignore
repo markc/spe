@@ -1,20 +1,107 @@
-all.php
-.ht*
+# ===================
+# Security - NEVER commit these
+# ===================
 .env
-.env.local
-**/.env.local
-composer.lock
-vendor/*
-public/php_errors.log
-cache/*
-**/*.db
+.env.*
+!.env.example
+.ht*
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cert
+*credentials*.json
+*secret*.json
+*token*.json
+id_rsa*
+id_ed25519*
 
-# Tutorial generated content (reproducible from tutorial.txt)
+# ===================
+# Large binary files - NEVER commit these
+# ===================
+# Video
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.webm
+*.wmv
+*.flv
+
+# Audio
+*.wav
+*.mp3
+*.ogg
+*.flac
+*.aac
+*.m4a
+
+# Images (large)
+*.psd
+*.xcf
+*.tiff
+*.bmp
+*.raw
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# ===================
+# PHP / Composer
+# ===================
+vendor/
+composer.lock
+*.phar
+
+# ===================
+# Databases
+# ===================
+*.db
+*.sqlite
+*.sqlite3
+
+# ===================
+# Logs and caches
+# ===================
+*.log
+cache/
+tmp/
+temp/
+
+# ===================
+# Tutorial generated content
+# (reproducible from tutorial.txt)
+# ===================
 */frames/
 */audio/
-*/slideshow.mp4
-*/frames.txt
-*/recordings/
 */segments/
-00-Tutorial/*.mp4
-00-Tutorial/node_modules/
+*/recordings/
+*/frames.txt
+*/slideshow.mp4
+
+# Node/Bun
+node_modules/
+bun.lockb
+
+# ===================
+# IDE / OS
+# ===================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ===================
+# Project specific
+# ===================
+all.php
+public/php_errors.log
