@@ -7,11 +7,7 @@ use SPE\App\{Db, QueryType};
 
 final class App {
     public string $buf = '';
-    public array $a = [];
-    public array $in;
-    public array $out;
-    public array $n1;
-    public array $n2;
+    public array $a = [], $in, $out, $n1, $n2;
 
     public function __construct() {
         $i = ['l' => '', 'm' => 'list', 'o' => 'Home', 't' => 'Simple', 'x' => ''];
