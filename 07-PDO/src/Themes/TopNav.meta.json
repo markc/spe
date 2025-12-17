@@ -1,9 +1,0 @@
-{
-    "name": "TopNav",
-    "description": "Top navigation bar layout",
-    "version": "1.0.0",
-    "icon": "bi bi-layout-text-window-reverse",
-    "emoji": "🎨",
-    "order": 2,
-    "enabled": true
-}

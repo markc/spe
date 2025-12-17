@@ -1,0 +1,25 @@
+{
+  "title": "SPE Chapter 07 - PDO: Ultra-Compact SQLite Blog in 326 Lines",
+  "description": "Chapter 07 of Simple PHP Examples - an ultra-compact SQLite-powered blog CMS in just 326 lines across 5 files using modern PHP 8.5 features.\n\nThis tutorial covers:\n• PHP 8.5 pipe operator for input processing\n• SQLite database with PDO wrapper\n• Dynamic navigation from database\n• Three switchable themes (Simple, TopNav, SideBar)\n• Full CRUD operations for blog posts\n• Markdown rendering support\n• Emoji icon selector\n• Search and pagination\n\n🔗 Links:\nGitHub: https://github.com/markc/spe/tree/main/07-PDO\nSource Code: https://github.com/markc/spe/tree/main/07-PDO/src\nProject: https://github.com/markc/spe\nWebsite: https://markc.github.io/spe/\n\n📚 SPE Tutorial Series:\n00 - Tutorial (Introduction)\n01 - Simple\n02 - Styled\n03 - Plugins\n04 - Themes\n05 - Autoload\n06 - Session\n07 - PDO (this video)\n08 - Users\n09 - Blog\n\n⏱️ Timestamps:\n0:00 Introduction\n0:11 Live Demo: Pages\n0:24 Live Demo: Blog\n0:44 Live Demo: Themes\n0:58 Code: index.php\n1:03 Code: App.php\n1:34 Code: Model.php\n2:05 Code: View.php\n2:35 Code: Theme.php\n3:04 Conclusion\n\n#PHP #PHP85 #PipeOperator #SQLite #PDO #WebDevelopment #Tutorial #OpenSource #BlogCMS",
+  "tags": [
+    "php",
+    "php 8.5",
+    "pipe operator",
+    "sqlite",
+    "pdo",
+    "database",
+    "blog",
+    "cms",
+    "markdown",
+    "tutorial",
+    "web development",
+    "programming",
+    "coding tutorial",
+    "micro-framework",
+    "crud"
+  ],
+  "categoryId": "28",
+  "privacyStatus": "public",
+  "playlistId": "PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B",
+  "playlistPosition": 7
+}

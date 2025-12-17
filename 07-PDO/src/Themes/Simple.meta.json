@@ -1,9 +1,0 @@
-{
-    "name": "Simple",
-    "description": "Minimal single-column layout",
-    "version": "1.0.0",
-    "icon": "bi bi-layout-text-window",
-    "emoji": "🎨",
-    "order": 1,
-    "enabled": true
-}
