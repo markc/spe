@@ -1,0 +1,22 @@
+# Chapter 05: Autoload - Narration Script
+# Format: duration|URL|text
+# Structure: Introduction → Live Demo → Code Walkthrough → Conclusion
+
+# --- Introduction ---
+7|http://localhost:8080/05-Autoload/public/|Welcome to Chapter Five. We're reorganizing the code with PSR-4 autoloading using Composer for professional project structure.
+
+# --- Live Demo ---
+6|http://localhost:8080/05-Autoload/public/|The application works identically to Chapter Four. The difference is how the code is organized behind the scenes.
+5|http://localhost:8080/05-Autoload/public/?t=TopNav|All features still work. Theme switching, navigation, everything. But now each class lives in its own file.
+5|http://localhost:8080/05-Autoload/public/?o=About|Plugins are organized into directories with separate Model and View files. Let's explore the new structure.
+
+# --- Code Walkthrough ---
+8|https://github.com/markc/spe/blob/main/05-Autoload/public/index.php|The entry point is now just 5 lines. Composer's autoloader handles all class loading automatically.
+7|https://github.com/markc/spe/blob/main/05-Autoload/public/index.php#L7|We use PHP's grouped use statement to import Init and Ctx from the Core namespace.
+8|https://github.com/markc/spe/tree/main/05-Autoload/src|The source code is organized into a src directory with three subdirectories: Core, Plugins, and Themes.
+7|https://github.com/markc/spe/tree/main/05-Autoload/src/Core|The Core directory contains framework classes: Ctx, Init, Plugin, View, and Theme.
+8|https://github.com/markc/spe/tree/main/05-Autoload/src/Plugins|Plugins are now in subdirectories. Each plugin has its own folder with Model and View files.
+7|https://github.com/markc/spe/tree/main/05-Autoload/src/Themes|Theme classes have their own files. Simple, TopNav, and SideBar are separate, reusable components.
+
+# --- Conclusion ---
+3|https://github.com/markc/spe/blob/main/composer.json|That's Chapter Five. We've adopted PSR-4 autoloading with proper namespacing. Next chapter adds PHP sessions!

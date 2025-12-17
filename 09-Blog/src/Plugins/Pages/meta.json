@@ -1,0 +1,15 @@
+{
+    "name": "Pages",
+    "description": "Static pages management",
+    "version": "1.0.0",
+    "icon": "bi bi-file-text",
+    "emoji": "📄",
+    "href": "?o=Pages",
+    "method": "list",
+    "ajax": false,
+    "order": 12,
+    "group": "admin",
+    "auth": true,
+    "admin": true,
+    "enabled": true
+}

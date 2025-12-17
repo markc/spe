@@ -1,0 +1,23 @@
+# Chapter 07: PDO - Narration Script
+# Format: duration|URL|text
+# Structure: Introduction → Live Demo → Code Walkthrough → Conclusion
+
+# --- Introduction ---
+7|http://localhost:8080/07-PDO|Welcome to Chapter Seven. We're adding a SQLite database using PDO with a clean wrapper for CRUD operations.
+
+# --- Live Demo ---
+6|http://localhost:8080/07-PDO|The application now has database-driven content. Data is stored in SQLite and retrieved dynamically.
+5|http://localhost:8080/07-PDO?o=About|Each page can have database-backed content. The framework handles all the SQL transparently.
+5|http://localhost:8080/07-PDO?o=Contact|The same clean interface, now powered by a real database. Let's examine the PDO wrapper class.
+
+# --- Code Walkthrough ---
+8|https://github.com/markc/spe/blob/main/07-PDO/src/Core/Db.php#L9-L13|A QueryType enum defines three fetch modes: All returns all rows, One returns a single row, Column returns one value.
+7|https://github.com/markc/spe/blob/main/07-PDO/src/Core/Db.php#L15-L28|The Db class extends PDO. The constructor builds a DSN for either MySQL or SQLite based on configuration.
+8|https://github.com/markc/spe/blob/main/07-PDO/src/Core/Db.php#L21-L25|PDO options enable exceptions, associative arrays, and disable emulated prepares for better security.
+7|https://github.com/markc/spe/blob/main/07-PDO/src/Core/Db.php#L30-L38|The create method inserts a row. It uses the pipe operator to build field names and placeholder values.
+8|https://github.com/markc/spe/blob/main/07-PDO/src/Core/Db.php#L40-L51|The read method handles SELECT queries. It accepts a table, fields, where clause, parameters, and QueryType.
+7|https://github.com/markc/spe/blob/main/07-PDO/src/Core/Db.php#L46-L50|A match expression returns data based on QueryType. Fetch all rows, one row, or a single column value.
+8|https://github.com/markc/spe/blob/main/07-PDO/src/Core/Db.php#L53-L59|The update method modifies existing rows. It merges data and where parameters for secure binding.
+
+# --- Conclusion ---
+3|https://github.com/markc/spe/blob/main/07-PDO/src/Core/Db.php|That's Chapter Seven. We have a clean PDO wrapper with type-safe query methods. Next chapter adds user management!

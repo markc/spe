@@ -1,0 +1,32 @@
+# Chapter 01: Simple - Narration Script
+# Format: duration|URL|text
+# Pronunciation: Use spaces for acronyms (P H P), or SSML tags for complex cases
+
+# --- Hook ---
+4|http://localhost:8080/01-Simple|Thirty-two lines of P H P. That's all it takes to build a complete web application.
+
+# --- Introduction ---
+5|http://localhost:8080/01-Simple|Welcome to Simple P H P Examples, Chapter One. We're exploring modern P H P 8.5... in its most minimal form.
+
+# --- Live Demo ---
+5|http://localhost:8080/01-Simple|Here's our finished app. Three pages, clean navigation, zero dependencies.
+4|http://localhost:8080/01-Simple?m=about|Click About... and the URL parameter changes. Simple routing.
+4|http://localhost:8080/01-Simple?m=contact|Contact works the same way. Now let's see how it's built.
+
+# --- Code Walkthrough ---
+6|https://github.com/markc/spe/blob/main/01-Simple/index.php#L4|One anonymous class... that echoes itself. Everything self-contained.
+5|https://github.com/markc/spe/blob/main/01-Simple/index.php#L5|A typed constant defines the default page. P H P 8.3 feature.
+6|https://github.com/markc/spe/blob/main/01-Simple/index.php#L6-L10|The pages array maps route names... to display names and content.
+7|https://github.com/markc/spe/blob/main/01-Simple/index.php#L11-L12|P H P 8.4's asymmetric visibility. Public read, private write. Clean encapsulation.
+
+# --- Pipe operator focus ---
+8|https://github.com/markc/spe/blob/main/01-Simple/index.php#L14-L17|Here's the star of the show. Chained pipe operators with first-class callables.
+6|https://github.com/markc/spe/blob/main/01-Simple/index.php#L15|Each result flows to the next function. Trim... sanitize... default. One clean expression.
+
+# --- Output generation ---
+6|https://github.com/markc/spe/blob/main/01-Simple/index.php#L19-L31|The toString method builds our HTML. Navigation generated dynamically from the pages array.
+5|https://github.com/markc/spe/blob/main/01-Simple/index.php#L20-L21|Array keys, map, implode... all piped together.
+
+# --- Conclusion ---
+5|https://github.com/markc/spe/blob/main/01-Simple/index.php|That's Chapter One. Typed constants, asymmetric visibility, and the pipe operator.
+3|http://localhost:8080/01-Simple|Next up... we add some style.

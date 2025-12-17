@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask a Question
+    url: https://github.com/markc/spe/discussions/new?category=q-a
+    about: Ask questions about the tutorial or framework in Discussions
+  - name: Share Ideas
+    url: https://github.com/markc/spe/discussions/new?category=ideas
+    about: Suggest features or improvements in Discussions
+  - name: YouTube Tutorials
+    url: https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B
+    about: Watch the video tutorial series
+  - name: PHP Documentation
+    url: https://www.php.net/docs.php
+    about: Official PHP documentation for language features

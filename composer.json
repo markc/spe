@@ -1,0 +1,31 @@
+{
+    "name": "markc/spe",
+    "description": "Simple PHP Examples (SPE)",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mark Constable",
+            "email": "mc@netserva.org"
+        }
+    ],
+    "require": {
+        "php": "^8.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "SPE\\App\\": "app/lib",
+            "SPE\\Simple\\": "01-Simple/src",
+            "SPE\\Styled\\": "02-Styled/src",
+            "SPE\\Plugins\\": "03-Plugins/src",
+            "SPE\\Themes\\": "04-Themes/src",
+            "SPE\\Autoload\\": "05-Autoload/src",
+            "SPE\\Session\\": "06-Session/src",
+            "SPE\\PDO\\": "07-PDO/src",
+            "SPE\\Users\\": "08-Users/src",
+            "SPE\\Blog\\": "09-Blog/src",
+            "SPE\\YouTube\\": "10-YouTube/src"
+        }
+    },
+    "minimum-stability": "stable"
+}

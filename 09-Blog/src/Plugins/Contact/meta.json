@@ -1,0 +1,15 @@
+{
+    "name": "Contact",
+    "description": "Contact page (now served from database)",
+    "version": "1.0.0",
+    "icon": "bi bi-envelope",
+    "emoji": "✉️",
+    "href": "?p=contact",
+    "method": "list",
+    "ajax": false,
+    "order": 3,
+    "group": "main",
+    "auth": false,
+    "admin": false,
+    "enabled": false
+}

@@ -1,0 +1,22 @@
+# Chapter 04: Themes - Narration Script
+# Format: duration|URL|text
+# Structure: Introduction → Live Demo → Code Walkthrough → Conclusion
+
+# --- Introduction ---
+7|http://localhost:8080/04-Themes|Welcome to Chapter Four. We're adding Model View separation and a powerful theming system with multiple layout options.
+
+# --- Live Demo ---
+6|http://localhost:8080/04-Themes|The application now supports multiple themes. We start with the Simple theme, similar to previous chapters.
+5|http://localhost:8080/04-Themes?t=TopNav|Switching to Top Nav moves navigation to a horizontal bar at the top. Same content, different layout.
+5|http://localhost:8080/04-Themes?t=SideBar|The SideBar theme places navigation vertically on the left. Themes can completely transform the user interface. Let's examine the code.
+
+# --- Code Walkthrough ---
+8|https://github.com/markc/spe/blob/main/04-Themes/index.php#L5-L19|The Context class now has two navigation arrays. Nav 1 defines page links, nav 2 defines theme options.
+7|https://github.com/markc/spe/blob/main/04-Themes/index.php#L10|The in array adds a t parameter for theme selection. This lets users switch between different layout styles.
+8|https://github.com/markc/spe/blob/main/04-Themes/index.php#L16-L17|Nav 1 contains page links with emoji labels. Nav 2 contains theme options: Simple, Top Nav, and Side Bar.
+8|https://github.com/markc/spe/blob/main/04-Themes/index.php#L21-L49|Init handles both Model and View routing. It first loads the Model to get data, then renders with the appropriate Theme.
+7|https://github.com/markc/spe/blob/main/04-Themes/index.php#L28-L29|The model name is built from the o parameter. If a Model class exists, it's instantiated and its method is called.
+8|https://github.com/markc/spe/blob/main/04-Themes/index.php#L36-L40|View resolution tries the specific View first, then falls back to the Theme. This enables per-page customization.
+
+# --- Conclusion ---
+3|https://github.com/markc/spe/blob/main/04-Themes/index.php|That's Chapter Four. We've added Model View separation and swappable themes. Next chapter introduces Composer autoloading!

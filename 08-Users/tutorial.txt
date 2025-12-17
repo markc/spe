@@ -1,0 +1,23 @@
+# Chapter 08: Users - Narration Script
+# Format: duration|URL|text
+# Structure: Introduction → Live Demo → Code Walkthrough → Conclusion
+
+# --- Introduction ---
+7|http://localhost:8080/08-Users|Welcome to Chapter Eight. We're adding user management with full Create, Read, Update, Delete, and List operations.
+
+# --- Live Demo ---
+6|http://localhost:8080/08-Users?o=Users|Here's the Users plugin showing a list of registered users. Each row has action buttons for viewing, editing, and deleting.
+5|http://localhost:8080/08-Users?o=Users&m=read&i=1|Clicking a user shows their details. We can see login name, email, group membership, and admin status.
+5|http://localhost:8080/08-Users?o=Users&m=update&i=1|The edit form allows updating user information. Password changes are handled securely. Let's see the code.
+
+# --- Code Walkthrough ---
+8|https://github.com/markc/spe/blob/main/08-Users/src/Plugins/Users/UsersModel.php#L11-L14|UsersModel defines input fields for user data. ID, group, ACL, login, names, password, and admin notes.
+7|https://github.com/markc/spe/blob/main/08-Users/src/Plugins/Users/UsersModel.php#L17-L23|The constructor populates inputs from the request and connects to the SQLite database.
+8|https://github.com/markc/spe/blob/main/08-Users/src/Plugins/Users/UsersModel.php#L25-L39|The create method handles new users. Password is hashed using password hash with the default algorithm.
+7|https://github.com/markc/spe/blob/main/08-Users/src/Plugins/Users/UsersModel.php#L30|Note the password hash call. This securely stores passwords using bcrypt or Argon2 depending on PHP version.
+8|https://github.com/markc/spe/blob/main/08-Users/src/Plugins/Users/UsersModel.php#L41-L44|The read method fetches a single user by ID using QueryType One to return exactly one row.
+7|https://github.com/markc/spe/blob/main/08-Users/src/Plugins/Users/UsersModel.php#L46-L61|Update checks for POST data, merges changes, and conditionally updates the password if provided.
+8|https://github.com/markc/spe/blob/main/08-Users/src/Plugins/Users/UsersModel.php#L63-L68|Delete removes the user and redirects back to the list. Simple, direct, and secure.
+
+# --- Conclusion ---
+3|https://github.com/markc/spe/blob/main/08-Users/src/Plugins/Users/UsersModel.php|That's Chapter Eight. Full CRUDL user management with secure password hashing. The final chapter builds a complete blog CMS!

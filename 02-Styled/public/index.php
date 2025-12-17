@@ -1,0 +1,114 @@
+<?php declare(strict_types=1);
+// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+
+echo new class {
+    private const string DEFAULT = 'home';                                      // PHP 8.3 typed constant
+
+    private array $pages = [
+        'home'    => ['🏠 Home',    'Home Page',    'Welcome to SPE::02 Styled example.'],
+        'about'   => ['📖 About',   'About Page',   'This demonstrates PHP 8.5 with custom CSS.'],
+        'contact' => ['✉️ Contact', 'Contact Page', 'Get in touch via the form below.'],
+    ];
+
+    public private(set) string $page;                                           // PHP 8.4 asymmetric visibility
+    public private(set) string $title;
+    public private(set) string $content;
+
+    public function __construct()
+    {
+        $this->page = ($_REQUEST['m'] ?? '')                                    // PHP 8.5 pipe operator
+            |> trim(...)
+            |> (fn($s) => filter_var($s, FILTER_SANITIZE_URL))
+            |> (fn($p) => $p && isset($this->pages[$p]) ? $p : self::DEFAULT);
+
+        $this->title = $this->pages[$this->page][1];
+        $this->content = $this->pages[$this->page][2];
+    }
+
+    public function __toString(): string
+    {
+        $nav = $this->pages
+            |> array_keys(...)                                                  // PHP 8.1 first-class callable
+            |> (fn($keys) => array_map(
+                fn($k) => sprintf(
+                    '<a href="?m=%s"%s>%s</a>',
+                    $k,
+                    $k === $this->page ? ' class="active"' : '',
+                    $this->pages[$k][0]
+                ),
+                $keys
+            ))
+            |> (fn($links) => implode(' ', $links));
+
+        $main = $this->page === 'contact' ? $this->contactForm() : "<p>{$this->content}</p>";
+
+        return <<<HTML
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta name="color-scheme" content="light dark">
+            <title>SPE::02 {$this->title}</title>
+            <link rel="stylesheet" href="/spe.css">
+        </head>
+        <body>
+            <div class="container">
+                <header>
+                    <h1><a href="/">« Styled PHP Example</a></h1>
+                </header>
+                <nav class="flex">
+                    $nav
+                    <span style="margin-left:auto">
+                        <button class="theme-toggle" id="theme-icon">🌙</button>
+                    </span>
+                </nav>
+                <main>
+                    <div class="card">
+                        <h2>{$this->title}</h2>
+                        $main
+                    </div>
+                    <div class="flex justify-center mt-2">
+                        <button class="btn btn-success" onclick="showToast('Success!', 'success')">Success</button>
+                        <button class="btn btn-danger" onclick="showToast('Error!', 'danger')">Danger</button>
+                    </div>
+                </main>
+                <footer class="text-center mt-3">
+                    <small>© 2015-2025 Mark Constable (MIT License)</small>
+                </footer>
+            </div>
+            <script src="/spe.js"></script>
+        </body>
+        </html>
+        HTML;
+    }
+
+    private function contactForm(): string
+    {
+        return <<<HTML
+        <p>{$this->content}</p>
+        <form class="mt-2" onsubmit="return handleContact(this)">
+            <div class="form-group">
+                <label for="subject">Subject</label>
+                <input type="text" id="subject" name="subject" required>
+            </div>
+            <div class="form-group">
+                <label for="message">Message</label>
+                <textarea id="message" name="message" rows="4" required></textarea>
+            </div>
+            <div class="text-right">
+                <button type="submit" class="btn">Send Message</button>
+            </div>
+        </form>
+        <script>
+        function handleContact(form) {
+            location.href = 'mailto:mc@netserva.org?subject=' +
+                encodeURIComponent(form.subject.value) +
+                '&body=' + encodeURIComponent(form.message.value);
+            showToast('Opening email client...', 'success');
+            return false;
+        }
+        </script>
+        HTML;
+    }
+};

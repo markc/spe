@@ -1,0 +1,22 @@
+# Chapter 03: Plugins - Narration Script
+# Format: duration|URL|text
+# Structure: Introduction → Live Demo → Code Walkthrough → Conclusion
+
+# --- Introduction ---
+7|http://localhost:8080/03-Plugins|Welcome to Chapter Three. We're introducing the Plugin architecture pattern to organize code into reusable, swappable components.
+
+# --- Live Demo ---
+6|http://localhost:8080/03-Plugins|The application now has a modular plugin system. Home, About, and Contact are separate plugins that can be added or removed.
+5|http://localhost:8080/03-Plugins?o=About|Each plugin handles its own content. The About plugin renders this page with its specific layout.
+5|http://localhost:8080/03-Plugins?o=Contact|The Contact plugin provides a different structure. Plugins can have multiple methods for CRUDL operations. Let's see how it's built.
+
+# --- Code Walkthrough ---
+8|https://github.com/markc/spe/blob/main/03-Plugins/index.php#L5-L18|The code is now split into distinct classes. A Context class holds global state, Init handles bootstrapping, and Plugin classes handle specific pages.
+8|https://github.com/markc/spe/blob/main/03-Plugins/index.php#L5-L8|The Context class uses constructor property promotion to define all properties in the constructor signature.
+7|https://github.com/markc/spe/blob/main/03-Plugins/index.php#L8|The in array holds input parameters. The o parameter selects which plugin to load, and m selects which method to call.
+8|https://github.com/markc/spe/blob/main/03-Plugins/index.php#L9-L13|The out array contains output sections. Doc for the title, head for the header, main for content, and foot for the footer.
+7|https://github.com/markc/spe/blob/main/03-Plugins/index.php#L14-L16|The nav array defines navigation items. Each item links to a plugin by name.
+8|https://github.com/markc/spe/blob/main/03-Plugins/index.php#L20-L31|The Init class is marked as readonly. This means all its properties are implicitly readonly once set in the constructor.
+
+# --- Conclusion ---
+3|https://github.com/markc/spe/blob/main/03-Plugins/index.php|That's Chapter Three. We've separated concerns with the Plugin pattern, using Context for state and Init for routing. Next chapter adds theming!

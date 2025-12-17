@@ -1,0 +1,21 @@
+{
+  "title": "SPE Chapter 02 - Styled: CSS Variables, Dark Mode & Toast Notifications",
+  "description": "Chapter 02 of Simple PHP Examples - building on Chapter 01 with external CSS, JavaScript, theme switching, and toast notifications.\n\nThis tutorial covers:\n• Incremental updates from Chapter 01\n• External CSS/JS shared across chapters\n• CSS custom properties (variables) for theming\n• prefers-color-scheme media query for dark mode\n• Theme toggle with localStorage persistence\n• Toast notification system (success/danger)\n\nLinks:\nGitHub: https://github.com/markc/spe/tree/main/02-Styled\nCSS Source: https://github.com/markc/spe/blob/main/spe.css\nJS Source: https://github.com/markc/spe/blob/main/spe.js\nProject: https://github.com/markc/spe\nWebsite: https://markc.github.io/spe/\n\nSPE Tutorial Series:\n00 - Tutorial (Introduction)\n01 - Simple\n02 - Styled (this video)\n03 - Plugins\n04 - Themes\n05 - Autoload\n06 - Session\n07 - PDO\n08 - Users\n09 - Blog\n\nTimestamps:\n0:00 Hook\n0:05 Introduction\n0:11 Demo - Pages\n0:22 Theme Toggle\n0:31 Toast Notifications\n0:45 Code - What's New\n1:05 CSS Custom Properties\n1:18 JavaScript\n1:36 Conclusion\n\n#PHP #CSS #DarkMode #Toast #WebDevelopment #Tutorial #OpenSource",
+  "tags": [
+    "php",
+    "css",
+    "css custom properties",
+    "css variables",
+    "dark mode",
+    "theme toggle",
+    "toast notifications",
+    "localStorage",
+    "web development",
+    "tutorial",
+    "programming"
+  ],
+  "categoryId": "28",
+  "privacyStatus": "public",
+  "playlistId": "PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B",
+  "playlistPosition": 2
+}

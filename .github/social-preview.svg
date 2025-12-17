@@ -1,0 +1,57 @@
+<svg width="1280" height="640" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#777BB4"/>
+      <stop offset="100%" style="stop-color:#4FC08D"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="640" fill="url(#bg)"/>
+
+  <!-- Decorative code lines -->
+  <g opacity="0.1" fill="#fff">
+    <rect x="60" y="80" width="300" height="8" rx="4"/>
+    <rect x="60" y="100" width="200" height="8" rx="4"/>
+    <rect x="60" y="120" width="250" height="8" rx="4"/>
+    <rect x="920" y="500" width="280" height="8" rx="4"/>
+    <rect x="970" y="520" width="230" height="8" rx="4"/>
+    <rect x="920" y="540" width="300" height="8" rx="4"/>
+  </g>
+
+  <!-- PHP Logo circle -->
+  <circle cx="640" cy="200" r="70" fill="#777BB4"/>
+  <text x="640" y="220" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#fff" text-anchor="middle">PHP</text>
+
+  <!-- Main Title -->
+  <text x="640" y="340" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="#fff" text-anchor="middle">Simple PHP Examples</text>
+
+  <!-- Subtitle -->
+  <text x="640" y="400" font-family="Arial, sans-serif" font-size="32" fill="#aaa" text-anchor="middle">A Progressive PHP 8.5 Micro-Framework Tutorial</text>
+
+  <!-- Pipe operator showcase -->
+  <rect x="340" y="450" width="600" height="60" rx="8" fill="#2d2d44"/>
+  <text x="640" y="490" font-family="monospace" font-size="28" fill="url(#accent)" text-anchor="middle">$data |&gt; trim(...) |&gt; validate(...)</text>
+
+  <!-- Bottom badges -->
+  <g transform="translate(640, 570)">
+    <rect x="-280" y="0" width="100" height="30" rx="4" fill="#777BB4"/>
+    <text x="-230" y="21" font-family="Arial, sans-serif" font-size="14" fill="#fff" text-anchor="middle">PHP 8.5</text>
+
+    <rect x="-160" y="0" width="100" height="30" rx="4" fill="#003B57"/>
+    <text x="-110" y="21" font-family="Arial, sans-serif" font-size="14" fill="#fff" text-anchor="middle">SQLite</text>
+
+    <rect x="-40" y="0" width="80" height="30" rx="4" fill="#2ea44f"/>
+    <text x="0" y="21" font-family="Arial, sans-serif" font-size="14" fill="#fff" text-anchor="middle">MIT</text>
+
+    <rect x="60" y="0" width="120" height="30" rx="4" fill="#0066cc"/>
+    <text x="120" y="21" font-family="Arial, sans-serif" font-size="14" fill="#fff" text-anchor="middle">10 Chapters</text>
+
+    <rect x="200" y="0" width="80" height="30" rx="4" fill="#ff6600"/>
+    <text x="240" y="21" font-family="Arial, sans-serif" font-size="14" fill="#fff" text-anchor="middle">MVC</text>
+  </g>
+</svg>

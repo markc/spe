@@ -1,0 +1,15 @@
+{
+    "name": "Profile",
+    "description": "User profile management",
+    "version": "1.0.0",
+    "icon": "bi bi-person",
+    "emoji": "👤",
+    "href": "?o=Profile",
+    "method": "list",
+    "ajax": false,
+    "order": 10,
+    "group": "admin",
+    "auth": true,
+    "admin": false,
+    "enabled": false
+}

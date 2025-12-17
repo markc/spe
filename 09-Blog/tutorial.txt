@@ -1,0 +1,23 @@
+# Chapter 09: Blog - Narration Script
+# Format: duration|URL|text
+# Structure: Introduction → Live Demo → Code Walkthrough → Conclusion
+
+# --- Introduction ---
+7|http://localhost:8080/09-Blog|Welcome to Chapter Nine, the final chapter. We're building a complete blog CMS with authentication, posts, categories, and markdown support.
+
+# --- Live Demo ---
+6|http://localhost:8080/09-Blog?o=Blog|Here's the public blog view. Posts are displayed as cards with featured images, titles, excerpts, and author information.
+5|http://localhost:8080/09-Blog?o=Blog&m=read&i=1|Clicking a post shows the full article. Markdown content is rendered to HTML. Categories and navigation links appear below.
+5|http://localhost:8080/09-Blog?o=Auth|The login page handles authentication. Admin users can manage posts, categories, pages, and user accounts.
+5|http://localhost:8080/09-Blog?o=Posts|The Posts admin shows all blog entries. Authors can create, edit, and delete their own posts. Admins can manage everything.
+
+# --- Code Walkthrough ---
+8|https://github.com/markc/spe/blob/main/09-Blog/src/Plugins/Blog/BlogModel.php#L28-L49|BlogModel handles the public blog. The list method fetches published posts with pagination and generates excerpts.
+7|https://github.com/markc/spe/blob/main/09-Blog/src/Plugins/Blog/BlogModel.php#L51-L66|The read method shows a single post with categories. It also fetches previous and next posts for navigation.
+8|https://github.com/markc/spe/blob/main/09-Blog/src/Plugins/Blog/BlogView.php#L17-L53|BlogView renders a card grid layout. Each card shows the featured image, title, excerpt, and author.
+7|https://github.com/markc/spe/blob/main/09-Blog/src/Plugins/Blog/BlogView.php#L55-L91|The single post view renders markdown content. Category tags link to the category listing view.
+8|https://github.com/markc/spe/blob/main/09-Blog/src/Plugins/Posts/PostsModel.php#L15-L20|PostsModel handles admin CRUD for blog posts. The canEdit method checks permissions before allowing changes.
+7|https://github.com/markc/spe/blob/main/09-Blog/src/Core/Util.php#L15-L25|The Util class provides markdown parsing with the md method. It transforms markdown text to safe HTML output.
+
+# --- Conclusion ---
+3|https://github.com/markc/spe/blob/main/09-Blog/src/Plugins/Blog/BlogModel.php|That completes Simple PHP Examples. From a 44-line single file to a full CMS, we've explored modern PHP 8.5 features throughout. Thanks for watching!

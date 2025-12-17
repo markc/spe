@@ -1,0 +1,21 @@
+{
+  "title": "SPE Chapter 00 - Introduction to Simple PHP Examples",
+  "description": "Welcome to Simple PHP Examples (SPE) - a progressive PHP 8.5 micro-framework tutorial in 10 chapters.\n\nThis introduction covers:\n• Project overview and GitHub repository tour\n• Running chapters locally with PHP's built-in server\n• The YouTube tutorial series\n• How these tutorials are created (meta!)\n• The video generation pipeline (Piper TTS, Playwright, melt)\n\n🔗 Links:\nGitHub: https://github.com/markc/spe\nWebsite: https://markc.github.io/spe/\nPlaylist: https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B\n\n📚 Chapters in this series:\n00 - Tutorial (this video)\n01 - Simple\n02 - Styled\n03 - Plugins\n04 - Themes\n05 - Autoload\n06 - Session\n07 - PDO\n08 - Users\n09 - Blog\n\n⏱️ Timestamps:\n0:00 Introduction\n0:20 GitHub Repository Tour\n0:46 Running Locally\n1:04 YouTube Tutorial Series\n1:17 How Tutorials Are Made\n1:47 The Video Pipeline\n2:07 Contributing\n2:18 Conclusion\n\n#PHP #PHP85 #WebDevelopment #Tutorial #OpenSource",
+  "tags": [
+    "php",
+    "php8",
+    "php 8.5",
+    "pipe operator",
+    "tutorial",
+    "micro-framework",
+    "web development",
+    "open source",
+    "sqlite",
+    "pdo",
+    "programming",
+    "coding tutorial"
+  ],
+  "categoryId": "28",
+  "privacyStatus": "public",
+  "playlistId": "PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B"
+}

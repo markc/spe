@@ -1,0 +1,31 @@
+# CODEOWNERS - Define code ownership for automatic PR review requests
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything
+* @markc
+
+# Core framework
+/01-Simple/ @markc
+/02-Styled/ @markc
+/03-Plugins/ @markc
+/04-Themes/ @markc
+/05-Autoload/ @markc
+/06-Session/ @markc
+/07-PDO/ @markc
+/08-Users/ @markc
+/09-Blog/ @markc
+/10-YouTube/ @markc
+
+# Tutorial generation
+/00-Tutorial/ @markc
+
+# Shared assets
+/spe.css @markc
+/spe.js @markc
+
+# Documentation
+/docs/ @markc
+/*.md @markc
+
+# GitHub configuration
+/.github/ @markc

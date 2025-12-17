@@ -1,0 +1,20 @@
+all.php
+.ht*
+.env
+.env.local
+**/.env.local
+composer.lock
+vendor/*
+public/php_errors.log
+cache/*
+**/*.db
+
+# Tutorial generated content (reproducible from tutorial.txt)
+*/frames/
+*/audio/
+*/slideshow.mp4
+*/frames.txt
+*/recordings/
+*/segments/
+00-Tutorial/*.mp4
+00-Tutorial/node_modules/

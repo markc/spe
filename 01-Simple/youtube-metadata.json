@@ -1,0 +1,22 @@
+{
+  "title": "SPE Chapter 01 - Simple: Single-File PHP 8.5 Application",
+  "description": "Chapter 01 of Simple PHP Examples - building a complete web application in 32 lines using modern PHP 8.5 features.\n\nThis tutorial covers:\n• Anonymous class pattern for self-contained apps\n• PHP 8.3 typed constants\n• PHP 8.4 asymmetric visibility (public private(set))\n• PHP 8.5 pipe operator for data transformation\n• First-class callables with spread syntax\n• Dynamic navigation generation\n\n🔗 Links:\nGitHub: https://github.com/markc/spe/tree/main/01-Simple\nSource Code: https://github.com/markc/spe/blob/main/01-Simple/index.php\nProject: https://github.com/markc/spe\nWebsite: https://markc.github.io/spe/\n\n📚 SPE Tutorial Series:\n00 - Tutorial (Introduction)\n01 - Simple (this video)\n02 - Styled\n03 - Plugins\n04 - Themes\n05 - Autoload\n06 - Session\n07 - PDO\n08 - Users\n09 - Blog\n\n⏱️ Timestamps:\n0:00 Hook - 32 lines of PHP\n0:04 Introduction\n0:09 Live Demo - Home\n0:14 Live Demo - About\n0:18 Live Demo - Contact\n0:24 Code Overview\n0:30 Typed Constants\n0:35 Pages Array\n0:41 Asymmetric Visibility\n0:51 Pipe Operators\n0:59 Data Flow\n1:05 HTML Output\n1:11 Navigation\n1:23 Conclusion\n1:30 Next Chapter\n\n#PHP #PHP85 #PipeOperator #WebDevelopment #Tutorial #OpenSource",
+  "tags": [
+    "php",
+    "php 8.5",
+    "pipe operator",
+    "anonymous class",
+    "typed constants",
+    "asymmetric visibility",
+    "first-class callables",
+    "tutorial",
+    "web development",
+    "programming",
+    "coding tutorial",
+    "micro-framework"
+  ],
+  "categoryId": "28",
+  "privacyStatus": "public",
+  "playlistId": "PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B",
+  "playlistPosition": 1
+}

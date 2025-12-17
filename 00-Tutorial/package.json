@@ -1,0 +1,15 @@
+{
+  "name": "spe-tutorial",
+  "version": "1.0.0",
+  "description": "SPE Tutorial Video Generator - Playwright capture automation",
+  "type": "module",
+  "scripts": {
+    "capture": "bun run scripts/capture.ts",
+    "demo": "bun run scripts/demo.ts",
+    "codegen": "bunx playwright codegen"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.4",
+    "playwright": "^1.49.0"
+  }
+}

@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: PHP Syntax Check
+    runs-on: ubuntu-latest
+    # PHP 8.5 not yet available - pipe operator will fail syntax check
+    # Remove continue-on-error when PHP 8.5 is available in GitHub Actions
+    continue-on-error: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo, pdo_sqlite, sqlite3
+          coverage: none
+
+      - name: Check PHP syntax (chapters 01-04)
+        run: |
+          for file in 01-Simple/index.php 02-Styled/index.php 03-Plugins/index.php 04-Themes/index.php; do
+            if [ -f "$file" ]; then
+              echo "Checking $file"
+              php -l "$file" || exit 1
+            fi
+          done
+
+      - name: Check PHP syntax (chapters 05-10)
+        run: |
+          for dir in 05-Autoload 06-Session 07-PDO 08-Users 09-Blog 10-YouTube; do
+            if [ -d "$dir/src" ]; then
+              echo "Checking $dir/src/"
+              find "$dir/src" -name "*.php" -exec php -l {} \; | grep -v "No syntax errors" || true
+              find "$dir/src" -name "*.php" -exec php -l {} \; | grep -q "Parse error" && exit 1 || true
+            fi
+            if [ -f "$dir/public/index.php" ]; then
+              echo "Checking $dir/public/index.php"
+              php -l "$dir/public/index.php" || exit 1
+            fi
+          done
+
+  composer:
+    name: Composer Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Validate composer.json
+        run: composer validate --strict
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --ignore-platform-reqs
+
+      - name: Check autoload
+        run: composer dump-autoload --optimize --strict-psr
+
+  code-style:
+    name: Code Style
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Check file headers
+        run: |
+          echo "Checking for declare(strict_types=1) in PHP files..."
+          missing=0
+          for file in $(find . -name "*.php" -not -path "./vendor/*"); do
+            if ! head -1 "$file" | grep -q "declare(strict_types=1)"; then
+              echo "Missing strict_types: $file"
+              missing=$((missing + 1))
+            fi
+          done
+          if [ $missing -gt 0 ]; then
+            echo "Found $missing files missing strict_types declaration"
+            exit 1
+          fi
+          echo "All PHP files have strict_types declaration"
+
+      - name: Check for Bootstrap references
+        run: |
+          echo "Checking for Bootstrap dependencies..."
+          if grep -r "bootstrap" --include="*.php" --include="*.css" --include="*.html" . | grep -v "vendor" | grep -vi "# bootstrap" | grep -qi "bootstrap\."; then
+            echo "Found Bootstrap references - this project uses custom CSS only"
+            exit 1
+          fi
+          echo "No Bootstrap dependencies found"
