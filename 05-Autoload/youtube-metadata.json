@@ -1,0 +1,9 @@
+{
+  "title": "SPE Chapter 05 - Autoload: PSR-4 & Composer Integration",
+  "description": "Chapter 05 of Simple PHP Examples - reorganizing with PSR-4 autoloading and Composer.\n\nThis tutorial covers:\n• PSR-4 autoloading standard\n• Composer integration\n• Namespace organization\n• Directory structure (src/Core, src/Plugins, src/Themes)\n• Grouped use statements\n\n🔗 Links:\nGitHub: https://github.com/markc/spe/tree/main/05-Autoload\nSource: https://github.com/markc/spe/blob/main/05-Autoload/public/index.php\n\n#PHP #PHP85 #Tutorial #PSR4 #Composer #Autoloading",
+  "tags": ["php", "php 8.5", "psr-4", "composer", "autoloading", "tutorial", "namespaces"],
+  "categoryId": "28",
+  "privacyStatus": "public",
+  "playlistId": "PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B",
+  "playlistPosition": 5
+}

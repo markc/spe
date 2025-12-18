@@ -1,0 +1,9 @@
+{
+  "title": "SPE Chapter 04 - Themes: Model-View Separation & Multiple Layouts",
+  "description": "Chapter 04 of Simple PHP Examples - adding Model-View separation and swappable themes.\n\nThis tutorial covers:\n• Model-View separation\n• Multiple theme layouts (Simple, TopNav, SideBar)\n• Theme switching via URL parameters\n• Dual navigation arrays\n• View resolution and fallbacks\n\n🔗 Links:\nGitHub: https://github.com/markc/spe/tree/main/04-Themes\nSource: https://github.com/markc/spe/blob/main/04-Themes/index.php\n\n#PHP #PHP85 #Tutorial #Themes #MVC #WebDevelopment",
+  "tags": ["php", "php 8.5", "themes", "mvc", "model-view", "tutorial", "web development"],
+  "categoryId": "28",
+  "privacyStatus": "public",
+  "playlistId": "PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B",
+  "playlistPosition": 4
+}

@@ -1,58 +1,66 @@
 # Chapter 07: PDO - Ultra-Compact SQLite Blog
 # Format: duration|URL|text|action
-# Total duration: ~4 minutes
+# Total duration: ~5 minutes
 
 # --- Introduction ---
-6|http://localhost:8080/07-PDO/?o=Home|Welcome to Chapter Seven, PDO. This is an ultra-compact SQLite blog in just 326 lines across 5 files.
-5|http://localhost:8080/07-PDO/?o=Home|The application demonstrates the PHP 8.5 pipe operator, dynamic navigation from database, and three switchable themes.
+6|http://localhost:8080/07-PDO/?o=Home|Welcome to Chapter Seven, PDO. This ultra-compact blog runs on SQLite or MariaDB in just 322 lines across 5 files.
+6|http://localhost:8080/07-PDO/?o=Home|The chapter focuses on PHP's PDO extension for database abstraction. One codebase works with both SQLite and MySQL.
 
 # --- Live Demo: Pages ---
-5|http://localhost:8080/07-PDO/?o=Home|Here's the Home page. Navigation links are loaded from the database, not hardcoded.
-4|http://localhost:8080/07-PDO/?o=About|The About page. Each page has an emoji icon and markdown content.
+5|http://localhost:8080/07-PDO/?o=Home|Here's the Home page. Navigation links are loaded dynamically from the database, not hardcoded.
+4|http://localhost:8080/07-PDO/?o=About|The About page. Each page has an emoji icon and markdown content stored in SQLite.
 4|http://localhost:8080/07-PDO/?o=Contact|Contact page. All pages are stored as type equals page in the posts table.
 
 # --- Live Demo: Blog ---
-5|http://localhost:8080/07-PDO/?o=Blog|The Blog view shows posts with pagination. Let's click into a post.
-5|http://localhost:8080/07-PDO/?o=Blog&m=read&id=1|Single post view with full markdown rendering. Notice the edit and delete buttons.
-5|http://localhost:8080/07-PDO/?o=Blog&edit|Admin mode shows all posts and pages in a table with search and actions.
-5|http://localhost:8080/07-PDO/?o=Blog&m=create|The create form has an emoji icon selector and post type dropdown. Content uses markdown.
+5|http://localhost:8080/07-PDO/?o=Blog|The Blog view shows posts with pagination. Database queries handle filtering and sorting.
+5|http://localhost:8080/07-PDO/?o=Blog&m=read&id=1|Single post view with full markdown rendering. The ID parameter is safely bound to prevent SQL injection.
+5|http://localhost:8080/07-PDO/?o=Blog&edit|Admin mode shows all posts and pages in a searchable table. Search uses prepared statements.
+5|http://localhost:8080/07-PDO/?o=Blog&m=create|The create form inserts new records using PDO's parameter binding for security.
 
 # --- Live Demo: Themes ---
-5|http://localhost:8080/07-PDO/?o=Blog&t=TopNav|Here's the TopNav theme with a fixed navigation bar. Themes switch via the dropdown menu.
-5|http://localhost:8080/07-PDO/?o=Blog&t=SideBar|The SideBar theme has collapsible navigation groups. Perfect for documentation sites.
-4|http://localhost:8080/07-PDO/?o=Blog&t=Simple|Back to Simple theme. Let's examine the source code.
+5|http://localhost:8080/07-PDO/?o=Blog&t=TopNav|Here's the TopNav theme. All themes share the same database connection and queries.
+5|http://localhost:8080/07-PDO/?o=Blog&t=SideBar|The SideBar theme. Theme selection is stored in the URL, not the database.
+4|http://localhost:8080/07-PDO/?o=Blog&t=Simple|Back to Simple theme. Now let's examine the database layer.
+
+# --- Code: Db.php (Database Wrapper) ---
+7|https://github.com/markc/spe/blob/main/app/lib/Db.php#L1-L17|The Db class extends PDO directly. It defines a QueryType enum with All, One, and Col fetch modes.
+7|https://github.com/markc/spe/blob/main/app/lib/Db.php#L19-L38|The constructor supports both SQLite and MySQL. A match expression builds the DSN based on environment config.
+6|https://github.com/markc/spe/blob/main/app/lib/Db.php#L40-L48|The create method builds INSERT statements dynamically. Column names become named placeholders for binding.
+7|https://github.com/markc/spe/blob/main/app/lib/Db.php#L50-L62|The read method is flexible. QueryType determines if you get all rows, one row, or a single column value.
+6|https://github.com/markc/spe/blob/main/app/lib/Db.php#L64-L77|Update and delete methods use WHERE clauses with bound parameters. No raw SQL concatenation.
+5|https://github.com/markc/spe/blob/main/app/lib/Db.php#L79-L88|The bind helper iterates parameters and calls bindValue. This prevents SQL injection attacks.
 
 # --- Code: index.php ---
 5|https://github.com/markc/spe/blob/main/07-PDO/public/index.php|The entry point is just 7 lines. Load autoloader, environment, and echo a new App instance.
 
 # --- Code: App.php ---
-6|https://github.com/markc/spe/blob/main/07-PDO/src/App.php#L1-L15|App.php handles all routing in 44 lines. Properties hold the buffer, data, input, output, and navigation arrays.
-7|https://github.com/markc/spe/blob/main/07-PDO/src/App.php#L16-L21|The constructor processes URL parameters using the pipe operator with trim and htmlspecialchars.
-6|https://github.com/markc/spe/blob/main/07-PDO/src/App.php#L23-L27|Navigation is built by querying database pages. The Blog link is appended. Theme links are static.
-7|https://github.com/markc/spe/blob/main/07-PDO/src/App.php#L29-L35|Routing logic: Blog requests go to Model, page requests query the database directly. View and Theme render output.
-5|https://github.com/markc/spe/blob/main/07-PDO/src/App.php#L38-L43|The toString method returns JSON for API requests, otherwise the HTML buffer.
+6|https://github.com/markc/spe/blob/main/07-PDO/src/App.php#L1-L10|App.php handles routing in 40 lines. A single line declares all array properties.
+6|https://github.com/markc/spe/blob/main/07-PDO/src/App.php#L12-L17|The constructor processes URL parameters using the pipe operator with trim and htmlspecialchars.
+6|https://github.com/markc/spe/blob/main/07-PDO/src/App.php#L19-L23|Navigation is built by querying database pages using the Db wrapper's read method.
+6|https://github.com/markc/spe/blob/main/07-PDO/src/App.php#L25-L31|Routing: Blog requests go to Model, page requests query the database directly with QueryType One.
+5|https://github.com/markc/spe/blob/main/07-PDO/src/App.php#L34-L39|The toString method returns JSON for API requests, otherwise the HTML buffer.
 
 # --- Code: Model.php ---
-6|https://github.com/markc/spe/blob/main/07-PDO/src/Model.php#L1-L15|Model.php is 66 lines. It initializes form fields from REQUEST and creates a Db instance for blog.
-6|https://github.com/markc/spe/blob/main/07-PDO/src/Model.php#L17-L19|The slug method uses the pipe operator to convert titles to URL-safe slugs.
-6|https://github.com/markc/spe/blob/main/07-PDO/src/Model.php#L21-L30|Create and read methods. Create normalizes line endings for markdown. Read fetches by ID.
-6|https://github.com/markc/spe/blob/main/07-PDO/src/Model.php#L36-L51|Update and delete methods. Both redirect to the edit list after completion.
-7|https://github.com/markc/spe/blob/main/07-PDO/src/Model.php#L53-L65|The list method handles pagination and search. It builds a dynamic WHERE clause and returns paginated results.
+6|https://github.com/markc/spe/blob/main/07-PDO/src/Model.php#L1-L15|Model.php is 66 lines. It creates a Db instance and initializes form fields from REQUEST.
+5|https://github.com/markc/spe/blob/main/07-PDO/src/Model.php#L17-L19|The slug method uses the pipe operator to convert titles to URL-safe slugs.
+6|https://github.com/markc/spe/blob/main/07-PDO/src/Model.php#L21-L30|Create calls db create with an associative array. Read uses QueryType One for single records.
+6|https://github.com/markc/spe/blob/main/07-PDO/src/Model.php#L36-L51|Update and delete use bound parameters for the WHERE clause. Both redirect after completion.
+6|https://github.com/markc/spe/blob/main/07-PDO/src/Model.php#L53-L65|The list method demonstrates QueryType Col for COUNT and QueryType All for paginated results.
 
 # --- Code: View.php ---
-6|https://github.com/markc/spe/blob/main/07-PDO/src/View.php#L1-L21|View.php is 105 lines. It defines 26 emoji icons and simple CRUD methods that call the form helper.
-6|https://github.com/markc/spe/blob/main/07-PDO/src/View.php#L22-L36|The read and page methods render posts with markdown. They include navigation and action buttons.
-6|https://github.com/markc/spe/blob/main/07-PDO/src/View.php#L40-L53|The public list view shows cards with excerpts, dates, and read more buttons.
-6|https://github.com/markc/spe/blob/main/07-PDO/src/View.php#L55-L74|The admin list is a table with search, type icons, and action links. Uses CSS utility classes.
-6|https://github.com/markc/spe/blob/main/07-PDO/src/View.php#L86-L104|The form builder handles both create and update. Icon dropdown, type selector, and markdown textarea.
+5|https://github.com/markc/spe/blob/main/07-PDO/src/View.php#L1-L21|View.php is 105 lines. It defines emoji icons and delegates to the form helper for CRUD views.
+5|https://github.com/markc/spe/blob/main/07-PDO/src/View.php#L22-L36|The read and page methods render database records as HTML with markdown conversion.
+5|https://github.com/markc/spe/blob/main/07-PDO/src/View.php#L40-L53|The public list view iterates database results to build blog cards with excerpts.
+5|https://github.com/markc/spe/blob/main/07-PDO/src/View.php#L55-L74|The admin list renders a table. Each row comes from the database result array.
+5|https://github.com/markc/spe/blob/main/07-PDO/src/View.php#L86-L104|The form builder populates fields from database records for editing.
 
 # --- Code: Theme.php ---
-6|https://github.com/markc/spe/blob/main/07-PDO/src/Theme.php#L1-L21|Theme.php is 104 lines. The nav method builds links. The dropdown method creates the theme switcher.
-6|https://github.com/markc/spe/blob/main/07-PDO/src/Theme.php#L23-L40|The html wrapper method is shared by all themes. It outputs the DOCTYPE, head, and body structure.
-6|https://github.com/markc/spe/blob/main/07-PDO/src/Theme.php#L42-L56|Simple theme builds a centered layout with a card-styled navigation bar.
-5|https://github.com/markc/spe/blob/main/07-PDO/src/Theme.php#L58-L71|TopNav theme has a fixed header with centered links. The theme dropdown is in the navigation.
-6|https://github.com/markc/spe/blob/main/07-PDO/src/Theme.php#L73-L103|SideBar theme has a collapsible sidebar with grouped navigation. Pages and themes are separate groups.
+5|https://github.com/markc/spe/blob/main/07-PDO/src/Theme.php#L1-L21|Theme.php is 104 lines. The nav method builds links from database-driven navigation arrays.
+5|https://github.com/markc/spe/blob/main/07-PDO/src/Theme.php#L23-L40|The html wrapper is shared by all themes. Output is database content wrapped in layout.
+5|https://github.com/markc/spe/blob/main/07-PDO/src/Theme.php#L42-L56|Simple theme builds a centered layout with card-styled navigation.
+4|https://github.com/markc/spe/blob/main/07-PDO/src/Theme.php#L58-L71|TopNav theme has a fixed header with centered links and a theme dropdown.
+5|https://github.com/markc/spe/blob/main/07-PDO/src/Theme.php#L73-L103|SideBar theme has a collapsible sidebar with grouped navigation sections.
 
 # --- Conclusion ---
-6|http://localhost:8080/07-PDO/?o=Blog|That's Chapter Seven. An ultra-compact blog CMS in 326 lines with SQLite, three themes, and full markdown support.
+6|http://localhost:8080/07-PDO/?o=Blog|That's Chapter Seven. A complete blog CMS using PDO for database abstraction with SQLite or MariaDB support.
 5|http://localhost:8080/07-PDO/?o=Blog|Next chapter adds user authentication and management. Thanks for watching!

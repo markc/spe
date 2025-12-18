@@ -1,0 +1,9 @@
+{
+  "title": "SPE Chapter 06 - Session: PHP Session Management",
+  "description": "Chapter 06 of Simple PHP Examples - adding PHP sessions for persistent state.\n\nThis tutorial covers:\n• PHP session management\n• Theme persistence across pages\n• Session helper methods\n• Visit tracking\n• Match expressions for timeAgo\n• Graceful fallbacks\n\n🔗 Links:\nGitHub: https://github.com/markc/spe/tree/main/06-Session\nSource: https://github.com/markc/spe/blob/main/06-Session/src/Core/Ctx.php\n\n#PHP #PHP85 #Tutorial #Sessions #StateManagement #WebDevelopment",
+  "tags": ["php", "php 8.5", "sessions", "state management", "tutorial", "web development"],
+  "categoryId": "28",
+  "privacyStatus": "public",
+  "playlistId": "PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B",
+  "playlistPosition": 6
+}

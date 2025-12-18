@@ -11,7 +11,6 @@ final class BlogModel extends Plugin {
     private ?Db $dbh = null;
     private array $in = ['id' => 0, 'title' => '', 'content' => '', 'author' => '', 'created' => null, 'updated' => null];
 
-    #[\Override]
     public function __construct(protected Ctx $ctx) {
         parent::__construct($ctx);
         foreach ($this->in as $k => &$v) $v = $_REQUEST[$k] ?? $v;

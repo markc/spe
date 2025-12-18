@@ -1,0 +1,9 @@
+{
+  "title": "SPE Chapter 03 - Plugins: Modular Architecture Pattern",
+  "description": "Chapter 03 of Simple PHP Examples - introducing the Plugin architecture for modular, reusable components.\n\nThis tutorial covers:\n• Plugin architecture pattern\n• Context class for global state\n• Constructor property promotion\n• Readonly classes\n• CRUDL operations pattern\n• Input/output arrays\n\n🔗 Links:\nGitHub: https://github.com/markc/spe/tree/main/03-Plugins\nSource: https://github.com/markc/spe/blob/main/03-Plugins/index.php\n\n#PHP #PHP85 #Tutorial #Plugins #Architecture #WebDevelopment",
+  "tags": ["php", "php 8.5", "plugins", "architecture", "tutorial", "web development", "CRUDL"],
+  "categoryId": "28",
+  "privacyStatus": "public",
+  "playlistId": "PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B",
+  "playlistPosition": 3
+}

@@ -1,42 +1,48 @@
-# Chapter 00: Tutorial - Introduction to Simple PHP Examples
+# Chapter 00: Tutorial - Introduction to Simple P H P Examples
 # Format: duration|URL|text
-# Structure: Project Overview → GitHub Tour → YouTube Series → How Tutorials Are Made
+# Pronunciation: Use spaces for acronyms (P H P, S P E, C S S)
 
 # --- Project Introduction ---
-7|https://github.com/markc/spe|Welcome to Simple PHP Examples. A progressive PHP 8.5 micro-framework tutorial in 10 chapters. Each chapter builds on the previous, demonstrating modern PHP features.
-6|https://github.com/markc/spe|This project is completely open source under the MIT license. You can clone it, run it locally, modify it, and learn by doing.
-7|https://github.com/markc/spe|PHP 8.5 introduces the pipe operator for elegant data transformation. We use it throughout, along with typed constants, asymmetric visibility, and enums.
+7|https://github.com/markc/spe|Welcome to Simple P H P Examples. A progressive P H P 8.5 micro-framework tutorial in 10 chapters. Each chapter builds on the previous, demonstrating modern P H P features.
+6|https://github.com/markc/spe|This project is completely open source under the M I T license. You can clone it, run it locally, modify it, and learn by doing.
+7|https://github.com/markc/spe|P H P 8.5 introduces the pipe operator for elegant data transformation. We use it throughout, along with typed constants, asymmetric visibility, and enums.
 
 # --- GitHub Repository Tour ---
-6|https://github.com/markc/spe#chapters|The project has 10 chapters. Starting with a 32-line single-file app, we progressively add CSS styling, plugins, themes, autoloading, sessions, and database access.
-7|https://github.com/markc/spe/tree/main/01-Simple|Chapter One is Simple. A complete web application in one anonymous class. It demonstrates the pipe operator and PHP 8.4 asymmetric visibility.
+6|https://github.com/markc/spe#chapters|The project has 10 chapters. Starting with a 32-line single-file app, we progressively add C S S styling, plugins, themes, autoloading, sessions, and database access.
+7|https://github.com/markc/spe/tree/main/01-Simple|Chapter One is Simple. A complete web application in one anonymous class. It demonstrates the pipe operator and P H P 8.4 asymmetric visibility.
 6|https://github.com/markc/spe/tree/main/09-Blog|Chapter Nine is Blog. A full content management system with authentication, posts, pages, categories, and markdown support. Production ready.
-6|https://github.com/markc/spe/tree/main/00-Tutorial|Chapter Zero is where you are now. This folder contains the tooling used to create these very tutorial videos. Yes, it's recursive!
+6|https://github.com/markc/spe/tree/main/00-Tutorial|Chapter Zero is where you are now. This folder contains the tooling used to create these tutorial videos. Yes, it's recursive!
 
 # --- Running Locally ---
-7|https://github.com/markc/spe#quick-start|To run locally, clone the repo, install Composer dependencies, and start PHP's built-in server. That's it. No Docker, no complex setup.
-6|http://localhost:8080/01-Simple|Each chapter runs independently. Navigate to any chapter directory and see it in action. The interface is clean and responsive with custom CSS.
-5|http://localhost:8080/01-Simple?m=about|URL parameters control navigation. The m parameter selects which page to display. Simple routing without a framework.
-
-# --- YouTube Tutorial Series ---
-7|https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B|Every chapter has a companion video tutorial on YouTube. Watch the explanations, then experiment with the code yourself.
-6|https://github.com/markc/spe|The videos walk through each chapter's source code, explain the PHP features used, and demonstrate the running application.
+7|https://github.com/markc/spe#quick-start|To run locally, clone the repo, install Composer dependencies, and start P H P's built-in server. That's it. No Docker, no complex setup.
+6|http://localhost:8080/01-Simple|Each chapter runs independently. Navigate to any chapter directory and see it in action. The interface is clean and responsive with custom C S S.
+5|http://localhost:8080/01-Simple?m=about|U R L parameters control navigation. The m parameter selects which page to display. Simple routing without a framework.
 
 # --- How These Tutorials Are Made ---
-8|https://github.com/markc/spe/tree/main/00-Tutorial|Now for the fun part. How are these tutorial videos created? The answer is in chapter zero. A complete video generation pipeline.
+7|https://github.com/markc/spe/tree/main/00-Tutorial|Now for the fun part. How are these tutorial videos created? The answer is in chapter zero. A complete video generation pipeline.
 7|https://github.com/markc/spe/blob/main/00-Tutorial/scripts/spe-tutorial.sh|The main script is spe-tutorial.sh. It orchestrates audio generation, screenshot capture, and video assembly. One command creates a complete tutorial.
-7|https://github.com/markc/spe/blob/main/01-Simple/tutorial.txt|Each chapter has a tutorial.txt file. This simple format specifies duration, URL, and narration text. Edit the script, regenerate the video.
-8|https://github.com/markc/spe/blob/main/00-Tutorial/scripts/capture.ts|Playwright automates screenshot capture. It reads the URLs from tutorial.txt, loads each page, and saves 4K screenshots. GitHub and localhost are both supported.
+6|https://github.com/markc/spe/blob/main/01-Simple/tutorial.txt|Each chapter has a tutorial.txt file. This simple format specifies duration, U R L, and narration text. Edit the script, regenerate the video.
+7|https://github.com/markc/spe/blob/main/00-Tutorial/scripts/capture.ts|Playwright automates screenshot capture. It reads the U R Ls from tutorial.txt, loads each page, and saves 4 K screenshots.
+
+# --- Text to Speech Options ---
+7|https://github.com/markc/spe/blob/main/00-Tutorial/CLAUDE.md#piper-tts-commands-reference|The pipeline supports two T T S engines. Piper runs locally and is completely free. Google Neural 2 requires an A P I key but produces higher quality audio.
+8|https://github.com/markc/spe/blob/main/00-Tutorial/scripts/spe-tutorial.sh#L19|Piper T T S is fast and private. Your text never leaves your machine. The Lessac voice is clear and works well for technical content. Good for drafts and testing.
+8|https://github.com/markc/spe/blob/main/00-Tutorial/scripts/google-tts.sh|Google Neural 2 produces remarkably natural speech. The voice has better intonation, more natural pauses, and clearer pronunciation of technical terms.
+7|https://github.com/markc/spe/blob/main/00-Tutorial/CLAUDE.md#workflow|To use Piper, run the audio command with no extra argument. For Google, add google as the third parameter. The video you're watching uses Google Neural 2.
 
 # --- The Video Pipeline ---
-7|https://github.com/markc/spe/blob/main/00-Tutorial/README.md#workflow|The workflow has four steps. First, edit the narration script. Second, generate AI voiceover with Piper TTS. Third, capture screenshots. Fourth, assemble the final video.
-6|https://github.com/markc/spe/blob/main/00-Tutorial/README.md|Piper TTS generates natural-sounding narration from text. The hfc male voice provides clear, professional audio for technical content.
-7|https://github.com/markc/spe/blob/main/00-Tutorial/README.md#commands-reference|The melt command combines video and audio with smooth crossfades. Hardware acceleration with Intel VAAPI keeps rendering fast.
+7|https://github.com/markc/spe/blob/main/00-Tutorial/README.md#workflow|The workflow has four steps. First, edit the narration script. Second, generate A I voiceover. Third, capture screenshots. Fourth, assemble the final video.
+6|https://github.com/markc/spe/blob/main/00-Tutorial/README.md|Audio segments are generated for each line of the script. Actual durations are recorded in a timings file to ensure perfect synchronization.
+6|https://github.com/markc/spe/blob/main/00-Tutorial/README.md#commands-reference|The melt command combines video and audio with smooth crossfades. Hardware acceleration with Intel V A A P I keeps rendering fast.
+
+# --- YouTube Upload ---
+6|https://github.com/markc/spe/blob/main/00-Tutorial/scripts/youtube-upload.sh|The youtube-upload script handles authentication and uploads. Metadata comes from a J S O N file in each chapter directory.
+6|https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B|Videos are automatically added to the S P E playlist. Position is set from the metadata, keeping chapters in order.
 
 # --- Contributing ---
-6|https://github.com/markc/spe/blob/main/CONTRIBUTING.md|Want to improve a tutorial? The narration scripts are versioned in Git. Submit a pull request with better explanations. No PHP knowledge required.
+6|https://github.com/markc/spe/blob/main/CONTRIBUTING.md|Want to improve a tutorial? The narration scripts are versioned in Git. Submit a pull request with better explanations. No P H P knowledge required.
 5|https://github.com/markc/spe/discussions|Join the discussions on GitHub. Ask questions, share your experience, or suggest new features. The community is friendly and welcoming.
 
 # --- Conclusion ---
-6|https://github.com/markc/spe|That's Simple PHP Examples. Ten chapters of modern PHP, complete video tutorials, and open source tooling to create more. Clone the repo and start learning.
+6|https://github.com/markc/spe|That's Simple P H P Examples. Ten chapters of modern P H P, complete video tutorials, and open source tooling to create more. Clone the repo and start learning.
 5|https://markc.github.io/spe/|Visit the project website for quick access to documentation, videos, and releases. Happy coding!

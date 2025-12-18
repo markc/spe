@@ -1,42 +1,41 @@
 # Chapter 02: Styled - Narration Script
 # Format: duration|URL|text|action (action is optional)
-# Pronunciation: Use spaces for acronyms (P H P, S P E), ellipsis for pauses
+# Pronunciation: Use spaces for acronyms (P H P, C S S, H T M L)
 
 # --- Hook ---
-5|http://localhost:8080/02-Styled|From plain H T M L... to polished interface. Chapter Two adds style.
+5|http://localhost:8080/02-Styled/public/index.php|From plain H T M L to polished interface. Chapter Two adds style.
 
 # --- Introduction ---
-6|http://localhost:8080/02-Styled|Building on Chapter One, we add external C S S, JavaScript, and theme switching.
+6|http://localhost:8080/02-Styled/public/index.php|Building on Chapter One, we add external C S S, JavaScript, and theme switching.
 
 # --- Demo: Pages ---
-5|http://localhost:8080/02-Styled|Same three pages as before. Home, About, Contact. Now with card layout and icons.
-4|http://localhost:8080/02-Styled?m=about|The About page... with emoji icon.
-4|http://localhost:8080/02-Styled?m=contact|Contact page. Same clean design.
+5|http://localhost:8080/02-Styled/public/index.php|Same three pages as before. Home, About, Contact. Now with card layout and emoji icons.
+4|http://localhost:8080/02-Styled/public/index.php?m=about|The About page with its emoji icon and styled content.
+4|http://localhost:8080/02-Styled/public/index.php?m=contact|Contact page. Same clean design throughout the application.
 
 # --- Demo: Theme Toggle ---
-5|http://localhost:8080/02-Styled|See the moon icon in the corner? Click it for dark mode.|click:.theme-toggle
-5|http://localhost:8080/02-Styled|Colors invert instantly. The theme saves to local storage.|click:.theme-toggle
+5|http://localhost:8080/02-Styled/public/index.php|See the moon icon in the corner? Click it for dark mode.|click:.theme-toggle
+5|http://localhost:8080/02-Styled/public/index.php|Colors invert instantly. The theme preference saves to local storage.|click:.theme-toggle
 
 # --- Demo: Toast Notifications ---
-5|http://localhost:8080/02-Styled|Notice the Success and Danger buttons. Click Success.|click:.btn-success
-5|http://localhost:8080/02-Styled|A green toast notification slides in. Now try Danger.|click:.btn-danger
-5|http://localhost:8080/02-Styled|Red for errors. Toasts auto-dismiss after three seconds.
+5|http://localhost:8080/02-Styled/public/index.php|Notice the Success and Danger buttons. Click Success for a notification.|click:.btn-success
+5|http://localhost:8080/02-Styled/public/index.php|A green toast slides in from the top. Now try Danger.|click:.btn-danger
+5|http://localhost:8080/02-Styled/public/index.php|Red for errors. Toasts auto-dismiss after three seconds.
 
 # --- Code: What's New ---
-6|https://github.com/markc/spe/blob/main/02-Styled/index.php#L53|One new line links the external stylesheet. Shared C S S across all chapters.
-6|https://github.com/markc/spe/blob/main/02-Styled/index.php#L7-L11|Pages array gains emoji icons... and separate title and content fields.
-5|https://github.com/markc/spe/blob/main/02-Styled/index.php#L71-L74|Toast buttons call the show Toast function from our shared JavaScript.
-5|https://github.com/markc/spe/blob/main/02-Styled/index.php#L80|JavaScript loaded at the bottom. Best practice for page performance.
+6|https://github.com/markc/spe/blob/main/02-Styled/public/index.php#L53|One new line links the external stylesheet. Shared C S S used across all chapters.
+6|https://github.com/markc/spe/blob/main/02-Styled/public/index.php#L7-L11|The pages array gains emoji icons and separate title and content fields.
+6|https://github.com/markc/spe/blob/main/02-Styled/public/index.php#L71-L74|Toast buttons call the show Toast function from our shared JavaScript file.
+5|https://github.com/markc/spe/blob/main/02-Styled/public/index.php#L80|JavaScript loaded at the bottom. Best practice for page load performance.
 
 # --- Code: CSS Custom Properties ---
 6|https://github.com/markc/spe/blob/main/spe.css#L1-L15|C S S custom properties define the color palette. Change one variable, update everywhere.
-6|https://github.com/markc/spe/blob/main/spe.css#L17-L27|The prefers color scheme query... detects system dark mode preference.
+6|https://github.com/markc/spe/blob/main/spe.css#L17-L27|The prefers color scheme media query detects the system's dark mode preference.
 
 # --- Code: JavaScript ---
-6|https://github.com/markc/spe/blob/main/spe.js#L6-L27|Theme management. Checks local storage first... then system preference.
-6|https://github.com/markc/spe/blob/main/spe.js#L39-L52|The show Toast function creates temporary notification elements.
+6|https://github.com/markc/spe/blob/main/spe.js#L6-L27|Theme management code. It checks local storage first, then falls back to system preference.
+6|https://github.com/markc/spe/blob/main/spe.js#L39-L52|The show Toast function creates temporary notification elements with auto-dismiss.
 
 # --- Conclusion ---
-6|http://localhost:8080/02-Styled|That's Chapter Two. External assets, C S S variables, dark mode, and toast notifications.
-4|http://localhost:8080/02-Styled|Next chapter... introduces the plugin architecture.
-
+6|http://localhost:8080/02-Styled/public/index.php|That's Chapter Two. External assets, C S S variables, dark mode, and toast notifications.
+4|http://localhost:8080/02-Styled/public/index.php|Next chapter introduces the plugin architecture for modular code organization.

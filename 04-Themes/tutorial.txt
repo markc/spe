@@ -1,22 +1,31 @@
 # Chapter 04: Themes - Narration Script
 # Format: duration|URL|text
-# Structure: Introduction → Live Demo → Code Walkthrough → Conclusion
+# Pronunciation: Use spaces for acronyms (P H P)
 
 # --- Introduction ---
-7|http://localhost:8080/04-Themes|Welcome to Chapter Four. We're adding Model View separation and a powerful theming system with multiple layout options.
+7|http://localhost:8080/04-Themes/public/index.php|Welcome to Chapter Four. We're adding Model View separation and a powerful theming system with multiple layouts.
 
 # --- Live Demo ---
-6|http://localhost:8080/04-Themes|The application now supports multiple themes. We start with the Simple theme, similar to previous chapters.
-5|http://localhost:8080/04-Themes?t=TopNav|Switching to Top Nav moves navigation to a horizontal bar at the top. Same content, different layout.
-5|http://localhost:8080/04-Themes?t=SideBar|The SideBar theme places navigation vertically on the left. Themes can completely transform the user interface. Let's examine the code.
+6|http://localhost:8080/04-Themes/public/index.php|The application now supports multiple themes. We start with the Simple theme, similar to previous chapters.
+5|http://localhost:8080/04-Themes/public/index.php?t=TopNav|Switching to TopNav moves navigation to a horizontal bar at the top. Same content, different layout.
+6|http://localhost:8080/04-Themes/public/index.php?t=SideBar|The SideBar theme places navigation vertically on the left. Themes can completely transform the interface.
+5|http://localhost:8080/04-Themes/public/index.php?o=About&t=SideBar|Pages work with any theme. Here's About with the SideBar layout. Let's examine the code.
 
-# --- Code Walkthrough ---
-8|https://github.com/markc/spe/blob/main/04-Themes/index.php#L5-L19|The Context class now has two navigation arrays. Nav 1 defines page links, nav 2 defines theme options.
-7|https://github.com/markc/spe/blob/main/04-Themes/index.php#L10|The in array adds a t parameter for theme selection. This lets users switch between different layout styles.
-8|https://github.com/markc/spe/blob/main/04-Themes/index.php#L16-L17|Nav 1 contains page links with emoji labels. Nav 2 contains theme options: Simple, Top Nav, and Side Bar.
-8|https://github.com/markc/spe/blob/main/04-Themes/index.php#L21-L49|Init handles both Model and View routing. It first loads the Model to get data, then renders with the appropriate Theme.
-7|https://github.com/markc/spe/blob/main/04-Themes/index.php#L28-L29|The model name is built from the o parameter. If a Model class exists, it's instantiated and its method is called.
-8|https://github.com/markc/spe/blob/main/04-Themes/index.php#L36-L40|View resolution tries the specific View first, then falls back to the Theme. This enables per-page customization.
+# --- Code: Context Class ---
+8|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L5-L19|The Context class now has two navigation arrays. Nav 1 for page links, nav 2 for theme options.
+7|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L10|The in array adds a t parameter for theme selection. Users can switch between different layout styles.
+7|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L16-L17|Nav 1 contains page links with emoji labels. Nav 2 contains theme options: Simple, TopNav, and SideBar.
+
+# --- Code: Init Class ---
+8|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L21-L49|Init handles both Model and View routing. It first loads the Model for data, then renders with the Theme.
+7|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L28-L29|The model name is built from the o parameter. If a Model class exists, it's instantiated and called.
+8|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L36-L40|View resolution tries the specific View first, then falls back to the Theme. This enables per-page customization.
+
+# --- Code: Theme Classes ---
+7|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L51-L70|The base Theme class provides shared navigation building. Child themes override the render method.
+6|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L72-L90|Simple theme wraps content in a centered container. TopNav adds a fixed header bar.
+7|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L92-L115|SideBar theme creates a two-column layout. Navigation in the left column, content on the right.
 
 # --- Conclusion ---
-3|https://github.com/markc/spe/blob/main/04-Themes/index.php|That's Chapter Four. We've added Model View separation and swappable themes. Next chapter introduces Composer autoloading!
+6|http://localhost:8080/04-Themes/public/index.php|That's Chapter Four. Model View separation and swappable themes that transform the entire layout.
+4|http://localhost:8080/04-Themes/public/index.php|Next chapter introduces Composer autoloading for proper namespace organization!

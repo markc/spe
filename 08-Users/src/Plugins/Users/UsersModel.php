@@ -14,7 +14,6 @@ final class UsersModel extends Plugin {
         'altemail' => '', 'webpw' => '', 'otp' => '', 'otpttl' => 0, 'cookie' => '', 'anote' => ''
     ];
 
-    #[\Override]
     public function __construct(protected Ctx $ctx) {
         parent::__construct($ctx);
         foreach ($this->in as $k => &$v) $v = $_REQUEST[$k] ?? $v;

@@ -5,10 +5,17 @@ namespace SPE\App;
 
 final class Util
 {
-    // Encoding & escaping
+    // Text processing
     public static function enc(string $s): string
     {
         return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+    }
+
+    public static function excerpt(string $s, int $len = 200): string
+    {
+        $s = strip_tags($s);
+        $s = preg_replace('/\s+/', ' ', trim($s));
+        return strlen($s) > $len ? substr($s, 0, $len) . '...' : $s;
     }
 
     public static function esc(array $in): array

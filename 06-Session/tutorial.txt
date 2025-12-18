@@ -1,13 +1,13 @@
 # Chapter 06: Session - Narration Script
 # Format: duration|URL|text
-# Structure: Introduction → Live Demo → Code Walkthrough → Conclusion
+# Pronunciation: Use spaces for acronyms (P H P)
 
 # --- Introduction ---
-7|http://localhost:8080/06-Session/public/|Welcome to Chapter Six. We're adding PHP sessions to persist user preferences like theme selection across page loads.
+7|http://localhost:8080/06-Session/public/|Welcome to Chapter Six. We're adding P H P sessions to persist user preferences... like theme selection across page loads.
 
 # --- Live Demo ---
 6|http://localhost:8080/06-Session/public/|The application now remembers your choices. Select a theme, and it persists even after navigating away.
-5|http://localhost:8080/06-Session/public/?t=SideBar|Switch to SideBar theme. Now navigate to another page, and the theme stays. No URL parameter needed.
+5|http://localhost:8080/06-Session/public/?t=SideBar|Switch to SideBar theme. Now navigate to another page, and the theme stays. No U R L parameter needed.
 5|http://localhost:8080/06-Session/public/?o=About|The About page keeps your SideBar theme. Sessions provide seamless state management. Let's see the implementation.
 
 # --- Code Walkthrough ---
@@ -16,7 +16,8 @@
 8|https://github.com/markc/spe/blob/main/06-Session/src/Core/Init.php#L10-L12|Init uses the ses method to persist page and theme. The method parameter defaults to list from the request.
 7|https://github.com/markc/spe/blob/main/06-Session/src/Core/Init.php#L22-L26|Theme fallback is handled gracefully. If a theme class doesn't exist, it falls back to Simple.
 8|https://github.com/markc/spe/blob/main/06-Session/src/Plugins/Home/HomeModel.php#L9-L16|HomeModel tracks visits using sessions. First visit time and visit count are stored in the session.
-7|https://github.com/markc/spe/blob/main/06-Session/src/Core/Util.php#L11-L16|The Util class provides a timeAgo helper using match expressions to format elapsed time naturally.
+7|https://github.com/markc/spe/blob/main/06-Session/src/Core/Util.php#L11-L16|The Util class provides a timeAgo helper... using match expressions to format elapsed time naturally.
 
 # --- Conclusion ---
-3|https://github.com/markc/spe/blob/main/06-Session/src/Core/Ctx.php|That's Chapter Six. Sessions provide persistent state without databases. Next chapter adds SQLite with PDO!
+5|https://github.com/markc/spe/blob/main/06-Session/src/Core/Ctx.php|That's Chapter Six. Sessions provide persistent state without databases. Next chapter adds SQLite with P D O!
+
