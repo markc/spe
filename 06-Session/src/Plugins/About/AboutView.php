@@ -5,4 +5,4 @@ namespace SPE\Session\Plugins\About;
 
 use SPE\Session\Core\View;
 
-final readonly class AboutView extends View {}
+final class AboutView extends View {}

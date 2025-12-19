@@ -5,17 +5,27 @@ namespace SPE\Session\Plugins\Home;
 
 use SPE\Session\Core\View;
 
-final readonly class HomeView extends View {
+final class HomeView extends View {
     #[\Override] public function list(): string {
-        ['head' => $h, 'main' => $m, 'time_ago' => $t, 'visit_count' => $v] = $this->ctx->ary;
+        ['head' => $h, 'main' => $m, 'time_ago' => $t, 'visit_count' => $v, 'session_id' => $sid] = $this->ary;
         return <<<HTML
-        <div class="card"><h2>$h</h2><p>$m</p>
-            <p><strong>First visit:</strong> $t</p>
-            <p><strong>Page views this session:</strong> $v</p>
-            <p class="text-center mt-2"><a class="btn" href="?o=Home&m=reset">🔄 Reset Session</a></p>
+        <div class="card">
+            <h2>{$h}</h2>
+            <p>{$m}</p>
+            <div class="mt-2">
+                <p><strong>First visit:</strong> {$t}</p>
+                <p><strong>Page views:</strong> {$v}</p>
+                <p><strong>Session ID:</strong> <code>{$sid}</code></p>
+            </div>
+            <p class="text-muted mt-2">Navigate to other pages and back - your visit count increases. Change themes - your selection persists. Close the browser and return - session data remains.</p>
+            <div class="flex justify-center mt-2">
+                <a class="btn btn-danger" href="?m=reset">🔄 Reset Session</a>
+            </div>
         </div>
         HTML;
     }
 
-    public function reset(): string { return $this->list(); }
+    public function reset(): string {
+        return $this->list();
+    }
 }

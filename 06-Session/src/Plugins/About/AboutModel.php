@@ -5,8 +5,11 @@ namespace SPE\Session\Plugins\About;
 
 use SPE\Session\Core\Plugin;
 
-final readonly class AboutModel extends Plugin {
+final class AboutModel extends Plugin {
     #[\Override] public function list(): array {
-        return ['head' => '📖 About', 'main' => "PHP 8.5 framework with session management. Contact: {$this->ctx->email}"];
+        return [
+            'head' => 'About Page',
+            'main' => 'This chapter adds <b>PHP session management</b> with sticky URL parameters, flash messages, and visit tracking.'
+        ];
     }
 }

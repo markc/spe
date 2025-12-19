@@ -4,25 +4,39 @@
 namespace SPE\Session\Core;
 
 final class Ctx {
-    public string $buf = '';
-    public array $ary = [];
+    public array $in;
+    public array $out;
 
     public function __construct(
-        public private(set) string $email = 'mc@netserva.org',
-        public array $in = ['l' => '', 'm' => 'list', 'o' => 'Home', 't' => 'Simple', 'x' => ''],
-        public array $out = [
-            'doc' => 'SPE::06', 'head' => 'Session PHP Example',
-            'main' => 'Error: missing plugin!', 'foot' => '© 2015-2025 Mark Constable (MIT License)'
-        ],
-        public array $nav1 = [['🏠 Home', 'Home'], ['📖 About', 'About'], ['✉️ Contact', 'Contact']],
-        public array $nav2 = [['🎨 Simple', 'Simple'], ['📍 TopNav', 'TopNav'], ['📂 SideBar', 'SideBar']]
+        public string $email = 'mc@netserva.org',
+        array $in = ['o' => 'Home', 'm' => 'list', 't' => 'Simple', 'x' => ''],
+        array $out = ['doc' => 'SPE::06', 'head' => '', 'main' => '', 'foot' => ''],
+        public array $nav = [['🏠 Home', 'Home'], ['📖 About', 'About'], ['✉️ Contact', 'Contact']],
+        public array $themes = [['🎨 Simple', 'Simple'], ['🎨 TopNav', 'TopNav'], ['🎨 SideBar', 'SideBar']]
     ) {
         session_status() === PHP_SESSION_NONE && session_start();
+
+        // Sticky parameters: URL overrides session, session persists across requests
+        $this->in = array_map(fn($k, $v) => $this->ses($k, $v), array_keys($in), $in)
+            |> (fn($v) => array_combine(array_keys($in), $v));
+        $this->out = $out;
     }
 
+    // Get/set session value: URL param overrides, else use session, else use default
     public function ses(string $k, mixed $v = ''): mixed {
         return $_SESSION[$k] = isset($_REQUEST[$k])
-            ? (is_array($_REQUEST[$k]) ? $_REQUEST[$k] : trim($_REQUEST[$k]))
+            ? (is_array($_REQUEST[$k]) ? $_REQUEST[$k] : trim($_REQUEST[$k]) |> htmlspecialchars(...))
             : ($_SESSION[$k] ?? $v);
+    }
+
+    // Flash message: set message, retrieve once, then clear
+    public function flash(string $k, ?string $msg = null): ?string {
+        if ($msg !== null) {
+            $_SESSION["_flash_{$k}"] = $msg;
+            return $msg;
+        }
+        $val = $_SESSION["_flash_{$k}"] ?? null;
+        unset($_SESSION["_flash_{$k}"]);
+        return $val;
     }
 }

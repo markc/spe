@@ -5,8 +5,11 @@ namespace SPE\Session\Plugins\Contact;
 
 use SPE\Session\Core\Plugin;
 
-final readonly class ContactModel extends Plugin {
+final class ContactModel extends Plugin {
     #[\Override] public function list(): array {
-        return ['head' => '✉️ Contact', 'main' => 'form', 'email' => $this->ctx->email];
+        return [
+            'head' => 'Contact Page',
+            'main' => 'Get in touch using the <b>email form</b> below.'
+        ];
     }
 }

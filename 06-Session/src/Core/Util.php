@@ -3,7 +3,7 @@
 
 namespace SPE\Session\Core;
 
-final readonly class Util {
+final class Util {
     public static function esc(string $s): string {
         return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
     }
@@ -17,16 +17,30 @@ final readonly class Util {
     }
 
     private static function fmt(int $d): string {
-        $u = [['year', 31536000], ['month', 2678400], ['week', 604800],
-              ['day', 86400], ['hour', 3600], ['min', 60], ['sec', 1]];
-        $r = [];
-        foreach ($u as [$n, $s]) {
-            if ($d >= $s && count($r) < 2) {
-                $a = (int)($d / $s);
-                $r[] = "$a $n" . ($a > 1 ? 's' : '');
-                $d %= $s;
+        $units = [['year', 31536000], ['month', 2678400], ['week', 604800],
+                  ['day', 86400], ['hour', 3600], ['min', 60], ['sec', 1]];
+        $parts = [];
+        foreach ($units as [$name, $secs]) {
+            if ($d >= $secs && count($parts) < 2) {
+                $amt = (int)($d / $secs);
+                $parts[] = "$amt $name" . ($amt > 1 ? 's' : '');
+                $d %= $secs;
             }
         }
-        return implode(' ', $r) . ' ago';
+        return implode(' ', $parts) . ' ago';
+    }
+
+    public static function sessionInfo(): array {
+        return [
+            'id' => session_id(),
+            'name' => session_name(),
+            'status' => match (session_status()) {
+                PHP_SESSION_DISABLED => 'disabled',
+                PHP_SESSION_NONE => 'none',
+                PHP_SESSION_ACTIVE => 'active'
+            },
+            'save_path' => session_save_path(),
+            'data' => $_SESSION
+        ];
     }
 }

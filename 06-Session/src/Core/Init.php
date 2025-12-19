@@ -5,37 +5,26 @@ namespace SPE\Session\Core;
 
 final readonly class Init {
     private const string NS = 'SPE\\Session\\';
+    private array $out;
 
     public function __construct(private Ctx $ctx) {
-        $this->ctx->in['o'] = $this->ctx->ses('o', $this->ctx->in['o']);
-        $this->ctx->in['t'] = $this->ctx->ses('t', $this->ctx->in['t']);
-        $this->ctx->in['m'] = $_REQUEST['m'] ?? 'list';
-
-        ['o' => $o, 'm' => $m, 't' => $t] = $this->ctx->in;
+        [$o, $m, $t] = [$ctx->in['o'], $ctx->in['m'], $ctx->in['t']];
 
         $model = self::NS . "Plugins\\{$o}\\{$o}Model";
-        $this->ctx->ary = class_exists($model) ? new $model($this->ctx)->$m() : [];
+        $ary = class_exists($model) ? (new $model($ctx))->$m() : [];
 
         $view = self::NS . "Plugins\\{$o}\\{$o}View";
-        $theme = self::NS . "Themes\\{$t}";
+        $main = class_exists($view) ? (new $view($ctx, $ary))->$m() : "<p>{$ary['main']}</p>";
 
-        if (!class_exists($theme)) {
-            $this->ctx->in['t'] = $t = 'Simple';
-            $_SESSION['t'] = $t;
-            $theme = self::NS . "Themes\\{$t}";
-        }
-
-        $v = class_exists($view) ? new $view($this->ctx) : null;
-        $th = class_exists($theme) ? new $theme($this->ctx) : null;
-
-        $this->ctx->out['main'] = $v?->$m() ?? $th?->$m() ?? $this->ctx->out['main'];
-        $this->ctx->buf = $th?->html() ?? '';
+        $this->out = [...$ctx->out, ...$ary, 'main' => $main];
     }
 
     public function __toString(): string {
+        $t = $this->ctx->in['t'];
+        $theme = self::NS . "Themes\\{$t}";
         return match ($this->ctx->in['x']) {
-            'json' => (header('Content-Type: application/json') ?: '') . json_encode($this->ctx->out),
-            default => $this->ctx->buf
+            'json' => (header('Content-Type: application/json') ?: '') . json_encode($this->out),
+            default => (new $theme($this->ctx, $this->out))->render()
         };
     }
 }

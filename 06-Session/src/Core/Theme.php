@@ -3,15 +3,55 @@
 
 namespace SPE\Session\Core;
 
-abstract readonly class Theme {
-    public function __construct(protected Ctx $ctx) {}
+abstract class Theme {
+    public function __construct(protected Ctx $ctx, protected array $out) {}
 
-    abstract public function html(): string;
+    abstract public function render(): string;
 
-    protected function nav(array $items, string $p = 'o'): string {
-        return $items
-            |> (fn($a) => array_map(fn($n) => sprintf('<a href="?%s=%s"%s>%s</a>',
-                $p, $n[1], $this->ctx->in[$p] === $n[1] ? ' class="active"' : '', $n[0]), $a))
-            |> (fn($l) => implode(' ', $l));
+    protected function nav(): string {
+        ['o' => $o, 't' => $t] = $this->ctx->in;
+        return $this->ctx->nav
+            |> (fn($n) => array_map(fn($p) => sprintf(
+                '<a href="?o=%s"%s>%s</a>',
+                $p[1], $o === $p[1] ? ' class="active"' : '', $p[0]
+            ), $n))
+            |> (fn($a) => implode(' ', $a));
+    }
+
+    protected function dropdown(): string {
+        ['o' => $o, 't' => $t] = $this->ctx->in;
+        $links = $this->ctx->themes
+            |> (fn($n) => array_map(fn($p) => sprintf(
+                '<a href="?t=%s"%s>%s</a>',
+                $p[1], $t === $p[1] ? ' class="active"' : '', $p[0]
+            ), $n))
+            |> (fn($a) => implode('', $a));
+        return "<div class=\"dropdown\"><span class=\"dropdown-toggle\">🎨 Themes</span><div class=\"dropdown-menu\">$links</div></div>";
+    }
+
+    protected function flash(): string {
+        $msg = $this->ctx->flash('msg');
+        $type = $this->ctx->flash('type') ?? 'success';
+        return $msg ? "<script>showToast('$msg', '$type');</script>" : '';
+    }
+
+    protected function html(string $theme, string $body): string {
+        $flash = $this->flash();
+        return <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{$this->out['doc']} [$theme]</title>
+    <link rel="stylesheet" href="/spe.css">
+</head>
+<body>
+$body
+<script src="/spe.js"></script>
+$flash
+</body>
+</html>
+HTML;
     }
 }
