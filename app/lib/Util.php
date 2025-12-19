@@ -77,6 +77,24 @@ final class Util
         return "<div style=\"margin-bottom:1rem;padding:1rem;border-radius:4px;background:$bg;color:$fg\">" . self::enc($log['msg']) . "</div>";
     }
 
+    // Time formatting
+    public static function timeAgo(int $ts): string
+    {
+        $d = time() - $ts;
+        if ($d < 10) return 'just now';
+        $units = [['year', 31536000], ['month', 2678400], ['week', 604800],
+                  ['day', 86400], ['hour', 3600], ['min', 60], ['sec', 1]];
+        $parts = [];
+        foreach ($units as [$name, $secs]) {
+            if ($d >= $secs && count($parts) < 2) {
+                $amt = (int)($d / $secs);
+                $parts[] = "$amt $name" . ($amt > 1 ? 's' : '');
+                $d %= $secs;
+            }
+        }
+        return implode(' ', $parts) . ' ago';
+    }
+
     // Markdown parser - GFM subset (headings, bold, italic, strikethrough, links, images, code, blockquotes, lists, hr, tables)
     public static function md(string $s): string
     {

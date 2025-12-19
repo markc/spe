@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mlt LC_NUMERIC="C" producer="main_bin" version="7.24.0" root="/home/markc/Dev/spe/04-Themes">
+  <profile frame_rate_num="30" sample_aspect_num="1" display_aspect_den="9" colorspace="709" progressive="1" description="HD 4K" display_aspect_num="16" frame_rate_den="1" width="3840" height="2160" sample_aspect_den="1"/>
+
+  <producer id="producer0" in="00:00:00.000" out="00:05:00.000">
+    <property name="resource">/home/markc/Dev/spe/04-Themes/slideshow.mp4</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="kdenlive:clipname">Video</property>
+  </producer>
+
+  <producer id="producer1" in="00:00:00.000" out="00:05:00.000">
+    <property name="resource">/home/markc/Dev/spe/04-Themes/audio/narration.wav</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="kdenlive:clipname">Narration</property>
+  </producer>
+
+  <playlist id="main_bin">
+    <property name="kdenlive:docproperties.version">1.1</property>
+    <property name="kdenlive:docproperties.profile">atsc_2160p_30</property>
+    <entry producer="producer0"/>
+    <entry producer="producer1"/>
+  </playlist>
+
+  <tractor id="tractor0" in="00:00:00.000" out="00:05:00.000">
+    <track producer="producer0"/>
+    <track producer="producer1"/>
+  </tractor>
+</mlt>
