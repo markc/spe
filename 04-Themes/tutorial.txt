@@ -2,30 +2,45 @@
 # Format: duration|URL|text
 # Pronunciation: Use spaces for acronyms (P H P)
 
+# --- Hook ---
+6|http://localhost:8080/04-Themes/public/index.php|Same pages, deeper separation. Chapter Four splits data from presentation with switchable layouts.
+
 # --- Introduction ---
-7|http://localhost:8080/04-Themes/public/index.php|Welcome to Chapter Four. We're adding Model View separation and a powerful theming system with multiple layouts.
+7|http://localhost:8080/04-Themes/public/index.php|The application looks familiar. But the code now has three layers: Models return data, Views render H T M L, Themes wrap layouts.
 
-# --- Live Demo ---
-6|http://localhost:8080/04-Themes/public/index.php|The application now supports multiple themes. We start with the Simple theme, similar to previous chapters.
-5|http://localhost:8080/04-Themes/public/index.php?t=TopNav|Switching to TopNav moves navigation to a horizontal bar at the top. Same content, different layout.
-6|http://localhost:8080/04-Themes/public/index.php?t=SideBar|The SideBar theme places navigation vertically on the left. Themes can completely transform the interface.
-5|http://localhost:8080/04-Themes/public/index.php?o=About&t=SideBar|Pages work with any theme. Here's About with the SideBar layout. Let's examine the code.
+# --- Live Demo: Themes ---
+5|http://localhost:8080/04-Themes/public/index.php|Simple theme. Centered container with card navigation, just like Chapter Three.
+5|http://localhost:8080/04-Themes/public/index.php?t=TopNav|TopNav theme. Fixed navigation bar at the top. Same content, completely different layout.
+5|http://localhost:8080/04-Themes/public/index.php?t=SideBar|SideBar theme. Two-column layout with grouped navigation on the left.
+5|http://localhost:8080/04-Themes/public/index.php?o=Contact&t=SideBar|Contact page in SideBar. The theme persists as you navigate between pages.
 
-# --- Code: Context Class ---
-8|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L5-L19|The Context class now has two navigation arrays. Nav 1 for page links, nav 2 for theme options.
-7|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L10|The in array adds a t parameter for theme selection. Users can switch between different layout styles.
-7|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L16-L17|Nav 1 contains page links with emoji labels. Nav 2 contains theme options: Simple, TopNav, and SideBar.
+# --- Live Demo: Dropdown ---
+6|http://localhost:8080/04-Themes/public/index.php|The themes dropdown uses pure C S S. Hover to reveal, click to switch. No JavaScript required.
 
-# --- Code: Init Class ---
-8|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L21-L49|Init handles both Model and View routing. It first loads the Model for data, then renders with the Theme.
-7|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L28-L29|The model name is built from the o parameter. If a Model class exists, it's instantiated and called.
-8|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L36-L40|View resolution tries the specific View first, then falls back to the Theme. This enables per-page customization.
+# --- Context Class ---
+7|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L4-L17|The Ctx class adds a themes array alongside navigation. Both define menu structures in one place.
+6|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L8|The in array includes t for theme selection. Default is Simple.
 
-# --- Code: Theme Classes ---
-7|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L51-L70|The base Theme class provides shared navigation building. Child themes override the render method.
-6|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L72-L90|Simple theme wraps content in a centered container. TopNav adds a fixed header bar.
-7|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L92-L115|SideBar theme creates a two-column layout. Navigation in the left column, content on the right.
+# --- Init Dispatch Chain ---
+7|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L23-L29|Init orchestrates Model, View, and Theme. Model runs first, returning a data array.
+6|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L27-L28|View receives the model data and renders H T M L. If no View exists, the model data is wrapped in a paragraph.
+6|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L32-L36|The to string method invokes the selected theme. Dynamic method call based on the t parameter.
+
+# --- Models Return Data ---
+7|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L49-L52|Models return arrays, not strings. Head for title, main for content. No H T M L, just semantic data.
+
+# --- Views Render Fragments ---
+7|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L67-L77|The base View wraps model data in a card. Specific views like ContactView add forms and interactivity.
+
+# --- Theme Class ---
+7|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L120-L131|The Theme class has a nav helper using the pipe operator. Links preserve the current theme in the U R L.
+6|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L133-L142|The dropdown method builds the themes menu. C S S handles visibility on hover.
+
+# --- Theme Layouts ---
+6|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L162-L177|Simple layout. Container, card nav with dropdown, main content, footer.
+6|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L179-L193|TopNav layout. Fixed navigation bar with brand, links, dropdown, and toggle buttons.
+6|https://github.com/markc/spe/blob/main/04-Themes/public/index.php#L195-L233|SideBar layout. Topnav plus two-column split with aside and main regions.
 
 # --- Conclusion ---
-6|http://localhost:8080/04-Themes/public/index.php|That's Chapter Four. Model View separation and swappable themes that transform the entire layout.
-4|http://localhost:8080/04-Themes/public/index.php|Next chapter introduces Composer autoloading for proper namespace organization!
+6|http://localhost:8080/04-Themes/public/index.php|That's Chapter Four. Model View Theme separation with three switchable layouts and a C S S dropdown.
+5|http://localhost:8080/04-Themes/public/index.php|Next chapter introduces P S R 4 autoloading to organize classes into separate files.
