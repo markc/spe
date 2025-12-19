@@ -2,22 +2,52 @@
 # Format: duration|URL|text
 # Pronunciation: Use spaces for acronyms (P H P, P S R)
 
+# --- Hook ---
+6|http://localhost:8080/05-Autoload/public/index.php|Same application, completely different structure. Chapter Five splits one file into fourteen with P S R 4 autoloading.
+
 # --- Introduction ---
-7|http://localhost:8080/05-Autoload/public/|Welcome to Chapter Five. We're reorganizing the code with P S R 4 autoloading... using Composer for professional project structure.
+7|http://localhost:8080/05-Autoload/public/index.php|The pages look identical to Chapter Four. But now each class lives in its own file, loaded automatically by Composer.
 
-# --- Live Demo ---
-6|http://localhost:8080/05-Autoload/public/|The application works identically to Chapter Four. The difference is how the code is organized behind the scenes.
-5|http://localhost:8080/05-Autoload/public/?t=TopNav|All features still work. Theme switching, navigation, everything. But now each class lives in its own file.
-5|http://localhost:8080/05-Autoload/public/?o=About|Plugins are organized into directories with separate Model and View files. Let's explore the new structure.
+# --- Live Demo: Pages ---
+5|http://localhost:8080/05-Autoload/public/index.php|Home page. Same card layout, same toast buttons. The transformation is invisible to users.
+5|http://localhost:8080/05-Autoload/public/index.php?o=About|About page. Describing P S R 4 autoloading via Composer.
+5|http://localhost:8080/05-Autoload/public/index.php?o=Contact|Contact page. Same email form as before.
 
-# --- Code Walkthrough ---
-8|https://github.com/markc/spe/blob/main/05-Autoload/public/index.php|The entry point is now just 5 lines. Composer's autoloader handles all class loading automatically.
-7|https://github.com/markc/spe/blob/main/05-Autoload/public/index.php#L7|We use P H P's grouped use statement to import Init and Ctx from the Core namespace.
-8|https://github.com/markc/spe/tree/main/05-Autoload/src|The source code is organized into a src directory with three subdirectories... Core, Plugins, and Themes.
-7|https://github.com/markc/spe/tree/main/05-Autoload/src/Core|The Core directory contains framework classes. Ctx, Init, Plugin, View, and Theme.
-8|https://github.com/markc/spe/tree/main/05-Autoload/src/Plugins|Plugins are now in subdirectories. Each plugin has its own folder with Model and View files.
-7|https://github.com/markc/spe/tree/main/05-Autoload/src/Themes|Theme classes have their own files. Simple, TopNav, and SideBar are separate, reusable components.
+# --- Live Demo: Themes ---
+5|http://localhost:8080/05-Autoload/public/index.php?t=TopNav|TopNav theme. Each theme is now a separate file extending an abstract base class.
+5|http://localhost:8080/05-Autoload/public/index.php?t=SideBar|SideBar theme. The dropdown still works, all themes render correctly.
+
+# --- Entry Point ---
+6|https://github.com/markc/spe/blob/main/05-Autoload/public/index.php|The entry point is now just three lines. Require the autoloader, import classes, echo the result.
+6|https://github.com/markc/spe/blob/main/05-Autoload/public/index.php#L4|Composer's autoloader handles all class loading. No manual require statements needed.
+
+# --- Directory Structure ---
+7|https://github.com/markc/spe/tree/main/05-Autoload/src|The src directory contains Core, Plugins, and Themes. Fourteen files organized by namespace.
+6|https://github.com/markc/spe/tree/main/05-Autoload/src/Core|Core contains Ctx, Init, Plugin, Theme, and View. The framework infrastructure.
+6|https://github.com/markc/spe/tree/main/05-Autoload/src/Plugins|Plugins are grouped by name. Home, About, Contact each get their own directory.
+6|https://github.com/markc/spe/tree/main/05-Autoload/src/Themes|Themes are separate files. Simple, TopNav, SideBar as individual classes.
+
+# --- Composer Configuration ---
+7|https://github.com/markc/spe/blob/main/composer.json#L22|The composer dot json maps namespace to directory. S P E backslash Autoload points to 05-Autoload/src.
+
+# --- Init Class ---
+7|https://github.com/markc/spe/blob/main/05-Autoload/src/Core/Init.php#L6-L8|Init stores the namespace prefix as a typed constant. P H P 8.3 allows typed class constants.
+7|https://github.com/markc/spe/blob/main/05-Autoload/src/Core/Init.php#L13-L14|Model class names are built dynamically. The namespace plus Plugins plus the object name plus Model.
+6|https://github.com/markc/spe/blob/main/05-Autoload/src/Core/Init.php#L23-L27|Theme classes follow the same pattern. Namespace plus Themes plus the theme name.
+
+# --- Abstract Theme ---
+7|https://github.com/markc/spe/blob/main/05-Autoload/src/Core/Theme.php#L6-L9|The Theme base class is abstract. It provides nav, dropdown, and h t m l helpers.
+6|https://github.com/markc/spe/blob/main/05-Autoload/src/Core/Theme.php#L9|The render method is abstract. Each concrete theme must implement its own layout.
+
+# --- Concrete Themes ---
+7|https://github.com/markc/spe/blob/main/05-Autoload/src/Themes/Simple.php|Simple extends Theme and overrides render. Twenty-five lines for the complete layout.
+6|https://github.com/markc/spe/blob/main/05-Autoload/src/Themes/TopNav.php|TopNav is another twenty-five lines. Each theme is self-contained and focused.
+6|https://github.com/markc/spe/blob/main/05-Autoload/src/Themes/SideBar.php|SideBar is slightly longer. It builds sidebar navigation differently from the dropdown.
+
+# --- Plugin Structure ---
+7|https://github.com/markc/spe/blob/main/05-Autoload/src/Plugins/Home/HomeModel.php|HomeModel is twelve lines. It extends Plugin and returns data for the home page.
+6|https://github.com/markc/spe/blob/main/05-Autoload/src/Plugins/Home/HomeView.php|HomeView is twenty-one lines. It adds the toast demonstration buttons.
 
 # --- Conclusion ---
-5|https://github.com/markc/spe/blob/main/composer.json|That's Chapter Five. We've adopted P S R 4 autoloading with proper namespacing. Next chapter adds P H P sessions!
-
+6|http://localhost:8080/05-Autoload/public/index.php|That's Chapter Five. P S R 4 autoloading with Composer organizing fourteen files by namespace.
+5|http://localhost:8080/05-Autoload/public/index.php|Next chapter adds session management to this autoloaded foundation.
