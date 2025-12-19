@@ -4,20 +4,20 @@
 namespace SPE\Autoload\Core;
 
 final class Ctx {
-    public string $buf = '';
-    public array $ary = [];
+    public array $in;
+    public array $out;
 
     public function __construct(
-        public private(set) string $email = 'mc@netserva.org',
-        public array $in = ['l' => '', 'm' => 'list', 'o' => 'Home', 't' => 'Simple', 'x' => ''],
-        public array $out = [
-            'doc' => 'SPE::05', 'head' => 'Autoload PHP Example',
-            'main' => 'Error: missing plugin!', 'foot' => '© 2015-2025 Mark Constable (MIT License)'
-        ],
-        public array $nav1 = [['🏠 Home', 'Home'], ['📖 About', 'About'], ['✉️ Contact', 'Contact']],
-        public array $nav2 = [['🎨 Simple', 'Simple'], ['📍 TopNav', 'TopNav'], ['📂 SideBar', 'SideBar']]
+        public string $email = 'mc@netserva.org',
+        array $in = ['o' => 'Home', 'm' => 'list', 't' => 'Simple', 'x' => ''],
+        array $out = ['doc' => 'SPE::05', 'head' => '', 'main' => '', 'foot' => ''],
+        public array $nav = [['🏠 Home', 'Home'], ['📖 About', 'About'], ['✉️ Contact', 'Contact']],
+        public array $themes = [['🎨 Simple', 'Simple'], ['🎨 TopNav', 'TopNav'], ['🎨 SideBar', 'SideBar']]
     ) {
-        foreach ($this->in as $k => $v)
-            $this->in[$k] = ($_REQUEST[$k] ?? $v) |> trim(...) |> htmlspecialchars(...);
+        $this->in = array_map(fn($k, $v) => ($_REQUEST[$k] ?? $v)
+            |> trim(...)
+            |> htmlspecialchars(...), array_keys($in), $in)
+            |> (fn($v) => array_combine(array_keys($in), $v));
+        $this->out = $out;
     }
 }

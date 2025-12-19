@@ -5,27 +5,26 @@ namespace SPE\Autoload\Core;
 
 final readonly class Init {
     private const string NS = 'SPE\\Autoload\\';
+    private array $out;
 
     public function __construct(private Ctx $ctx) {
-        ['o' => $o, 'm' => $m, 't' => $t] = $this->ctx->in;
+        [$o, $m, $t] = [$ctx->in['o'], $ctx->in['m'], $ctx->in['t']];
 
         $model = self::NS . "Plugins\\{$o}\\{$o}Model";
-        $this->ctx->ary = class_exists($model) ? new $model($this->ctx)->$m() : [];
+        $ary = class_exists($model) ? (new $model($ctx))->$m() : [];
 
         $view = self::NS . "Plugins\\{$o}\\{$o}View";
-        $theme = self::NS . "Themes\\{$t}";
+        $main = class_exists($view) ? (new $view($ctx, $ary))->$m() : "<p>{$ary['main']}</p>";
 
-        $v = class_exists($view) ? new $view($this->ctx) : null;
-        $th = class_exists($theme) ? new $theme($this->ctx) : null;
-
-        $this->ctx->out['main'] = $v?->$m() ?? $th?->$m() ?? $this->ctx->out['main'];
-        $this->ctx->buf = $th?->html() ?? '';
+        $this->out = [...$ctx->out, ...$ary, 'main' => $main];
     }
 
     public function __toString(): string {
+        $t = $this->ctx->in['t'];
+        $theme = self::NS . "Themes\\{$t}";
         return match ($this->ctx->in['x']) {
-            'json' => (header('Content-Type: application/json') ?: '') . json_encode($this->ctx->out),
-            default => $this->ctx->buf
+            'json' => (header('Content-Type: application/json') ?: '') . json_encode($this->out),
+            default => (new $theme($this->ctx, $this->out))->render()
         };
     }
 }

@@ -5,4 +5,4 @@ namespace SPE\Autoload\Plugins\About;
 
 use SPE\Autoload\Core\View;
 
-final readonly class AboutView extends View {}
+final class AboutView extends View {}

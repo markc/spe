@@ -5,8 +5,8 @@ namespace SPE\Autoload\Plugins\Home;
 
 use SPE\Autoload\Core\Plugin;
 
-final readonly class HomeModel extends Plugin {
+final class HomeModel extends Plugin {
     #[\Override] public function list(): array {
-        return ['head' => '🏠 Home', 'main' => 'Welcome to SPE::05 Autoload - PSR-4 autoloading with Composer.'];
+        return ['head' => 'Home Page', 'main' => 'Welcome to the <b>Autoload</b> example with PSR-4 autoloading via Composer.'];
     }
 }

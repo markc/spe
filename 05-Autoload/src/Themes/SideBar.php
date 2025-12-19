@@ -5,33 +5,44 @@ namespace SPE\Autoload\Themes;
 
 use SPE\Autoload\Core\Theme;
 
-final readonly class SideBar extends Theme {
-    #[\Override] public function html(): string {
-        ['doc' => $doc, 'head' => $head, 'main' => $main, 'foot' => $foot] = $this->ctx->out;
-        ['t' => $t, 'o' => $o] = $this->ctx->in;
-        $nav1 = $this->ctx->nav1
-            |> (fn($a) => array_map(fn($n) => '<a href="?o=' . $n[1] . '&t=' . $t . '"' . ($n[1] === $o ? ' class="active"' : '') . '>' . $n[0] . '</a>', $a))
-            |> (fn($l) => implode('', $l));
-        $nav2 = $this->ctx->nav2
-            |> (fn($a) => array_map(fn($n) => '<a href="?o=' . $o . '&t=' . $n[1] . '"' . ($n[1] === $t ? ' class="active"' : '') . '>' . $n[0] . '</a>', $a))
-            |> (fn($l) => implode('', $l));
-        return <<<HTML
-        <!DOCTYPE html><html lang="en"><head>
-            <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-            <title>$doc [SideBar]</title><link rel="stylesheet" href="/spe.css">
-        </head><body>
-            <nav class="topnav"><button class="menu-toggle">☰</button><a class="brand" href="../">« $head</a>
-                <button class="theme-toggle" id="theme-icon">🌙</button></nav>
-            <div class="sidebar-layout">
-                <aside class="sidebar">
-                    <div class="sidebar-group"><div class="sidebar-group-title">Pages</div><nav>$nav1</nav></div>
-                    <div class="sidebar-group"><div class="sidebar-group-title">Themes</div><nav>$nav2</nav></div>
-                </aside>
-                <div class="sidebar-main"><main>$main</main>
-                    <footer class="text-center mt-3"><small>$foot</small></footer>
-                </div>
-            </div>
-        <script src="/spe.js"></script></body></html>
-        HTML;
+final class SideBar extends Theme {
+    #[\Override] public function render(): string {
+        ['o' => $o, 't' => $t] = $this->ctx->in;
+        $n1 = $this->ctx->nav
+            |> (fn($n) => array_map(fn($p) => sprintf(
+                '<a href="?o=%s&t=%s"%s>%s</a>',
+                $p[1], $t, $o === $p[1] ? ' class="active"' : '', $p[0]
+            ), $n))
+            |> (fn($a) => implode('', $a));
+        $n2 = $this->ctx->themes
+            |> (fn($n) => array_map(fn($p) => sprintf(
+                '<a href="?o=%s&t=%s"%s>%s</a>',
+                $o, $p[1], $t === $p[1] ? ' class="active"' : '', $p[0]
+            ), $n))
+            |> (fn($a) => implode('', $a));
+        $body = <<<HTML
+<nav class="topnav">
+    <button class="menu-toggle">☰</button>
+    <a class="brand" href="/">« Autoload PHP Example</a>
+    <button class="theme-toggle" id="theme-icon">🌙</button>
+</nav>
+<div class="sidebar-layout">
+    <aside class="sidebar">
+        <div class="sidebar-group">
+            <div class="sidebar-group-title">Pages</div>
+            <nav>$n1</nav>
+        </div>
+        <div class="sidebar-group">
+            <div class="sidebar-group-title">Themes</div>
+            <nav>$n2</nav>
+        </div>
+    </aside>
+    <div class="sidebar-main">
+        <main class="mt-4">{$this->out['main']}</main>
+        <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
+    </div>
+</div>
+HTML;
+        return $this->html('SideBar', $body);
     }
 }
