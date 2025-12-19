@@ -1,41 +1,39 @@
 # Chapter 02: Styled - Narration Script
-# Format: duration|URL|text|action (action is optional)
-# Pronunciation: Use spaces for acronyms (P H P, C S S, H T M L)
+# Format: duration|URL|text
+# Pronunciation: Use spaces for acronyms (P H P)
 
 # --- Hook ---
-5|http://localhost:8080/02-Styled/public/index.php|From plain H T M L to polished interface. Chapter Two adds style.
+6|http://localhost:8080/02-Styled/public/index.php|Two lines of code. External C S S and JavaScript. Plain H T M L transforms into a polished, themed interface.
 
 # --- Introduction ---
-6|http://localhost:8080/02-Styled/public/index.php|Building on Chapter One, we add external C S S, JavaScript, and theme switching.
+7|http://localhost:8080/02-Styled/public/index.php|Chapter Two introduces the external asset layer. The P H P structure stays identical to Chapter One, but the output transforms completely.
 
-# --- Demo: Pages ---
-5|http://localhost:8080/02-Styled/public/index.php|Same three pages as before. Home, About, Contact. Now with card layout and emoji icons.
-4|http://localhost:8080/02-Styled/public/index.php?m=about|The About page with its emoji icon and styled content.
-4|http://localhost:8080/02-Styled/public/index.php?m=contact|Contact page. Same clean design throughout the application.
+# --- Live Demo ---
+5|http://localhost:8080/02-Styled/public/index.php|The home page now has card layouts, proper typography, and visual hierarchy.
+5|http://localhost:8080/02-Styled/public/index.php?m=about|About page. Notice the active state in navigation. The current link is highlighted.
+5|http://localhost:8080/02-Styled/public/index.php?m=contact|Contact page includes a form. The styling comes entirely from external C S S.
+6|http://localhost:8080/02-Styled/public/index.php|Click the moon icon. Dark mode activates instantly. The preference saves to local storage.|click:#theme-icon
+5|http://localhost:8080/02-Styled/public/index.php|Toast notifications provide user feedback. Success and danger variants.|click:.btn-success
 
-# --- Demo: Theme Toggle ---
-5|http://localhost:8080/02-Styled/public/index.php|See the moon icon in the corner? Click it for dark mode.|click:.theme-toggle
-5|http://localhost:8080/02-Styled/public/index.php|Colors invert instantly. The theme preference saves to local storage.|click:.theme-toggle
+# --- Data Structure ---
+7|https://github.com/markc/spe/blob/main/02-Styled/public/index.php#L6-L10|The pages array evolves to three elements. Emoji plus label for navigation, title for the heading, content for the body.
 
-# --- Demo: Toast Notifications ---
-5|http://localhost:8080/02-Styled/public/index.php|Notice the Success and Danger buttons. Click Success for a notification.|click:.btn-success
-5|http://localhost:8080/02-Styled/public/index.php|A green toast slides in from the top. Now try Danger.|click:.btn-danger
-5|http://localhost:8080/02-Styled/public/index.php|Red for errors. Toasts auto-dismiss after three seconds.
+# --- External Assets ---
+6|https://github.com/markc/spe/blob/main/02-Styled/public/index.php#L43|The stylesheet link loads spe dot C S S. Three hundred lines of utility classes, components, and theme variables.
+5|https://github.com/markc/spe/blob/main/02-Styled/public/index.php#L61|The script tag loads spe dot J S. Theme management, toast notifications, and interactive behaviors.
 
-# --- Code: What's New ---
-6|https://github.com/markc/spe/blob/main/02-Styled/public/index.php#L53|One new line links the external stylesheet. Shared C S S used across all chapters.
-6|https://github.com/markc/spe/blob/main/02-Styled/public/index.php#L7-L11|The pages array gains emoji icons and separate title and content fields.
-6|https://github.com/markc/spe/blob/main/02-Styled/public/index.php#L71-L74|Toast buttons call the show Toast function from our shared JavaScript file.
-5|https://github.com/markc/spe/blob/main/02-Styled/public/index.php#L80|JavaScript loaded at the bottom. Best practice for page load performance.
+# --- Navigation Active State ---
+7|https://github.com/markc/spe/blob/main/02-Styled/public/index.php#L25-L31|Navigation generation adds conditional active classes. The sprintf formats each link with a class when the route matches.
 
-# --- Code: CSS Custom Properties ---
-6|https://github.com/markc/spe/blob/main/spe.css#L1-L15|C S S custom properties define the color palette. Change one variable, update everywhere.
-6|https://github.com/markc/spe/blob/main/spe.css#L17-L27|The prefers color scheme media query detects the system's dark mode preference.
+# --- Theme Toggle ---
+6|https://github.com/markc/spe/blob/main/02-Styled/public/index.php#L48|The theme toggle button sits in the nav. JavaScript handles the click, swapping light and dark classes on the document.
 
-# --- Code: JavaScript ---
-6|https://github.com/markc/spe/blob/main/spe.js#L6-L27|Theme management code. It checks local storage first, then falls back to system preference.
-6|https://github.com/markc/spe/blob/main/spe.js#L39-L52|The show Toast function creates temporary notification elements with auto-dismiss.
+# --- Contact Form ---
+7|https://github.com/markc/spe/blob/main/02-Styled/public/index.php#L67-L83|The private contact form method returns H T M L. JavaScript intercepts submission and opens the user's email client with prefilled values.
+
+# --- CSS Architecture ---
+7|http://localhost:8080/02-Styled/public/index.php|The C S S uses custom properties for theming. Colors like bg, fg, and accent define the palette. Dark mode overrides these same variables.|click:#theme-icon
 
 # --- Conclusion ---
-6|http://localhost:8080/02-Styled/public/index.php|That's Chapter Two. External assets, C S S variables, dark mode, and toast notifications.
-4|http://localhost:8080/02-Styled/public/index.php|Next chapter introduces the plugin architecture for modular code organization.
+6|http://localhost:8080/02-Styled/public/index.php|That's Chapter Two. External assets, dark mode theming, toast notifications, and form handling. All with the same self-rendering pattern.
+5|http://localhost:8080/02-Styled/public/index.php|Next chapter introduces the plugin architecture for extensible applications.
