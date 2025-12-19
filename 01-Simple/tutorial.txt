@@ -3,30 +3,38 @@
 # Pronunciation: Use spaces for acronyms (P H P)
 
 # --- Hook ---
-5|http://localhost:8080/01-Simple/public/index.php|Thirty-two lines of P H P. That's all it takes to build a complete web application.
+6|http://localhost:8080/01-Simple/public/index.php|One statement. One anonymous class. A complete web application that echoes itself into existence.
 
 # --- Introduction ---
-6|http://localhost:8080/01-Simple/public/index.php|Welcome to Simple P H P Examples, Chapter One. We're exploring modern P H P 8.5 in its most minimal form.
+7|http://localhost:8080/01-Simple/public/index.php|Welcome to Simple P H P Examples Chapter One. We're building a self-rendering object using modern P H P 8.5 features.
 
 # --- Live Demo ---
-5|http://localhost:8080/01-Simple/public/index.php|Here's our finished app. Three pages, clean navigation, zero dependencies.
-5|http://localhost:8080/01-Simple/public/index.php?m=about|Click About and the U R L parameter changes. Simple routing without a framework.
-4|http://localhost:8080/01-Simple/public/index.php?m=contact|Contact works the same way. Now let's see how it's built.
+5|http://localhost:8080/01-Simple/public/index.php|Here's the running application. Three pages, dynamic navigation, zero external dependencies.
+5|http://localhost:8080/01-Simple/public/index.php?m=about|Click About. The U R L parameter changes and the content updates. Simple routing without a framework.
+5|http://localhost:8080/01-Simple/public/index.php?m=contact|Contact works the same way. The pages array defines both routes and content. Now let's see how it works.
 
-# --- Code Walkthrough ---
-7|https://github.com/markc/spe/blob/main/01-Simple/public/index.php#L4|One anonymous class that echoes itself. Everything self-contained in a single file.
-6|https://github.com/markc/spe/blob/main/01-Simple/public/index.php#L5|A typed constant defines the default page. This is a P H P 8.3 feature for type-safe constants.
-7|https://github.com/markc/spe/blob/main/01-Simple/public/index.php#L6-L10|The pages array maps route names to display names and content. Simple data structure, no database needed.
-8|https://github.com/markc/spe/blob/main/01-Simple/public/index.php#L11-L12|P H P 8.4's asymmetric visibility. Public read, private write. Clean encapsulation without getters.
+# --- Core Pattern ---
+8|https://github.com/markc/spe/blob/main/01-Simple/public/index.php#L4|Echo new class. This single statement instantiates an anonymous class and outputs it as a string. The entire request lifecycle in one expression.
+7|https://github.com/markc/spe/blob/main/01-Simple/public/index.php#L1|Strict types at the top ensures P H P throws errors for wrong types instead of silently coercing them.
 
-# --- Pipe Operator Focus ---
-9|https://github.com/markc/spe/blob/main/01-Simple/public/index.php#L14-L17|Here's the star of the show. The P H P 8.5 pipe operator with first-class callables.
-7|https://github.com/markc/spe/blob/main/01-Simple/public/index.php#L15|Each result flows to the next function. Trim, sanitize, then apply default. One clean expression.
+# --- Data Structure ---
+6|https://github.com/markc/spe/blob/main/01-Simple/public/index.php#L5|A typed constant defines the default page. P H P 8.3 ensures this is always a string.
+7|https://github.com/markc/spe/blob/main/01-Simple/public/index.php#L6-L10|The pages array maps route slugs to display titles and content. One data structure drives both routing and navigation.
+
+# --- Asymmetric Visibility ---
+8|https://github.com/markc/spe/blob/main/01-Simple/public/index.php#L11-L12|P H P 8.4 asymmetric visibility. Public read, private write. External code can read these properties but only the constructor can set them.
+
+# --- Pipe Operator ---
+8|https://github.com/markc/spe/blob/main/01-Simple/public/index.php#L14-L19|The constructor processes the request using P H P 8.5 pipe operators. Data flows left to right through each transformation.
+7|https://github.com/markc/spe/blob/main/01-Simple/public/index.php#L15-L18|Trim whitespace, escape special characters, apply the default. Each step is a first-class callable connected by the pipe operator.
 
 # --- Output Generation ---
-7|https://github.com/markc/spe/blob/main/01-Simple/public/index.php#L19-L31|The toString method builds our H T M L. Navigation is generated dynamically from the pages array.
-6|https://github.com/markc/spe/blob/main/01-Simple/public/index.php#L20-L21|Array keys, map, implode... all piped together for clean data transformation.
+8|https://github.com/markc/spe/blob/main/01-Simple/public/index.php#L22-L26|The to string method builds navigation using another pipe chain. Array keys become links, then joined with separators.
+7|https://github.com/markc/spe/blob/main/01-Simple/public/index.php#L28-L44|A heredoc template contains the H T M L. Variables interpolate directly. The color scheme meta tag enables automatic dark mode.
+
+# --- Why This Structure ---
+8|https://github.com/markc/spe/blob/main/01-Simple/public/index.php|This architecture demonstrates that routing, content management and templating need very little machinery. The pattern scales naturally to larger applications.
 
 # --- Conclusion ---
-6|https://github.com/markc/spe/blob/main/01-Simple/public/index.php|That's Chapter One. Typed constants, asymmetric visibility, and the pipe operator in 32 lines.
-4|http://localhost:8080/01-Simple/public/index.php|Next up, we add some style with external C S S and JavaScript.
+6|http://localhost:8080/01-Simple/public/index.php|That's Chapter One. A self-rendering anonymous class using typed constants, asymmetric visibility, and the pipe operator.
+5|http://localhost:8080/01-Simple/public/index.php|Next chapter adds external C S S, JavaScript, and dark mode theming.
