@@ -2,22 +2,41 @@
 # Format: duration|URL|text
 # Pronunciation: Use spaces for acronyms (P H P)
 
+# --- Hook ---
+6|http://localhost:8080/06-Session/public/index.php|Adding memory to the application. Chapter Six introduces P H P sessions for state that persists across requests.
+
 # --- Introduction ---
-7|http://localhost:8080/06-Session/public/|Welcome to Chapter Six. We're adding P H P sessions to persist user preferences... like theme selection across page loads.
+7|http://localhost:8080/06-Session/public/index.php|H T T P is stateless. Each request forgets what came before. Sessions solve this with server-side storage.
 
-# --- Live Demo ---
-6|http://localhost:8080/06-Session/public/|The application now remembers your choices. Select a theme, and it persists even after navigating away.
-5|http://localhost:8080/06-Session/public/?t=SideBar|Switch to SideBar theme. Now navigate to another page, and the theme stays. No U R L parameter needed.
-5|http://localhost:8080/06-Session/public/?o=About|The About page keeps your SideBar theme. Sessions provide seamless state management. Let's see the implementation.
+# --- Live Demo: Visit Tracking ---
+5|http://localhost:8080/06-Session/public/index.php|Home page shows visit tracking. First visit time, page view count, and your unique session I D.
+5|http://localhost:8080/06-Session/public/index.php?o=About|Navigate to About. The session persists. Go back to Home and watch the count increase.
+5|http://localhost:8080/06-Session/public/index.php|Back to Home. Notice the page view counter increased. The session remembers every visit.
 
-# --- Code Walkthrough ---
-8|https://github.com/markc/spe/blob/main/06-Session/src/Core/Ctx.php#L19-L21|The Ctx constructor starts the session automatically. Session status is checked before calling session start.
-7|https://github.com/markc/spe/blob/main/06-Session/src/Core/Ctx.php#L23-L27|The ses helper method handles session storage. It checks request first, then session, then uses the default.
-8|https://github.com/markc/spe/blob/main/06-Session/src/Core/Init.php#L10-L12|Init uses the ses method to persist page and theme. The method parameter defaults to list from the request.
-7|https://github.com/markc/spe/blob/main/06-Session/src/Core/Init.php#L22-L26|Theme fallback is handled gracefully. If a theme class doesn't exist, it falls back to Simple.
-8|https://github.com/markc/spe/blob/main/06-Session/src/Plugins/Home/HomeModel.php#L9-L16|HomeModel tracks visits using sessions. First visit time and visit count are stored in the session.
-7|https://github.com/markc/spe/blob/main/06-Session/src/Core/Util.php#L11-L16|The Util class provides a timeAgo helper... using match expressions to format elapsed time naturally.
+# --- Live Demo: Sticky Parameters ---
+5|http://localhost:8080/06-Session/public/index.php?t=TopNav|Select TopNav theme. Now the U R L only needs the theme parameter once.
+5|http://localhost:8080/06-Session/public/index.php?o=Contact|Navigate to Contact. No theme in the U R L, but TopNav persists from the session.
+5|http://localhost:8080/06-Session/public/index.php?t=SideBar|Switch to SideBar. Navigate anywhere. The theme sticks until you explicitly change it.
+
+# --- Live Demo: Session Reset ---
+5|http://localhost:8080/06-Session/public/index.php?m=reset|Click Reset Session. Watch the flash message and the counter resetting to one.
+
+# --- Ctx Class ---
+7|https://github.com/markc/spe/blob/main/06-Session/src/Core/Ctx.php#L17|Session starts in the constructor. The short-circuit pattern avoids errors if already active.
+7|https://github.com/markc/spe/blob/main/06-Session/src/Core/Ctx.php#L26-L30|The ses method implements sticky parameters. U R L overrides session, session persists, default as fallback.
+6|https://github.com/markc/spe/blob/main/06-Session/src/Core/Ctx.php#L33-L41|Flash messages exist for one request only. Set a message, retrieve it once, then it's gone.
+
+# --- Visit Tracking ---
+7|https://github.com/markc/spe/blob/main/06-Session/src/Plugins/Home/HomeModel.php#L10-L11|Home Model tracks visits. First visit uses null coalescing assignment. Count increments each load.
+6|https://github.com/markc/spe/blob/main/06-Session/src/Plugins/Home/HomeModel.php#L22-L38|The reset method destroys and recreates the session. Flash message set before destruction.
+
+# --- Util Helpers ---
+7|https://github.com/markc/spe/blob/main/06-Session/src/Core/Util.php#L11-L16|Time ago helper converts timestamps to natural language. Just now, or hours and minutes ago.
+6|https://github.com/markc/spe/blob/main/06-Session/src/Core/Util.php#L33-L45|Session info exposes internals. I D, name, status, save path, and all stored data.
+
+# --- Theme Flash ---
+7|https://github.com/markc/spe/blob/main/06-Session/src/Core/Theme.php#L32-L36|Theme base class renders flash messages automatically. Retrieves message, generates toast script.
 
 # --- Conclusion ---
-5|https://github.com/markc/spe/blob/main/06-Session/src/Core/Ctx.php|That's Chapter Six. Sessions provide persistent state without databases. Next chapter adds SQLite with P D O!
-
+6|http://localhost:8080/06-Session/public/index.php|That's Chapter Six. Sticky parameters, flash messages, and visit tracking with P H P sessions.
+5|http://localhost:8080/06-Session/public/index.php|Next chapter adds SQLite database access with P D O for persistent data storage.
