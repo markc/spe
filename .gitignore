@@ -101,6 +101,11 @@ bun.lockb
 Thumbs.db
 
 # ===================
+# Claude Code
+# ===================
+.claude/settings.local.json
+
+# ===================
 # Project specific
 # ===================
 all.php
