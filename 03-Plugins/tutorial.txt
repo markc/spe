@@ -1,31 +1,41 @@
 # Chapter 03: Plugins - Narration Script
 # Format: duration|URL|text
-# Pronunciation: Use spaces for acronyms (P H P, C R U D L)
+# Pronunciation: Use spaces for acronyms (P H P)
+
+# --- Hook ---
+6|http://localhost:8080/03-Plugins/public/index.php|Same interface, completely different code. Chapter Three restructures everything while changing nothing visible.
 
 # --- Introduction ---
-7|http://localhost:8080/03-Plugins/public/index.php|Welcome to Chapter Three. We're introducing the Plugin architecture pattern to organize code into reusable components.
+7|http://localhost:8080/03-Plugins/public/index.php|The browser shows identical output to Chapter Two. But the P H P behind it now uses four named classes instead of one anonymous class.
 
 # --- Live Demo ---
-6|http://localhost:8080/03-Plugins/public/index.php|The application now has a modular plugin system. Home, About, and Contact are separate plugins.
-5|http://localhost:8080/03-Plugins/public/index.php?o=About|Each plugin handles its own content. The About plugin renders this page with its specific layout.
-6|http://localhost:8080/03-Plugins/public/index.php?o=Contact|The Contact plugin provides a different structure. Plugins support C R U D L operations. Let's see how it's built.
+5|http://localhost:8080/03-Plugins/public/index.php|Home page looks the same. Card layout, theme toggle, toast buttons. All working as before.
+5|http://localhost:8080/03-Plugins/public/index.php?o=About|About page. Notice the U R L now uses o equals About instead of m equals about.
+5|http://localhost:8080/03-Plugins/public/index.php?o=Contact|Contact page with the email form. Same functionality, different architecture.
+6|http://localhost:8080/03-Plugins/public/index.php?o=Home&x=json|Add x equals json to any U R L. Every plugin now has an automatic JSON A P I.
 
-# --- Code: Context Class ---
-8|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L5-L18|The code is now split into distinct classes. Context holds global state, Init handles bootstrapping.
-7|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L5-L8|The Context class uses constructor property promotion to define all properties in the constructor signature.
-7|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L8|The in array holds input parameters. The o parameter selects which plugin, m selects which method.
-8|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L9-L13|The out array contains output sections. Doc for title, head for header, main for content, foot for footer.
-6|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L14-L16|The nav array defines navigation items. Each item links to a plugin by name.
+# --- Context Class ---
+7|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L4-L11|The Ctx class is a readonly value object. It holds email, input parameters, output placeholders, and navigation.
+6|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L7|The in array defines U R L parameters with defaults. O for plugin, m for method, x for output format.
 
-# --- Code: Init Class ---
-8|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L20-L31|The Init class is marked as readonly. All its properties are implicitly readonly once set in the constructor.
-7|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L24-L28|Plugin loading uses dynamic class names. The o parameter becomes a class name, m becomes a method name.
-6|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L30|The toString method returns the rendered output buffer from the context.
+# --- Init Class ---
+7|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L13-L23|The Init class processes requests. Constructor sanitizes input with pipe operators, then calls dispatch.
+8|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L25-L31|The dispatch method uses match true pattern. It validates the class exists, method exists, then invokes it dynamically.
+6|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L33-L38|The to string method switches output format. JSON or H T M L based on the x parameter.
 
-# --- Code: Plugin Classes ---
-7|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L33-L40|Each plugin extends a base Plugin class. The Home plugin has a list method that returns page content.
-6|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L42-L49|About and Contact plugins follow the same pattern. Simple classes with focused responsibilities.
+# --- Navigation ---
+7|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L41-L47|Navigation uses the same pipe pattern as Chapter Two. The context's nav array flows through map and implode.
+
+# --- Plugin Base ---
+7|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L72-L80|The abstract Plugin class defines the C R U D L contract. Create, Read, Update, Delete, List. Five stub methods.
+
+# --- Concrete Plugins ---
+7|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L82-L94|The Home plugin extends Plugin and overrides list. The Override attribute ensures the method signature matches.
+6|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L107-L129|Contact plugin accesses context data. The email address comes from ctx, not hardcoded.
+
+# --- Entry Point ---
+6|https://github.com/markc/spe/blob/main/03-Plugins/public/index.php#L131|One line launches everything. Echo new Init new Ctx. Context created, request processed, output rendered.
 
 # --- Conclusion ---
-6|http://localhost:8080/03-Plugins/public/index.php|That's Chapter Three. We've separated concerns with the Plugin pattern using Context for state and Init for routing.
-4|http://localhost:8080/03-Plugins/public/index.php|Next chapter adds theming with multiple layout options!
+6|http://localhost:8080/03-Plugins/public/index.php|That's Chapter Three. Four classes, plugin dispatch, JSON A P I. Same visual output, extensible architecture.
+5|http://localhost:8080/03-Plugins/public/index.php|Next chapter adds theming with multiple layout options.
