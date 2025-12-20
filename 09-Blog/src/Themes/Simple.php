@@ -20,7 +20,7 @@ final class Simple extends Theme {
             <title>$doc [Simple]</title><link rel="stylesheet" href="/spe.css">
         </head><body><div class="container">
             $toast
-            <header><h1><a href="../">« $head</a></h1></header>
+            <header><h1><a class="brand" href="../">🐘 $head</a></h1></header>
             <nav class="flex flex-wrap items-center">$pages $admin $themes<span style="margin-left:auto">$auth <button class="theme-toggle" id="theme-icon">🌙</button></span></nav>
             <main>$main</main>
             <footer class="text-center mt-3"><small>$foot</small></footer>

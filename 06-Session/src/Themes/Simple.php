@@ -11,7 +11,7 @@ final class Simple extends Theme {
         $dd = $this->dropdown();
         $body = <<<HTML
 <div class="container">
-    <header><h1><a href="/">« Session PHP Example</a></h1></header>
+    <header><h1><a class="brand" href="/">🐘 Session PHP Example</a></h1></header>
     <nav class="card flex">
         $nav $dd
         <span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span>

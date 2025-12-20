@@ -58,7 +58,7 @@ readonly class Init {
 </head>
 <body>
 <div class="container">
-    <header><h1><a href="/">« Plugins PHP Example</a></h1></header>
+    <header><h1><a class="brand" href="/">🐘 Plugins PHP Example</a></h1></header>
     <nav class="card flex">$nav<span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span></nav>
     <main>{$this->out['main']}</main>
     <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
