@@ -135,7 +135,7 @@ HTML;
             $list = $this->chapterList();
             $body = <<<HTML
 <nav class="topnav">
-    <a class="brand" href="/">🐘 Simple PHP Examples</a>
+    <h1><a class="brand" href="/">🐘 Simple PHP Examples</a></h1>
     <div class="topnav-links">$nav $dd</div>
     <button class="theme-toggle" id="theme-icon">🌙</button>
     <button class="menu-toggle">☰</button>
@@ -169,7 +169,7 @@ HTML;
             $body = <<<HTML
 <nav class="topnav">
     <button class="menu-toggle">☰</button>
-    <a class="brand" href="/">🐘 Simple PHP Examples</a>
+    <h1><a class="brand" href="/">🐘 Simple PHP Examples</a></h1>
     <button class="theme-toggle" id="theme-icon">🌙</button>
 </nav>
 <div class="sidebar-layout">
