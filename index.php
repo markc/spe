@@ -30,6 +30,11 @@ namespace SPE\Router {
             array $in = ['t' => 'Simple'],
             public array $out = ['doc' => 'SPE'],
             public array $nav = [
+                ['🐙 GitHub', 'https://github.com/markc/spe'],
+                ['🎬 Tutorials', 'https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B'],
+                ['📚 Docs', 'docs/'],
+            ],
+            public array $chapters = [
                 ['00', 'Tutorial', 'Video generation pipeline'],
                 ['01', 'Simple', 'Single-file anonymous class, pipe operator'],
                 ['02', 'Styled', 'Custom CSS, dark mode, toast notifications'],
@@ -54,23 +59,18 @@ namespace SPE\Router {
     final class Theme {
         public function __construct(private Ctx $ctx) {}
 
-        private function cards(): string {
-            return $this->ctx->nav
-                |> (fn($c) => array_map(fn($ch) => <<<HTML
-                    <a href="{$ch[0]}-{$ch[1]}/" class="card-link">
-                        <span class="card-title">{$ch[0]}</span><h3>{$ch[1]}</h3><p>{$ch[2]}</p>
-                    </a>
-                    HTML, $c))
+        private function chapterList(): string {
+            return $this->ctx->chapters
+                |> (fn($c) => array_map(fn($ch) => sprintf(
+                    '<a href="%s-%s/">%s %s <span class="text-muted">— %s</span></a>',
+                    $ch[0], $ch[1], $ch[0], $ch[1], $ch[2]
+                ), $c))
                 |> (fn($a) => implode("\n", $a));
         }
 
         private function nav(): string {
-            $t = $this->ctx->in['t'];
             return $this->ctx->nav
-                |> (fn($n) => array_map(fn($ch) => sprintf(
-                    '<a href="%s-%s/">%s %s</a>',
-                    $ch[0], $ch[1], $ch[0], $ch[1]
-                ), $n))
+                |> (fn($n) => array_map(fn($p) => sprintf('<a href="%s">%s</a>', $p[1], $p[0]), $n))
                 |> (fn($a) => implode(' ', $a));
         }
 
@@ -83,26 +83,6 @@ namespace SPE\Router {
                 ), $n))
                 |> (fn($a) => implode('', $a));
             return "<div class=\"dropdown\"><span class=\"dropdown-toggle\">🎨 Themes</span><div class=\"dropdown-menu\">$links</div></div>";
-        }
-
-        private function links(): string {
-            return <<<HTML
-                <a href="https://github.com/markc/spe" class="btn btn-php">GitHub</a>
-                <a href="https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B" class="btn btn-outline">Tutorials</a>
-                <a href="docs/" class="btn btn-outline">Docs</a>
-            HTML;
-        }
-
-        private function features(): string {
-            return <<<HTML
-            <section class="mt-3"><h2>PHP Features</h2>
-            <div class="feature-grid">
-                <div class="feature"><div class="feature-icon">|></div><h4>Pipe Operator</h4><p>PHP 8.5 data transformation chains</p></div>
-                <div class="feature"><div class="feature-icon">🔌</div><h4>Plugin System</h4><p>Extensible architecture with CRUDL</p></div>
-                <div class="feature"><div class="feature-icon">🎨</div><h4>Custom CSS</h4><p>270 lines, dark mode, responsive</p></div>
-                <div class="feature"><div class="feature-icon">🗄️</div><h4>SQLite + PDO</h4><p>Type-safe queries with enums</p></div>
-            </div></section>
-            HTML;
         }
 
         private function html(string $theme, string $body): string {
@@ -125,20 +105,22 @@ HTML;
         }
 
         public function Simple(): string {
-            $cards = $this->cards();
+            $nav = $this->nav();
             $dd = $this->dropdown();
-            $links = $this->links();
-            $features = $this->features();
+            $list = $this->chapterList();
             $body = <<<HTML
 <div class="container">
-    <header class="hero">
-        <div class="flex-center"><h1>🐘 Simple PHP Examples</h1>$dd<button class="theme-toggle" id="theme-icon">🌙</button></div>
-        <p>A progressive PHP 8.5 micro-framework tutorial in 11 chapters</p>
-        <div class="flex-center">$links</div>
-    </header>
+    <header><h1>🐘 Simple PHP Examples</h1></header>
+    <nav class="card flex">
+        $nav $dd
+        <span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span>
+    </nav>
     <main>
-        <div class="grid grid-auto mt-2">$cards</div>
-        $features
+        <div class="card">
+            <h2>Chapters</h2>
+            <p>A progressive PHP 8.5 micro-framework tutorial in 11 chapters</p>
+            <nav class="chapter-list">$list</nav>
+        </div>
     </main>
     <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
 </div>
@@ -147,42 +129,33 @@ HTML;
         }
 
         public function TopNav(): string {
-            $cards = $this->cards();
+            $nav = $this->nav();
             $dd = $this->dropdown();
-            $links = $this->links();
-            $features = $this->features();
+            $list = $this->chapterList();
             $body = <<<HTML
 <nav class="topnav">
     <a class="brand" href="/">🐘 SPE</a>
-    <div class="topnav-links">$links $dd</div>
+    <div class="topnav-links">$nav $dd</div>
     <button class="theme-toggle" id="theme-icon">🌙</button>
     <button class="menu-toggle">☰</button>
 </nav>
-<div class="container mt-4">
-    <header class="hero">
-        <h1>Simple PHP Examples</h1>
+<main class="container mt-4">
+    <div class="card">
+        <h2>Chapters</h2>
         <p>A progressive PHP 8.5 micro-framework tutorial in 11 chapters</p>
-    </header>
-    <main>
-        <div class="grid grid-auto mt-2">$cards</div>
-        $features
-    </main>
-    <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
-</div>
+        <nav class="chapter-list">$list</nav>
+    </div>
+</main>
+<footer class="container text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
 HTML;
             return $this->html('TopNav', $body);
         }
 
         public function SideBar(): string {
             $t = $this->ctx->in['t'];
-            $cards = $this->cards();
-            $links = $this->links();
-            $features = $this->features();
+            $list = $this->chapterList();
             $n1 = $this->ctx->nav
-                |> (fn($n) => array_map(fn($ch) => sprintf(
-                    '<a href="%s-%s/">%s %s</a>',
-                    $ch[0], $ch[1], $ch[0], $ch[1]
-                ), $n))
+                |> (fn($n) => array_map(fn($p) => sprintf('<a href="%s">%s</a>', $p[1], $p[0]), $n))
                 |> (fn($a) => implode('', $a));
             $n2 = $this->ctx->themes
                 |> (fn($n) => array_map(fn($p) => sprintf(
@@ -199,26 +172,21 @@ HTML;
 <div class="sidebar-layout">
     <aside class="sidebar">
         <div class="sidebar-group">
-            <div class="sidebar-group-title">Chapters</div>
+            <div class="sidebar-group-title">Links</div>
             <nav>$n1</nav>
         </div>
         <div class="sidebar-group">
             <div class="sidebar-group-title">Themes</div>
             <nav>$n2</nav>
         </div>
-        <div class="sidebar-group">
-            <div class="sidebar-group-title">Links</div>
-            <nav>
-                <a href="https://github.com/markc/spe">GitHub</a>
-                <a href="https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B">Tutorials</a>
-                <a href="docs/">Docs</a>
-            </nav>
-        </div>
     </aside>
     <div class="sidebar-main">
         <main class="mt-4">
-            <div class="grid grid-auto">$cards</div>
-            $features
+            <div class="card">
+                <h2>Chapters</h2>
+                <p>A progressive PHP 8.5 micro-framework tutorial in 11 chapters</p>
+                <nav class="chapter-list">$list</nav>
+            </div>
         </main>
         <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
     </div>
