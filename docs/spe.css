@@ -137,9 +137,9 @@ nav.nav-card { border: 1px solid var(--border); border-radius: var(--radius-md);
 
 /* Chapter list */
 .chapter-list { display: flex; flex-direction: column; margin-top: 1rem; }
-.chapter-list a { display: block; padding: 0.5rem 0; color: var(--fg); border-bottom: 1px solid var(--border); }
-.chapter-list a:last-child { border-bottom: none; }
-.chapter-list a:hover { color: var(--accent); }
+.chapter-list a { display: block; padding: 0.5rem; margin: 0 -0.5rem; color: var(--fg);
+    border-radius: var(--radius-sm); }
+.chapter-list a:hover { background: var(--nav-bg); }
 .chapter-list strong { font-weight: 600; }
 
 /* === Forms === */
