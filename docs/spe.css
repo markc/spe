@@ -186,8 +186,7 @@ button:hover, .btn:hover { filter: brightness(1.1); text-decoration: none; }
     opacity: 0; visibility: hidden; transform: translateY(-8px);
     transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s; }
 .dropdown-menu::before { content: ''; position: absolute; top: -0.5rem; left: 0; right: 0; height: 0.5rem; }
-.dropdown-menu a { display: block; padding: 0.5rem 1rem; margin: 0.125rem 0.25rem;
-    border-radius: var(--radius-sm); }
+.dropdown-menu a { display: block; padding: 0.5rem 1rem; margin: 0.125rem 0.25rem; }
 .dropdown-menu a:hover { background: var(--card-bg); text-decoration: none; }
 .dropdown:hover .dropdown-menu, .dropdown.open .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
 .dropdown-divider { border-top: 1px solid var(--border); margin: 0.5rem 0; }
