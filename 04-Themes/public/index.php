@@ -164,7 +164,7 @@ HTML;
         $dd = $this->dropdown();
         $body = <<<HTML
 <div class="container">
-    <header><h1><a href="/">« Themes PHP Example</a></h1></header>
+    <header><h1><a class="brand" href="/">🐘 Themes PHP Example</a></h1></header>
     <nav class="card flex">
         $nav $dd
         <span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span>
@@ -181,13 +181,15 @@ HTML;
         $dd = $this->dropdown();
         $body = <<<HTML
 <nav class="topnav">
-    <a class="brand" href="/">« Themes PHP Example</a>
+    <h1><a class="brand" href="/">🐘 Themes PHP Example</a></h1>
     <div class="topnav-links">$nav $dd</div>
     <button class="theme-toggle" id="theme-icon">🌙</button>
     <button class="menu-toggle">☰</button>
 </nav>
-<main class="container mt-4">{$this->out['main']}</main>
-<footer class="container text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
+<div class="container">
+    <main>{$this->out['main']}</main>
+    <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
+</div>
 HTML;
         return $this->html('TopNav', $body);
     }
@@ -209,7 +211,7 @@ HTML;
         $body = <<<HTML
 <nav class="topnav">
     <button class="menu-toggle">☰</button>
-    <a class="brand" href="/">« Themes PHP Example</a>
+    <h1><a class="brand" href="/">🐘 Themes PHP Example</a></h1>
     <button class="theme-toggle" id="theme-icon">🌙</button>
 </nav>
 <div class="sidebar-layout">
