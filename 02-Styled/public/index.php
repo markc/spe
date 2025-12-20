@@ -44,7 +44,7 @@ echo new class {
 </head>
 <body>
 <div class="container">
-    <header><h1><a href="/">« Styled PHP Example</a></h1></header>
+    <header><h1><a class="brand" href="/">🐘 Styled PHP Example</a></h1></header>
     <nav class="card flex">$nav<span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span></nav>
     <main>
         <div class="card">
