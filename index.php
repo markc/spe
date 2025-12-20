@@ -111,7 +111,7 @@ HTML;
             $list = $this->chapterList();
             $body = <<<HTML
 <div class="container">
-    <header><h1>🐘 Simple PHP Examples</h1></header>
+    <header><h1><a class="brand" href="/">🐘 Simple PHP Examples</a></h1></header>
     <nav class="card flex">
         $nav $dd
         <span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span>
