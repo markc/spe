@@ -135,6 +135,15 @@ nav.nav-card { border: 1px solid var(--border); border-radius: var(--radius-md);
     transition: max-height 0.3s ease, opacity 0.2s ease; }
 .sidebar-group.collapsed nav { max-height: 0; opacity: 0; }
 
+/* Chapter list */
+.chapter-list { display: flex; flex-direction: column; margin-top: 1rem; }
+.chapter-list a { display: block; padding: 0.75rem 1rem; border: 1px solid var(--border);
+    border-bottom: none; color: var(--fg); transition: background 0.15s; }
+.chapter-list a:first-child { border-radius: var(--radius-md) var(--radius-md) 0 0; }
+.chapter-list a:last-child { border-bottom: 1px solid var(--border);
+    border-radius: 0 0 var(--radius-md) var(--radius-md); }
+.chapter-list a:hover { background: var(--nav-bg); text-decoration: none; }
+
 /* === Forms === */
 input, textarea, select, button { font: inherit; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); }
 input, textarea, select { border: 1px solid var(--border); background: var(--bg); color: var(--fg); width: 100%; }
