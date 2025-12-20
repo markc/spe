@@ -181,7 +181,7 @@ button:hover, .btn:hover { filter: brightness(1.1); text-decoration: none; }
 .dropdown-toggle::after { content: '▾'; font-size: 0.7em; transition: transform 0.2s ease; }
 .dropdown:hover .dropdown-toggle::after, .dropdown.open .dropdown-toggle::after { transform: rotate(180deg); }
 .dropdown-menu { position: absolute; top: 100%; left: 0; margin-top: 0.5rem;
-    background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md);
+    background: var(--bg); border: 1px solid var(--border); border-radius: 0;
     min-width: 160px; z-index: 1001; box-shadow: var(--shadow-md); padding: 0.25rem 0;
     opacity: 0; visibility: hidden; transform: translateY(-8px);
     transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s; }
