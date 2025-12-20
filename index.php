@@ -140,14 +140,17 @@ HTML;
     <button class="theme-toggle" id="theme-icon">🌙</button>
     <button class="menu-toggle">☰</button>
 </nav>
-<main class="container mt-4">
-    <div class="card">
-        <h2>Chapters</h2>
-        <p>A progressive PHP 8.5 micro-framework tutorial in 11 chapters</p>
-        $list
-    </div>
-</main>
-<footer class="container text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
+<div class="container">
+    <header><h1>🐘 Simple PHP Examples</h1></header>
+    <main>
+        <div class="card">
+            <h2>Chapters</h2>
+            <p>A progressive PHP 8.5 micro-framework tutorial in 11 chapters</p>
+            $list
+        </div>
+    </main>
+    <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
+</div>
 HTML;
             return $this->html('TopNav', $body);
         }
@@ -167,7 +170,7 @@ HTML;
             $body = <<<HTML
 <nav class="topnav">
     <button class="menu-toggle">☰</button>
-    <a class="brand" href="/">🐘 Simple PHP Examples</a>
+    <a class="brand" href="/">🐘 SPE</a>
     <button class="theme-toggle" id="theme-icon">🌙</button>
 </nav>
 <div class="sidebar-layout">
@@ -182,7 +185,8 @@ HTML;
         </div>
     </aside>
     <div class="sidebar-main">
-        <main class="mt-4">
+        <header><h1>🐘 Simple PHP Examples</h1></header>
+        <main>
             <div class="card">
                 <h2>Chapters</h2>
                 <p>A progressive PHP 8.5 micro-framework tutorial in 11 chapters</p>
