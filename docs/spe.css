@@ -137,12 +137,10 @@ nav.nav-card { border: 1px solid var(--border); border-radius: var(--radius-md);
 
 /* Chapter list */
 .chapter-list { display: flex; flex-direction: column; margin-top: 1rem; }
-.chapter-list a { display: block; padding: 0.75rem 1rem; border: 1px solid var(--border);
-    border-bottom: none; color: var(--fg); transition: background 0.15s; }
-.chapter-list a:first-child { border-radius: var(--radius-md) var(--radius-md) 0 0; }
-.chapter-list a:last-child { border-bottom: 1px solid var(--border);
-    border-radius: 0 0 var(--radius-md) var(--radius-md); }
-.chapter-list a:hover { background: var(--nav-bg); text-decoration: none; }
+.chapter-list a { display: block; padding: 0.5rem 0; color: var(--fg); border-bottom: 1px solid var(--border); }
+.chapter-list a:last-child { border-bottom: none; }
+.chapter-list a:hover { color: var(--accent); }
+.chapter-list strong { font-weight: 600; }
 
 /* === Forms === */
 input, textarea, select, button { font: inherit; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); }
