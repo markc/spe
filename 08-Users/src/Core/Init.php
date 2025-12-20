@@ -3,6 +3,8 @@
 
 namespace SPE\Users\Core;
 
+use SPE\App\Util;
+
 final class Init {
     private const string NS = 'SPE\\Users\\';
 
