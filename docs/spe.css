@@ -114,7 +114,7 @@ nav.nav-card { border: 1px solid var(--border); border-radius: var(--radius-md);
 .topnav h1 { margin: 0; font-size: 1.5rem; }
 header h1 a.brand, nav.topnav h1 a.brand { color: var(--accent); font-weight: bold; border: none; }
 header h1 a.brand:hover, nav.topnav h1 a.brand:hover { border: none; text-decoration: none; }
-.topnav + .container { margin-top: 3rem; }
+.topnav + .container, .topnav + .sidebar-layout { margin-top: 3rem; }
 .topnav-links { display: flex; gap: 0.5rem; position: absolute; left: 50%; transform: translateX(-50%); }
 
 /* SideBar */
