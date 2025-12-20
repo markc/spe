@@ -35,17 +35,17 @@ namespace SPE\Router {
                 ['📚 Docs', 'docs/'],
             ],
             public array $chapters = [
-                ['00', 'Tutorial', 'Video generation pipeline'],
-                ['01', 'Simple', 'Single-file anonymous class, pipe operator'],
-                ['02', 'Styled', 'Custom CSS, dark mode, toast notifications'],
-                ['03', 'Plugins', 'Plugin architecture, CRUDL pattern'],
-                ['04', 'Themes', 'Model/View separation, multiple layouts'],
-                ['05', 'Autoload', 'PSR-4 autoloading via Composer'],
-                ['06', 'Session', 'PHP session management'],
-                ['07', 'PDO', 'SQLite database, QueryType enum'],
-                ['08', 'Users', 'User management CRUDL'],
-                ['09', 'Blog', 'Full CMS: Auth, Blog, Pages, Docs'],
-                ['10', 'YouTube', 'OAuth, API integration'],
+                ['00', 'Tutorial', 'Automated video generation pipeline using Playwright browser capture and Piper text-to-speech'],
+                ['01', 'Simple', 'Single-file anonymous class demonstrating PHP 8.5 pipe operator with first-class callables'],
+                ['02', 'Styled', 'Custom CSS framework with CSS variables, automatic dark mode detection, and toast notifications'],
+                ['03', 'Plugins', 'Plugin architecture introducing the CRUDL pattern for Create, Read, Update, Delete, List operations'],
+                ['04', 'Themes', 'Model/View separation with three switchable layout themes: Simple, TopNav, and SideBar'],
+                ['05', 'Autoload', 'PSR-4 autoloading via Composer with proper namespacing and directory structure'],
+                ['06', 'Session', 'PHP session management with sticky URL parameters and flash messages for user feedback'],
+                ['07', 'PDO', 'SQLite database integration using PDO wrapper class and QueryType enum for fetch modes'],
+                ['08', 'Users', 'User management system with full CRUDL operations and profile handling'],
+                ['09', 'Blog', 'Complete CMS featuring authentication, blog posts, static pages, and documentation'],
+                ['10', 'YouTube', 'YouTube API integration with OAuth authentication for video management'],
             ],
             public array $themes = [['🎨 Simple', 'Simple'], ['🎨 TopNav', 'TopNav'], ['🎨 SideBar', 'SideBar']]
         ) {
@@ -62,7 +62,7 @@ namespace SPE\Router {
         private function chapterList(): string {
             return $this->ctx->chapters
                 |> (fn($c) => array_map(fn($ch) => sprintf(
-                    '<a href="%s-%s/">%s %s <span class="text-muted">— %s</span></a>',
+                    '<a href="%s-%s/"><strong>%s %s</strong> — %s</a>',
                     $ch[0], $ch[1], $ch[0], $ch[1], $ch[2]
                 ), $c))
                 |> (fn($a) => implode("\n", $a));
