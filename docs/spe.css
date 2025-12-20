@@ -112,8 +112,9 @@ nav.nav-card { border: 1px solid var(--border); border-radius: var(--radius-md);
 .topnav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
     display: flex; align-items: center; justify-content: space-between; }
 .topnav h1 { margin: 0; font-size: 1.5rem; }
-.topnav h1 a.brand { color: var(--fg); font-weight: bold; }
+.topnav h1 a.brand { color: var(--accent); font-weight: bold; text-decoration: none; }
 .topnav h1 a.brand:hover { text-decoration: none; }
+.topnav + .container { margin-top: 4rem; }
 .topnav-links { display: flex; gap: 0.5rem; position: absolute; left: 50%; transform: translateX(-50%); }
 
 /* SideBar */
