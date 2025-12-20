@@ -11,13 +11,15 @@ final class TopNav extends Theme {
         $dd = $this->dropdown();
         $body = <<<HTML
 <nav class="topnav">
-    <a class="brand" href="/">« PDO PHP Example</a>
+    <h1><a class="brand" href="/">🐘 PDO PHP Example</a></h1>
     <div class="topnav-links">$nav $dd</div>
     <button class="theme-toggle" id="theme-icon">🌙</button>
     <button class="menu-toggle">☰</button>
 </nav>
-<main class="container mt-4">{$this->out['main']}</main>
-<footer class="container text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
+<div class="container">
+    <main>{$this->out['main']}</main>
+    <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
+</div>
 HTML;
         return $this->html('TopNav', $body);
     }

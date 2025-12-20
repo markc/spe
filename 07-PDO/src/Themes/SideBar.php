@@ -23,7 +23,7 @@ final class SideBar extends Theme {
         $body = <<<HTML
 <nav class="topnav">
     <button class="menu-toggle">☰</button>
-    <a class="brand" href="/">« PDO PHP Example</a>
+    <h1><a class="brand" href="/">🐘 PDO PHP Example</a></h1>
     <button class="theme-toggle" id="theme-icon">🌙</button>
 </nav>
 <div class="sidebar-layout">
@@ -38,7 +38,7 @@ final class SideBar extends Theme {
         </div>
     </aside>
     <div class="sidebar-main">
-        <main class="mt-4">{$this->out['main']}</main>
+        <main class="mt-2">{$this->out['main']}</main>
         <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
     </div>
 </div>
