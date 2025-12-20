@@ -60,12 +60,13 @@ namespace SPE\Router {
         public function __construct(private Ctx $ctx) {}
 
         private function chapterList(): string {
-            return $this->ctx->chapters
+            $rows = $this->ctx->chapters
                 |> (fn($c) => array_map(fn($ch) => sprintf(
-                    '<a href="%s-%s/"><strong>%s %s</strong> — %s</a>',
+                    '<tr><td><a href="%s-%s/"><strong>%s %s</strong></a></td><td>%s</td></tr>',
                     $ch[0], $ch[1], $ch[0], $ch[1], $ch[2]
                 ), $c))
                 |> (fn($a) => implode("\n", $a));
+            return "<table class=\"chapter-table\">$rows</table>";
         }
 
         private function nav(): string {
@@ -119,7 +120,7 @@ HTML;
         <div class="card">
             <h2>Chapters</h2>
             <p>A progressive PHP 8.5 micro-framework tutorial in 11 chapters</p>
-            <nav class="chapter-list">$list</nav>
+            <div class="chapter-list">$list</div>
         </div>
     </main>
     <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>

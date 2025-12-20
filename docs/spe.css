@@ -135,11 +135,14 @@ nav.nav-card { border: 1px solid var(--border); border-radius: var(--radius-md);
     transition: max-height 0.3s ease, opacity 0.2s ease; }
 .sidebar-group.collapsed nav { max-height: 0; opacity: 0; }
 
-/* Chapter list */
-.chapter-list { display: flex; flex-direction: column; margin-top: 1rem; }
-.chapter-list a { display: block; padding: 0.4rem 0; color: var(--fg); }
-.chapter-list a:hover { background: var(--nav-bg); }
-.chapter-list strong { font-weight: 600; }
+/* Chapter table */
+.chapter-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+.chapter-table td { padding: 0.4rem 0; vertical-align: top; }
+.chapter-table td:first-child { white-space: nowrap; padding-right: 1rem; }
+.chapter-table td:last-child { color: var(--muted); }
+.chapter-table tr:hover { background: var(--nav-bg); }
+.chapter-table a { color: var(--fg); }
+.chapter-table strong { font-weight: 600; }
 
 /* === Forms === */
 input, textarea, select, button { font: inherit; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); }
