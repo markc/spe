@@ -135,13 +135,12 @@ HTML;
             $list = $this->chapterList();
             $body = <<<HTML
 <nav class="topnav">
-    <a class="brand" href="/">🐘 SPE</a>
+    <a class="brand brand-lg" href="/">🐘 Simple PHP Examples</a>
     <div class="topnav-links">$nav $dd</div>
     <button class="theme-toggle" id="theme-icon">🌙</button>
     <button class="menu-toggle">☰</button>
 </nav>
 <div class="container">
-    <header><h1>🐘 Simple PHP Examples</h1></header>
     <main>
         <div class="card">
             <h2>Chapters</h2>
