@@ -120,7 +120,7 @@ header h1 a.brand:hover, nav.topnav h1 a.brand:hover { border: none; text-decora
 
 /* SideBar */
 .sidebar-layout { display: flex; min-height: 100vh; }
-.sidebar { width: 220px; background: var(--nav-bg); padding: 1rem; padding-top: 4rem;
+.sidebar { width: 220px; background: var(--nav-bg); padding: 1rem; padding-top: 2rem;
     border-right: 1px solid var(--border); flex-shrink: 0;
     position: sticky; top: 0; height: 100vh; overflow-y: auto; }
 .sidebar nav { display: block; background: transparent; border: none; padding: 0; }
