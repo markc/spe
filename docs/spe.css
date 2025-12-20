@@ -111,8 +111,8 @@ nav.nav-card { border: 1px solid var(--border); border-radius: var(--radius-md);
 /* TopNav */
 .topnav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
     display: flex; align-items: center; justify-content: space-between; }
-.topnav .brand { font-weight: bold; font-size: 1.1rem; }
-.topnav .brand-lg { font-size: 2rem; }
+.topnav .brand { font-weight: bold; font-size: 1.5rem; }
+.topnav .brand:hover { text-decoration: none; }
 .topnav-links { display: flex; gap: 0.5rem; position: absolute; left: 50%; transform: translateX(-50%); }
 
 /* SideBar */
