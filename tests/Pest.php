@@ -48,3 +48,11 @@ function simpleIndexPath(): string
 {
     return dirname(__DIR__) . '/01-Simple/public/index.php';
 }
+
+/**
+ * Get the 02-Styled index.php path
+ */
+function styledIndexPath(): string
+{
+    return dirname(__DIR__) . '/02-Styled/public/index.php';
+}

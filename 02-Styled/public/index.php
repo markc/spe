@@ -13,7 +13,7 @@ echo new class {
     public private(set) string $content;
 
     public function __construct() {
-        $this->page = ($_REQUEST['m'] ?? '')
+        $this->page = (isset($_GET['m']) && is_string($_GET['m']) ? $_GET['m'] : '')
             |> trim(...)
             |> htmlspecialchars(...)
             |> (fn($p) => $p && isset($this->pages[$p]) ? $p : self::DEFAULT);
@@ -28,7 +28,7 @@ echo new class {
                 '<a href="?m=%s"%s>%s</a>',
                 $p, $p === $this->page ? ' class="active"' : '', $this->pages[$p][0]
             ), $k))
-            |> (fn($a) => implode(' ', $a));
+            |> (static fn($a) => implode(' ', $a));
 
         $main = $this->page === 'contact' ? $this->contactForm() : "<p>{$this->content}</p>";
 
@@ -45,11 +45,11 @@ echo new class {
 <body>
 <div class="container">
     <header><h1><a class="brand" href="/">🐘 Styled PHP Example</a></h1></header>
-    <nav class="card flex">$nav<span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span></nav>
+    <nav class="card flex">{$nav}<span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span></nav>
     <main>
         <div class="card">
             <h2>{$this->title}</h2>
-            $main
+            {$main}
         </div>
         <div class="flex justify-center mt-2">
             <button class="btn btn-success" onclick="showToast('Success!', 'success')">Success</button>
