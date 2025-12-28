@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
+if (!class_exists('Ctx')) {
 readonly class Ctx {
     public array $in;
     public function __construct(
@@ -10,10 +11,10 @@ readonly class Ctx {
         public array $nav = [['🏠 Home', 'Home'], ['📖 About', 'About'], ['✉️ Contact', 'Contact']],
         public array $themes = [['🎨 Simple', 'Simple'], ['🎨 TopNav', 'TopNav'], ['🎨 SideBar', 'SideBar']]
     ) {
-        $this->in = array_map(fn($k, $v) => ($_REQUEST[$k] ?? $v)
+        $this->in = array_map(static fn($k, $v) => (isset($_GET[$k]) && is_string($_GET[$k]) ? $_GET[$k] : $v)
             |> trim(...)
             |> htmlspecialchars(...), array_keys($in), $in)
-            |> (fn($v) => array_combine(array_keys($in), $v));
+            |> (static fn($v) => array_combine(array_keys($in), $v));
     }
 }
 
@@ -31,7 +32,7 @@ readonly class Init {
 
     public function __toString(): string {
         return match ($this->ctx->in['x']) {
-            'json' => (header('Content-Type: application/json') ?: '') . json_encode($this->out),
+            'json' => (header('Content-Type: application/json') ? '' : '') . json_encode($this->out),
             default => (new Theme($this->ctx, $this->out))->{$this->ctx->in['t']}()
         };
     }
@@ -123,22 +124,22 @@ final class Theme {
     private function nav(): string {
         ['o' => $o, 't' => $t] = $this->ctx->in;
         return $this->ctx->nav
-            |> (fn($n) => array_map(fn($p) => sprintf(
+            |> (static fn($n) => array_map(static fn($p) => sprintf(
                 '<a href="?o=%s&t=%s"%s>%s</a>',
                 $p[1], $t, $o === $p[1] ? ' class="active"' : '', $p[0]
             ), $n))
-            |> (fn($a) => implode(' ', $a));
+            |> (static fn($a) => implode(' ', $a));
     }
 
     private function dropdown(): string {
         ['o' => $o, 't' => $t] = $this->ctx->in;
         $links = $this->ctx->themes
-            |> (fn($n) => array_map(fn($p) => sprintf(
+            |> (static fn($n) => array_map(static fn($p) => sprintf(
                 '<a href="?o=%s&t=%s"%s>%s</a>',
                 $o, $p[1], $t === $p[1] ? ' class="active"' : '', $p[0]
             ), $n))
-            |> (fn($a) => implode('', $a));
-        return "<div class=\"dropdown\"><span class=\"dropdown-toggle\">🎨 Themes</span><div class=\"dropdown-menu\">$links</div></div>";
+            |> (static fn($a) => implode('', $a));
+        return "<div class=\"dropdown\"><span class=\"dropdown-toggle\">🎨 Themes</span><div class=\"dropdown-menu\">{$links}</div></div>";
     }
 
     private function html(string $theme, string $body): string {
@@ -148,11 +149,11 @@ final class Theme {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{$this->out['doc']} [$theme]</title>
+    <title>{$this->out['doc']} [{$theme}]</title>
     <link rel="stylesheet" href="/spe.css">
 </head>
 <body>
-$body
+{$body}
 <script src="/spe.js"></script>
 </body>
 </html>
@@ -166,7 +167,7 @@ HTML;
 <div class="container">
     <header><h1><a class="brand" href="/">🐘 Themes PHP Example</a></h1></header>
     <nav class="card flex">
-        $nav $dd
+        {$nav} {$dd}
         <span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span>
     </nav>
     <main>{$this->out['main']}</main>
@@ -182,7 +183,7 @@ HTML;
         $body = <<<HTML
 <nav class="topnav">
     <h1><a class="brand" href="/">🐘 Themes PHP Example</a></h1>
-    <div class="topnav-links">$nav $dd</div>
+    <div class="topnav-links">{$nav} {$dd}</div>
     <button class="theme-toggle" id="theme-icon">🌙</button>
     <button class="menu-toggle">☰</button>
 </nav>
@@ -197,17 +198,17 @@ HTML;
     public function SideBar(): string {
         ['o' => $o, 't' => $t] = $this->ctx->in;
         $n1 = $this->ctx->nav
-            |> (fn($n) => array_map(fn($p) => sprintf(
+            |> (static fn($n) => array_map(static fn($p) => sprintf(
                 '<a href="?o=%s&t=%s"%s>%s</a>',
                 $p[1], $t, $o === $p[1] ? ' class="active"' : '', $p[0]
             ), $n))
-            |> (fn($a) => implode('', $a));
+            |> (static fn($a) => implode('', $a));
         $n2 = $this->ctx->themes
-            |> (fn($n) => array_map(fn($p) => sprintf(
+            |> (static fn($n) => array_map(static fn($p) => sprintf(
                 '<a href="?o=%s&t=%s"%s>%s</a>',
                 $o, $p[1], $t === $p[1] ? ' class="active"' : '', $p[0]
             ), $n))
-            |> (fn($a) => implode('', $a));
+            |> (static fn($a) => implode('', $a));
         $body = <<<HTML
 <nav class="topnav">
     <button class="menu-toggle">☰</button>
@@ -218,11 +219,11 @@ HTML;
     <aside class="sidebar">
         <div class="sidebar-group">
             <div class="sidebar-group-title">Pages</div>
-            <nav>$n1</nav>
+            <nav>{$n1}</nav>
         </div>
         <div class="sidebar-group">
             <div class="sidebar-group-title">Themes</div>
-            <nav>$n2</nav>
+            <nav>{$n2}</nav>
         </div>
     </aside>
     <div class="sidebar-main">
@@ -233,6 +234,7 @@ HTML;
 HTML;
         return $this->html('SideBar', $body);
     }
+}
 }
 
 echo new Init(new Ctx);

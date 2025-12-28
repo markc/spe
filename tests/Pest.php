@@ -64,3 +64,31 @@ function pluginsIndexPath(): string
 {
     return dirname(__DIR__) . '/03-Plugins/public/index.php';
 }
+
+/**
+ * Get the 04-Themes index.php path
+ */
+function themesIndexPath(): string
+{
+    return dirname(__DIR__) . '/04-Themes/public/index.php';
+}
+
+/**
+ * Check if a specific chapter's classes are loaded
+ * (03-Plugins and 04-Themes have class name conflicts)
+ */
+function isChapterLoaded(int $chapter): bool
+{
+    if (!class_exists('Ctx')) {
+        return false;
+    }
+    // Check if Ctx has themes property (only in 04-Themes)
+    $ref = new ReflectionClass('Ctx');
+    $hasThemes = $ref->hasProperty('themes');
+
+    return match ($chapter) {
+        3 => !$hasThemes,
+        4 => $hasThemes,
+        default => false
+    };
+}
