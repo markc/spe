@@ -56,3 +56,11 @@ function styledIndexPath(): string
 {
     return dirname(__DIR__) . '/02-Styled/public/index.php';
 }
+
+/**
+ * Get the 03-Plugins index.php path
+ */
+function pluginsIndexPath(): string
+{
+    return dirname(__DIR__) . '/03-Plugins/public/index.php';
+}
