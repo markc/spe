@@ -16,7 +16,7 @@ echo
 
         public function __construct()
         {
-            $this->page = ($_GET['m'] ?? '')
+            $this->page = (isset($_GET['m']) && is_string($_GET['m']) ? $_GET['m'] : '')
                 |> trim(...) // PHP 8.5 |> Pipe operator
                 |> htmlspecialchars(...)
                 |> (static fn($p) => $p !== '' ? $p : self::DEFAULT);
