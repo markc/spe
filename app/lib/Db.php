@@ -26,21 +26,28 @@ final class Db extends PDO
             Schema::init($name);
         }
 
+        // Password from file or direct value
+        $pass = Env::get('DB_PASS', '');
+        $pass = file_exists($pass) ? trim(file_get_contents($pass)) : $pass;
+
         $dsn = match ($type) {
             'sqlite' => 'sqlite:' . Schema::path($name),
-            default => sprintf('mysql:host=%s;port=%s;dbname=%s',
-                Env::get('DB_HOST', 'localhost'),
-                Env::get('DB_PORT', '3306'),
-                Env::get("DB_{$name}_NAME", $name)),
+            'mariadb' => 'mysql:' . (($sock = Env::get('DB_SOCK'))
+                ? "unix_socket=$sock"
+                : 'host=' . Env::get('DB_HOST', 'localhost') . ';port=' . Env::get('DB_PORT', '3306'))
+                . ';dbname=' . Env::get("DB_{$name}_NAME", $name),
+            default => throw new \RuntimeException("Unsupported DB type: $type"),
         };
 
-        parent::__construct($dsn, Env::get('DB_USER'), Env::get('DB_PASS'), self::OPTS);
+        parent::__construct($dsn, Env::get('DB_USER'), $pass, self::OPTS);
     }
+
+    // === CRUD Methods ===
 
     public function create(string $tbl, array $data): int
     {
         $cols = implode(', ', array_keys($data));
-        $vals = implode(', ', array_map(fn($k) => ":$k", array_keys($data)));
+        $vals = implode(', ', array_map(static fn($k) => ":$k", array_keys($data)));
         $stmt = $this->prepare("INSERT INTO `$tbl` ($cols) VALUES ($vals)");
         $this->bind($stmt, $data);
         $stmt->execute();
@@ -63,7 +70,7 @@ final class Db extends PDO
 
     public function update(string $tbl, array $data, string $where, array $params = []): bool
     {
-        $set = implode(', ', array_map(fn($k) => "$k = :$k", array_keys($data)));
+        $set = implode(', ', array_map(static fn($k) => "$k = :$k", array_keys($data)));
         $stmt = $this->prepare("UPDATE `$tbl` SET $set WHERE $where");
         $this->bind($stmt, [...$data, ...$params]);
         return $stmt->execute();
@@ -76,14 +83,39 @@ final class Db extends PDO
         return $stmt->execute();
     }
 
+    // === Generic Query (for complex/raw SQL) ===
+
+    public function qry(string $sql, array $params = [], QueryType $type = QueryType::All): mixed
+    {
+        $stmt = $this->prepare($sql);
+        if ($params) $this->bind($stmt, $params);
+        $stmt->execute();
+
+        return match ($type) {
+            QueryType::All => $stmt->fetchAll(),
+            QueryType::One => $stmt->fetch(),
+            QueryType::Col => $stmt->fetchColumn(),
+        };
+    }
+
+    // === Type-aware Parameter Binding ===
+
     private function bind(PDOStatement $stmt, array $params): void
     {
-        foreach ($params as $k => $v) $stmt->bindValue(":$k", $v);
+        foreach ($params as $k => $v) {
+            $type = match (true) {
+                is_int($v) => PDO::PARAM_INT,
+                is_bool($v) => PDO::PARAM_BOOL,
+                is_null($v) => PDO::PARAM_NULL,
+                default => PDO::PARAM_STR,
+            };
+            $stmt->bindValue(":$k", $v, $type);
+        }
     }
 
     private function ensureDir(string $name): void
     {
         $dir = dirname(Schema::path($name));
-        if (!is_dir($dir)) mkdir($dir, 0755, true);
+        if (!is_dir($dir)) mkdir($dir, 0o755, true);
     }
 }

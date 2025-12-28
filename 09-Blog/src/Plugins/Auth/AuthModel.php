@@ -3,216 +3,337 @@
 
 namespace SPE\Blog\Plugins\Auth;
 
-use SPE\App\{Db, QueryType, Util};
-use SPE\Blog\Core\{Ctx, Plugin};
+use SPE\App\{Acl, Db, QueryType, Util};
+use SPE\Blog\Core\Ctx;
 
-final class AuthModel extends Plugin {
-    private const int OTP_LENGTH = 10;
-    private const int REMEMBER_EXP = 604800; // 7 days
-    private ?Db $dbh = null;
+/**
+ * Auth plugin - handles authentication flows
+ *
+ * Methods:
+ *   login    - Login form and processing
+ *   logout   - Clear session and cookies
+ *   forgotpw - Request password reset (sends OTP email)
+ *   resetpw  - Reset password via OTP link
+ *   profile  - User profile management
+ */
+final class AuthModel
+{
+    private Db $db;
+    private array $f = [
+        'login' => '',
+        'webpw' => '',
+        'remember' => '',
+        'otp' => '',
+        'passwd1' => '',
+        'passwd2' => '',
+        'fname' => '',
+        'lname' => '',
+        'altemail' => '',
+    ];
 
-    public function __construct(protected Ctx $ctx) {
-        parent::__construct($ctx);
-        $this->dbh = new Db('users');
+    public function __construct(private Ctx $ctx)
+    {
+        foreach ($this->f as $k => &$v) $v = $_REQUEST[$k] ?? $v;
+        $this->db = new Db('users');
     }
 
-    // Login form and processing
-    #[\Override] public function list(): array {
+    // === Login ===
+
+    public function login(): array
+    {
+        Util::elog(__METHOD__);
+
+        // Already logged in
         if (Util::is_usr()) {
-            Util::redirect('?o=Home');
+            header('Location: /');
+            exit;
         }
 
         if (!Util::is_post()) {
             return ['action' => 'login'];
         }
 
-        $login = trim($_POST['login'] ?? '');
-        $webpw = $_POST['webpw'] ?? '';
+        $login = trim($this->f['login']);
+        $webpw = Util::decpw($this->f['webpw']);
 
         if (!$login || !$webpw) {
             Util::log('Please enter email and password');
             return ['action' => 'login', 'login' => $login];
         }
 
-        $usr = $this->dbh->read('users', '*', 'login = :login', ['login' => $login], QueryType::One);
+        $usr = $this->db->read('users', '*', 'login = :login', ['login' => $login], QueryType::One);
 
         if (!$usr || !password_verify($webpw, $usr['webpw'])) {
             Util::log('Invalid email or password');
             return ['action' => 'login', 'login' => $login];
         }
 
-        if ((int)$usr['acl'] === 9) {
-            Util::log('Account is disabled');
+        $acl = Acl::tryFrom((int)$usr['acl']) ?? Acl::Anonymous;
+
+        if ($acl === Acl::Suspended) {
+            Util::log('Account is suspended. Contact administrator.');
             return ['action' => 'login', 'login' => $login];
         }
 
-        // Remember me cookie
-        if (isset($_POST['remember'])) {
-            $cookie = Util::random_token(32);
-            $this->dbh->update('users', ['cookie' => $cookie], 'id = :id', ['id' => $usr['id']]);
-            Util::set_cookie('remember', $cookie, self::REMEMBER_EXP);
-        }
-
+        // Set session
         $_SESSION['usr'] = [
-            'id' => $usr['id'], 'login' => $usr['login'], 'fname' => $usr['fname'],
-            'lname' => $usr['lname'], 'acl' => $usr['acl'], 'grp' => $usr['grp']
+            'id' => $usr['id'],
+            'grp' => $usr['grp'],
+            'acl' => $usr['acl'],
+            'login' => $usr['login'],
+            'fname' => $usr['fname'],
+            'lname' => $usr['lname'],
         ];
 
-        Util::log("{$usr['fname']} logged in", 'success');
-        Util::redirect('?o=Home');
+        // Remember me cookie
+        if ($this->f['remember']) {
+            Util::setRemember($this->db, (int)$usr['id']);
+        }
+
+        // Set admin session flag (from HCP pattern)
+        if ($acl->can(Acl::Admin)) {
+            $_SESSION['adm'] = $usr['id'];
+        }
+
+        Util::log(($usr['fname'] ?: $usr['login']) . ' logged in', 'success');
+        header('Location: /');
+        exit;
     }
 
-    // Forgot password form
-    #[\Override] public function create(): array {
+    // === Logout ===
+
+    public function logout(): array
+    {
+        Util::elog(__METHOD__);
+
         if (Util::is_usr()) {
-            Util::redirect('?o=Home');
+            $login = $_SESSION['usr']['login'] ?? 'User';
+            $id = (int)$_SESSION['usr']['id'];
+
+            // Clear remember cookie
+            Util::clearRemember($this->db, $id);
+
+            // Clear admin session
+            if (isset($_SESSION['adm'])) {
+                unset($_SESSION['adm']);
+            }
+
+            unset($_SESSION['usr']);
+            session_regenerate_id(true);
+
+            Util::log("$login logged out", 'success');
+        }
+
+        header('Location: /');
+        exit;
+    }
+
+    // === Forgot Password (request reset) ===
+
+    public function forgotpw(): array
+    {
+        Util::elog(__METHOD__);
+
+        if (Util::is_usr()) {
+            header('Location: /');
+            exit;
         }
 
         if (!Util::is_post()) {
-            return ['action' => 'forgot'];
+            return ['action' => 'forgotpw'];
         }
 
-        $login = trim($_POST['login'] ?? '');
+        $login = trim($this->f['login']);
 
         if (!filter_var($login, FILTER_VALIDATE_EMAIL)) {
             Util::log('Please enter a valid email address');
-            return ['action' => 'forgot', 'login' => $login];
+            return ['action' => 'forgotpw', 'login' => $login];
         }
 
-        $usr = $this->dbh->read('users', 'id,acl,login', 'login = :login', ['login' => $login], QueryType::One);
+        $usr = $this->db->read('users', 'id,acl,login', 'login = :login', ['login' => $login], QueryType::One);
 
-        if (!$usr) {
-            Util::log('If that email exists, a reset link has been sent', 'success');
-            return ['action' => 'forgot'];
+        // Always show success message (don't reveal if email exists)
+        $successMsg = 'If that email exists, a password reset link has been sent';
+
+        if ($usr) {
+            $acl = Acl::tryFrom((int)$usr['acl']) ?? Acl::Anonymous;
+
+            if ($acl !== Acl::Suspended && $acl !== Acl::Anonymous) {
+                $otp = Util::genOtp();
+
+                $this->db->update('users', [
+                    'otp' => $otp,
+                    'otpttl' => time(),
+                    'updated' => date('Y-m-d H:i:s')
+                ], 'id = :id', ['id' => $usr['id']]);
+
+                if (Util::mailResetPw($login, $otp, $this->ctx->email)) {
+                    Util::elog("Password reset email sent to $login");
+                } else {
+                    Util::elog("Failed to send password reset email to $login");
+                }
+            }
         }
 
-        if ((int)$usr['acl'] === 9) {
-            Util::log('Account is disabled');
-            return ['action' => 'forgot'];
-        }
-
-        $otp = Util::random_token(self::OTP_LENGTH);
-        $this->dbh->update('users', ['otp' => $otp, 'otpttl' => time()], 'id = :id', ['id' => $usr['id']]);
-
-        // Send email (simplified - in production use proper mail library)
-        $scheme = $_SERVER['REQUEST_SCHEME'] ?? 'http';
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        $path = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
-        $link = "{$scheme}://{$host}{$path}?o=Auth&m=read&otp={$otp}";
-        $subject = "Password Reset - {$host}";
-        $message = "Click the link below to reset your password (valid for 1 hour):\n\n{$link}\n\nIf you didn't request this, ignore this email.";
-        @mail($login, $subject, $message, "From: {$this->ctx->email}");
-
-        Util::log('If that email exists, a reset link has been sent', 'success');
-        return ['action' => 'forgot'];
+        Util::log($successMsg, 'success');
+        header('Location: ?o=Auth&m=login');
+        exit;
     }
 
-    // Reset password (via OTP link)
-    #[\Override] public function read(): array {
+    // === Reset Password (via OTP link) ===
+
+    public function resetpw(): array
+    {
+        Util::elog(__METHOD__);
+
+        // Check for OTP in URL
         $otp = trim($_GET['otp'] ?? '');
 
-        if (strlen($otp) !== self::OTP_LENGTH * 2) { // hex encoded
-            Util::log('Invalid reset link');
-            Util::redirect('?o=Auth');
+        if ($otp) {
+            // Validate OTP from URL
+            $usr = $this->db->read('users', '*', 'otp = :otp', ['otp' => $otp], QueryType::One);
+
+            if (!$usr) {
+                Util::log('Invalid or expired reset link');
+                header('Location: ?o=Auth&m=login');
+                exit;
+            }
+
+            if (!Util::chkOtp((int)$usr['otpttl'])) {
+                // Clear expired OTP
+                $this->db->update('users', ['otp' => '', 'otpttl' => 0], 'id = :id', ['id' => $usr['id']]);
+                header('Location: ?o=Auth&m=login');
+                exit;
+            }
+
+            // Store in session for form submission
+            $_SESSION['resetpw'] = [
+                'id' => $usr['id'],
+                'login' => $usr['login'],
+            ];
+
+            return ['action' => 'resetpw', 'login' => $usr['login']];
         }
 
-        $usr = $this->dbh->read('users', 'id,login,otpttl', 'otp = :otp', ['otp' => $otp], QueryType::One);
-
-        if (!$usr) {
-            Util::log('Invalid or expired reset link');
-            Util::redirect('?o=Auth');
+        // Handle form submission
+        if (!isset($_SESSION['resetpw'])) {
+            Util::log('Session expired. Please request a new reset link.');
+            header('Location: ?o=Auth&m=forgotpw');
+            exit;
         }
-
-        if ((int)$usr['otpttl'] + 3600 < time()) {
-            Util::log('Reset link has expired');
-            Util::redirect('?o=Auth');
-        }
-
-        $_SESSION['resetpw'] = ['id' => $usr['id'], 'login' => $usr['login']];
-        Util::redirect('?o=Auth&m=update');
-    }
-
-    // Update password form
-    #[\Override] public function update(): array {
-        $fromReset = isset($_SESSION['resetpw']);
-        $fromUser = Util::is_usr();
-
-        if (!$fromReset && !$fromUser) {
-            Util::log('Please login first');
-            Util::redirect('?o=Auth');
-        }
-
-        $id = $fromReset ? $_SESSION['resetpw']['id'] : $_SESSION['usr']['id'];
-        $login = $fromReset ? $_SESSION['resetpw']['login'] : $_SESSION['usr']['login'];
 
         if (!Util::is_post()) {
-            return ['action' => 'update', 'login' => $login];
+            return ['action' => 'resetpw', 'login' => $_SESSION['resetpw']['login']];
         }
 
-        $p1 = $_POST['passwd1'] ?? '';
-        $p2 = $_POST['passwd2'] ?? '';
+        $id = (int)$_SESSION['resetpw']['id'];
+        $p1 = Util::decpw($this->f['passwd1']);
+        $p2 = Util::decpw($this->f['passwd2']);
 
-        if (strlen($p1) < 8) {
-            Util::log('Password must be at least 8 characters');
-            return ['action' => 'update', 'login' => $login];
+        if (!Util::chkpw($p1, $p2)) {
+            return ['action' => 'resetpw', 'login' => $_SESSION['resetpw']['login']];
         }
 
-        if ($p1 !== $p2) {
-            Util::log('Passwords do not match');
-            return ['action' => 'update', 'login' => $login];
+        // Verify OTP hasn't expired during form fill
+        $usr = $this->db->read('users', 'otpttl', 'id = :id', ['id' => $id], QueryType::One);
+
+        if (!$usr || !Util::chkOtp((int)$usr['otpttl'])) {
+            unset($_SESSION['resetpw']);
+            Util::log('Reset link expired. Please request a new one.');
+            header('Location: ?o=Auth&m=forgotpw');
+            exit;
         }
 
-        $this->dbh->update('users', [
+        // Update password and clear OTP
+        $this->db->update('users', [
             'webpw' => password_hash($p1, PASSWORD_DEFAULT),
-            'otp' => '', 'otpttl' => 0, 'updated' => date('Y-m-d H:i:s')
+            'otp' => '',
+            'otpttl' => 0,
+            'updated' => date('Y-m-d H:i:s')
         ], 'id = :id', ['id' => $id]);
 
-        if ($fromReset) {
-            unset($_SESSION['resetpw']);
-            Util::log('Password updated. Please login.', 'success');
-            Util::redirect('?o=Auth');
-        }
-
-        Util::log('Password updated', 'success');
-        Util::redirect('?o=Home');
+        unset($_SESSION['resetpw']);
+        Util::log('Password reset successfully. Please login.', 'success');
+        header('Location: ?o=Auth&m=login');
+        exit;
     }
 
-    // Logout
-    #[\Override] public function delete(): array {
+    // === Change Password (logged-in user) ===
+
+    public function changepw(): array
+    {
+        Util::elog(__METHOD__);
+
         if (!Util::is_usr()) {
-            Util::redirect('?o=Auth');
+            header('Location: ?o=Auth&m=login');
+            exit;
         }
 
+        $id = (int)$_SESSION['usr']['id'];
         $login = $_SESSION['usr']['login'];
-        $id = $_SESSION['usr']['id'];
 
-        // Clear remember cookie
-        if (isset($_COOKIE['remember'])) {
-            $this->dbh->update('users', ['cookie' => ''], 'id = :id', ['id' => $id]);
-            Util::set_cookie('remember', '', -3600);
+        if (!Util::is_post()) {
+            return ['action' => 'changepw', 'login' => $login];
         }
 
-        unset($_SESSION['usr']);
-        session_regenerate_id(true);
+        // Verify current password
+        $currentPw = Util::decpw($this->f['webpw']);
+        $usr = $this->db->read('users', 'webpw', 'id = :id', ['id' => $id], QueryType::One);
 
-        Util::log('Logged out', 'success');
-        Util::redirect('?o=Auth');
+        if (!$usr || !password_verify($currentPw, $usr['webpw'])) {
+            Util::log('Current password is incorrect');
+            return ['action' => 'changepw', 'login' => $login];
+        }
+
+        $p1 = Util::decpw($this->f['passwd1']);
+        $p2 = Util::decpw($this->f['passwd2']);
+
+        if (!Util::chkpw($p1, $p2)) {
+            return ['action' => 'changepw', 'login' => $login];
+        }
+
+        $this->db->update('users', [
+            'webpw' => password_hash($p1, PASSWORD_DEFAULT),
+            'updated' => date('Y-m-d H:i:s')
+        ], 'id = :id', ['id' => $id]);
+
+        Util::log('Password changed successfully', 'success');
+        header('Location: ?o=Auth&m=profile');
+        exit;
     }
 
-    // Check remember cookie on init
-    public function checkRemember(): void {
-        if (Util::is_usr() || !isset($_COOKIE['remember'])) {
-            return;
+    // === User Profile ===
+
+    public function profile(): array
+    {
+        Util::elog(__METHOD__);
+
+        if (!Util::is_usr()) {
+            header('Location: ?o=Auth&m=login');
+            exit;
         }
 
-        $cookie = $_COOKIE['remember'];
-        $usr = $this->dbh->read('users', '*', 'cookie = :cookie AND cookie != ""', ['cookie' => $cookie], QueryType::One);
+        $id = (int)$_SESSION['usr']['id'];
 
-        if ($usr && (int)$usr['acl'] !== 9) {
-            $_SESSION['usr'] = [
-                'id' => $usr['id'], 'login' => $usr['login'], 'fname' => $usr['fname'],
-                'lname' => $usr['lname'], 'acl' => $usr['acl'], 'grp' => $usr['grp']
+        if (Util::is_post()) {
+            $data = [
+                'fname' => trim($this->f['fname']),
+                'lname' => trim($this->f['lname']),
+                'altemail' => trim($this->f['altemail']),
+                'updated' => date('Y-m-d H:i:s')
             ];
+
+            $this->db->update('users', $data, 'id = :id', ['id' => $id]);
+
+            // Update session
+            $_SESSION['usr']['fname'] = $data['fname'];
+            $_SESSION['usr']['lname'] = $data['lname'];
+
+            Util::log('Profile updated', 'success');
+            header('Location: ?o=Auth&m=profile');
+            exit;
         }
+
+        return $this->db->read('users', '*', 'id = :id', ['id' => $id], QueryType::One) ?: [];
     }
 }

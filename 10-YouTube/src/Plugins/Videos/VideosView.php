@@ -3,7 +3,7 @@
 
 namespace SPE\YouTube\Plugins\Videos;
 
-use SPE\YouTube\Core\{Ctx, Theme};
+use SPE\YouTube\Core\{ Theme};
 use SPE\YouTube\Services\{Privacy, YouTubeService};
 
 /**

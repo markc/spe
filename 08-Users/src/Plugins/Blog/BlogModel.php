@@ -3,65 +3,84 @@
 
 namespace SPE\Users\Plugins\Blog;
 
-use SPE\App\{Db, QueryType};
-use SPE\Users\Core\{Ctx, Plugin};
+use SPE\Users\Core\Ctx;
+use SPE\App\{QueryType, Util};
 
-final class BlogModel extends Plugin {
-    private const int PER_PAGE = 6;
-    private ?Db $dbh = null;
-    private array $in = ['id' => 0, 'title' => '', 'content' => '', 'author' => '', 'created' => null, 'updated' => null];
+final class BlogModel {
+    private array $f = ['i' => 0, 'title' => '', 'slug' => '', 'content' => '', 'type' => 'post', 'icon' => ''];
 
-    public function __construct(protected Ctx $ctx) {
-        parent::__construct($ctx);
-        foreach ($this->in as $k => &$v) $v = $_REQUEST[$k] ?? $v;
-        $this->dbh ??= new Db('blog');
+    public function __construct(private Ctx $ctx) {
+        foreach ($this->f as $k => &$v) $v = $_REQUEST[$k] ?? $v;
     }
 
-    #[\Override] public function create(): array {
-        if ($_POST) {
-            $this->dbh->create('posts', [
-                'title' => $this->in['title'], 'content' => $this->in['content'], 'author' => 'admin',
-                'created' => date('Y-m-d H:i:s'), 'updated' => date('Y-m-d H:i:s')
+    private function slug(string $t): string {
+        return $t |> strtolower(...) |> (static fn($s) => preg_replace('/[^a-z0-9]+/', '-', $s)) |> (static fn($s) => trim($s, '-'));
+    }
+
+    public function create(): array {
+        if (Util::is_post()) {
+            $content = str_replace("\r\n", "\n", $this->f['content']);
+            $this->ctx->db->create('posts', [
+                'title' => $this->f['title'],
+                'slug' => $this->f['slug'] ?: $this->slug($this->f['title']),
+                'content' => $content,
+                'type' => $this->f['type'],
+                'icon' => $this->f['icon'],
+                'author' => 'admin',
+                'created' => date('Y-m-d H:i:s'),
+                'updated' => date('Y-m-d H:i:s')
             ]);
-            header('Location: ?o=Blog&t=' . $this->ctx->in['t']);
+            Util::log('Post created successfully', 'success');
+            header('Location: ?o=Blog&edit');
             exit;
         }
         return [];
     }
 
-    #[\Override] public function read(): array {
-        return $this->dbh->read('posts', '*', 'id = :id', ['id' => (int)$this->in['id']], QueryType::One) ?: [];
+    public function read(): array {
+        return $this->ctx->db->read('posts', '*', 'id=:id', ['id' => (int)$this->f['i']], QueryType::One);
     }
 
-    #[\Override] public function update(): array {
-        $id = (int)$this->in['id'];
-        if ($_POST) {
-            $this->dbh->update('posts', [
-                'title' => $this->in['title'], 'content' => $this->in['content'], 'updated' => date('Y-m-d H:i:s')
-            ], 'id = :id', ['id' => $id]);
-            header("Location: ?o=Blog&m=read&id=$id&t=" . $this->ctx->in['t']);
+    public function update(): array {
+        $id = (int)$this->f['i'];
+        if (Util::is_post()) {
+            $content = str_replace("\r\n", "\n", $this->f['content']);
+            $this->ctx->db->update('posts', [
+                'title' => $this->f['title'],
+                'slug' => $this->f['slug'] ?: $this->slug($this->f['title']),
+                'content' => $content,
+                'type' => $this->f['type'],
+                'icon' => $this->f['icon'],
+                'updated' => date('Y-m-d H:i:s')
+            ], 'id=:id', ['id' => $id]);
+            Util::log('Post updated successfully', 'success');
+            header('Location: ?o=Blog&edit');
             exit;
         }
-        return $this->dbh->read('posts', '*', 'id = :id', ['id' => $id], QueryType::One) ?: [];
+        return $this->ctx->db->read('posts', '*', 'id=:id', ['id' => $id], QueryType::One);
     }
 
-    #[\Override] public function delete(): array {
-        $this->dbh->delete('posts', 'id = :id', ['id' => (int)$this->in['id']]);
-        header('Location: ?o=Blog&t=' . $this->ctx->in['t']);
+    public function delete(): array {
+        $this->ctx->db->delete('posts', 'id=:id', ['id' => (int)$this->f['i']]);
+        Util::log('Post deleted', 'success');
+        header('Location: ?o=Blog&edit');
         exit;
     }
 
-    #[\Override] public function list(): array {
-        $page = filter_var($_REQUEST['page'] ?? 1, FILTER_VALIDATE_INT) ?: 1;
-        $pp = filter_var($_REQUEST['perpage'] ?? self::PER_PAGE, FILTER_VALIDATE_INT) ?: self::PER_PAGE;
+    public function list(): array {
+        $pg = (int)($_REQUEST['page'] ?? 1) ?: 1;
+        $pp = $this->ctx->perp;
         $q = trim($_GET['q'] ?? '');
-
-        [$where, $params] = $q ? ['(title LIKE :s OR content LIKE :s)', ['s' => "%$q%"]] : ['1=1', []];
-        $total = $this->dbh->read('posts', 'COUNT(*)', $where, $params, QueryType::Col);
-
+        $ed = isset($_GET['edit']);
+        $w = array_filter([$ed ? '' : "type='post'", $q ? "(title LIKE :s OR content LIKE :s)" : '']);
+        $where = $w ? implode(' AND ', $w) : '1=1';
+        $p = $q ? ['s' => "%$q%"] : [];
+        $total = $this->ctx->db->read('posts', 'COUNT(*)', $where, $p, QueryType::Col);
         return [
-            'items' => $this->dbh->read('posts', '*', "$where ORDER BY updated DESC LIMIT :l OFFSET :o", [...$params, 'l' => $pp, 'o' => ($page - 1) * $pp]),
-            'pagination' => ['page' => $page, 'perPage' => $pp, 'total' => $total, 'pages' => ceil($total / $pp)]
+            'edit' => $ed,
+            'items' => $this->ctx->db->read('posts', '*', "$where ORDER BY updated DESC LIMIT :l OFFSET :o",
+                [...$p, 'l' => $pp, 'o' => ($pg - 1) * $pp]),
+            'pagination' => ['page' => $pg, 'perPage' => $pp, 'total' => $total, 'pages' => (int)ceil($total / $pp)]
         ];
     }
 }

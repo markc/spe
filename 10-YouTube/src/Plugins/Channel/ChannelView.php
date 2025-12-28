@@ -3,7 +3,7 @@
 
 namespace SPE\YouTube\Plugins\Channel;
 
-use SPE\YouTube\Core\{Ctx, Theme};
+use SPE\YouTube\Core\{ Theme};
 
 /**
  * Channel view - Channel statistics UI

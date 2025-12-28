@@ -4,7 +4,7 @@
 namespace SPE\Blog\Plugins\Pages;
 
 use SPE\App\Util;
-use SPE\Blog\Core\{Ctx, Theme};
+use SPE\Blog\Core\{ Theme};
 
 final class PagesView extends Theme {
 

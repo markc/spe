@@ -9,12 +9,19 @@ final class Env
 
     public static function load(string $chapter = ''): void
     {
+        // Resolve relative paths (e.g., "07-PDO/public/.." → "07-PDO")
+        $chapter = $chapter ? realpath($chapter) ?: $chapter : '';
         $root = $chapter ? dirname($chapter) : dirname(__DIR__, 2);
+
+        // Store chapter name for database prefixing (e.g., "07-PDO" from path)
+        if ($chapter) {
+            self::$v['_CHAPTER'] = basename($chapter);
+        }
 
         // Cascade: global -> global.local -> chapter -> chapter.local
         [$root . '/.env', $root . '/.env.local']
-            |> (fn($f) => $chapter ? [...$f, "$chapter/.env", "$chapter/.env.local"] : $f)
-            |> (fn($files) => array_map(self::parse(...), array_filter($files, 'file_exists')));
+            |> (static fn($f) => $chapter ? [...$f, "$chapter/.env", "$chapter/.env.local"] : $f)
+            |> (static fn($files) => array_map(self::parse(...), array_filter($files, 'file_exists')));
     }
 
     public static function get(string $k, string $d = ''): string
@@ -36,10 +43,10 @@ final class Env
     private static function parse(string $path): void
     {
         file_get_contents($path)
-            |> (fn($s) => explode("\n", $s))
-            |> (fn($lines) => array_filter($lines, fn($l) =>
+            |> (static fn($s) => explode("\n", $s))
+            |> (static fn($lines) => array_filter($lines, static fn($l) =>
                 ($l = trim($l)) && $l[0] !== '#' && str_contains($l, '=')))
-            |> (fn($lines) => array_map(function($l) {
+            |> (static fn($lines) => array_map(static function($l) {
                 [$k, $v] = explode('=', $l, 2) + [1 => ''];
                 self::$v[trim($k)] = trim($v, " \t\n\r\0\x0B\"'");
             }, $lines));

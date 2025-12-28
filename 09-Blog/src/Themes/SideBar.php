@@ -3,97 +3,72 @@
 
 namespace SPE\Blog\Themes;
 
-use SPE\App\Util;
-use SPE\Blog\Core\{Ctx, Theme};
+use SPE\Blog\Core\Theme;
 
 final class SideBar extends Theme {
+    #[\Override] public function render(): string {
+        $path = '/' . trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+        $t = $this->ctx->in['t'];
 
-    public function html(): string {
-        extract($this->ctx->out);
-        $sidebarNav = $this->buildSidebarNav();
+        // Navigation links (supports both clean URLs and query strings)
+        $n1 = $this->ctx->nav
+            |> (fn($n) => array_map(fn($p) => sprintf(
+                '<a href="%s"%s>%s</a>',
+                $p[1],
+                $this->isActiveNav($p[1], $path) ? ' class="active"' : '',
+                $p[0]
+            ), $n))
+            |> (static fn($a) => implode('', $a));
+
+        // Theme links
+        $n2 = $this->ctx->themes
+            |> (static fn($n) => array_map(static fn($p) => sprintf(
+                '<a href="?t=%s"%s>%s</a>',
+                $p[1], $t === $p[1] ? ' class="active"' : '', $p[0]
+            ), $n))
+            |> (static fn($a) => implode('', $a));
+
         $auth = $this->authNav();
-        $toast = $this->toast();
-        return <<<HTML
-        <!DOCTYPE html><html lang="en"><head>
-            <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-            <title>$doc [SideBar]</title><link rel="stylesheet" href="/spe.css">
-        </head><body>
-            $toast
-            <nav class="topnav"><button class="menu-toggle">☰</button><a class="brand" href="../">« $head</a>
-                <span style="margin-left:auto">$auth</span>
-                <button class="theme-toggle" id="theme-icon">🌙</button></nav>
-            <div class="sidebar-layout">
-                <aside class="sidebar">
-                    $sidebarNav
-                </aside>
-                <div class="sidebar-main"><main>$main</main>
-                    <footer class="text-center mt-3"><small>$foot</small></footer>
-                </div>
-            </div>
-        <script src="/spe.js"></script></body></html>
-        HTML;
+        $body = <<<HTML
+<nav class="topnav">
+    <button class="menu-toggle">☰</button>
+    <h1><a class="brand" href="/">🐘 Blog PHP Example</a></h1>
+    <span class="topnav-links">$auth</span>
+    <button class="theme-toggle" id="theme-icon">🌙</button>
+</nav>
+<div class="sidebar-layout">
+    <aside class="sidebar">
+        <div class="sidebar-group">
+            <div class="sidebar-group-title">Pages</div>
+            <nav>$n1</nav>
+        </div>
+        <div class="sidebar-group">
+            <div class="sidebar-group-title">Themes</div>
+            <nav>$n2</nav>
+        </div>
+    </aside>
+    <div class="sidebar-main">
+        <main class="mt-2">{$this->out['main']}</main>
+        <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
+    </div>
+</div>
+HTML;
+        return $this->html('SideBar', $body);
     }
 
-    private function buildSidebarNav(): string {
-        $html = '';
-        ['o' => $o, 't' => $t] = $this->ctx->in;
-
-        // Pages section (from database)
-        $pages = $this->ctx->navPages;
-        if (!empty($pages)) {
-            $links = array_map(fn($n) => sprintf(
-                '<a href="%s"%s>%s</a>',
-                str_starts_with($n[1], '?') ? $n[1] : "?o={$n[1]}",
-                $n[1] === $o ? ' class="active"' : '',
-                $n[0]
-            ), $pages);
-            $html .= '<div class="sidebar-group"><div class="sidebar-group-title">Pages</div><nav>' . implode('', $links) . '</nav></div>';
+    private function isActiveNav(string $href, string $path): bool
+    {
+        // Clean URL match
+        if (str_starts_with($href, '/')) {
+            return $href === $path || ($href === '/' && $path === '/');
         }
-
-        // Admin section (for logged-in users)
-        if (Util::is_usr()) {
-            $adminItems = [
-                ['📝 Posts', 'Posts'],
-                ['📄 Pages', 'Pages'],
-                ['🏷️ Categories', 'Categories'],
-            ];
-            if (Util::is_adm()) {
-                $adminItems[] = ['👥 Users', 'Users'];
-            }
-            $adminItems[] = ['📚 Docs', 'Docs'];
-            $links = array_map(fn($n) => sprintf('<a href="?o=%s"%s>%s</a>', $n[1], $n[1] === $o ? ' class="active"' : '', $n[0]), $adminItems);
-            $html .= '<div class="sidebar-group"><div class="sidebar-group-title">Admin</div><nav>' . implode('', $links) . '</nav></div>';
+        // Query string match
+        if (str_starts_with($href, '?o=')) {
+            $o = substr($href, 3);
+            $pos = strpos($o, '&');
+            if ($pos !== false) $o = substr($o, 0, $pos);
+            return str_starts_with($this->ctx->in['o'], $o);
         }
-
-        // Grouped pages by category (from database)
-        $groups = $this->ctx->navGroups;
-        foreach ($groups as $slug => $group) {
-            if ($slug === 'main' || !is_array($group) || empty($group['items'])) continue;
-
-            $groupName = htmlspecialchars($group['name']);
-            $links = array_map(fn($n) => sprintf(
-                '<a href="%s"%s>%s</a>',
-                str_starts_with($n[1], '?') ? $n[1] : "?o={$n[1]}",
-                $n[1] === $o ? ' class="active"' : '',
-                $n[0]
-            ), $group['items']);
-            $html .= "<div class=\"sidebar-group\"><div class=\"sidebar-group-title\">$groupName</div><nav>" . implode('', $links) . '</nav></div>';
-        }
-
-        // Themes section (always visible) - preserves current URL params
-        $themes = $this->ctx->nav2;
-        if (!empty($themes)) {
-            $links = $themes
-                |> (fn($items) => array_map(fn($n) => sprintf(
-                    '<a href="%s"%s>%s</a>',
-                    $_GET |> (fn($p) => [...$p, 't' => $n[1]]) |> http_build_query(...) |> (fn($q) => "?$q"),
-                    $n[1] === $t ? ' class="active"' : '',
-                    $n[0]
-                ), $items))
-                |> (fn($l) => implode('', $l));
-            $html .= '<div class="sidebar-group"><div class="sidebar-group-title">Themes</div><nav>' . $links . '</nav></div>';
-        }
-
-        return $html;
+        return false;
     }
 }

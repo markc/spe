@@ -3,7 +3,7 @@
 
 namespace SPE\Blog\Plugins\Contact;
 
-use SPE\Blog\Core\{Ctx, Theme};
+use SPE\Blog\Core\{ Theme};
 
 final class ContactView extends Theme {
 

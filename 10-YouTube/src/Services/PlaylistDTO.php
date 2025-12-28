@@ -50,6 +50,6 @@ readonly class PlaylistDTO
     {
         return $this->publishedAt
             |> strtotime(...)
-            |> (fn($ts) => date('M j, Y', $ts));
+            |> (static fn($ts) => date('M j, Y', $ts));
     }
 }

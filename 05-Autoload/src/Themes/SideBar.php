@@ -9,17 +9,17 @@ final class SideBar extends Theme {
     #[\Override] public function render(): string {
         ['o' => $o, 't' => $t] = $this->ctx->in;
         $n1 = $this->ctx->nav
-            |> (fn($n) => array_map(fn($p) => sprintf(
+            |> (static fn($n) => array_map(static fn($p) => sprintf(
                 '<a href="?o=%s&t=%s"%s>%s</a>',
                 $p[1], $t, $o === $p[1] ? ' class="active"' : '', $p[0]
             ), $n))
-            |> (fn($a) => implode('', $a));
+            |> (static fn($a) => implode('', $a));
         $n2 = $this->ctx->themes
-            |> (fn($n) => array_map(fn($p) => sprintf(
+            |> (static fn($n) => array_map(static fn($p) => sprintf(
                 '<a href="?o=%s&t=%s"%s>%s</a>',
                 $o, $p[1], $t === $p[1] ? ' class="active"' : '', $p[0]
             ), $n))
-            |> (fn($a) => implode('', $a));
+            |> (static fn($a) => implode('', $a));
         $body = <<<HTML
 <nav class="topnav">
     <button class="menu-toggle">☰</button>

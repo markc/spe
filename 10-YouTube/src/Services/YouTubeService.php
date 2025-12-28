@@ -77,7 +77,7 @@ final class YouTubeService
 
         $this->tokenPath
             |> file_get_contents(...)
-            |> (fn($json) => json_decode($json, true))
+            |> (static fn($json) => json_decode($json, true))
             |> $this->client->setAccessToken(...);
 
         if ($this->client->isAccessTokenExpired()) {
@@ -123,8 +123,8 @@ final class YouTubeService
         $token = $this->client->getAccessToken();
         if ($token) {
             $this->tokenPath
-                |> (fn($path) => file_put_contents($path, json_encode($token, JSON_PRETTY_PRINT)));
-            chmod($this->tokenPath, 0600);
+                |> (static fn($path) => file_put_contents($path, json_encode($token, JSON_PRETTY_PRINT)));
+            chmod($this->tokenPath, 0o600);
         }
     }
 
@@ -157,7 +157,7 @@ final class YouTubeService
         }
 
         return $items[0]
-            |> (fn($ch) => [
+            |> (static fn($ch) => [
                 'id' => $ch->getId(),
                 'snippet' => $ch->getSnippet(),
                 'statistics' => $ch->getStatistics(),

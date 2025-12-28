@@ -38,8 +38,8 @@ final class DashboardModel extends Plugin
             'stats' => [
                 // Use actual count (API stats can be delayed by hours/days)
                 'totalVideos' => count($videos),
-                'totalViews' => $channel?->viewCount ?? 0,
-                'subscribers' => $channel?->subscriberCount ?? 0,
+                'totalViews' => $channel->viewCount ?? 0,
+                'subscribers' => $channel->subscriberCount ?? 0,
                 'playlistCount' => count($playlists),
             ],
         ];

@@ -3,7 +3,7 @@
 
 namespace SPE\YouTube\Themes;
 
-use SPE\YouTube\Core\{Ctx, Theme};
+use SPE\YouTube\Core\{ Theme};
 
 /**
  * SideBar theme for YouTube Manager - vertical sidebar navigation
@@ -50,13 +50,13 @@ final class SideBar extends Theme
         if (!empty($pages)) {
             $current = $this->ctx->in['o'] ?? '';
             $links = $pages
-                |> (fn($items) => array_map(fn($n) => sprintf(
+                |> (static fn($items) => array_map(static fn($n) => sprintf(
                     '<a href="?o=%s"%s>%s</a>',
                     $n[1],
                     $n[1] === $current ? ' class="active"' : '',
                     $n[0]
                 ), $items))
-                |> (fn($l) => implode('', $l));
+                |> (static fn($l) => implode('', $l));
             $html .= '<div class="sidebar-group"><div class="sidebar-group-title">Navigation</div><nav>' . $links . '</nav></div>';
         }
 
@@ -65,13 +65,13 @@ final class SideBar extends Theme
         $currentTheme = $this->ctx->in['t'] ?? '';
         if (!empty($themes)) {
             $links = $themes
-                |> (fn($items) => array_map(fn($n) => sprintf(
+                |> (static fn($items) => array_map(static fn($n) => sprintf(
                     '<a href="%s"%s>%s</a>',
-                    $_GET |> (fn($p) => [...$p, 't' => $n[1]]) |> http_build_query(...) |> (fn($q) => "?$q"),
+                    $_GET |> (static fn($p) => [...$p, 't' => $n[1]]) |> http_build_query(...) |> (static fn($q) => "?$q"),
                     $n[1] === $currentTheme ? ' class="active"' : '',
                     $n[0]
                 ), $items))
-                |> (fn($l) => implode('', $l));
+                |> (static fn($l) => implode('', $l));
             $html .= '<div class="sidebar-group"><div class="sidebar-group-title">Themes</div><nav>' . $links . '</nav></div>';
         }
 

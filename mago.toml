@@ -1,0 +1,16 @@
+php-version = "8.5"
+
+[source]
+paths = [
+    "app/lib",
+    "01-Simple/src",
+    "02-Styled/src",
+    "03-Plugins/src",
+    "04-Themes/src",
+    "05-Autoload/src",
+    "06-Session/src",
+    "07-PDO/src",
+    "08-Users/src",
+    "09-Blog/src",
+    "10-YouTube/src",
+]

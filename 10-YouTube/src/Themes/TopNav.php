@@ -3,7 +3,7 @@
 
 namespace SPE\YouTube\Themes;
 
-use SPE\YouTube\Core\{Ctx, Theme};
+use SPE\YouTube\Core\{ Theme};
 
 /**
  * TopNav theme for YouTube Manager - horizontal navigation bar

@@ -9,10 +9,10 @@ final class Util {
         if ($d < 10) return 'just now';
         $units = [['hour', 3600], ['min', 60], ['sec', 1]];
         foreach ($units as [$name, $secs]) {
-            if ($d >= $secs) {
-                $amt = (int)($d / $secs);
+            if ($d < $secs) { continue; }
+
+$amt = (int)($d / $secs);
                 return "$amt $name" . ($amt > 1 ? 's' : '') . ' ago';
-            }
         }
         return 'just now';
     }

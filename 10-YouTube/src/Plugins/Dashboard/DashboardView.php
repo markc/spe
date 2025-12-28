@@ -3,8 +3,8 @@
 
 namespace SPE\YouTube\Plugins\Dashboard;
 
-use SPE\YouTube\Core\{Ctx, Theme};
-use SPE\YouTube\Services\YouTubeService;
+use SPE\YouTube\Core\{ Theme};
+
 
 /**
  * Dashboard view - Channel overview UI

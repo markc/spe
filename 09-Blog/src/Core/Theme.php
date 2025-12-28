@@ -3,104 +3,101 @@
 
 namespace SPE\Blog\Core;
 
-class Theme {
-    public function __construct(protected Ctx $ctx) {}
+use SPE\App\Util;
 
-    /** Build flat nav links from items array */
-    protected function nav(array $items, string $param = 'o'): string {
-        return $items |> (fn($a) => array_map(fn($n) => sprintf(
-            '<a href="%s"%s>%s</a>',
-            str_starts_with($n[1], '?') ? $n[1] : "?{$param}={$n[1]}",
-            $this->isActive($n[1], $param) ? ' class="active"' : '',
-            $n[0]
-        ), $a)) |> (fn($l) => implode(' ', $l));
+abstract class Theme
+{
+    public function __construct(protected Ctx $ctx, protected array $out) {}
+
+    abstract public function render(): string;
+
+    protected function nav(): string
+    {
+        $path = '/' . trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+        return $this->ctx->nav
+            |> (fn($n) => array_map(fn($p) => sprintf(
+                '<a href="%s"%s>%s</a>',
+                $p[1],
+                $this->isActive($p[1], $path) ? ' class="active"' : '',
+                $p[0]
+            ), $n))
+            |> (static fn($a) => implode(' ', $a));
     }
 
-    /** Build dropdown menu from items array */
-    protected function dropdown(string $label, array $items, string $param = 'o'): string {
-        if (empty($items)) return '';
-        $links = $items |> (fn($a) => array_map(fn($n) => sprintf(
-            '<a href="%s">%s</a>',
-            str_starts_with($n[1], '?') ? $n[1] : "?{$param}={$n[1]}",
-            $n[0]
-        ), $a)) |> (fn($l) => implode('', $l));
-        return <<<HTML
-        <div class="dropdown">
-            <a class="dropdown-toggle">$label</a>
-            <div class="dropdown-menu">$links</div>
-        </div>
-        HTML;
-    }
-
-    private function isActive(string $href, string $param): bool {
-        if (str_starts_with($href, '?p=')) {
-            $slug = substr($href, 3);
-            return ($_GET['p'] ?? '') === $slug;
+    private function isActive(string $href, string $path): bool
+    {
+        // Clean URL match
+        if (str_starts_with($href, '/')) {
+            return $href === $path || ($href === '/' && $path === '/');
         }
-        return $this->ctx->in[$param] === $href;
-    }
-
-    /** Build pages nav (flat links for core pages) */
-    protected function pagesNav(): string {
-        return $this->nav($this->ctx->navPages);
-    }
-
-    /** Build admin dropdown (content + admin items based on ACL) */
-    protected function adminDropdown(): string {
-        if (!Util::is_usr()) return '';
-
-        // Content management items for all logged-in users
-        $items = [
-            ['📝 Posts', 'Posts'],
-            ['📄 Pages', 'Pages'],
-            ['🏷️ Categories', 'Categories'],
-        ];
-
-        // Add admin-only items
-        if (Util::is_adm()) {
-            $items[] = ['👥 Users', 'Users'];
+        // Query string match
+        if (str_starts_with($href, '?o=')) {
+            $o = substr($href, 3);
+            return str_starts_with($this->ctx->in['o'], $o);
         }
-
-        // Docs at the bottom
-        $items[] = ['📚 Docs', 'Docs'];
-
-        return $this->dropdown('⚙️ Admin', $items);
+        return false;
     }
 
-    /** Build themes dropdown - preserves current URL params */
-    protected function themesDropdown(): string {
-        $items = array_map(fn($n) => [$n[0], $this->themeLink($n[1])], $this->ctx->nav2);
-        return $this->dropdown('🎨 Theme', $items);
+    protected function dropdown(): string
+    {
+        $t = $this->ctx->in['t'];
+        $links = $this->ctx->themes
+            |> (static fn($n) => array_map(static fn($p) => sprintf(
+                '<a href="?t=%s"%s>%s</a>',
+                $p[1], $t === $p[1] ? ' class="active"' : '', $p[0]
+            ), $n))
+            |> (static fn($a) => implode('', $a));
+        return "<div class=\"dropdown\"><span class=\"dropdown-toggle\">🎨 Themes</span><div class=\"dropdown-menu\">$links</div></div>";
     }
 
-    /** Build theme link preserving current URL params */
-    private function themeLink(string $theme): string {
-        return $_GET
-            |> (fn($p) => [...$p, 't' => $theme])
-            |> http_build_query(...)
-            |> (fn($q) => "?$q");
+    protected function flash(): string
+    {
+        $log = Util::log();
+        if (!$log) return '';
+
+        $html = '';
+        foreach ($log as $type => $msg) {
+            $msg = htmlspecialchars($msg);
+            $html .= "<script>showToast('$msg', '$type');</script>";
+        }
+        return $html;
     }
 
-    protected function authNav(): string {
+    protected function authNav(): string
+    {
         if (Util::is_usr()) {
             $usr = $_SESSION['usr'];
             $name = htmlspecialchars($usr['fname'] ?: $usr['login']);
-            return <<<HTML
-            <a href="?o=Profile" title="My Profile">$name</a>
-            <a href="?o=Auth&m=delete" title="Logout">🚪</a>
-            HTML;
+            $role = Util::is_adm() ? ' (admin)' : '';
+            return "<a href=\"?o=Auth&m=profile\">👤 $name$role</a> <a href=\"?o=Auth&m=logout\">Logout</a>";
         }
-        return '<a href="?o=Auth">🔒 Login</a>';
+        return '<a href="?o=Auth&m=login">🔒 Login</a>';
     }
 
-    protected function toast(): string {
-        $log = Util::get_log();
-        if (empty($log)) return '';
-        $type = $log['type'] === 'success' ? 'toast-success' : 'toast-danger';
-        $msg = htmlspecialchars($log['msg']);
+    protected function html(string $theme, string $body): string
+    {
+        $flash = $this->flash();
+        $css = $this->out['css'] ?? '';
+        $js = $this->out['js'] ?? '';
+        $end = $this->out['end'] ?? '';
         return <<<HTML
-        <div class="toast $type" onclick="this.remove()">$msg</div>
-        <script>setTimeout(() => document.querySelector('.toast')?.remove(), 4000)</script>
-        HTML;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{$this->out['doc']} [$theme]</title>
+    <link rel="stylesheet" href="/spe.css">
+$css
+</head>
+<body>
+$body
+<script src="/spe.js"></script>
+$js
+$flash
+$end
+</body>
+</html>
+HTML;
     }
 }

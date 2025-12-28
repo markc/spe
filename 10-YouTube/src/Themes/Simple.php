@@ -3,8 +3,8 @@
 
 namespace SPE\YouTube\Themes;
 
-use SPE\App\Util;
-use SPE\YouTube\Core\{Ctx, Theme};
+
+use SPE\YouTube\Core\{ Theme};
 
 /**
  * Simple theme for YouTube Manager - minimal layout

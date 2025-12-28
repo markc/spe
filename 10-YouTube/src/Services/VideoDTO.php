@@ -66,7 +66,7 @@ readonly class VideoDTO
     {
         return $this->publishedAt
             |> strtotime(...)
-            |> (fn($ts) => date('M j, Y', $ts));
+            |> (static fn($ts) => date('M j, Y', $ts));
     }
 
     public function shortDescription(int $length = 150): string
@@ -74,6 +74,6 @@ readonly class VideoDTO
         return $this->description
             |> strip_tags(...)
             |> trim(...)
-            |> (fn($s) => mb_strlen($s) > $length ? mb_substr($s, 0, $length) . '...' : $s);
+            |> (static fn($s) => mb_strlen($s) > $length ? mb_substr($s, 0, $length) . '...' : $s);
     }
 }

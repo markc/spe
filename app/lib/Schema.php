@@ -18,7 +18,10 @@ final class Schema
             throw new \RuntimeException("Schema not found: $file");
         }
 
-        $pdo = new PDO(self::dsn($db, $type), Env::get('DB_USER'), Env::get('DB_PASS'));
+        $pass = Env::get('DB_PASS', '');
+        $pass = file_exists($pass) ? trim(file_get_contents($pass)) : $pass;
+
+        $pdo = new PDO(self::dsn($db, $type), Env::get('DB_USER'), $pass);
         $pdo->exec(file_get_contents($file));
     }
 
@@ -28,7 +31,8 @@ final class Schema
 
         return match ($type) {
             'sqlite' => file_exists(self::sqlitePath($db)),
-            default => self::mysqlExists($db),
+            'mariadb' => self::mariadbExists($db),
+            default => false,
         };
     }
 
@@ -41,27 +45,41 @@ final class Schema
 
     private static function sqlitePath(string $db): string
     {
-        $dir = Env::get('SQLITE_DIR', __DIR__ . '/../sqlite');
-        return "$dir/$db.db";
+        $dir = Env::get('SQLITE_DIR');
+        if ($dir) {
+            // Resolve relative paths from project root (where composer.json lives)
+            if (!str_starts_with($dir, '/')) {
+                $dir = dirname(__DIR__, 2) . '/' . $dir;
+            }
+        } else {
+            $dir = __DIR__ . '/../sqlite';
+        }
+
+        // Add chapter prefix for isolation (e.g., "07-PDO-blog.db")
+        $chapter = Env::get('_CHAPTER');
+        $name = $chapter ? "{$chapter}-{$db}" : $db;
+
+        return "$dir/$name.db";
     }
 
     private static function dsn(string $db, string $type): string
     {
         return match ($type) {
             'sqlite' => 'sqlite:' . self::sqlitePath($db),
-            default => sprintf(
-                'mysql:host=%s;port=%s;dbname=%s',
-                Env::get('DB_HOST', 'localhost'),
-                Env::get('DB_PORT', '3306'),
-                Env::get("DB_{$db}_NAME", $db)
-            ),
+            'mariadb' => 'mysql:' . (($sock = Env::get('DB_SOCK'))
+                ? "unix_socket=$sock"
+                : 'host=' . Env::get('DB_HOST', 'localhost') . ';port=' . Env::get('DB_PORT', '3306'))
+                . ';dbname=' . Env::get("DB_{$db}_NAME", $db),
+            default => throw new \RuntimeException("Unsupported DB type: $type"),
         };
     }
 
-    private static function mysqlExists(string $db): bool
+    private static function mariadbExists(string $db): bool
     {
         try {
-            new PDO(self::dsn($db, 'mariadb'), Env::get('DB_USER'), Env::get('DB_PASS'));
+            $pass = Env::get('DB_PASS', '');
+            $pass = file_exists($pass) ? trim(file_get_contents($pass)) : $pass;
+            new PDO(self::dsn($db, 'mariadb'), Env::get('DB_USER'), $pass);
             return true;
         } catch (\PDOException) {
             return false;

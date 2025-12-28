@@ -5,10 +5,11 @@ namespace SPE\App;
 
 final class Util
 {
-    // Text processing
+    // === Text Processing ===
+
     public static function enc(string $s): string
     {
-        return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+        return htmlspecialchars(trim($s), ENT_QUOTES, 'UTF-8');
     }
 
     public static function excerpt(string $s, int $len = 200): string
@@ -30,128 +31,368 @@ final class Util
         return nl2br(self::enc($s));
     }
 
-    // Session
+    // === Session ===
+
     public static function ses(string $k, mixed $v = '', mixed $x = null): mixed
     {
         return $_SESSION[$k] = isset($_REQUEST[$k])
-            ? (is_array($_REQUEST[$k]) ? $_REQUEST[$k] : trim($_REQUEST[$k]))
+            ? (is_array($_REQUEST[$k]) ? $_REQUEST[$k] : self::enc($_REQUEST[$k]))
             : ($_SESSION[$k] ?? $x ?? $v);
     }
 
-    // Auth
-    public static function is_usr(): bool { return isset($_SESSION['usr']); }
-    public static function is_adm(): bool { return isset($_SESSION['usr']) && (int)$_SESSION['usr']['acl'] === 0; }
-    public static function is_post(): bool { return $_SERVER['REQUEST_METHOD'] === 'POST'; }
+    // === Authentication ===
 
-    // Security
-    public static function token(int $len = 16): string { return bin2hex(random_bytes($len)); }
-
-    public static function cookie(string $name, string $val, int $exp): void
+    public static function is_usr(int $id = null): bool
     {
-        setcookie($name, $val, ['expires' => time() + $exp, 'path' => '/', 'httponly' => true, 'samesite' => 'Lax']);
+        return is_null($id)
+            ? isset($_SESSION['usr'])
+            : isset($_SESSION['usr']['id']) && (int)$_SESSION['usr']['id'] === $id;
     }
 
-    // Flow control
-    public static function redirect(string $url): never { header("Location: $url"); exit; }
-
-    // Flash messages
-    public static function log(string $msg, string $type = 'danger'): void
+    public static function is_adm(): bool
     {
-        $_SESSION['log'] = ['msg' => $msg, 'type' => $type];
+        return Acl::check(Acl::Admin);
     }
 
-    public static function flash(): array
+    public static function is_acl(int|Acl $acl): bool
     {
-        $log = $_SESSION['log'] ?? [];
-        unset($_SESSION['log']);
-        return $log;
+        $required = $acl instanceof Acl ? $acl : (Acl::tryFrom($acl) ?? Acl::Anonymous);
+        return Acl::check($required);
+    }
+
+    // === Security ===
+
+    public static function token(int $len = 32): string
+    {
+        $token = base64_encode(random_bytes($len));
+        return substr(str_replace(['+', '/', '='], '', $token), 0, $len);
+    }
+
+    public static function csrf(): string
+    {
+        if (!isset($_SESSION['c'])) {
+            $_SESSION['c'] = self::token(32);
+        }
+        return $_SESSION['c'];
+    }
+
+    public static function csrfField(): string
+    {
+        return '<input type="hidden" name="c" value="' . self::csrf() . '">';
+    }
+
+    public static function is_post(): bool
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return false;
+        }
+        if (!isset($_POST['c']) || !isset($_SESSION['c']) || $_POST['c'] !== $_SESSION['c']) {
+            self::log('Invalid form submission');
+            return false;
+        }
+        return true;
+    }
+
+    public static function chkpw(string $pw, string $pw2 = ''): bool
+    {
+        if (strlen($pw) < 12) {
+            self::log('Password must be at least 12 characters');
+            return false;
+        }
+        if (!preg_match('/[0-9]/', $pw)) {
+            self::log('Password must contain at least one number');
+            return false;
+        }
+        if (!preg_match('/[A-Z]/', $pw)) {
+            self::log('Password must contain at least one capital letter');
+            return false;
+        }
+        if (!preg_match('/[a-z]/', $pw)) {
+            self::log('Password must contain at least one lowercase letter');
+            return false;
+        }
+        if ($pw2 && $pw !== $pw2) {
+            self::log('Passwords do not match');
+            return false;
+        }
+        return true;
+    }
+
+    public static function genpw(int $len = 16): string
+    {
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+        $pw = '';
+        for ($i = 0; $i < $len; $i++) {
+            $pw .= $chars[random_int(0, strlen($chars) - 1)];
+        }
+        return $pw;
+    }
+
+    // === OTP (One Time Password) for password reset (from HCP pattern) ===
+
+    private const int OTP_LENGTH = 10;
+    private const int OTP_TTL = 3600;  // 1 hour
+
+    public static function genOtp(): string
+    {
+        return self::token(self::OTP_LENGTH);
+    }
+
+    public static function chkOtp(int $otpttl): bool
+    {
+        if (!$otpttl) {
+            self::log('Invalid reset token');
+            return false;
+        }
+        if (($otpttl + self::OTP_TTL) < time()) {
+            self::log('Your reset token has expired');
+            return false;
+        }
+        return true;
+    }
+
+    public static function mailResetPw(string $email, string $otp, string $from = ''): bool
+    {
+        $scheme = $_SERVER['REQUEST_SCHEME'] ?? 'https';
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $self = str_replace('index.php', '', $_SERVER['PHP_SELF'] ?? '/');
+        $link = "{$scheme}://{$host}{$self}?o=Users&m=resetpw&otp={$otp}";
+
+        $subject = "Password reset for {$host}";
+        $body = <<<MAIL
+Here is your one-time password reset link, valid for 1 hour.
+
+Click below to reset your password:
+
+{$link}
+
+If you did not request this, please ignore this message.
+MAIL;
+
+        $headers = $from ? "From: {$from}" : '';
+        return mail($email, $subject, $body, $headers);
+    }
+
+    // Decode HTML entities in password (handles special chars from forms)
+    public static function decpw(string $pw): string
+    {
+        return html_entity_decode($pw, ENT_QUOTES, 'UTF-8');
+    }
+
+    // === Cookies ===
+
+    public static function getCookie(string $name, string $default = ''): string
+    {
+        return $_COOKIE[$name] ?? $default;
+    }
+
+    public static function setCookie(string $name, string $val, int $exp = 604800): bool
+    {
+        return setcookie($name, $val, [
+            'expires' => time() + $exp,
+            'path' => '/',
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
+    }
+
+    public static function delCookie(string $name): bool
+    {
+        return self::setCookie($name, '', -3600);
+    }
+
+    // === Flow Control ===
+
+    public static function redirect(string $url, int $delay = 0, string $msg = ''): never
+    {
+        if ($delay > 0) {
+            header("Refresh: $delay; url=$url");
+            echo "<!DOCTYPE html><title>Redirecting...</title>";
+            echo "<h2 style='text-align:center'>Redirecting in $delay seconds...</h2>";
+            if ($msg) echo "<pre style='width:50em;margin:0 auto'>$msg</pre>";
+            exit;
+        }
+        header("Location: $url");
+        exit;
+    }
+
+    // === Flash Messages (accumulating, dual-use) ===
+
+    public static function log(string $msg = '', string $type = 'danger'): array
+    {
+        if ($msg) {
+            // Write mode
+            $_SESSION['log'][$type] = empty($_SESSION['log'][$type])
+                ? $msg
+                : $_SESSION['log'][$type] . '<br>' . $msg;
+        } elseif (!empty($_SESSION['log'])) {
+            // Read mode (no $msg passed) - return and clear
+            $log = $_SESSION['log'];
+            $_SESSION['log'] = [];
+            return $log;
+        }
+        return [];
     }
 
     public static function toast(): string
     {
-        $log = self::flash();
+        $log = self::log();
         if (!$log) return '';
-        $ok = $log['type'] === 'success';
-        $bg = $ok ? '#d4edda' : '#f8d7da';
-        $fg = $ok ? '#155724' : '#721c24';
-        return "<div style=\"margin-bottom:1rem;padding:1rem;border-radius:4px;background:$bg;color:$fg\">" . self::enc($log['msg']) . "</div>";
+
+        $html = '';
+        foreach ($log as $type => $msg) {
+            $ok = $type === 'success';
+            $bg = $ok ? '#d4edda' : '#f8d7da';
+            $fg = $ok ? '#155724' : '#721c24';
+            $html .= "<div style=\"margin-bottom:1rem;padding:1rem;border-radius:4px;background:$bg;color:$fg\">" . $msg . "</div>";
+        }
+        return $html;
     }
 
-    // Time formatting
-    public static function timeAgo(int $ts): string
+    // === Time Formatting ===
+
+    public static function timeAgo(int|string $date): string
     {
-        $d = time() - $ts;
+        $ts = is_numeric($date) ? (int)$date : strtotime($date);
+        $d = abs(time() - $ts);
+
         if ($d < 10) return 'just now';
-        $units = [['year', 31536000], ['month', 2678400], ['week', 604800],
-                  ['day', 86400], ['hour', 3600], ['min', 60], ['sec', 1]];
+
+        $units = [
+            ['year', 31536000], ['month', 2678400], ['week', 604800],
+            ['day', 86400], ['hour', 3600], ['min', 60], ['sec', 1]
+        ];
         $parts = [];
         foreach ($units as [$name, $secs]) {
-            if ($d >= $secs && count($parts) < 2) {
-                $amt = (int)($d / $secs);
+            if (!($d >= $secs && count($parts) < 2)) { continue; }
+
+$amt = (int)($d / $secs);
                 $parts[] = "$amt $name" . ($amt > 1 ? 's' : '');
                 $d %= $secs;
-            }
         }
         return implode(' ', $parts) . ' ago';
     }
 
-    // Markdown parser - GFM subset (headings, bold, italic, strikethrough, links, images, code, blockquotes, lists, hr, tables)
+    // === Number Formatting ===
+
+    public static function numfmt(float $size, int $precision = null): string
+    {
+        if ($size == 0) return '0';
+        if ($size >= 1e12) return round($size / 1e12, $precision ?? 3) . ' TB';
+        if ($size >= 1e9) return round($size / 1e9, $precision ?? 2) . ' GB';
+        if ($size >= 1e6) return round($size / 1e6, $precision ?? 1) . ' MB';
+        if ($size >= 1e3) return round($size / 1e3, $precision ?? 0) . ' KB';
+        return $size . ' B';
+    }
+
+    // === Markdown (delegates to Md class) ===
+
     public static function md(string $s): string
     {
-        $b = []; $L = "\x02"; $R = "\x03";
+        return Md::parse($s);
+    }
 
-        // Protect code blocks
-        $s = preg_replace_callback('/```(\w*)\r?\n(.*?)\r?\n```/s', function($m) use (&$b, $L, $R) {
-            $lang = $m[1] ? " class=\"lang-{$m[1]}\"" : '';
-            $b[] = "{$L}pre{$R}{$L}code{$lang}{$R}" . htmlspecialchars(rtrim($m[2])) . "{$L}/code{$R}{$L}/pre{$R}";
-            return "\x00" . (count($b) - 1) . "\x00";
-        }, $s);
-        $s = preg_replace_callback('/`([^`\n]+)`/', function($m) use (&$b, $L, $R) {
-            $b[] = "{$L}code{$R}" . htmlspecialchars($m[1]) . "{$L}/code{$R}";
-            return "\x00" . (count($b) - 1) . "\x00";
-        }, $s);
+    // === Remember Me (persistent login via cookie) ===
 
-        // GFM Tables
-        $s = preg_replace_callback('/^(\|.+\|)\r?\n(\|[-:\| ]+\|)\r?\n((?:\|.+\|\r?\n?)+)/m', function($m) use ($L, $R) {
-            $hdr = array_map('trim', array_filter(explode('|', $m[1])));
-            $align = array_map(fn($c) => match(true) {
-                str_starts_with($c = trim($c), ':') && str_ends_with($c, ':') => 'center',
-                str_ends_with($c, ':') => 'right', default => 'left'
-            }, array_filter(explode('|', $m[2])));
-            $th = implode('', array_map(fn($h, $i) => "{$L}th style=\"text-align:{$align[$i]}\"{$R}$h{$L}/th{$R}", $hdr, array_keys($hdr)));
-            $rows = array_filter(explode("\n", trim($m[3])));
-            $tb = implode('', array_map(function($r) use ($align, $L, $R) {
-                $cells = array_map('trim', array_filter(explode('|', $r)));
-                return "{$L}tr{$R}" . implode('', array_map(fn($c, $i) =>
-                    "{$L}td style=\"text-align:" . ($align[$i] ?? 'left') . "\"{$R}$c{$L}/td{$R}", $cells, array_keys($cells))) . "{$L}/tr{$R}";
-            }, $rows));
-            return "{$L}table{$R}{$L}thead{$R}{$L}tr{$R}$th{$L}/tr{$R}{$L}/thead{$R}{$L}tbody{$R}$tb{$L}/tbody{$R}{$L}/table{$R}";
-        }, $s);
+    public static function remember(Db $db): void
+    {
+        // Already logged in
+        if (self::is_usr()) return;
 
-        // Block elements
-        $s = preg_replace_callback('/^(#{1,6})\s+(.+)$/m', fn($m) => "{$L}h" . strlen($m[1]) . "{$R}" . trim($m[2]) . "{$L}/h" . strlen($m[1]) . "{$R}", $s);
-        $s = preg_replace('/^[-*_]{3,}\s*$/m', "{$L}hr{$R}", $s);
-        $s = preg_replace('/^>\s*(.+)$/m', "{$L}blockquote{$R}$1{$L}/blockquote{$R}", $s);
+        // Check for remember cookie
+        $cookie = self::getCookie('remember');
+        if (!$cookie) return;
 
-        // Lists
-        $s = preg_replace('/^[-*+]\s+(.+)$/m', "{$L}ul{$R}{$L}li{$R}$1{$L}/li{$R}{$L}/ul{$R}", $s);
-        $s = preg_replace('/^\d+\.\s+(.+)$/m', "{$L}ol{$R}{$L}li{$R}$1{$L}/li{$R}{$L}/ol{$R}", $s);
-        $s = preg_replace(["/{$L}\/ul{$R}\s*{$L}ul{$R}/", "/{$L}\/ol{$R}\s*{$L}ol{$R}/", "/{$L}\/blockquote{$R}\s*{$L}blockquote{$R}/"], ['', '', "\n"], $s);
+        // Look up user by cookie token
+        $usr = $db->read('users', '*', 'cookie = :cookie', ['cookie' => $cookie], QueryType::One);
+        if (!$usr || (int)$usr['acl'] === 9) return;
 
-        // Inline elements
-        $s = preg_replace('/!\[([^\]]*)\]\(([^)\s]+)\)/', "{$L}img src=\"$2\" alt=\"$1\"{$R}", $s);
-        $s = preg_replace('/\[([^\]]+)\]\(([^)]+)\)/', "{$L}a href=\"$2\"{$R}$1{$L}/a{$R}", $s);
-        $s = preg_replace(['/(\*\*|__)(.+?)\1/', '/(\*|_)(.+?)\1/', '/~~(.+?)~~/'],
-            ["{$L}strong{$R}$2{$L}/strong{$R}", "{$L}em{$R}$2{$L}/em{$R}", "{$L}del{$R}$1{$L}/del{$R}"], $s);
+        // Restore session
+        $_SESSION['usr'] = [
+            'id' => $usr['id'],
+            'login' => $usr['login'],
+            'fname' => $usr['fname'],
+            'lname' => $usr['lname'],
+            'acl' => $usr['acl']
+        ];
+    }
 
-        // Finalize
-        $s = htmlspecialchars($s, ENT_NOQUOTES);
-        $s = preg_replace_callback('/\x00(\d+)\x00/', fn($m) => $b[(int)$m[1]], $s);
-        $s = str_replace([$L, $R], ['<', '>'], $s);
+    public static function setRemember(Db $db, int $id): void
+    {
+        $token = self::token(32);
+        $db->update('users', ['cookie' => $token], 'id = :id', ['id' => $id]);
+        self::setCookie('remember', $token, 86400 * 30); // 30 days
+    }
 
-        // Paragraphs
-        return implode("\n", array_map(fn($p) => ($p = trim($p)) === '' ? '' :
-            (preg_match('/^<(?:h[1-6]|ul|ol|blockquote|hr|pre|table)/', $p) ? $p : '<p>' . preg_replace('/\n/', '<br>', $p) . '</p>'),
-            preg_split('/\n{2,}/', trim($s)))) |> trim(...);
+    public static function clearRemember(Db $db, int $id): void
+    {
+        $db->update('users', ['cookie' => ''], 'id = :id', ['id' => $id]);
+        self::delCookie('remember');
+    }
+
+    // === API Authentication ===
+
+    public static function chkapi(string $key): bool
+    {
+        $apiKey = Env::get('API_KEY', '');
+        if (!$apiKey || $key !== $apiKey) {
+            self::log('Invalid API key');
+            return false;
+        }
+        return true;
+    }
+
+    // === Debug Logging ===
+
+    public static function elog(string $msg): void
+    {
+        if (Env::get('DEBUG', '') === 'true') {
+            error_log($msg);
+        }
+    }
+
+    public static function dump(mixed ...$vars): void
+    {
+        if (Env::get('DEBUG', '') === 'true') {
+            foreach ($vars as $var) {
+                error_log(print_r($var, true));
+            }
+        }
+    }
+
+    // === Performance Timing ===
+
+    public static function elapsed(): float
+    {
+        return round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']), 4);
+    }
+
+    public static function perfLog(string $label = ''): void
+    {
+        $time = self::elapsed();
+        $mem = self::numfmt(memory_get_peak_usage(true));
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'cli';
+        self::elog(($label ? "$label " : '') . "{$ip} {$time}s {$mem}");
+    }
+
+    // === Debug Output (for $out['end'] slot) ===
+
+    public static function dbg(mixed ...$vars): string
+    {
+        if (Env::get('DEBUG', '') !== 'true') return '';
+
+        $out = "<pre style='background:#1e1e1e;color:#d4d4d4;padding:1rem;margin:1rem 0;overflow:auto;font-size:12px'>";
+        $out .= "<b>DEBUG</b> " . self::elapsed() . "s | " . self::numfmt(memory_get_peak_usage(true)) . "\n";
+        $out .= str_repeat('─', 60) . "\n";
+
+        foreach ($vars as $i => $var) {
+            $out .= "<b>[$i]</b> " . self::enc(print_r($var, true)) . "\n";
+        }
+
+        $out .= str_repeat('─', 60) . "\n";
+        $out .= "GET: " . self::enc(print_r($_GET, true));
+        $out .= "POST: " . self::enc(print_r($_POST, true));
+        $out .= "SESSION: " . self::enc(print_r($_SESSION ?? [], true));
+        return $out . "</pre>";
     }
 }

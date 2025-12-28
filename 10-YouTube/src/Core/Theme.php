@@ -21,17 +21,17 @@ class Theme {
             str_starts_with($n[1], '?') ? $n[1] : "?{$param}={$n[1]}",
             $this->isActive($n[1], $param) ? ' class="active"' : '',
             $n[0]
-        ), $a)) |> (fn($l) => implode(' ', $l));
+        ), $a)) |> (static fn($l) => implode(' ', $l));
     }
 
     /** Build dropdown menu from items array */
     protected function dropdown(string $label, array $items, string $param = 'o'): string {
         if (empty($items)) return '';
-        $links = $items |> (fn($a) => array_map(fn($n) => sprintf(
+        $links = $items |> (static fn($a) => array_map(static fn($n) => sprintf(
             '<a href="%s">%s</a>',
             str_starts_with($n[1], '?') ? $n[1] : "?{$param}={$n[1]}",
             $n[0]
-        ), $a)) |> (fn($l) => implode('', $l));
+        ), $a)) |> (static fn($l) => implode('', $l));
         return <<<HTML
         <div class="dropdown">
             <a class="dropdown-toggle">$label</a>
@@ -67,9 +67,9 @@ class Theme {
     /** Build theme link preserving current URL params */
     private function themeLink(string $theme): string {
         return $_GET
-            |> (fn($p) => [...$p, 't' => $theme])
+            |> (static fn($p) => [...$p, 't' => $theme])
             |> http_build_query(...)
-            |> (fn($q) => "?$q");
+            |> (static fn($q) => "?$q");
     }
 
     /** YouTube OAuth auth nav */

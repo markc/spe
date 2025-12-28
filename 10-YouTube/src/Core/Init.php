@@ -34,7 +34,7 @@ final class Init {
         $theme = self::NS . "Themes\\{$t}";
 
         // Return null for empty strings to allow fallback via ??
-        $render = fn(?object $obj, string $method): ?string =>
+        $render = static fn(?object $obj, string $method): ?string =>
             ($obj && method_exists($obj, $method)) ? ($obj->$method() ?: null) : null;
 
         $v1 = class_exists($view) ? new $view($this->ctx) : null;
@@ -74,7 +74,7 @@ final class Init {
         return match ($this->ctx->in['x']) {
             'text' => $this->ctx->out['main']
                 |> strip_tags(...)
-                |> (fn($s) => preg_replace('/^\h*\v+/m', '', $s)),
+                |> (static fn($s) => preg_replace('/^\h*\v+/m', '', $s)),
             'json' => (header('Content-Type: application/json') ?: '')
                 . $this->ctx->out['main'],
             default => $this->ctx->out[$this->ctx->in['x']]

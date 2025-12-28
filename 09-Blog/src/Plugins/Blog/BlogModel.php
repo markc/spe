@@ -35,9 +35,9 @@ final class BlogModel extends Plugin {
 
         // Generate excerpts for posts without one
         foreach ($posts as &$post) {
-            if (empty($post['excerpt'])) {
-                $post['excerpt'] = $this->generateExcerpt($post['content'], 100);
-            }
+            if (!(empty($post['excerpt']))) { continue; }
+
+$post['excerpt'] = $this->generateExcerpt($post['content'], 100);
         }
 
         return [

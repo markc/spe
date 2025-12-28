@@ -3,7 +3,7 @@
 
 namespace SPE\YouTube\Plugins\Auth;
 
-use SPE\YouTube\Core\{Ctx, Theme};
+use SPE\YouTube\Core\{ Theme};
 
 /**
  * Auth view - Google OAuth login UI

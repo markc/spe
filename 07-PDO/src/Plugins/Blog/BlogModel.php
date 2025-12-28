@@ -14,7 +14,7 @@ final class BlogModel {
     }
 
     private function slug(string $t): string {
-        return $t |> strtolower(...) |> (fn($s) => preg_replace('/[^a-z0-9]+/', '-', $s)) |> (fn($s) => trim($s, '-'));
+        return $t |> strtolower(...) |> (static fn($s) => preg_replace('/[^a-z0-9]+/', '-', $s)) |> (static fn($s) => trim($s, '-'));
     }
 
     public function create(): array {

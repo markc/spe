@@ -4,7 +4,7 @@
 namespace SPE\Blog\Plugins\Docs;
 
 use SPE\App\Util;
-use SPE\Blog\Core\{Ctx, Theme};
+use SPE\Blog\Core\{ Theme};
 
 final class DocsView extends Theme {
 
@@ -48,7 +48,7 @@ final class DocsView extends Theme {
         // Categories
         $cats = '';
         if (!empty($a['categories'])) {
-            $cats = implode('', array_map(fn($c) =>
+            $cats = implode('', array_map(static fn($c) =>
                 '<span class="tag">' . htmlspecialchars($c['name']) . '</span>',
                 $a['categories']
             ));

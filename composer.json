@@ -27,5 +27,20 @@
             "SPE\\YouTube\\": "10-YouTube/src"
         }
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests"
+        }
+    },
+    "require-dev": {
+        "pestphp/pest": "*",
+        "carthage-software/mago": "*"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "carthage-software/mago": true
+        }
+    }
 }

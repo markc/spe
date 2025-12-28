@@ -14,10 +14,10 @@ final class Ctx {
         public array $nav = [['🏠 Home', 'Home'], ['📖 About', 'About'], ['✉️ Contact', 'Contact']],
         public array $themes = [['🎨 Simple', 'Simple'], ['🎨 TopNav', 'TopNav'], ['🎨 SideBar', 'SideBar']]
     ) {
-        $this->in = array_map(fn($k, $v) => ($_REQUEST[$k] ?? $v)
+        $this->in = array_map(static fn($k, $v) => ($_REQUEST[$k] ?? $v)
             |> trim(...)
             |> htmlspecialchars(...), array_keys($in), $in)
-            |> (fn($v) => array_combine(array_keys($in), $v));
+            |> (static fn($v) => array_combine(array_keys($in), $v));
         $this->out = $out;
     }
 }

@@ -3,34 +3,48 @@
 
 namespace SPE\Users\Themes;
 
-use SPE\Users\Core\{Ctx, Theme};
+use SPE\Users\Core\Theme;
 
 final class SideBar extends Theme {
-
-    public function html(): string {
-        extract($this->ctx->out);
+    #[\Override] public function render(): string {
         ['o' => $o, 't' => $t] = $this->ctx->in;
-        $nav1 = $this->ctx->nav1 |> (fn($a) => array_map(fn($n) => sprintf(
-            '<a href="?o=%s"%s>%s</a>', $n[1], $n[1] === $o ? ' class="active"' : '', $n[0]), $a)) |> (fn($l) => implode('', $l));
-        $nav2 = $this->ctx->nav2 |> (fn($a) => array_map(fn($n) => sprintf(
-            '<a href="?t=%s"%s>%s</a>', $n[1], $n[1] === $t ? ' class="active"' : '', $n[0]), $a)) |> (fn($l) => implode('', $l));
-        return <<<HTML
-        <!DOCTYPE html><html lang="en"><head>
-            <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-            <title>$doc [SideBar]</title><link rel="stylesheet" href="/spe.css">
-        </head><body>
-            <nav class="topnav"><button class="menu-toggle">☰</button><a class="brand" href="../">« $head</a>
-                <button class="theme-toggle" id="theme-icon">🌙</button></nav>
-            <div class="sidebar-layout">
-                <aside class="sidebar">
-                    <div class="sidebar-group"><div class="sidebar-group-title">Pages</div><nav>$nav1</nav></div>
-                    <div class="sidebar-group"><div class="sidebar-group-title">Themes</div><nav>$nav2</nav></div>
-                </aside>
-                <div class="sidebar-main"><main>$main</main>
-                    <footer class="text-center mt-3"><small>$foot</small></footer>
-                </div>
-            </div>
-        <script src="/spe.js"></script></body></html>
-        HTML;
+        $n1 = $this->ctx->nav
+            |> (static fn($n) => array_map(static fn($p) => sprintf(
+                '<a href="?o=%s"%s>%s</a>',
+                $p[1], $o === $p[1] ? ' class="active"' : '', $p[0]
+            ), $n))
+            |> (static fn($a) => implode('', $a));
+        $n2 = $this->ctx->themes
+            |> (static fn($n) => array_map(static fn($p) => sprintf(
+                '<a href="?t=%s"%s>%s</a>',
+                $p[1], $t === $p[1] ? ' class="active"' : '', $p[0]
+            ), $n))
+            |> (static fn($a) => implode('', $a));
+        $auth = $this->authNav();
+        $body = <<<HTML
+<nav class="topnav">
+    <button class="menu-toggle">☰</button>
+    <h1><a class="brand" href="/">🐘 Users PHP Example</a></h1>
+    <span class="topnav-links">$auth</span>
+    <button class="theme-toggle" id="theme-icon">🌙</button>
+</nav>
+<div class="sidebar-layout">
+    <aside class="sidebar">
+        <div class="sidebar-group">
+            <div class="sidebar-group-title">Pages</div>
+            <nav>$n1</nav>
+        </div>
+        <div class="sidebar-group">
+            <div class="sidebar-group-title">Themes</div>
+            <nav>$n2</nav>
+        </div>
+    </aside>
+    <div class="sidebar-main">
+        <main class="mt-2">{$this->out['main']}</main>
+        <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
+    </div>
+</div>
+HTML;
+        return $this->html('SideBar', $body);
     }
 }

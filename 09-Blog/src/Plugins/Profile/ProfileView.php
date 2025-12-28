@@ -3,8 +3,8 @@
 
 namespace SPE\Blog\Plugins\Profile;
 
-use SPE\App\Util;
-use SPE\Blog\Core\{Ctx, Theme};
+
+use SPE\Blog\Core\{ Theme};
 
 final class ProfileView extends Theme {
 

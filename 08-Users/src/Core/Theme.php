@@ -3,13 +3,94 @@
 
 namespace SPE\Users\Core;
 
-class Theme {
-    public function __construct(protected Ctx $ctx) {}
+use SPE\App\Util;
 
-    protected function nav(array $items, string $param = 'o'): string {
-        return $items |> (fn($a) => array_map(fn($n) => sprintf(
-            '<a href="?%s=%s"%s>%s</a>', $param, $n[1],
-            $this->ctx->in[$param] === $n[1] ? ' class="active"' : '', $n[0]
-        ), $a)) |> (fn($l) => implode(' ', $l));
+abstract class Theme {
+    public function __construct(protected Ctx $ctx, protected array $out) {}
+
+    abstract public function render(): string;
+
+    protected function nav(): string {
+        $path = '/' . trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+        return $this->ctx->nav
+            |> (fn($n) => array_map(fn($p) => sprintf(
+                '<a href="%s"%s>%s</a>',
+                $p[1],
+                $this->isActive($p[1], $path) ? ' class="active"' : '',
+                $p[0]
+            ), $n))
+            |> (static fn($a) => implode(' ', $a));
+    }
+
+    private function isActive(string $href, string $path): bool {
+        // Clean URL match
+        if (str_starts_with($href, '/')) {
+            return $href === $path || ($href === '/' && $path === '/');
+        }
+        // Query string match
+        if (str_starts_with($href, '?o=')) {
+            $o = substr($href, 3);
+            return $this->ctx->in['o'] === $o;
+        }
+        return false;
+    }
+
+    protected function dropdown(): string {
+        $t = $this->ctx->in['t'];
+        $links = $this->ctx->themes
+            |> (static fn($n) => array_map(static fn($p) => sprintf(
+                '<a href="?t=%s"%s>%s</a>',
+                $p[1], $t === $p[1] ? ' class="active"' : '', $p[0]
+            ), $n))
+            |> (static fn($a) => implode('', $a));
+        return "<div class=\"dropdown\"><span class=\"dropdown-toggle\">🎨 Themes</span><div class=\"dropdown-menu\">$links</div></div>";
+    }
+
+    protected function flash(): string {
+        $log = Util::log();
+        if (!$log) return '';
+
+        $html = '';
+        foreach ($log as $type => $msg) {
+            $msg = htmlspecialchars($msg);
+            $html .= "<script>showToast('$msg', '$type');</script>";
+        }
+        return $html;
+    }
+
+    protected function authNav(): string {
+        if (Util::is_usr()) {
+            $usr = $_SESSION['usr'];
+            $name = htmlspecialchars($usr['fname'] ?: $usr['login']);
+            $role = Util::is_adm() ? ' (admin)' : '';
+            return "<a href=\"?o=Users&m=profile\">👤 $name$role</a> <a href=\"?o=Users&m=logout\">Logout</a>";
+        }
+        return '<a href="?o=Users&m=login">🔒 Login</a>';
+    }
+
+    protected function html(string $theme, string $body): string {
+        $flash = $this->flash();
+        $css = $this->out['css'] ?? '';  // Additional CSS (from HCP pattern)
+        $js = $this->out['js'] ?? '';    // Additional JS (from HCP pattern)
+        $end = $this->out['end'] ?? '';  // End content (from HCP pattern)
+        return <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{$this->out['doc']} [$theme]</title>
+    <link rel="stylesheet" href="/spe.css">
+$css
+</head>
+<body>
+$body
+<script src="/spe.js"></script>
+$js
+$flash
+$end
+</body>
+</html>
+HTML;
     }
 }

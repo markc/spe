@@ -20,14 +20,14 @@ final class Ctx {
         session_status() === PHP_SESSION_NONE && session_start();
 
         // Sticky parameters: URL overrides session, session persists across requests
-        $this->in = array_map(fn($k, $v) => $this->ses($k, $v), array_keys($in), $in)
-            |> (fn($v) => array_combine(array_keys($in), $v));
+        $this->in = array_map($this->ses(...), array_keys($in), $in)
+            |> (static fn($v) => array_combine(array_keys($in), $v));
         $this->out = $out;
 
         // Initialize database and build navigation from pages
         $this->db = new Db('blog');
         $this->nav = array_map(
-            fn($r) => [trim(($r['icon'] ?? '') . ' ' . $r['title']), ucfirst($r['slug'])],
+            static fn($r) => [trim(($r['icon'] ?? '') . ' ' . $r['title']), ucfirst($r['slug'])],
             $this->db->read('posts', 'id,title,slug,icon', "type='page' ORDER BY id", [], QueryType::All)
         );
         $this->nav[] = ['📝 Blog', 'Blog'];

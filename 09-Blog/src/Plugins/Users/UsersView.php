@@ -4,7 +4,7 @@
 namespace SPE\Blog\Plugins\Users;
 
 use SPE\App\Util;
-use SPE\Blog\Core\{Ctx, Theme};
+use SPE\Blog\Core\{ Theme};
 
 final class UsersView extends Theme {
 

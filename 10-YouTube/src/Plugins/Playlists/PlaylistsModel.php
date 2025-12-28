@@ -59,10 +59,10 @@ final class PlaylistsModel extends Plugin
         $playlists = $this->youtube->listPlaylists(50);
         $playlist = null;
         foreach ($playlists as $pl) {
-            if ($pl->id === $id) {
-                $playlist = $pl;
+            if ($pl->id !== $id) { continue; }
+
+$playlist = $pl;
                 break;
-            }
         }
 
         if (!$playlist) {

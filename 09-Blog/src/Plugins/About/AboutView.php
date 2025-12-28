@@ -3,7 +3,7 @@
 
 namespace SPE\Blog\Plugins\About;
 
-use SPE\Blog\Core\{Ctx, Theme};
+use SPE\Blog\Core\{ Theme};
 
 final class AboutView extends Theme {
 

@@ -24,22 +24,22 @@ final readonly class PluginLoader {
     /** Scan Plugins directory for meta.json files */
     private function scanPlugins(): array {
         $files = glob(self::PLUGINS_DIR . '/*/meta.json') ?: [];
-        $metas = array_map(fn(string $path) => PluginMeta::fromFile($path), $files);
-        $enabled = array_filter($metas, fn(?PluginMeta $m) => $m?->enabled ?? false);
+        $metas = array_map(PluginMeta::fromFile(...), $files);
+        $enabled = array_filter($metas, static fn(?PluginMeta $m) => $m->enabled ?? false);
         return $this->keyByName($this->sortByOrder($enabled));
     }
 
     /** Scan Themes directory for *.meta.json files */
     private function scanThemes(): array {
         $files = glob(self::THEMES_DIR . '/*.meta.json') ?: [];
-        $metas = array_map(fn(string $path) => PluginMeta::fromFile($path), $files);
-        $enabled = array_filter($metas, fn(?PluginMeta $m) => $m?->enabled ?? false);
+        $metas = array_map(PluginMeta::fromFile(...), $files);
+        $enabled = array_filter($metas, static fn(?PluginMeta $m) => $m->enabled ?? false);
         return $this->keyByName($this->sortByOrder($enabled));
     }
 
     /** Sort array of PluginMeta by order property */
     private function sortByOrder(array $items): array {
-        usort($items, fn(PluginMeta $a, PluginMeta $b) => $a->order <=> $b->order);
+        usort($items, static fn(PluginMeta $a, PluginMeta $b) => $a->order <=> $b->order);
         return $items;
     }
 
@@ -54,43 +54,43 @@ final readonly class PluginLoader {
 
     /** Get plugins filtered by group */
     public function byGroup(string $group): array {
-        return array_filter($this->plugins, fn(PluginMeta $p) => $p->group === $group);
+        return array_filter($this->plugins, static fn(PluginMeta $p) => $p->group === $group);
     }
 
     /** Get plugins requiring authentication */
     public function authRequired(): array {
-        return array_filter($this->plugins, fn(PluginMeta $p) => $p->auth);
+        return array_filter($this->plugins, static fn(PluginMeta $p) => $p->auth);
     }
 
     /** Get admin-only plugins */
     public function adminOnly(): array {
-        return array_filter($this->plugins, fn(PluginMeta $p) => $p->admin);
+        return array_filter($this->plugins, static fn(PluginMeta $p) => $p->admin);
     }
 
     /** Get public plugins (no auth required, excluding hidden) */
     public function publicPlugins(): array {
-        return array_filter($this->plugins, fn(PluginMeta $p) => !$p->auth && !$p->admin && $p->group !== 'hidden');
+        return array_filter($this->plugins, static fn(PluginMeta $p) => !$p->auth && !$p->admin && $p->group !== 'hidden');
     }
 
     /** Build nav1 array (public plugins) for backwards compatibility */
     public function buildNav1(?string $group = null): array {
         $plugins = $this->publicPlugins();
         if ($group) {
-            $plugins = array_filter($plugins, fn(PluginMeta $p) => $p->group === $group);
+            $plugins = array_filter($plugins, static fn(PluginMeta $p) => $p->group === $group);
         }
-        return array_values(array_map(fn(PluginMeta $p) => $p->toNavItem(), $plugins));
+        return array_values(array_map(static fn(PluginMeta $p) => $p->toNavItem(), $plugins));
     }
 
     /** Build navAdmin array (auth-required plugins) for backwards compatibility */
     public function buildNavAdmin(): array {
         // Include both admin-only and auth-required plugins in admin nav
-        $authPlugins = array_filter($this->plugins, fn(PluginMeta $p) => $p->auth && $p->group === 'admin');
-        return array_values(array_map(fn(PluginMeta $p) => $p->toNavItem(), $authPlugins));
+        $authPlugins = array_filter($this->plugins, static fn(PluginMeta $p) => $p->auth && $p->group === 'admin');
+        return array_values(array_map(static fn(PluginMeta $p) => $p->toNavItem(), $authPlugins));
     }
 
     /** Build nav2 array (themes) for backwards compatibility */
     public function buildNav2(): array {
-        return array_values(array_map(fn(PluginMeta $p) => $p->toNavItem(), $this->themes));
+        return array_values(array_map(static fn(PluginMeta $p) => $p->toNavItem(), $this->themes));
     }
 
     /** Check if a plugin exists and is enabled */
@@ -110,6 +110,6 @@ final readonly class PluginLoader {
 
     /** Get all unique groups */
     public function groups(): array {
-        return array_values(array_unique(array_map(fn(PluginMeta $p) => $p->group, $this->plugins)));
+        return array_values(array_unique(array_map(static fn(PluginMeta $p) => $p->group, $this->plugins)));
     }
 }
