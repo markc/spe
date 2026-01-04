@@ -1,0 +1,27 @@
+{
+    "name": "spe/hcp",
+    "description": "Lightweight Hosting Control Panel based on SPE Framework",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mark Constable",
+            "email": "mc@netserva.org"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "phpseclib/phpseclib": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "SPE\\HCP\\": "src/",
+            "SPE\\HCP\\Lib\\": "lib/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true
+    },
+    "minimum-stability": "stable"
+}

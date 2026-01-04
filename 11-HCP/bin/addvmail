@@ -1,0 +1,62 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Filesystem operations for mailbox creation (runs as root via SSH)
+// Usage: addvmail user@domain.tld [password]
+
+$email = $argv[1] ?? null;
+$password = $argv[2] ?? null;
+
+if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    fwrite(STDERR, "Usage: addvmail <email> [password]\n");
+    exit(1);
+}
+
+$email = strtolower($email);
+[$user, $domain] = explode('@', $email);
+
+// Paths
+$domainPath = "/home/u/{$domain}";
+$home = "{$domainPath}/home/{$user}";
+
+// Check domain exists
+if (!is_dir($domainPath)) {
+    fwrite(STDERR, "Error: Domain path not found: {$domainPath}\n");
+    exit(1);
+}
+
+// Check mailbox doesn't exist
+if (is_dir($home)) {
+    fwrite(STDERR, "Error: Maildir already exists: {$home}\n");
+    exit(1);
+}
+
+// Get uid/gid from domain directory
+$stat = stat($domainPath);
+$uid = $stat['uid'];
+$gid = $stat['gid'];
+
+// Create maildir structure
+$dirs = [
+    $home,
+    "{$home}/Maildir",
+    "{$home}/Maildir/cur",
+    "{$home}/Maildir/new",
+    "{$home}/Maildir/tmp",
+    "{$home}/sieve",
+];
+
+foreach ($dirs as $dir) {
+    if (!mkdir($dir, 0700, true)) {
+        fwrite(STDERR, "Error: Failed to create {$dir}\n");
+        exit(1);
+    }
+    chown($dir, $uid);
+    chgrp($dir, $gid);
+}
+
+echo "OK\n";
+echo "Home: {$home}\n";
+echo "UID: {$uid}\n";
+echo "GID: {$gid}\n";
+exit(0);

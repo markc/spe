@@ -1,0 +1,8 @@
+{
+    "name": "Vhosts",
+    "title": "Virtual Hosts",
+    "icon": "globe",
+    "nav": true,
+    "acl": 1,
+    "order": 10
+}

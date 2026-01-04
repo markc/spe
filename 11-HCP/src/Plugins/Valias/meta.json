@@ -1,0 +1,8 @@
+{
+    "name": "Valias",
+    "title": "Mail Aliases",
+    "icon": "forward",
+    "nav": true,
+    "acl": 1,
+    "order": 25
+}

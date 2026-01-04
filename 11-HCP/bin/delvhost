@@ -1,0 +1,68 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Filesystem-only vhost deletion - runs as root via SSH
+
+if (php_sapi_name() !== 'cli') {
+    die("CLI only\n");
+}
+
+if ($argc < 2) {
+    die("Usage: delvhost <domain> [--keep-db]\n");
+}
+
+$domain = strtolower($argv[1]);
+$keepDb = in_array('--keep-db', $argv);
+
+$vhostBase = '/home/u';
+$home = "{$vhostBase}/{$domain}";
+
+// Get username from directory ownership
+if (!is_dir($home)) {
+    fwrite(STDERR, "Error: vhost directory not found: {$home}\n");
+    exit(1);
+}
+
+$stat = stat($home);
+$uid = $stat['uid'];
+$userInfo = posix_getpwuid($uid);
+$uname = $userInfo ? $userInfo['name'] : null;
+
+// Remove nginx config
+$nginxAvailable = "/etc/nginx/sites-available/{$domain}";
+$nginxEnabled = "/etc/nginx/sites-enabled/{$domain}";
+
+if (file_exists($nginxEnabled)) {
+    unlink($nginxEnabled);
+}
+if (file_exists($nginxAvailable)) {
+    unlink($nginxAvailable);
+}
+
+// Remove PHP-FPM pool
+foreach (['8.4', '8.3', '8.2'] as $phpVer) {
+    $poolPath = "/etc/php/{$phpVer}/fpm/pool.d/{$domain}.conf";
+    if (file_exists($poolPath)) {
+        unlink($poolPath);
+        break;
+    }
+}
+
+// Remove home directory
+exec("rm -rf " . escapeshellarg($home), $output, $code);
+if ($code !== 0) {
+    fwrite(STDERR, "Warning: failed to remove {$home}\n");
+}
+
+// Remove system user if exists
+if ($uname && $uname !== 'root' && $uid >= 1000) {
+    exec("userdel " . escapeshellarg($uname) . " 2>&1", $output, $code);
+    exec("groupdel " . escapeshellarg($uname) . " 2>&1", $output, $code);
+}
+
+echo "Deleted vhost: {$domain}\n";
+echo "Removed: {$home}\n";
+
+if (!$keepDb) {
+    echo "Note: database records should be removed separately\n";
+}

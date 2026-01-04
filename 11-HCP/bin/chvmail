@@ -1,0 +1,26 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Password hashing for mailbox (runs as root via SSH)
+// Usage: chvmail user@domain.tld newpassword
+
+$email = $argv[1] ?? null;
+$password = $argv[2] ?? null;
+
+if (!$email || !$password) {
+    fwrite(STDERR, "Usage: chvmail <email> <password>\n");
+    exit(1);
+}
+
+// Generate hash using doveadm if available
+$hash = trim(shell_exec("doveadm pw -s SHA512-CRYPT -p " . escapeshellarg($password) . " 2>/dev/null") ?? '');
+
+if (!$hash) {
+    // Fallback to PHP crypt
+    $salt = '$6$rounds=5000$' . bin2hex(random_bytes(8)) . '$';
+    $hash = '{SHA512-CRYPT}' . crypt($password, $salt);
+}
+
+echo "OK\n";
+echo "Hash: {$hash}\n";
+exit(0);

@@ -1,0 +1,165 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Filesystem-only vhost creation - runs as root via SSH
+
+if (php_sapi_name() !== 'cli') {
+    die("CLI only\n");
+}
+
+if ($argc < 2) {
+    die("Usage: addvhost <domain> [uname]\n");
+}
+
+$domain = strtolower($argv[1]);
+$uname = $argv[2] ?? preg_replace('/[^a-z0-9]/', '', explode('.', $domain)[0]);
+
+// Base paths
+$vhostBase = '/home/u';
+$home = "{$vhostBase}/{$domain}";
+
+// Check if already exists
+if (is_dir($home)) {
+    fwrite(STDERR, "Error: vhost directory already exists: {$home}\n");
+    exit(1);
+}
+
+// Create system user (using first available UID in range)
+$uid = null;
+for ($i = 1001; $i < 2000; $i++) {
+    if (!posix_getpwuid($i)) {
+        $uid = $i;
+        break;
+    }
+}
+
+if ($uid === null) {
+    fwrite(STDERR, "Error: no available UID in range 1001-1999\n");
+    exit(1);
+}
+
+$gid = $uid; // Same as UID for simplicity
+
+// Create group
+exec("groupadd -g {$gid} {$uname} 2>&1", $output, $code);
+if ($code !== 0 && $code !== 9) { // 9 = already exists
+    fwrite(STDERR, "Error creating group: " . implode("\n", $output) . "\n");
+    exit(1);
+}
+
+// Create user
+exec("useradd -u {$uid} -g {$gid} -d {$home} -s /bin/bash {$uname} 2>&1", $output, $code);
+if ($code !== 0 && $code !== 9) {
+    fwrite(STDERR, "Error creating user: " . implode("\n", $output) . "\n");
+    exit(1);
+}
+
+// Create directory structure
+$dirs = [
+    $home,
+    "{$home}/.ssh",
+    "{$home}/var",
+    "{$home}/var/log",
+    "{$home}/var/run",
+    "{$home}/home",               // For mailboxes
+    "{$home}/www",                // Document root
+    "{$home}/www/public",         // Public HTML
+];
+
+foreach ($dirs as $dir) {
+    if (!is_dir($dir)) {
+        mkdir($dir, 0755, true);
+    }
+}
+
+// Set ownership
+exec("chown -R {$uid}:{$gid} {$home}");
+
+// Set specific permissions
+chmod("{$home}/.ssh", 0700);
+chmod("{$home}/var/log", 0755);
+
+// Create default index.html
+$indexPath = "{$home}/www/public/index.html";
+$indexContent = <<<HTML
+<!DOCTYPE html>
+<html>
+<head><title>Welcome to {$domain}</title></head>
+<body>
+<h1>Welcome to {$domain}</h1>
+<p>This site is under construction.</p>
+</body>
+</html>
+HTML;
+
+file_put_contents($indexPath, $indexContent);
+chown($indexPath, $uid);
+chgrp($indexPath, $gid);
+
+// Create PHP-FPM pool config
+$poolConfig = <<<CONF
+[{$domain}]
+user = {$uname}
+group = {$uname}
+listen = /home/u/{$domain}/var/run/fpm.sock
+listen.owner = www-data
+listen.group = www-data
+pm = ondemand
+pm.max_children = 3
+pm.process_idle_timeout = 60s
+php_admin_value[error_log] = /home/u/{$domain}/var/log/php-error.log
+CONF;
+
+$poolPath = "/etc/php/8.3/fpm/pool.d/{$domain}.conf";
+// Try PHP 8.4, 8.3, 8.2
+foreach (['8.4', '8.3', '8.2'] as $phpVer) {
+    $testPath = "/etc/php/{$phpVer}/fpm/pool.d";
+    if (is_dir($testPath)) {
+        $poolPath = "{$testPath}/{$domain}.conf";
+        $poolConfig = str_replace('/home/u/', '/home/u/', $poolConfig);
+        break;
+    }
+}
+
+file_put_contents($poolPath, $poolConfig);
+
+// Create nginx vhost config
+$nginxConfig = <<<CONF
+server {
+    listen 80;
+    server_name {$domain} www.{$domain};
+    root /home/u/{$domain}/www/public;
+    index index.html index.php;
+
+    access_log /home/u/{$domain}/var/log/access.log;
+    error_log /home/u/{$domain}/var/log/error.log;
+
+    location / {
+        try_files \$uri \$uri/ /index.php?\$query_string;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/home/u/{$domain}/var/run/fpm.sock;
+        fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
+CONF;
+
+$nginxPath = "/etc/nginx/sites-available/{$domain}";
+file_put_contents($nginxPath, $nginxConfig);
+
+// Enable site
+$enablePath = "/etc/nginx/sites-enabled/{$domain}";
+if (!file_exists($enablePath)) {
+    symlink($nginxPath, $enablePath);
+}
+
+echo "Created vhost: {$domain}\n";
+echo "uid={$uid} gid={$gid}\n";
+echo "Home: {$home}\n";
+echo "Docroot: {$home}/www/public\n";

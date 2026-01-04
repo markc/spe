@@ -1,0 +1,8 @@
+{
+    "name": "Auth",
+    "title": "Authentication",
+    "icon": "lock",
+    "nav": false,
+    "acl": 0,
+    "order": 99
+}

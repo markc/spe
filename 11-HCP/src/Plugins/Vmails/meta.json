@@ -1,0 +1,8 @@
+{
+    "name": "Vmails",
+    "title": "Virtual Mailboxes",
+    "icon": "envelope",
+    "nav": true,
+    "acl": 1,
+    "order": 20
+}

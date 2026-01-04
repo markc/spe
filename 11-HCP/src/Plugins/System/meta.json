@@ -1,0 +1,8 @@
+{
+    "name": "System",
+    "title": "Dashboard",
+    "icon": "home",
+    "nav": true,
+    "acl": 1,
+    "order": 1
+}

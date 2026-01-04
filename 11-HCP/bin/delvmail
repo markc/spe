@@ -1,0 +1,42 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Filesystem operations for mailbox deletion (runs as root via SSH)
+// Usage: delvmail user@domain.tld [--keep-db]
+
+$email = $argv[1] ?? null;
+$keepDb = in_array('--keep-db', $argv);
+
+if (!$email || $email === '--keep-db' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    fwrite(STDERR, "Usage: delvmail <email> [--keep-db]\n");
+    exit(1);
+}
+
+$email = strtolower($email);
+[$user, $domain] = explode('@', $email);
+
+$home = "/home/u/{$domain}/home/{$user}";
+
+if (!is_dir($home)) {
+    fwrite(STDERR, "Error: Maildir not found: {$home}\n");
+    exit(1);
+}
+
+// Recursive delete
+function rrmdir(string $path): void {
+    if (is_dir($path)) {
+        $files = array_diff(scandir($path), ['.', '..']);
+        foreach ($files as $file) {
+            rrmdir("{$path}/{$file}");
+        }
+        rmdir($path);
+    } elseif (is_file($path)) {
+        unlink($path);
+    }
+}
+
+rrmdir($home);
+
+echo "OK\n";
+echo "Removed: {$home}\n";
+exit(0);

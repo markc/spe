@@ -1,0 +1,80 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Filesystem-only vhost info display - runs as root via SSH
+
+if (php_sapi_name() !== 'cli') {
+    die("CLI only\n");
+}
+
+if ($argc < 2) {
+    die("Usage: shvhost <domain> [--size]\n");
+}
+
+$domain = strtolower($argv[1]);
+$showSize = in_array('--size', $argv);
+
+$vhostBase = '/home/u';
+$home = "{$vhostBase}/{$domain}";
+
+if (!is_dir($home)) {
+    fwrite(STDERR, "Error: vhost directory not found: {$home}\n");
+    exit(1);
+}
+
+$stat = stat($home);
+$uid = $stat['uid'];
+$gid = $stat['gid'];
+
+$userInfo = posix_getpwuid($uid);
+$groupInfo = posix_getgrgid($gid);
+
+$uname = $userInfo ? $userInfo['name'] : '?';
+$gname = $groupInfo ? $groupInfo['name'] : '?';
+
+echo "Domain: {$domain}\n";
+echo "Home: {$home}\n";
+echo "User: {$uname} (uid={$uid})\n";
+echo "Group: {$gname} (gid={$gid})\n";
+
+// Check if nginx config exists
+$nginxEnabled = file_exists("/etc/nginx/sites-enabled/{$domain}");
+echo "Nginx: " . ($nginxEnabled ? "enabled" : "disabled") . "\n";
+
+// Check PHP-FPM pool
+$fpmActive = false;
+foreach (['8.4', '8.3', '8.2'] as $phpVer) {
+    if (file_exists("/etc/php/{$phpVer}/fpm/pool.d/{$domain}.conf")) {
+        $fpmActive = $phpVer;
+        break;
+    }
+}
+echo "PHP-FPM: " . ($fpmActive ? "PHP {$fpmActive}" : "none") . "\n";
+
+// Calculate disk usage if requested
+if ($showSize) {
+    exec("du -sb " . escapeshellarg($home) . " 2>/dev/null", $output);
+    if (!empty($output[0])) {
+        $size = (int)explode("\t", $output[0])[0];
+        echo "Size: {$size}\n";
+        echo "Size (human): " . formatBytes($size) . "\n";
+    }
+}
+
+// List mailboxes in home/
+$mailboxDir = "{$home}/home";
+if (is_dir($mailboxDir)) {
+    $mailboxes = array_filter(scandir($mailboxDir), fn($d) => $d !== '.' && $d !== '..');
+    echo "Mailboxes: " . count($mailboxes) . "\n";
+}
+
+function formatBytes(int $bytes): string
+{
+    $units = ['B', 'KB', 'MB', 'GB'];
+    $i = 0;
+    while ($bytes >= 1024 && $i < 3) {
+        $bytes /= 1024;
+        $i++;
+    }
+    return round($bytes, 1) . ' ' . $units[$i];
+}
