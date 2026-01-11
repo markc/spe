@@ -2,7 +2,12 @@
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 // Filesystem operations for mailbox creation (runs as root via SSH)
+// NS 3.0 path structure: /srv/domain/msg/user
 // Usage: addvmail user@domain.tld [password]
+
+if (php_sapi_name() !== 'cli') {
+    die("CLI only\n");
+}
 
 $email = $argv[1] ?? null;
 $password = $argv[2] ?? null;
@@ -15,9 +20,9 @@ if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
 $email = strtolower($email);
 [$user, $domain] = explode('@', $email);
 
-// Paths
-$domainPath = "/home/u/{$domain}";
-$home = "{$domainPath}/home/{$user}";
+// NS 3.0 paths
+$domainPath = "/srv/{$domain}";
+$home = "{$domainPath}/msg/{$user}";
 
 // Check domain exists
 if (!is_dir($domainPath)) {
@@ -55,7 +60,27 @@ foreach ($dirs as $dir) {
     chgrp($dir, $gid);
 }
 
+// Create default sieve script
+$sieveScript = <<<'SIEVE'
+require ["fileinto", "mailbox"];
+
+# Example: Move spam to Junk folder
+# if header :contains "X-Spam-Flag" "YES" {
+#     fileinto :create "Junk";
+#     stop;
+# }
+
+keep;
+SIEVE;
+
+$sievePath = "{$home}/sieve/default.sieve";
+file_put_contents($sievePath, $sieveScript);
+chown($sievePath, $uid);
+chgrp($sievePath, $gid);
+chmod($sievePath, 0600);
+
 echo "OK\n";
+echo "Email: {$email}\n";
 echo "Home: {$home}\n";
 echo "UID: {$uid}\n";
 echo "GID: {$gid}\n";

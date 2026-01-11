@@ -2,7 +2,12 @@
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 // Filesystem operations for mailbox info (runs as root via SSH)
+// NS 3.0 path structure: /srv/domain/msg/user
 // Usage: shvmail user@domain.tld [--size]
+
+if (php_sapi_name() !== 'cli') {
+    die("CLI only\n");
+}
 
 $email = $argv[1] ?? null;
 $showSize = in_array('--size', $argv);
@@ -15,7 +20,8 @@ if (!$email || $email === '--size') {
 $email = strtolower($email);
 [$user, $domain] = explode('@', $email);
 
-$home = "/home/u/{$domain}/home/{$user}";
+// NS 3.0 path
+$home = "/srv/{$domain}/msg/{$user}";
 
 if (!is_dir($home)) {
     fwrite(STDERR, "Error: Maildir not found: {$home}\n");
@@ -37,10 +43,23 @@ function dirSize(string $path): int {
 $stat = stat($home);
 $size = dirSize($home);
 
+// Count messages
+$msgCount = 0;
+$maildir = "{$home}/Maildir";
+if (is_dir($maildir)) {
+    foreach (['cur', 'new'] as $folder) {
+        $folderPath = "{$maildir}/{$folder}";
+        if (is_dir($folderPath)) {
+            $msgCount += count(array_diff(scandir($folderPath), ['.', '..']));
+        }
+    }
+}
+
 echo "OK\n";
 echo "Email: {$email}\n";
 echo "Home: {$home}\n";
 echo "UID: {$stat['uid']}\n";
 echo "GID: {$stat['gid']}\n";
 echo "Size: {$size}\n";
+echo "Messages: {$msgCount}\n";
 exit(0);

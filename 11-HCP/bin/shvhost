@@ -2,6 +2,7 @@
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 // Filesystem-only vhost info display - runs as root via SSH
+// NS 3.0 path structure: /srv/domain
 
 if (php_sapi_name() !== 'cli') {
     die("CLI only\n");
@@ -14,8 +15,9 @@ if ($argc < 2) {
 $domain = strtolower($argv[1]);
 $showSize = in_array('--size', $argv);
 
-$vhostBase = '/home/u';
-$home = "{$vhostBase}/{$domain}";
+// NS 3.0 base path
+$srvBase = '/srv';
+$home = "{$srvBase}/{$domain}";
 
 if (!is_dir($home)) {
     fwrite(STDERR, "Error: vhost directory not found: {$home}\n");
@@ -34,6 +36,7 @@ $gname = $groupInfo ? $groupInfo['name'] : '?';
 
 echo "Domain: {$domain}\n";
 echo "Home: {$home}\n";
+echo "Docroot: {$home}/web/ap/public\n";
 echo "User: {$uname} (uid={$uid})\n";
 echo "Group: {$gname} (gid={$gid})\n";
 
@@ -43,7 +46,7 @@ echo "Nginx: " . ($nginxEnabled ? "enabled" : "disabled") . "\n";
 
 // Check PHP-FPM pool
 $fpmActive = false;
-foreach (['8.4', '8.3', '8.2'] as $phpVer) {
+foreach (['8.5', '8.4', '8.3'] as $phpVer) {
     if (file_exists("/etc/php/{$phpVer}/fpm/pool.d/{$domain}.conf")) {
         $fpmActive = $phpVer;
         break;
@@ -61,8 +64,8 @@ if ($showSize) {
     }
 }
 
-// List mailboxes in home/
-$mailboxDir = "{$home}/home";
+// List mailboxes in msg/
+$mailboxDir = "{$home}/msg";
 if (is_dir($mailboxDir)) {
     $mailboxes = array_filter(scandir($mailboxDir), fn($d) => $d !== '.' && $d !== '..');
     echo "Mailboxes: " . count($mailboxes) . "\n";

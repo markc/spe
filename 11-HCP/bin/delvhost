@@ -2,6 +2,7 @@
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 // Filesystem-only vhost deletion - runs as root via SSH
+// NS 3.0 path structure: /srv/domain
 
 if (php_sapi_name() !== 'cli') {
     die("CLI only\n");
@@ -14,8 +15,9 @@ if ($argc < 2) {
 $domain = strtolower($argv[1]);
 $keepDb = in_array('--keep-db', $argv);
 
-$vhostBase = '/home/u';
-$home = "{$vhostBase}/{$domain}";
+// NS 3.0 base path
+$srvBase = '/srv';
+$home = "{$srvBase}/{$domain}";
 
 // Get username from directory ownership
 if (!is_dir($home)) {
@@ -40,7 +42,7 @@ if (file_exists($nginxAvailable)) {
 }
 
 // Remove PHP-FPM pool
-foreach (['8.4', '8.3', '8.2'] as $phpVer) {
+foreach (['8.5', '8.4', '8.3'] as $phpVer) {
     $poolPath = "/etc/php/{$phpVer}/fpm/pool.d/{$domain}.conf";
     if (file_exists($poolPath)) {
         unlink($poolPath);

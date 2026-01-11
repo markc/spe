@@ -2,7 +2,12 @@
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 // Filesystem operations for mailbox deletion (runs as root via SSH)
+// NS 3.0 path structure: /srv/domain/msg/user
 // Usage: delvmail user@domain.tld [--keep-db]
+
+if (php_sapi_name() !== 'cli') {
+    die("CLI only\n");
+}
 
 $email = $argv[1] ?? null;
 $keepDb = in_array('--keep-db', $argv);
@@ -15,7 +20,8 @@ if (!$email || $email === '--keep-db' || !filter_var($email, FILTER_VALIDATE_EMA
 $email = strtolower($email);
 [$user, $domain] = explode('@', $email);
 
-$home = "/home/u/{$domain}/home/{$user}";
+// NS 3.0 path
+$home = "/srv/{$domain}/msg/{$user}";
 
 if (!is_dir($home)) {
     fwrite(STDERR, "Error: Maildir not found: {$home}\n");

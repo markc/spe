@@ -2,6 +2,7 @@
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 // Filesystem-only vhost modification - runs as root via SSH
+// NS 3.0 path structure: /srv/domain
 
 if (php_sapi_name() !== 'cli') {
     die("CLI only\n");
@@ -14,8 +15,9 @@ if ($argc < 3) {
 $domain = strtolower($argv[1]);
 $action = $argv[2];
 
-$vhostBase = '/home/u';
-$home = "{$vhostBase}/{$domain}";
+// NS 3.0 base path
+$srvBase = '/srv';
+$home = "{$srvBase}/{$domain}";
 
 if (!is_dir($home)) {
     fwrite(STDERR, "Error: vhost directory not found: {$home}\n");
@@ -66,7 +68,7 @@ switch ($action) {
         exec("systemctl reload nginx");
 
         // Find and reload PHP-FPM
-        foreach (['8.4', '8.3', '8.2'] as $phpVer) {
+        foreach (['8.5', '8.4', '8.3'] as $phpVer) {
             if (file_exists("/etc/php/{$phpVer}/fpm/pool.d/{$domain}.conf")) {
                 exec("systemctl reload php{$phpVer}-fpm");
                 echo "Reloaded nginx and php{$phpVer}-fpm\n";
