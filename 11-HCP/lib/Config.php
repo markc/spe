@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
@@ -8,47 +7,49 @@ namespace SPE\HCP\Lib;
  * NS 3.0 Global Configuration
  *
  * Central path definitions for the NetServa 3.0 hosting structure.
- * Used by both lib/ classes and bin/ CLI scripts.
+ * Used by lib/ classes. CLI scripts use /etc/ns3/config.php.
  *
  * Directory structure:
  *   /srv/domain/
- *   ├── .ssh/
  *   ├── var/{log,run}/
  *   ├── msg/user/Maildir/{cur,new,tmp}
  *   └── web/app/public/
  */
 final class Config
 {
-    // Base paths
-    public const string VPATH = '/srv';                          // Base path for all vhosts
-    public const string VHOST = '';                              // Set at runtime via hostname()
+    // === Primary Host ===
+    public const string ADMIN = 'sysadm';
 
-    // Path templates (use sprintf with domain/user)
-    public const string WPATH = '/srv/%s/web/app/public';        // Web docroot: sprintf(WPATH, $domain)
-    public const string MPATH = '/srv/%s/msg';                   // Mail base: sprintf(MPATH, $domain)
-    public const string UPATH = '/srv/%s/msg/%s';                // User maildir: sprintf(UPATH, $domain, $user)
+    // === Base Paths ===
+    public const string VPATH = '/srv';
+    public const string WPATH = '/srv/%s/web/app/public';
+    public const string MPATH = '/srv/%s/msg';
+    public const string UPATH = '/srv/%s/msg/%s';
 
-    // System paths
-    public const string NGINX_AVAILABLE = '/etc/nginx/sites-available';
-    public const string NGINX_ENABLED = '/etc/nginx/sites-enabled';
-    public const string PHP_FPM_POOLS = '/etc/php/%s/fpm/pool.d'; // sprintf with PHP version
-
-    // Database paths
+    // === Database ===
+    public const string DTYPE = 'sqlite';
     public const string SYSADM_DB = '/srv/.local/sqlite/sysadm.db';
     public const string HCP_DB = '/srv/.local/sqlite/hcp.db';
 
-    // PHP versions to check (in order of preference)
+    // === Nginx ===
+    public const string NGINX_AVAILABLE = '/etc/nginx/sites-available';
+    public const string NGINX_ENABLED = '/etc/nginx/sites-enabled';
+
+    // === PHP ===
+    public const string V_PHP = '8.4';
     public const array PHP_VERSIONS = ['8.5', '8.4', '8.3'];
 
-    // UID/GID range for vhost users
+    // === UID/GID Range ===
     public const int UID_MIN = 1001;
     public const int UID_MAX = 1999;
+    public const string WUGID = 'www-data';
 
-    /**
-     * Get the primary hostname (cached).
-     */
+    // === Cached Values ===
     private static ?string $hostname = null;
 
+    /**
+     * Get primary hostname (VHOST).
+     */
     public static function hostname(): string
     {
         if (self::$hostname === null) {
@@ -58,7 +59,7 @@ final class Config
     }
 
     /**
-     * Get vhost home directory.
+     * Get vhost home directory: /srv/domain
      */
     public static function vhostPath(string $domain): string
     {
@@ -66,7 +67,7 @@ final class Config
     }
 
     /**
-     * Get web document root.
+     * Get web document root: /srv/domain/web/app/public
      */
     public static function webPath(string $domain): string
     {
@@ -74,7 +75,7 @@ final class Config
     }
 
     /**
-     * Get mail base directory for domain.
+     * Get mail base directory: /srv/domain/msg
      */
     public static function mailPath(string $domain): string
     {
@@ -82,7 +83,7 @@ final class Config
     }
 
     /**
-     * Get user maildir path.
+     * Get user maildir path: /srv/domain/msg/user
      */
     public static function userPath(string $domain, string $user): string
     {
@@ -90,13 +91,16 @@ final class Config
     }
 
     /**
-     * Get database path from environment or default.
+     * Get sysadm database path (from env or default).
      */
     public static function sysadmDb(): string
     {
         return $_ENV['SYSADM_DB'] ?? getenv('SYSADM_DB') ?: self::SYSADM_DB;
     }
 
+    /**
+     * Get HCP database path (from env or default).
+     */
     public static function hcpDb(): string
     {
         return $_ENV['HCP_DB'] ?? getenv('HCP_DB') ?: self::HCP_DB;
@@ -108,7 +112,7 @@ final class Config
     public static function phpFpmPoolDir(): ?string
     {
         foreach (self::PHP_VERSIONS as $ver) {
-            $path = sprintf(self::PHP_FPM_POOLS, $ver);
+            $path = "/etc/php/{$ver}/fpm/pool.d";
             if (is_dir($path)) {
                 return $path;
             }
@@ -117,12 +121,12 @@ final class Config
     }
 
     /**
-     * Get PHP version from pool directory.
+     * Get active PHP version.
      */
     public static function phpVersion(): ?string
     {
         foreach (self::PHP_VERSIONS as $ver) {
-            $path = sprintf(self::PHP_FPM_POOLS, $ver);
+            $path = "/etc/php/{$ver}/fpm/pool.d";
             if (is_dir($path)) {
                 return $ver;
             }
@@ -142,9 +146,4 @@ final class Config
         }
         return null;
     }
-}
-
-// Allow CLI scripts to include this file directly
-if (php_sapi_name() === 'cli' && !class_exists('SPE\HCP\Lib\Config', false)) {
-    // When included directly from bin/ scripts, make Config available
 }

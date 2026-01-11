@@ -3,24 +3,32 @@
 // Install to: /etc/ns3/config.php
 
 return [
-    // Base paths
-    'VPATH' => '/srv',                              // Base path for all vhosts
-    'WPATH' => '/srv/%s/web/app/public',            // Web docroot (sprintf with domain)
-    'MPATH' => '/srv/%s/msg',                       // Mail base (sprintf with domain)
-    'UPATH' => '/srv/%s/msg/%s',                    // User maildir (sprintf with domain, user)
+    // === Primary Host ===
+    'VHOST' => trim(shell_exec('hostname -f 2>/dev/null') ?? '') ?: 'localhost',
+    'ADMIN' => 'sysadm',
+    'AMAIL' => '',                                  // Set per-server
 
-    // Nginx paths
+    // === Base Paths ===
+    'VPATH' => '/srv',                              // Base: /srv/domain
+    'WPATH' => '/srv/%s/web/app/public',            // Docroot: sprintf(WPATH, $domain)
+    'MPATH' => '/srv/%s/msg',                       // Mail: sprintf(MPATH, $domain)
+    'UPATH' => '/srv/%s/msg/%s',                    // Maildir: sprintf(UPATH, $domain, $user)
+
+    // === Database ===
+    'DTYPE' => 'sqlite',                            // sqlite or mysql
+    'SYSADM_DB' => '/srv/.local/sqlite/sysadm.db',
+    'HCP_DB' => '/srv/.local/sqlite/hcp.db',
+
+    // === Nginx ===
     'NGINX_AVAILABLE' => '/etc/nginx/sites-available',
     'NGINX_ENABLED' => '/etc/nginx/sites-enabled',
 
-    // PHP versions (checked in order)
+    // === PHP ===
+    'V_PHP' => '8.4',
     'PHP_VERSIONS' => ['8.5', '8.4', '8.3'],
 
-    // UID/GID range for vhost users
+    // === UID/GID Range ===
     'UID_MIN' => 1001,
     'UID_MAX' => 1999,
-
-    // Database paths (for lib/ classes)
-    'SYSADM_DB' => '/srv/.local/sqlite/sysadm.db',
-    'HCP_DB' => '/srv/.local/sqlite/hcp.db',
+    'WUGID' => 'www-data',                          // Web server group
 ];
