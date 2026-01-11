@@ -4,10 +4,10 @@
 namespace SPE\HCP\Plugins\Vhosts;
 
 use SPE\HCP\Core\{Ctx, Plugin};
-use SPE\HCP\Lib\{Exec, Vhost};
+use SPE\HCP\Lib\{Exec, Vhosts};
 
 /**
- * Virtual hosts management - uses lib/Vhost.php orchestration layer.
+ * Virtual hosts management - uses lib/Vhosts.php orchestration layer.
  */
 final class VhostsModel extends Plugin
 {
@@ -34,7 +34,7 @@ final class VhostsModel extends Plugin
                 return ['error' => 'Invalid domain name'];
             }
 
-            $result = Vhost::add($domain, $this->in['uname'] ?: null);
+            $result = Vhosts::add($domain, $this->in['uname'] ?: null);
 
             if ($result['success']) {
                 header('Location: ?o=Vhosts&m=read&domain=' . urlencode($domain));
@@ -54,7 +54,7 @@ final class VhostsModel extends Plugin
             return ['error' => 'Invalid domain'];
         }
 
-        $result = Vhost::show($domain);
+        $result = Vhosts::show($domain);
 
         if (!$result['success']) {
             return ['error' => $result['error']];
@@ -75,7 +75,7 @@ final class VhostsModel extends Plugin
 
             if ($action === 'toggle') {
                 $active = ($_POST['active'] ?? '0') === '1';
-                $result = Vhost::setActive($domain, $active);
+                $result = Vhosts::setActive($domain, $active);
                 return $result['success']
                     ? ['success' => ($active ? 'Enabled' : 'Disabled') . " vhost", 'domain' => $domain]
                     : ['error' => $result['error']];
@@ -83,14 +83,14 @@ final class VhostsModel extends Plugin
 
             if ($action === 'aliases' && isset($_POST['aliases'])) {
                 $aliases = preg_split('/[,\n]+/', $_POST['aliases'], -1, PREG_SPLIT_NO_EMPTY);
-                $result = Vhost::setAliases($domain, $aliases);
+                $result = Vhosts::setAliases($domain, $aliases);
                 return $result['success']
                     ? ['success' => 'Aliases updated', 'domain' => $domain]
                     : ['error' => $result['error']];
             }
         }
 
-        return Vhost::show($domain);
+        return Vhosts::show($domain);
     }
 
     public function delete(): array
@@ -101,7 +101,7 @@ final class VhostsModel extends Plugin
         }
 
         if ($_POST && isset($_POST['confirm'])) {
-            $result = Vhost::del($domain);
+            $result = Vhosts::del($domain);
 
             if ($result['success']) {
                 header('Location: ?o=Vhosts');
@@ -116,7 +116,7 @@ final class VhostsModel extends Plugin
 
     public function list(): array
     {
-        $vhosts = Vhost::list();
+        $vhosts = Vhosts::list();
 
         // Enhance with filesystem info (SSL, enabled status)
         foreach ($vhosts as &$v) {

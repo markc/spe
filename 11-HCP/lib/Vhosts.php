@@ -12,7 +12,7 @@ namespace SPE\HCP\Lib;
  *
  * Schema: vhosts(id, domain, uname, uid, gid, active, aliases, created_at, updated_at)
  */
-final class Vhost
+final class Vhosts
 {
     private const string VHOST_BASE = '/srv';  // NS 3.0: /srv/domain/web/app/public
 

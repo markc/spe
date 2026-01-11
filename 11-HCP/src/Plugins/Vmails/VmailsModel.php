@@ -4,10 +4,10 @@
 namespace SPE\HCP\Plugins\Vmails;
 
 use SPE\HCP\Core\{Ctx, Plugin};
-use SPE\HCP\Lib\Vmail;
+use SPE\HCP\Lib\Vmails;
 
 /**
- * Virtual mailbox management - uses lib/Vmail.php orchestration layer.
+ * Virtual mailbox management - uses lib/Vmails.php orchestration layer.
  */
 final class VmailsModel extends Plugin
 {
@@ -33,7 +33,7 @@ final class VmailsModel extends Plugin
                 return ['error' => 'Invalid email address'];
             }
 
-            $result = Vmail::add($email, $this->in['password'] ?: null);
+            $result = Vmails::add($email, $this->in['password'] ?: null);
 
             if ($result['success']) {
                 // Store password temporarily to show user
@@ -57,7 +57,7 @@ final class VmailsModel extends Plugin
             return ['error' => 'Invalid email address'];
         }
 
-        $result = Vmail::show($email);
+        $result = Vmails::show($email);
 
         if (!$result['success']) {
             return ['error' => $result['error']];
@@ -82,7 +82,7 @@ final class VmailsModel extends Plugin
             $action = $_POST['action'] ?? '';
 
             if ($action === 'password' && !empty($_POST['password'])) {
-                $result = Vmail::passwd($email, $_POST['password']);
+                $result = Vmails::passwd($email, $_POST['password']);
                 return $result['success']
                     ? ['success' => 'Password updated', 'email' => $email]
                     : ['error' => $result['error']];
@@ -90,7 +90,7 @@ final class VmailsModel extends Plugin
 
             if ($action === 'toggle') {
                 $active = ($_POST['active'] ?? '0') === '1';
-                $result = Vmail::setActive($email, $active);
+                $result = Vmails::setActive($email, $active);
                 return $result['success']
                     ? ['success' => ($active ? 'Enabled' : 'Disabled') . " mailbox", 'email' => $email]
                     : ['error' => $result['error']];
@@ -108,7 +108,7 @@ final class VmailsModel extends Plugin
         }
 
         if ($_POST && isset($_POST['confirm'])) {
-            $result = Vmail::del($email);
+            $result = Vmails::del($email);
 
             if ($result['success']) {
                 header('Location: ?o=Vmails');
@@ -124,7 +124,7 @@ final class VmailsModel extends Plugin
     public function list(): array
     {
         $domain = $this->in['domain'] ?: null;
-        $mailboxes = Vmail::list($domain);
+        $mailboxes = Vmails::list($domain);
 
         // Get domains for filter dropdown
         $domains = $this->getActiveDomains();

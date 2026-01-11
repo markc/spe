@@ -12,7 +12,7 @@ namespace SPE\HCP\Lib;
  *
  * Schema: vmails(id, user, pass, home, uid, gid, active, created_at, updated_at)
  */
-final class Vmail
+final class Vmails
 {
     private const string MAILDIR_BASE = '/srv';  // NS 3.0: /srv/domain/msg/user
 
