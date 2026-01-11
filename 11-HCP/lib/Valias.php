@@ -16,20 +16,12 @@ final class Valias
     private static ?\PDO $pdo = null;
 
     /**
-     * Get database path from environment or use local default.
-     */
-    private static function dbPath(): string
-    {
-        return $_ENV['SYSADM_DB'] ?? getenv('SYSADM_DB') ?: __DIR__ . '/../sysadm.db';
-    }
-
-    /**
      * Get database connection.
      */
     private static function db(): \PDO
     {
         if (self::$pdo === null) {
-            self::$pdo = new \PDO('sqlite:' . self::dbPath(), null, null, [
+            self::$pdo = new \PDO('sqlite:' . Config::sysadmDb(), null, null, [
                 \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
                 \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
             ]);

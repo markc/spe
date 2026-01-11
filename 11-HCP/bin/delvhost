@@ -2,11 +2,17 @@
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 // Filesystem-only vhost deletion - runs as root via SSH
-// NS 3.0 path structure: /srv/domain
 
 if (php_sapi_name() !== 'cli') {
     die("CLI only\n");
 }
+
+// Load config or use defaults
+$config = is_file('/etc/ns3/config.php') ? require '/etc/ns3/config.php' : [];
+define('VPATH', $config['VPATH'] ?? '/srv');
+define('NGINX_AVAILABLE', $config['NGINX_AVAILABLE'] ?? '/etc/nginx/sites-available');
+define('NGINX_ENABLED', $config['NGINX_ENABLED'] ?? '/etc/nginx/sites-enabled');
+define('PHP_VERSIONS', $config['PHP_VERSIONS'] ?? ['8.5', '8.4', '8.3']);
 
 if ($argc < 2) {
     die("Usage: delvhost <domain> [--keep-db]\n");
@@ -15,9 +21,7 @@ if ($argc < 2) {
 $domain = strtolower($argv[1]);
 $keepDb = in_array('--keep-db', $argv);
 
-// NS 3.0 base path
-$srvBase = '/srv';
-$home = "{$srvBase}/{$domain}";
+$home = VPATH . "/{$domain}";
 
 // Get username from directory ownership
 if (!is_dir($home)) {
@@ -31,8 +35,8 @@ $userInfo = posix_getpwuid($uid);
 $uname = $userInfo ? $userInfo['name'] : null;
 
 // Remove nginx config
-$nginxAvailable = "/etc/nginx/sites-available/{$domain}";
-$nginxEnabled = "/etc/nginx/sites-enabled/{$domain}";
+$nginxAvailable = NGINX_AVAILABLE . "/{$domain}";
+$nginxEnabled = NGINX_ENABLED . "/{$domain}";
 
 if (file_exists($nginxEnabled)) {
     unlink($nginxEnabled);
@@ -42,7 +46,7 @@ if (file_exists($nginxAvailable)) {
 }
 
 // Remove PHP-FPM pool
-foreach (['8.5', '8.4', '8.3'] as $phpVer) {
+foreach (PHP_VERSIONS as $phpVer) {
     $poolPath = "/etc/php/{$phpVer}/fpm/pool.d/{$domain}.conf";
     if (file_exists($poolPath)) {
         unlink($poolPath);

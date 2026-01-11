@@ -2,11 +2,21 @@
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 // Filesystem-only vhost creation - runs as root via SSH
-// NS 3.0 path structure: /srv/domain/web/app/public
 
 if (php_sapi_name() !== 'cli') {
     die("CLI only\n");
 }
+
+// Load config or use defaults
+$config = is_file('/etc/ns3/config.php') ? require '/etc/ns3/config.php' : [];
+define('VPATH', $config['VPATH'] ?? '/srv');
+define('WPATH', $config['WPATH'] ?? VPATH . '/%s/web/app/public');
+define('MPATH', $config['MPATH'] ?? VPATH . '/%s/msg');
+define('NGINX_AVAILABLE', $config['NGINX_AVAILABLE'] ?? '/etc/nginx/sites-available');
+define('NGINX_ENABLED', $config['NGINX_ENABLED'] ?? '/etc/nginx/sites-enabled');
+define('PHP_VERSIONS', $config['PHP_VERSIONS'] ?? ['8.5', '8.4', '8.3']);
+define('UID_MIN', $config['UID_MIN'] ?? 1001);
+define('UID_MAX', $config['UID_MAX'] ?? 1999);
 
 if ($argc < 2) {
     die("Usage: addvhost <domain> [uname]\n");
@@ -15,9 +25,9 @@ if ($argc < 2) {
 $domain = strtolower($argv[1]);
 $uname = $argv[2] ?? preg_replace('/[^a-z0-9]/', '', explode('.', $domain)[0]);
 
-// NS 3.0 base path
-$srvBase = '/srv';
-$home = "{$srvBase}/{$domain}";
+$home = VPATH . "/{$domain}";
+$docroot = sprintf(WPATH, $domain);
+$maildir = sprintf(MPATH, $domain);
 
 // Check if already exists
 if (is_dir($home)) {
@@ -27,7 +37,7 @@ if (is_dir($home)) {
 
 // Create system user (using first available UID in range)
 $uid = null;
-for ($i = 1001; $i < 2000; $i++) {
+for ($i = UID_MIN; $i <= UID_MAX; $i++) {
     if (!posix_getpwuid($i)) {
         $uid = $i;
         break;
@@ -35,7 +45,7 @@ for ($i = 1001; $i < 2000; $i++) {
 }
 
 if ($uid === null) {
-    fwrite(STDERR, "Error: no available UID in range 1001-1999\n");
+    fwrite(STDERR, "Error: no available UID in range " . UID_MIN . "-" . UID_MAX . "\n");
     exit(1);
 }
 
@@ -62,10 +72,10 @@ $dirs = [
     "{$home}/var",
     "{$home}/var/log",
     "{$home}/var/run",
-    "{$home}/msg",                    // Mailboxes: /srv/domain/msg/user
+    $maildir,                         // Mailboxes: /srv/domain/msg
     "{$home}/web",                    // Web apps
     "{$home}/web/app",                // Primary app
-    "{$home}/web/app/public",         // Document root
+    $docroot,                         // Document root
 ];
 
 foreach ($dirs as $dir) {
@@ -82,7 +92,7 @@ chmod("{$home}/.ssh", 0700);
 chmod("{$home}/var/log", 0755);
 
 // Create default index.html
-$indexPath = "{$home}/web/app/public/index.html";
+$indexPath = "{$docroot}/index.html";
 $indexContent = <<<HTML
 <!DOCTYPE html>
 <html>
@@ -103,18 +113,18 @@ $poolConfig = <<<CONF
 [{$domain}]
 user = {$uname}
 group = {$uname}
-listen = /srv/{$domain}/var/run/fpm.sock
+listen = {$home}/var/run/fpm.sock
 listen.owner = www-data
 listen.group = www-data
 pm = ondemand
 pm.max_children = 3
 pm.process_idle_timeout = 60s
-php_admin_value[error_log] = /srv/{$domain}/var/log/php-error.log
+php_admin_value[error_log] = {$home}/var/log/php-error.log
 CONF;
 
-// Try PHP 8.5, 8.4, 8.3
+// Find PHP-FPM pool directory
 $poolPath = null;
-foreach (['8.5', '8.4', '8.3'] as $phpVer) {
+foreach (PHP_VERSIONS as $phpVer) {
     $testPath = "/etc/php/{$phpVer}/fpm/pool.d";
     if (is_dir($testPath)) {
         $poolPath = "{$testPath}/{$domain}.conf";
@@ -131,18 +141,18 @@ $nginxConfig = <<<CONF
 server {
     listen 80;
     server_name {$domain} www.{$domain};
-    root /srv/{$domain}/web/app/public;
+    root {$docroot};
     index index.html index.php;
 
-    access_log /srv/{$domain}/var/log/access.log;
-    error_log /srv/{$domain}/var/log/error.log;
+    access_log {$home}/var/log/access.log;
+    error_log {$home}/var/log/error.log;
 
     location / {
         try_files \$uri \$uri/ /index.php?\$query_string;
     }
 
     location ~ \.php$ {
-        fastcgi_pass unix:/srv/{$domain}/var/run/fpm.sock;
+        fastcgi_pass unix:{$home}/var/run/fpm.sock;
         fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
         include fastcgi_params;
     }
@@ -153,11 +163,11 @@ server {
 }
 CONF;
 
-$nginxPath = "/etc/nginx/sites-available/{$domain}";
+$nginxPath = NGINX_AVAILABLE . "/{$domain}";
 file_put_contents($nginxPath, $nginxConfig);
 
 // Enable site
-$enablePath = "/etc/nginx/sites-enabled/{$domain}";
+$enablePath = NGINX_ENABLED . "/{$domain}";
 if (!file_exists($enablePath)) {
     symlink($nginxPath, $enablePath);
 }
@@ -165,4 +175,4 @@ if (!file_exists($enablePath)) {
 echo "Created vhost: {$domain}\n";
 echo "uid={$uid} gid={$gid}\n";
 echo "Home: {$home}\n";
-echo "Docroot: {$home}/web/app/public\n";
+echo "Docroot: {$docroot}\n";

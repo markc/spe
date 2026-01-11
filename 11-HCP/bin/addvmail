@@ -2,12 +2,17 @@
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 // Filesystem operations for mailbox creation (runs as root via SSH)
-// NS 3.0 path structure: /srv/domain/msg/user
 // Usage: addvmail user@domain.tld [password]
 
 if (php_sapi_name() !== 'cli') {
     die("CLI only\n");
 }
+
+// Load config or use defaults
+$config = is_file('/etc/ns3/config.php') ? require '/etc/ns3/config.php' : [];
+define('VPATH', $config['VPATH'] ?? '/srv');
+define('MPATH', $config['MPATH'] ?? VPATH . '/%s/msg');
+define('UPATH', $config['UPATH'] ?? VPATH . '/%s/msg/%s');
 
 $email = $argv[1] ?? null;
 $password = $argv[2] ?? null;
@@ -20,9 +25,8 @@ if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
 $email = strtolower($email);
 [$user, $domain] = explode('@', $email);
 
-// NS 3.0 paths
-$domainPath = "/srv/{$domain}";
-$home = "{$domainPath}/msg/{$user}";
+$domainPath = VPATH . "/{$domain}";
+$home = sprintf(UPATH, $domain, $user);
 
 // Check domain exists
 if (!is_dir($domainPath)) {

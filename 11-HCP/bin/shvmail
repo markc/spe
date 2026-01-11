@@ -2,12 +2,16 @@
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 // Filesystem operations for mailbox info (runs as root via SSH)
-// NS 3.0 path structure: /srv/domain/msg/user
 // Usage: shvmail user@domain.tld [--size]
 
 if (php_sapi_name() !== 'cli') {
     die("CLI only\n");
 }
+
+// Load config or use defaults
+$config = is_file('/etc/ns3/config.php') ? require '/etc/ns3/config.php' : [];
+define('VPATH', $config['VPATH'] ?? '/srv');
+define('UPATH', $config['UPATH'] ?? VPATH . '/%s/msg/%s');
 
 $email = $argv[1] ?? null;
 $showSize = in_array('--size', $argv);
@@ -20,8 +24,7 @@ if (!$email || $email === '--size') {
 $email = strtolower($email);
 [$user, $domain] = explode('@', $email);
 
-// NS 3.0 path
-$home = "/srv/{$domain}/msg/{$user}";
+$home = sprintf(UPATH, $domain, $user);
 
 if (!is_dir($home)) {
     fwrite(STDERR, "Error: Maildir not found: {$home}\n");

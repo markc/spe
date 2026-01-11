@@ -2,11 +2,17 @@
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 // Filesystem-only vhost modification - runs as root via SSH
-// NS 3.0 path structure: /srv/domain
 
 if (php_sapi_name() !== 'cli') {
     die("CLI only\n");
 }
+
+// Load config or use defaults
+$config = is_file('/etc/ns3/config.php') ? require '/etc/ns3/config.php' : [];
+define('VPATH', $config['VPATH'] ?? '/srv');
+define('NGINX_AVAILABLE', $config['NGINX_AVAILABLE'] ?? '/etc/nginx/sites-available');
+define('NGINX_ENABLED', $config['NGINX_ENABLED'] ?? '/etc/nginx/sites-enabled');
+define('PHP_VERSIONS', $config['PHP_VERSIONS'] ?? ['8.5', '8.4', '8.3']);
 
 if ($argc < 3) {
     die("Usage: chvhost <domain> <action> [args...]\n\nActions:\n  enable   - Enable nginx site\n  disable  - Disable nginx site\n  restart  - Reload nginx and php-fpm\n");
@@ -15,9 +21,7 @@ if ($argc < 3) {
 $domain = strtolower($argv[1]);
 $action = $argv[2];
 
-// NS 3.0 base path
-$srvBase = '/srv';
-$home = "{$srvBase}/{$domain}";
+$home = VPATH . "/{$domain}";
 
 if (!is_dir($home)) {
     fwrite(STDERR, "Error: vhost directory not found: {$home}\n");
@@ -26,8 +30,8 @@ if (!is_dir($home)) {
 
 switch ($action) {
     case 'enable':
-        $available = "/etc/nginx/sites-available/{$domain}";
-        $enabled = "/etc/nginx/sites-enabled/{$domain}";
+        $available = NGINX_AVAILABLE . "/{$domain}";
+        $enabled = NGINX_ENABLED . "/{$domain}";
 
         if (!file_exists($available)) {
             fwrite(STDERR, "Error: nginx config not found: {$available}\n");
@@ -52,7 +56,7 @@ switch ($action) {
         break;
 
     case 'disable':
-        $enabled = "/etc/nginx/sites-enabled/{$domain}";
+        $enabled = NGINX_ENABLED . "/{$domain}";
 
         if (!file_exists($enabled)) {
             echo "Already disabled: {$domain}\n";
@@ -68,7 +72,7 @@ switch ($action) {
         exec("systemctl reload nginx");
 
         // Find and reload PHP-FPM
-        foreach (['8.5', '8.4', '8.3'] as $phpVer) {
+        foreach (PHP_VERSIONS as $phpVer) {
             if (file_exists("/etc/php/{$phpVer}/fpm/pool.d/{$domain}.conf")) {
                 exec("systemctl reload php{$phpVer}-fpm");
                 echo "Reloaded nginx and php{$phpVer}-fpm\n";

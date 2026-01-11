@@ -14,17 +14,7 @@ namespace SPE\HCP\Lib;
  */
 final class Vhosts
 {
-    private const string VHOST_BASE = '/srv';  // NS 3.0: /srv/domain/web/app/public
-
     private static ?\PDO $pdo = null;
-
-    /**
-     * Get database path from environment or use local default.
-     */
-    private static function dbPath(): string
-    {
-        return $_ENV['SYSADM_DB'] ?? getenv('SYSADM_DB') ?: __DIR__ . '/../sysadm.db';
-    }
 
     /**
      * Get database connection.
@@ -32,7 +22,7 @@ final class Vhosts
     private static function db(): \PDO
     {
         if (self::$pdo === null) {
-            self::$pdo = new \PDO('sqlite:' . self::dbPath(), null, null, [
+            self::$pdo = new \PDO('sqlite:' . Config::sysadmDb(), null, null, [
                 \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
                 \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
             ]);
@@ -99,7 +89,7 @@ final class Vhosts
             'uname' => $uname,
             'uid' => $uid,
             'gid' => $gid,
-            'home' => self::VHOST_BASE . "/{$domain}",
+            'home' => Config::vhostPath($domain),
         ];
     }
 
@@ -226,7 +216,7 @@ final class Vhosts
             'disk_human' => $diskHuman,
             'mailbox_count' => $mailCount,
             'alias_count' => $aliasCount,
-            'home' => self::VHOST_BASE . "/{$row['domain']}",
+            'home' => Config::vhostPath($row['domain']),
             'created_at' => $row['created_at'],
             'updated_at' => $row['updated_at'],
         ];
