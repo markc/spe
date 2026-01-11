@@ -74,16 +74,26 @@ final class SystemModel extends Plugin
 
     private function getCounts(): array
     {
-        $vhosts = count(glob('/home/u/*', GLOB_ONLYDIR)) - 1; // Exclude sysadm
+        // Query counts from sysadm.db
+        $dbPath = $_ENV['SYSADM_DB'] ?? getenv('SYSADM_DB') ?: __DIR__ . '/../../../sysadm.db';
+
+        $vhosts = 0;
         $mailboxes = 0;
         $databases = 0;
 
-        // Count mailboxes from /home/u/*/home/*
-        foreach (glob('/home/u/*/home', GLOB_ONLYDIR) as $maildir) {
-            $mailboxes += count(glob($maildir . '/*', GLOB_ONLYDIR));
+        if (file_exists($dbPath)) {
+            try {
+                $pdo = new \PDO('sqlite:' . $dbPath);
+                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+                $vhosts = (int)$pdo->query('SELECT COUNT(*) FROM vhosts')->fetchColumn();
+                $mailboxes = (int)$pdo->query('SELECT COUNT(*) FROM vmails')->fetchColumn();
+            } catch (\PDOException $e) {
+                // Database not available, keep defaults
+            }
         }
 
-        // Count databases
+        // Count databases from MariaDB if available
         $result = Shell::run('mysql', ['-Nse', 'SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name NOT IN ("information_schema","mysql","performance_schema","sys")']);
         if ($result['success']) {
             $databases = (int)trim($result['output']);

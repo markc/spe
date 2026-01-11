@@ -1,0 +1,9 @@
+# Database files (local data)
+*.db
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store

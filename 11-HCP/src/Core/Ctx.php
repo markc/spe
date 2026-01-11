@@ -3,14 +3,14 @@
 
 namespace SPE\HCP\Core;
 
-use SPE\App\{Acl, Db, Util};
+use SPE\App\{Acl, Util};
 
 final class Ctx
 {
     public array $in;
     public array $out;
     public array $nav;
-    public Db $db;
+    public HcpDb $db;
 
     public function __construct(
         public string $email = 'noreply@localhost',
@@ -34,12 +34,12 @@ final class Ctx
         ];
         $this->out = $out;
 
-        // Initialize users database for auth
-        $this->db = new Db('users');
+        // Initialize HCP database for auth
+        $this->db = new HcpDb();
         $this->nav = $this->buildNav();
 
         // Set email from hostname
-        $hostname = trim(`hostname -f 2>/dev/null`) ?: 'localhost';
+        $hostname = trim(shell_exec('hostname -f 2>/dev/null') ?? '') ?: 'localhost';
         $this->email = "noreply@{$hostname}";
     }
 

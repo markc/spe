@@ -3,8 +3,8 @@
 
 namespace SPE\HCP\Plugins\Auth;
 
-use SPE\App\{Acl, Db, QueryType, Util};
-use SPE\HCP\Core\Ctx;
+use SPE\App\{Acl, QueryType, Util};
+use SPE\HCP\Core\{Ctx, HcpDb};
 
 /**
  * Auth plugin - handles authentication flows
@@ -18,7 +18,7 @@ use SPE\HCP\Core\Ctx;
  */
 final class AuthModel
 {
-    private Db $db;
+    private HcpDb $db;
     private array $f = [
         'login' => '',
         'webpw' => '',
@@ -34,7 +34,7 @@ final class AuthModel
     public function __construct(private Ctx $ctx)
     {
         foreach ($this->f as $k => &$v) $v = $_REQUEST[$k] ?? $v;
-        $this->db = new Db('users');
+        $this->db = new HcpDb();
     }
 
     // === Login ===
@@ -45,7 +45,7 @@ final class AuthModel
 
         // Already logged in
         if (Util::is_usr()) {
-            header('Location: /');
+            header('Location: ?o=System');
             exit;
         }
 
@@ -85,10 +85,10 @@ final class AuthModel
             'lname' => $usr['lname'],
         ];
 
-        // Remember me cookie
-        if ($this->f['remember']) {
-            Util::setRemember($this->db, (int)$usr['id']);
-        }
+        // TODO: Remember me cookie - needs HcpDb-compatible implementation
+        // if ($this->f['remember']) {
+        //     Util::setRemember($this->db, (int)$usr['id']);
+        // }
 
         // Set admin session flag (from HCP pattern)
         if ($acl->can(Acl::Admin)) {
@@ -96,7 +96,7 @@ final class AuthModel
         }
 
         Util::log(($usr['fname'] ?: $usr['login']) . ' logged in', 'success');
-        header('Location: /');
+        header('Location: ?o=System');
         exit;
     }
 
@@ -110,8 +110,8 @@ final class AuthModel
             $login = $_SESSION['usr']['login'] ?? 'User';
             $id = (int)$_SESSION['usr']['id'];
 
-            // Clear remember cookie
-            Util::clearRemember($this->db, $id);
+            // TODO: Clear remember cookie - needs HcpDb-compatible implementation
+            // Util::clearRemember($this->db, $id);
 
             // Clear admin session
             if (isset($_SESSION['adm'])) {
@@ -124,7 +124,7 @@ final class AuthModel
             Util::log("$login logged out", 'success');
         }
 
-        header('Location: /');
+        header('Location: ?o=System');
         exit;
     }
 
@@ -135,7 +135,7 @@ final class AuthModel
         Util::elog(__METHOD__);
 
         if (Util::is_usr()) {
-            header('Location: /');
+            header('Location: ?o=System');
             exit;
         }
 

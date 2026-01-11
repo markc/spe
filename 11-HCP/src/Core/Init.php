@@ -3,7 +3,7 @@
 
 namespace SPE\HCP\Core;
 
-use SPE\App\{Acl, Db, Util};
+use SPE\App\{Acl, Util};
 
 final readonly class Init
 {
@@ -14,9 +14,8 @@ final readonly class Init
     {
         Util::elog(__METHOD__);
 
-        // Restore session from "remember me" cookie
-        $usersDb = new Db('users');
-        Util::remember($usersDb);
+        // TODO: Implement remember cookie with HcpDb
+        // Util::remember() expects SPE\App\Db, skip for now
 
         [$o, $m] = [$ctx->in['o'], $ctx->in['m']];
 
@@ -67,7 +66,11 @@ final readonly class Init
         // Execute model method
         $model = new $modelClass($ctx);
         if (!method_exists($model, $m)) {
-            $m = 'list';
+            // Auth defaults to login, others to list
+            $m = ($o === 'Auth') ? 'login' : 'list';
+        }
+        if (!method_exists($model, $m)) {
+            return '<div class="card"><p>Method not found: ' . htmlspecialchars($m) . '</p></div>';
         }
         $data = $model->$m();
 

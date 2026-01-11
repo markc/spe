@@ -2,6 +2,10 @@
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 // 11-HCP - Simple Hosting Control Panel
 
+// Suppress deprecation warnings to prevent header issues
+error_reporting(E_ALL & ~E_DEPRECATED);
+
+require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 use SPE\App\Env;
