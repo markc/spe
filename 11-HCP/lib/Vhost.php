@@ -14,7 +14,7 @@ namespace SPE\HCP\Lib;
  */
 final class Vhost
 {
-    private const string VHOST_BASE = '/srv';  // NS 3.0: /srv/domain/web/ap/public
+    private const string VHOST_BASE = '/srv';  // NS 3.0: /srv/domain/web/app/public
 
     private static ?\PDO $pdo = null;
 

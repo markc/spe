@@ -2,7 +2,7 @@
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 // Filesystem-only vhost creation - runs as root via SSH
-// NS 3.0 path structure: /srv/domain/web/ap/public
+// NS 3.0 path structure: /srv/domain/web/app/public
 
 if (php_sapi_name() !== 'cli') {
     die("CLI only\n");
@@ -64,8 +64,8 @@ $dirs = [
     "{$home}/var/run",
     "{$home}/msg",                    // Mailboxes: /srv/domain/msg/user
     "{$home}/web",                    // Web apps
-    "{$home}/web/ap",                 // Primary app
-    "{$home}/web/ap/public",          // Document root
+    "{$home}/web/app",                // Primary app
+    "{$home}/web/app/public",         // Document root
 ];
 
 foreach ($dirs as $dir) {
@@ -82,7 +82,7 @@ chmod("{$home}/.ssh", 0700);
 chmod("{$home}/var/log", 0755);
 
 // Create default index.html
-$indexPath = "{$home}/web/ap/public/index.html";
+$indexPath = "{$home}/web/app/public/index.html";
 $indexContent = <<<HTML
 <!DOCTYPE html>
 <html>
@@ -131,7 +131,7 @@ $nginxConfig = <<<CONF
 server {
     listen 80;
     server_name {$domain} www.{$domain};
-    root /srv/{$domain}/web/ap/public;
+    root /srv/{$domain}/web/app/public;
     index index.html index.php;
 
     access_log /srv/{$domain}/var/log/access.log;
@@ -165,4 +165,4 @@ if (!file_exists($enablePath)) {
 echo "Created vhost: {$domain}\n";
 echo "uid={$uid} gid={$gid}\n";
 echo "Home: {$home}\n";
-echo "Docroot: {$home}/web/ap/public\n";
+echo "Docroot: {$home}/web/app/public\n";

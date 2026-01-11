@@ -36,7 +36,7 @@ $gname = $groupInfo ? $groupInfo['name'] : '?';
 
 echo "Domain: {$domain}\n";
 echo "Home: {$home}\n";
-echo "Docroot: {$home}/web/ap/public\n";
+echo "Docroot: {$home}/web/app/public\n";
 echo "User: {$uname} (uid={$uid})\n";
 echo "Group: {$gname} (gid={$gid})\n";
 
