@@ -44,6 +44,9 @@ final class Config
     public const int UID_MAX = 1999;
     public const string WUGID = 'www-data';
 
+    // === SSH Target Host ===
+    public const string DEFAULT_HOST = '127.0.0.1';
+
     // === Cached Values ===
     private static ?string $hostname = null;
 
@@ -56,6 +59,14 @@ final class Config
             self::$hostname = trim(shell_exec('hostname -f 2>/dev/null') ?? '') ?: 'localhost';
         }
         return self::$hostname;
+    }
+
+    /**
+     * Get target SSH host (from env or default).
+     */
+    public static function targetHost(): string
+    {
+        return $_ENV['TARGET_HOST'] ?? getenv('TARGET_HOST') ?: self::DEFAULT_HOST;
     }
 
     /**

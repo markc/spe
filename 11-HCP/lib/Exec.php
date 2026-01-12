@@ -20,6 +20,7 @@ final class Exec
 {
     private const string BIN_PATH = '/usr/local/bin';
     private const string SSH_KEY_PATH = '/root/.ssh/id_ed25519';
+    private const string SSH_KEY_FALLBACK = '/.ssh/keys/lan';
     private const string SSH_USER = 'root';
     private const int SSH_PORT = 22;
     private const int SSH_TIMEOUT = 30;
@@ -42,7 +43,7 @@ final class Exec
         }
 
         // SSH execution (web UI or non-root CLI)
-        $host = $host ?? '127.0.0.1';
+        $host = $host ?? Config::targetHost();
         return self::sshExec($host, $cmd, $args);
     }
 
@@ -116,8 +117,8 @@ final class Exec
         // Load private key
         $keyPath = self::SSH_KEY_PATH;
         if (!file_exists($keyPath)) {
-            // Fallback to web user's key
-            $keyPath = getenv('HOME') . '/.ssh/id_ed25519';
+            // Fallback to user's key
+            $keyPath = getenv('HOME') . self::SSH_KEY_FALLBACK;
         }
 
         if (!file_exists($keyPath)) {
