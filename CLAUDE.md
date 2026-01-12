@@ -139,13 +139,12 @@ All chapters 02-10 reference shared assets via absolute paths (`/base.css`, `/si
 
 ### CSS Architecture (base.css + site.css)
 
-**base.css** - Generic reusable framework (~1750 lines):
+**base.css** - Generic reusable framework (~1700 lines):
 - CSS cascade layers: `@layer reset, tokens, base, components, utilities, animations`
 - Design tokens (spacing, typography, shadows, transitions)
 - Layouts: `.container`, `.topnav`, `.sidebar-layout`, `.sidebar`
 - Components: `.card`, `.btn`, `.tag`, `.dropdown`, `.toast`, `.prose`
 - Content: `.article-*`, `.data-table`, `.list-item-*`, `.pagination`
-- Legacy aliases: `.chapter-table`, `.blog-*`, `.docs-*` (backward compat)
 - Utilities: flex, grid, spacing, text alignment
 - Animations: fade, scale, reveal, hover effects
 - Accessibility: `prefers-reduced-motion`, `prefers-contrast`, `:focus-visible`
