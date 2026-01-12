@@ -990,6 +990,105 @@
         opacity: 0;
     }
 
+    /* === Prose (Article/Markdown Content) === */
+    .prose {
+        line-height: var(--leading-relaxed);
+    }
+
+    .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+        line-height: var(--leading-tight);
+        font-weight: 600;
+    }
+
+    .prose h1 {
+        font-size: 2em;
+        border-block-end: 1px solid var(--border);
+        padding-block-end: var(--space-3);
+    }
+
+    .prose h2 {
+        font-size: 1.5em;
+        border-block-end: 1px solid var(--border);
+        padding-block-end: var(--space-3);
+    }
+
+    .prose h3 { font-size: 1.25em; }
+    .prose h4 { font-size: 1em; }
+    .prose h5 { font-size: var(--text-sm); }
+
+    .prose p { margin-block: 1em; }
+    .prose ul, .prose ol { margin-block: 1em; padding-inline-start: 2em; }
+    .prose li { margin-block: 0.25em; }
+
+    .prose blockquote {
+        margin-block: 1em;
+        padding: var(--space-4);
+        border-inline-start: 3px solid var(--accent);
+        background: var(--bg-secondary);
+        border-radius: var(--radius-sm);
+        color: var(--fg-muted);
+    }
+
+    .prose pre {
+        margin-block: 1em;
+        padding: var(--space-4);
+        background: var(--bg-secondary);
+        border-radius: var(--radius-md);
+        overflow-x: auto;
+        border: 1px solid var(--border);
+    }
+
+    .prose code {
+        padding: 0.2em 0.4em;
+        background: var(--bg-secondary);
+        border-radius: var(--radius-sm);
+        font-size: var(--text-sm);
+    }
+
+    .prose pre code {
+        padding: 0;
+        background: none;
+        font-size: 0.85em;
+    }
+
+    .prose img {
+        max-width: 100%;
+        height: auto;
+        border-radius: var(--radius-md);
+        margin-block: 1em;
+    }
+
+    .prose hr {
+        margin-block: var(--space-8);
+        border: none;
+        border-block-start: 1px solid var(--border);
+    }
+
+    .prose a { text-decoration: underline; }
+    .prose del { color: var(--fg-muted); }
+
+    .prose table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-block: 1em;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+    }
+
+    .prose th, .prose td {
+        padding: var(--space-3) var(--space-4);
+        border: 1px solid var(--border);
+        text-align: start;
+    }
+
+    .prose th {
+        background: var(--bg-secondary);
+        font-weight: 600;
+        font-size: var(--text-sm);
+    }
+
+    .prose tr:nth-child(even) { background: var(--bg-secondary); }
+
     /* === Data Table === */
     .data-table {
         width: 100%;
