@@ -12,24 +12,9 @@
         /* Color scheme declaration */
         color-scheme: light dark;
 
-        /* Semantic color tokens - light theme defaults */
-        --bg-primary: #ffffff;
-        --bg-secondary: #f6f8fa;
-        --bg-tertiary: #eaeef2;
-        --fg-primary: #1f2328;
-        --fg-secondary: #656d76;
-        --fg-muted: #8b949e;
-        --accent: #0969da;
-        --accent-hover: #0550ae;
-        --accent-subtle: #ddf4ff;
-        --border: #d0d7de;
-        --border-muted: #d8dee4;
-        --success: #1a7f37;
-        --success-subtle: #dafbe1;
-        --danger: #cf222e;
-        --danger-subtle: #ffebe9;
-        --warning: #9a6700;
-        --warning-subtle: #fff8c5;
+        /* NOTE: All color tokens (--bg-*, --fg-*, --accent*, --border*,
+           --success*, --danger*, --warning*) are defined in site.css.
+           This allows easy theme customization without modifying base.css. */
 
         /* Typography scale (fluid) */
         --text-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.75rem);
@@ -114,48 +99,8 @@
         --z-toast: 800;
     }
 
-    /* Dark theme */
-    .dark {
-        --bg-primary: #0d1117;
-        --bg-secondary: #161b22;
-        --bg-tertiary: #21262d;
-        --fg-primary: #e6edf3;
-        --fg-secondary: #8b949e;
-        --fg-muted: #6e7681;
-        --accent: #58a6ff;
-        --accent-hover: #79b8ff;
-        --accent-subtle: #388bfd26;
-        --border: #30363d;
-        --border-muted: #21262d;
-        --success: #3fb950;
-        --success-subtle: #2ea04326;
-        --danger: #f85149;
-        --danger-subtle: #f8514926;
-        --warning: #d29922;
-        --warning-subtle: #bb800926;
-        --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.3);
-        --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
-        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
-        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
-        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4);
-    }
-
-    /* System preference fallback */
-    @media (prefers-color-scheme: dark) {
-        :root:not(.light):not(.dark) {
-            --bg-primary: #0d1117;
-            --bg-secondary: #161b22;
-            --bg-tertiary: #21262d;
-            --fg-primary: #e6edf3;
-            --fg-secondary: #8b949e;
-            --fg-muted: #6e7681;
-            --accent: #58a6ff;
-            --accent-hover: #79b8ff;
-            --accent-subtle: #388bfd26;
-            --border: #30363d;
-            --border-muted: #21262d;
-        }
-    }
+    /* NOTE: Dark theme colors and @media (prefers-color-scheme: dark)
+       are defined in site.css to keep all theming in one place. */
 }
 
 /* === CSS Reset === */
@@ -1349,6 +1294,15 @@
     .inline-flex { display: inline-flex; }
     .grid { display: grid; gap: var(--space-4); }
 
+    /* Display - Bootstrap aliases */
+    .d-none { display: none; }
+    .d-block { display: block; }
+    .d-inline { display: inline; }
+    .d-inline-block { display: inline-block; }
+    .d-flex { display: flex; gap: var(--space-4); }
+    .d-inline-flex { display: inline-flex; }
+    .d-grid { display: grid; gap: var(--space-4); }
+
     /* Flex */
     .flex-col { flex-direction: column; }
     .flex-wrap { flex-wrap: wrap; }
@@ -1362,6 +1316,18 @@
     .justify-between { justify-content: space-between; }
     .flex-1 { flex: 1; }
     .flex-2 { flex: 2; }
+
+    /* Flex - Bootstrap aliases */
+    .flex-column { flex-direction: column; }
+    .align-items-start { align-items: flex-start; }
+    .align-items-center { align-items: center; }
+    .align-items-end { align-items: flex-end; }
+    .justify-content-start { justify-content: flex-start; }
+    .justify-content-center { justify-content: center; }
+    .justify-content-end { justify-content: flex-end; }
+    .justify-content-between { justify-content: space-between; }
+    .justify-content-around { justify-content: space-around; }
+    .justify-content-evenly { justify-content: space-evenly; }
 
     /* Gap */
     .gap-0 { gap: var(--space-0); }
