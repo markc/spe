@@ -141,19 +141,27 @@ All chapters 02-10 reference shared assets via absolute paths (`/base.css`, `/si
 
 **Design Principle:** base.css is color-agnostic (never defines colors). site.css defines ALL colors. This separation allows base.min.css to be cached indefinitely while themes are swapped by changing site.css.
 
-**base.css** - Color-agnostic framework (~1665 lines):
+**Mobile-First Responsive:** Base styles are mobile, with progressive enhancement via `min-width` breakpoints:
+- **Mobile** (default): Single column, stacked flex, sidebar off-canvas, cards without radius
+- **600px+** (tablet): 2-column grids, cards gain border-radius and shadows
+- **768px+** (small desktop): Flex becomes row, sidebar visible, topnav links centered
+- **900px+** (desktop): 3-column grids
+- **1024px+** (large): 4-column grids
+
+**base.css** - Color-agnostic framework (~1700 lines):
 - CSS cascade layers: `@layer reset, tokens, base, components, utilities, animations`
 - Structural tokens only: typography, spacing, radius, shadows, transitions, z-index
 - Layouts: `.container`, `.topnav`, `.sidebar-layout`, `.sidebar`
-- Components: `.card`, `.btn`, `.tag`, `.dropdown`, `.toast`, `.prose`
+- Components: `.card`, `.btn`, `.tag`, `.dropdown`, `.toast`, `.prose`, `.glass`
 - Content: `.article-*`, `.data-table`, `.list-item-*`, `.pagination`
-- Utilities: flex, grid, spacing, text alignment
+- Utilities: `.flex`, `.flex-row`, `.flex-col`, grid, spacing, text
 - Bootstrap aliases: `d-flex`, `d-none`, `align-items-center`, `justify-content-between`, etc.
 - Animations: fade, scale, reveal, hover effects
 - Accessibility: `prefers-reduced-motion`, `prefers-contrast`, `:focus-visible`
 
-**site.css** - Complete theme definition (~147 lines):
+**site.css** - Complete theme definition (~168 lines):
 - Light theme colors in `:root` (--bg-*, --fg-*, --accent*, --border*, --success*, --danger*, --warning*)
+- Glass morphism tokens: `--glass`, `--glass-border`, `--accent-glow`
 - Dark theme via `@media (prefers-color-scheme: dark)`
 - Explicit `html.light` and `html.dark` for toggle overrides
 - Shadow overrides for dark mode (higher opacity)
