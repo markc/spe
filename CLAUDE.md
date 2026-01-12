@@ -139,19 +139,34 @@ All chapters 02-10 reference shared assets via absolute paths (`/base.css`, `/si
 
 ### CSS Architecture (base.css + site.css)
 
-**base.css** - Generic reusable framework (~1700 lines):
+**Design Principle:** base.css is color-agnostic (never defines colors). site.css defines ALL colors. This separation allows base.min.css to be cached indefinitely while themes are swapped by changing site.css.
+
+**base.css** - Color-agnostic framework (~1665 lines):
 - CSS cascade layers: `@layer reset, tokens, base, components, utilities, animations`
-- Design tokens (spacing, typography, shadows, transitions)
+- Structural tokens only: typography, spacing, radius, shadows, transitions, z-index
 - Layouts: `.container`, `.topnav`, `.sidebar-layout`, `.sidebar`
 - Components: `.card`, `.btn`, `.tag`, `.dropdown`, `.toast`, `.prose`
 - Content: `.article-*`, `.data-table`, `.list-item-*`, `.pagination`
 - Utilities: flex, grid, spacing, text alignment
+- Bootstrap aliases: `d-flex`, `d-none`, `align-items-center`, `justify-content-between`, etc.
 - Animations: fade, scale, reveal, hover effects
 - Accessibility: `prefers-reduced-motion`, `prefers-contrast`, `:focus-visible`
 
-**site.css** - Colors only (~67 lines):
-- Color tokens (light/dark themes via CSS custom properties)
-- Single brand class: `.btn-php`
+**site.css** - Complete theme definition (~147 lines):
+- Light theme colors in `:root` (--bg-*, --fg-*, --accent*, --border*, --success*, --danger*, --warning*)
+- Dark theme via `@media (prefers-color-scheme: dark)`
+- Explicit `html.light` and `html.dark` for toggle overrides
+- Shadow overrides for dark mode (higher opacity)
+- Brand class: `.btn-php`
+
+**Creating new themes:**
+```bash
+cp docs/site.css docs/themes/ocean.css  # Copy and modify colors
+```
+```html
+<link rel="stylesheet" href="/base.min.css">
+<link rel="stylesheet" href="/themes/ocean.css">
+```
 
 **Inline theme script** (in `<head>` to prevent FOUC):
 ```html
