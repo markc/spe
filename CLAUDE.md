@@ -139,19 +139,20 @@ All chapters 02-10 reference shared assets via absolute paths (`/base.css`, `/si
 
 ### CSS Architecture (base.css + site.css)
 
-**base.css** - Generic reusable framework (~1350 lines):
+**base.css** - Generic reusable framework (~1750 lines):
 - CSS cascade layers: `@layer reset, tokens, base, components, utilities, animations`
-- Design tokens (spacing, typography, colors, shadows, transitions)
+- Design tokens (spacing, typography, shadows, transitions)
 - Layouts: `.container`, `.topnav`, `.sidebar-layout`, `.sidebar`
-- Components: `.card`, `.btn`, `.tag`, `.dropdown`, `.toast`
+- Components: `.card`, `.btn`, `.tag`, `.dropdown`, `.toast`, `.prose`
+- Content: `.article-*`, `.data-table`, `.list-item-*`, `.pagination`
+- Legacy aliases: `.chapter-table`, `.blog-*`, `.docs-*` (backward compat)
 - Utilities: flex, grid, spacing, text alignment
 - Animations: fade, scale, reveal, hover effects
 - Accessibility: `prefers-reduced-motion`, `prefers-contrast`, `:focus-visible`
 
-**site.css** - SPE-specific branding (~465 lines):
-- Color tokens (light/dark themes)
-- Brand styles (`.brand` links, `.btn-php`)
-- SPE components: `.prose`, `.chapter-table`, `.blog-*`, `.docs-*`
+**site.css** - Colors only (~67 lines):
+- Color tokens (light/dark themes via CSS custom properties)
+- Single brand class: `.btn-php`
 
 **Inline theme script** (in `<head>` to prevent FOUC):
 ```html
