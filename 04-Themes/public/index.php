@@ -150,11 +150,13 @@ final class Theme {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{$this->out['doc']} [{$theme}]</title>
-    <link rel="stylesheet" href="/spe.css">
+    <link rel="stylesheet" href="/base.css">
+    <link rel="stylesheet" href="/site.css">
+    <script>(function(){const t=localStorage.getItem("base-theme");document.documentElement.className=t||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")})();</script>
 </head>
 <body>
 {$body}
-<script src="/spe.js"></script>
+<script src="/base.js"></script>
 </body>
 </html>
 HTML;

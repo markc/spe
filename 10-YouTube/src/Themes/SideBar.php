@@ -23,7 +23,9 @@ final class SideBar extends Theme
         <!DOCTYPE html><html lang="en"><head>
             <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
             <meta name="color-scheme" content="light dark">
-            <title>$doc [SideBar]</title><link rel="stylesheet" href="/spe.css">
+            <title>$doc [SideBar]</title><link rel="stylesheet" href="/base.css">
+            <link rel="stylesheet" href="/site.css">
+            <script>(function(){const t=localStorage.getItem("base-theme");document.documentElement.className=t||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")})();</script>
             <style>:root { --primary: #ff0000; }</style>
         </head><body>
             $toast
@@ -38,7 +40,7 @@ final class SideBar extends Theme
                     <footer class="text-center mt-3"><small>$foot</small></footer>
                 </div>
             </div>
-        <script src="/spe.js"></script></body></html>
+        <script src="/base.js"></script></body></html>
         HTML;
     }
 

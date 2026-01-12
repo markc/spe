@@ -6,7 +6,19 @@
     <meta name="color-scheme" content="light dark">
     <title>SPE Docs</title>
     <link rel="icon" href="favicon.ico">
-    <link rel="stylesheet" href="spe.css">
+    <link rel="stylesheet" href="base.css">
+    <link rel="stylesheet" href="site.css">
+    <script>
+    (function() {
+        const stored = localStorage.getItem("base-theme");
+        if (stored) {
+            document.documentElement.className = stored;
+        } else {
+            const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            document.documentElement.className = prefersDark ? "dark" : "light";
+        }
+    })();
+    </script>
 </head>
 <body>
     <nav class="topnav">
@@ -78,7 +90,7 @@
             </footer>
         </div>
     </div>
-    <script src="spe.js"></script>
+    <script src="base.js"></script>
     <script src="md.js"></script>
 </body>
 </html>

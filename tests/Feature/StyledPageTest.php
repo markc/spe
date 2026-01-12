@@ -25,7 +25,7 @@ describe('Full Page Rendering', function () {
         // Head section with assets
         expect($html)->toContain('<head>');
         expect($html)->toContain('<title>SPE::02 Home Page</title>');
-        expect($html)->toContain('href="/spe.css"');
+        expect($html)->toContain('href="/site.css"');
         expect($html)->toContain('</head>');
 
         // Body with container layout
@@ -36,7 +36,7 @@ describe('Full Page Rendering', function () {
         expect($html)->toContain('<main>');
         expect($html)->toContain('<footer');
         expect($html)->toContain('</div>');
-        expect($html)->toContain('src="/spe.js"');
+        expect($html)->toContain('src="/base.js"');
         expect($html)->toContain('</body>');
 
         // Page-specific content
@@ -257,20 +257,20 @@ describe('Comparison with 01-Simple', function () {
         $simpleHtml = renderPage(simpleIndexPath(), []);
 
         // Styled uses external CSS
-        expect($styledHtml)->toContain('href="/spe.css"');
+        expect($styledHtml)->toContain('href="/site.css"');
         expect($styledHtml)->not->toContain('<style>body{');
 
         // Simple uses inline styles
         expect($simpleHtml)->toContain('<style>');
-        expect($simpleHtml)->not->toContain('href="/spe.css"');
+        expect($simpleHtml)->not->toContain('href="/site.css"');
     });
 
     test('uses external JS instead of no JS', function () {
         $styledHtml = renderPage(styledIndexPath(), []);
         $simpleHtml = renderPage(simpleIndexPath(), []);
 
-        expect($styledHtml)->toContain('src="/spe.js"');
-        expect($simpleHtml)->not->toContain('src="/spe.js"');
+        expect($styledHtml)->toContain('src="/base.js"');
+        expect($simpleHtml)->not->toContain('src="/base.js"');
     });
 
     test('has container layout vs simple body', function () {

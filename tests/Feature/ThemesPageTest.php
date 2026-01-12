@@ -29,13 +29,13 @@ describe('Full Page Rendering', function () {
 
         expect($html)->toContain('<!DOCTYPE html>');
         expect($html)->toContain('<title>SPE::04 [Simple]</title>');
-        expect($html)->toContain('href="/spe.css"');
+        expect($html)->toContain('href="/site.css"');
         expect($html)->toContain('<div class="container">');
         expect($html)->toContain('<header>');
         expect($html)->toContain('<nav class="card flex">');
         expect($html)->toContain('<main>');
         expect($html)->toContain('<footer');
-        expect($html)->toContain('src="/spe.js"');
+        expect($html)->toContain('src="/base.js"');
     });
 
     test('renders complete page with TopNav theme', function () {

@@ -24,7 +24,7 @@ describe('Full Page Rendering', function () {
 
         // Head with assets
         expect($html)->toContain('<title>SPE::03 Home</title>');
-        expect($html)->toContain('href="/spe.css"');
+        expect($html)->toContain('href="/site.css"');
 
         // Body with container
         expect($html)->toContain('<div class="container">');
@@ -35,7 +35,7 @@ describe('Full Page Rendering', function () {
 
         // Plugin content
         expect($html)->toContain('Home Page');
-        expect($html)->toContain('src="/spe.js"');
+        expect($html)->toContain('src="/base.js"');
     });
 
     test('renders complete About page', function () {

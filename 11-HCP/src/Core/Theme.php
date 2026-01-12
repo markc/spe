@@ -76,14 +76,16 @@ abstract class Theme
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <title>{$this->out['doc']} - {$hostname}</title>
-            <link rel="stylesheet" href="/spe.css">
+            <link rel="stylesheet" href="/base.css">
+            <link rel="stylesheet" href="/site.css">
+            <script>(function(){const t=localStorage.getItem("base-theme");document.documentElement.className=t||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")})();</script>
             <link rel="stylesheet" href="/hcp.css">
         {$css}
         </head>
         <body>
         {$flash}
         {$body}
-        <script src="/spe.js"></script>
+        <script src="/base.js"></script>
         <script src="/tables.js"></script>
         {$js}
         {$end}

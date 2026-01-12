@@ -24,7 +24,9 @@ final class TopNav extends Theme
         <!DOCTYPE html><html lang="en"><head>
             <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
             <meta name="color-scheme" content="light dark">
-            <title>$doc [TopNav]</title><link rel="stylesheet" href="/spe.css">
+            <title>$doc [TopNav]</title><link rel="stylesheet" href="/base.css">
+            <link rel="stylesheet" href="/site.css">
+            <script>(function(){const t=localStorage.getItem("base-theme");document.documentElement.className=t||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")})();</script>
             <style>:root { --primary: #ff0000; }</style>
         </head><body>
             $toast
@@ -35,7 +37,7 @@ final class TopNav extends Theme
             </nav>
             <main class="container mt-3">$main</main>
             <footer class="container text-center mt-3"><small>$foot</small></footer>
-        <script src="/spe.js"></script></body></html>
+        <script src="/base.js"></script></body></html>
         HTML;
     }
 }
