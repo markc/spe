@@ -16,16 +16,17 @@
            --success*, --danger*, --warning*) are defined in site.css.
            This allows easy theme customization without modifying base.css. */
 
-        /* Typography scale (fluid) */
+        /* Typography scale (fluid) - aggressive scaling for headings */
         --text-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.75rem);
         --text-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.875rem);
         --text-base: clamp(0.9rem, 0.85rem + 0.25vw, 1rem);
         --text-lg: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
         --text-xl: clamp(1.1rem, 1rem + 0.5vw, 1.25rem);
-        --text-2xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
-        --text-3xl: clamp(1.5rem, 1.25rem + 1.25vw, 2rem);
-        --text-4xl: clamp(1.875rem, 1.5rem + 1.875vw, 2.5rem);
-        --text-5xl: clamp(2.25rem, 1.75rem + 2.5vw, 3rem);
+        --text-2xl: clamp(1.25rem, 1rem + 1vw, 1.5rem);
+        --text-3xl: clamp(1.5rem, 1rem + 2vw, 2rem);
+        --text-4xl: clamp(1.75rem, 1rem + 3vw, 2.5rem);
+        --text-5xl: clamp(2rem, 1rem + 4vw, 3.5rem);
+        --text-6xl: clamp(2.5rem, 1rem + 5vw, 4.5rem);
 
         /* Spacing scale */
         --space-0: 0;
@@ -535,6 +536,49 @@
 
     nav a.active::after {
         transform: scaleX(1);
+    }
+
+    /* Sliding nav indicator - animated background for active link */
+    .nav-indicator {
+        position: relative;
+        display: flex;
+        gap: var(--space-1);
+        padding: var(--space-1);
+        background: var(--bg-tertiary);
+        border-radius: var(--radius-full);
+    }
+
+    .nav-indicator a {
+        position: relative;
+        z-index: 1;
+        padding: var(--space-2) var(--space-4);
+        border-radius: var(--radius-full);
+        color: var(--fg-secondary);
+        transition: color var(--transition-fast);
+    }
+
+    .nav-indicator a::after {
+        display: none;
+    }
+
+    .nav-indicator a:hover {
+        color: var(--fg-primary);
+    }
+
+    .nav-indicator a.active {
+        color: var(--fg-primary);
+    }
+
+    .nav-indicator-inner {
+        position: absolute;
+        top: var(--space-1);
+        left: var(--space-1);
+        height: calc(100% - var(--space-2));
+        background: var(--bg-primary);
+        border-radius: var(--radius-full);
+        box-shadow: var(--shadow-sm);
+        transition: transform var(--transition-base), width var(--transition-base);
+        pointer-events: none;
     }
 
     /* Scrolled nav state - uses glass morphism */
@@ -1454,6 +1498,10 @@
     .text-lg { font-size: var(--text-lg); }
     .text-xl { font-size: var(--text-xl); }
     .text-2xl { font-size: var(--text-2xl); }
+    .text-3xl { font-size: var(--text-3xl); }
+    .text-4xl { font-size: var(--text-4xl); }
+    .text-5xl { font-size: var(--text-5xl); }
+    .text-6xl { font-size: var(--text-6xl); }
     .font-normal { font-weight: 400; }
     .font-medium { font-weight: 500; }
     .font-semibold { font-weight: 600; }
