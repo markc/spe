@@ -1,12 +1,17 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Session\Plugins\Home;
 
-use SPE\Session\Core\{Plugin, Util};
+use SPE\Session\Core\Plugin;
+use SPE\Session\Core\Util;
 
-final class HomeModel extends Plugin {
-    #[\Override] public function list(): array {
+final class HomeModel extends Plugin
+{
+    #[\Override]
+    public function list(): array
+    {
         $_SESSION['first_visit'] ??= time();
         $_SESSION['visit_count'] = ($_SESSION['visit_count'] ?? 0) + 1;
         return [
@@ -15,11 +20,12 @@ final class HomeModel extends Plugin {
             'first_visit' => $_SESSION['first_visit'],
             'visit_count' => $_SESSION['visit_count'],
             'time_ago' => Util::timeAgo($_SESSION['first_visit']),
-            'session_id' => session_id()
+            'session_id' => session_id(),
         ];
     }
 
-    public function reset(): array {
+    public function reset(): array
+    {
         $this->ctx->flash('msg', 'Session has been reset!');
         $this->ctx->flash('type', 'success');
         session_destroy();
@@ -34,7 +40,7 @@ final class HomeModel extends Plugin {
             'first_visit' => $_SESSION['first_visit'],
             'visit_count' => 1,
             'time_ago' => 'just now',
-            'session_id' => session_id()
+            'session_id' => session_id(),
         ];
     }
 }

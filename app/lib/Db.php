@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\App;
@@ -6,7 +7,12 @@ namespace SPE\App;
 use PDO;
 use PDOStatement;
 
-enum QueryType: string { case All = 'all'; case One = 'one'; case Col = 'col'; }
+enum QueryType: string
+{
+    case All = 'all';
+    case One = 'one';
+    case Col = 'col';
+}
 
 final class Db extends PDO
 {
@@ -32,10 +38,17 @@ final class Db extends PDO
 
         $dsn = match ($type) {
             'sqlite' => 'sqlite:' . Schema::path($name),
-            'mariadb' => 'mysql:' . (($sock = Env::get('DB_SOCK'))
-                ? "unix_socket=$sock"
-                : 'host=' . Env::get('DB_HOST', 'localhost') . ';port=' . Env::get('DB_PORT', '3306'))
-                . ';dbname=' . Env::get("DB_{$name}_NAME", $name),
+            'mariadb' => 'mysql:'
+                . (
+                    ($sock = Env::get('DB_SOCK'))
+                        ? "unix_socket=$sock"
+                        : 'host='
+                        . Env::get('DB_HOST', 'localhost')
+                        . ';port='
+                        . Env::get('DB_PORT', '3306')
+                )
+                . ';dbname='
+                . Env::get("DB_{$name}_NAME", $name),
             default => throw new \RuntimeException("Unsupported DB type: $type"),
         };
 
@@ -51,14 +64,20 @@ final class Db extends PDO
         $stmt = $this->prepare("INSERT INTO `$tbl` ($cols) VALUES ($vals)");
         $this->bind($stmt, $data);
         $stmt->execute();
-        return (int)$this->lastInsertId();
+        return (int) $this->lastInsertId();
     }
 
-    public function read(string $tbl, string $cols = '*', string $where = '', array $params = [], QueryType $type = QueryType::All): mixed
-    {
+    public function read(
+        string $tbl,
+        string $cols = '*',
+        string $where = '',
+        array $params = [],
+        QueryType $type = QueryType::All,
+    ): mixed {
         $sql = "SELECT $cols FROM `$tbl`" . ($where ? " WHERE $where" : '');
         $stmt = $this->prepare($sql);
-        if ($params) $this->bind($stmt, $params);
+        if ($params)
+            $this->bind($stmt, $params);
         $stmt->execute();
 
         return match ($type) {
@@ -88,7 +107,8 @@ final class Db extends PDO
     public function qry(string $sql, array $params = [], QueryType $type = QueryType::All): mixed
     {
         $stmt = $this->prepare($sql);
-        if ($params) $this->bind($stmt, $params);
+        if ($params)
+            $this->bind($stmt, $params);
         $stmt->execute();
 
         return match ($type) {
@@ -116,6 +136,7 @@ final class Db extends PDO
     private function ensureDir(string $name): void
     {
         $dir = dirname(Schema::path($name));
-        if (!is_dir($dir)) mkdir($dir, 0o755, true);
+        if (!is_dir($dir))
+            mkdir($dir, 0o755, true);
     }
 }

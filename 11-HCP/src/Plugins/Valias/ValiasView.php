@@ -1,9 +1,11 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Plugins\Valias;
 
-use SPE\HCP\Core\{Ctx, Plugin};
+use SPE\HCP\Core\Ctx;
+use SPE\HCP\Core\Plugin;
 
 /**
  * Mail alias view - HTML rendering for alias management.
@@ -12,7 +14,7 @@ final class ValiasView extends Plugin
 {
     public function __construct(
         protected Ctx $ctx,
-        private array $data = []
+        private array $data = [],
     ) {
         parent::__construct($ctx);
     }

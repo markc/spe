@@ -1,13 +1,15 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Plugins\Contact;
 
-use SPE\Blog\Core\{ Theme};
+use SPE\Blog\Core\Theme;
 
-final class ContactView extends Theme {
-
-    public function list(): string {
+final class ContactView extends Theme
+{
+    public function list(): string
+    {
         extract($this->ctx->ary);
         return <<<HTML
         <div class="card">

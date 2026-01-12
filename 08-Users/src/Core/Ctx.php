@@ -1,23 +1,40 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Users\Core;
 
-use SPE\App\{Acl, Db, QueryType, Util};
+use SPE\App\Acl;
+use SPE\App\Db;
+use SPE\App\QueryType;
+use SPE\App\Util;
 
-final class Ctx {
+final class Ctx
+{
     public array $in;
     public array $out;
     public array $nav;
     public Db $db;
 
     // Centralized config (from HCP pattern)
-    public int $perp = 10;  // Items per page
+    public int $perp = 10; // Items per page
 
     public function __construct(
         public string $email = 'mc@netserva.org',
-        array $out = ['doc' => 'SPE::08', 'head' => '', 'main' => '', 'foot' => '', 'css' => '', 'js' => '', 'end' => ''],
-        public array $themes = [['🎨 Simple', 'Simple'], ['🎨 TopNav', 'TopNav'], ['🎨 SideBar', 'SideBar']]
+        array $out = [
+            'doc' => 'SPE::08',
+            'head' => '',
+            'main' => '',
+            'foot' => '',
+            'css' => '',
+            'js' => '',
+            'end' => '',
+        ],
+        public array $themes = [
+            ['🎨 Simple',  'Simple'],
+            ['🎨 TopNav',  'TopNav'],
+            ['🎨 SideBar', 'SideBar'],
+        ],
     ) {
         session_status() === PHP_SESSION_NONE && session_start();
 
@@ -28,12 +45,12 @@ final class Ctx {
 
         // Input parameters (extended from HCP pattern)
         $this->in = [
-            'o' => $this->ses('o', 'Blog'),     // Object/plugin
-            'm' => $_REQUEST['m'] ?? 'list',    // Method/action
-            't' => $this->ses('t', 'Simple'),   // Theme
-            'x' => $_REQUEST['x'] ?? '',        // Output format (json, text, {key})
-            'i' => (int)($_REQUEST['i'] ?? 0),  // Item ID
-            'g' => (int)($_REQUEST['g'] ?? 0),  // Group/category filter
+            'o' => $this->ses('o', 'Blog'), // Object/plugin
+            'm' => $_REQUEST['m'] ?? 'list', // Method/action
+            't' => $this->ses('t', 'Simple'), // Theme
+            'x' => $_REQUEST['x'] ?? '', // Output format (json, text, {key})
+            'i' => (int) ($_REQUEST['i'] ?? 0), // Item ID
+            'g' => (int) ($_REQUEST['g'] ?? 0), // Group/category filter
         ];
         $this->out = $out;
 
@@ -48,7 +65,7 @@ final class Ctx {
         // Base navigation from pages table (clean URLs)
         $pages = array_map(
             static fn($r) => [trim(($r['icon'] ?? '') . ' ' . $r['title']), '/' . $r['slug']],
-            $this->db->read('posts', 'id,title,slug,icon', "type='page' ORDER BY id", [], QueryType::All)
+            $this->db->read('posts', 'id,title,slug,icon', "type='page' ORDER BY id", [], QueryType::All),
         );
         $pages[] = ['📝 Blog', '/blog'];
 
@@ -69,9 +86,10 @@ final class Ctx {
     }
 
     // Get/set session value: URL param overrides, else use session, else use default
-    public function ses(string $k, mixed $v = ''): mixed {
+    public function ses(string $k, mixed $v = ''): mixed
+    {
         return $_SESSION[$k] = isset($_REQUEST[$k])
-            ? (is_array($_REQUEST[$k]) ? $_REQUEST[$k] : trim($_REQUEST[$k]) |> htmlspecialchars(...))
-            : ($_SESSION[$k] ?? $v);
+            ? (is_array($_REQUEST[$k]) ? $_REQUEST[$k] : (trim($_REQUEST[$k]) |> htmlspecialchars(...)))
+            : $_SESSION[$k] ?? $v;
     }
 }

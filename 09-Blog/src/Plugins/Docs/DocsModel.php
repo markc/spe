@@ -1,26 +1,41 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Plugins\Docs;
 
-use SPE\App\{Db, QueryType, Util};
-use SPE\Blog\Core\{Ctx, Plugin};
+use SPE\App\Db;
+use SPE\App\QueryType;
+use SPE\App\Util;
+use SPE\Blog\Core\Ctx;
+use SPE\Blog\Core\Plugin;
 use SPE\Blog\Plugins\Categories\CategoriesModel;
 
-final class DocsModel extends Plugin {
+final class DocsModel extends Plugin
+{
     private ?Db $dbh = null;
     private array $in = [
-        'id' => 0, 'title' => '', 'slug' => '', 'content' => '',
-        'excerpt' => '', 'featured_image' => '', 'icon' => ''
+        'id' => 0,
+        'title' => '',
+        'slug' => '',
+        'content' => '',
+        'excerpt' => '',
+        'featured_image' => '',
+        'icon' => '',
     ];
 
-    public function __construct(protected Ctx $ctx) {
+    public function __construct(
+        protected Ctx $ctx,
+    ) {
         parent::__construct($ctx);
-        foreach ($this->in as $k => &$v) $v = $_REQUEST[$k] ?? $v;
+        foreach ($this->in as $k => &$v)
+            $v = $_REQUEST[$k] ?? $v;
         $this->dbh = new Db('blog');
     }
 
-    #[\Override] public function create(): array {
+    #[\Override]
+    public function create(): array
+    {
         if (!Util::is_usr()) {
             Util::log('Login required');
             Util::redirect('?o=Auth');
@@ -30,20 +45,26 @@ final class DocsModel extends Plugin {
             $slug = $this->in['slug'] ?: $this->slugify($this->in['title']);
 
             // Check slug uniqueness
-            $existing = $this->dbh->read('posts', 'id', 'slug = :slug AND type = :type', ['slug' => $slug, 'type' => 'doc'], QueryType::One);
+            $existing = $this->dbh->read(
+                'posts',
+                'id',
+                'slug = :slug AND type = :type',
+                ['slug' => $slug, 'type' => 'doc'],
+                QueryType::One,
+            );
             if ($existing) {
                 Util::log('A doc with this slug already exists');
                 return array_merge($this->in, [
                     'slug' => $slug,
                     'all_categories' => CategoriesModel::getAll($this->dbh),
-                    'post_categories' => []
+                    'post_categories' => [],
                 ]);
             }
 
             $data = [
                 'title' => $this->in['title'],
                 'slug' => $slug,
-                'content' => $this->in['content'],  // This is the PATH to the markdown file
+                'content' => $this->in['content'], // This is the PATH to the markdown file
                 'excerpt' => $this->in['excerpt'],
                 'featured_image' => $this->in['featured_image'],
                 'icon' => $this->in['icon'],
@@ -51,7 +72,7 @@ final class DocsModel extends Plugin {
                 'author_id' => $_SESSION['usr']['id'],
                 'type' => 'doc',
                 'created' => date('Y-m-d H:i:s'),
-                'updated' => date('Y-m-d H:i:s')
+                'updated' => date('Y-m-d H:i:s'),
             ];
             $docId = $this->dbh->create('posts', $data);
 
@@ -64,46 +85,76 @@ final class DocsModel extends Plugin {
         }
         return [
             'all_categories' => CategoriesModel::getAll($this->dbh),
-            'post_categories' => []
+            'post_categories' => [],
         ];
     }
 
-    #[\Override] public function read(): array {
+    #[\Override]
+    public function read(): array
+    {
         $slug = $_GET['slug'] ?? '';
         $id = filter_var($this->in['id'], FILTER_VALIDATE_INT);
 
         if ($slug) {
-            $doc = $this->dbh->read('posts', '*', 'slug = :slug AND type = :type', ['slug' => $slug, 'type' => 'doc'], QueryType::One) ?: [];
+            $doc = $this->dbh->read(
+                'posts',
+                '*',
+                'slug = :slug AND type = :type',
+                ['slug' => $slug, 'type' => 'doc'],
+                QueryType::One,
+            ) ?: [];
         } else {
-            $doc = $this->dbh->read('posts', '*', 'id = :id AND type = :type', ['id' => $id, 'type' => 'doc'], QueryType::One) ?: [];
+            $doc = $this->dbh->read(
+                'posts',
+                '*',
+                'id = :id AND type = :type',
+                ['id' => $id, 'type' => 'doc'],
+                QueryType::One,
+            ) ?: [];
         }
 
         if ($doc) {
-            $doc['categories'] = CategoriesModel::getForPost($this->dbh, (int)$doc['id']);
+            $doc['categories'] = CategoriesModel::getForPost($this->dbh, (int) $doc['id']);
 
             // Read markdown content from file path stored in content field
             $doc['file_content'] = $this->readMarkdownFile($doc['content']);
             $doc['file_exists'] = $doc['file_content'] !== null;
 
             // Get prev/next docs
-            $doc['prev'] = $this->dbh->read('posts', 'id, title, slug',
+            $doc['prev'] = $this->dbh->read(
+                'posts',
+                'id, title, slug',
                 'type = :type AND created < :created ORDER BY created DESC LIMIT 1',
-                ['type' => 'doc', 'created' => $doc['created']], QueryType::One);
-            $doc['next'] = $this->dbh->read('posts', 'id, title, slug',
+                ['type' => 'doc', 'created' => $doc['created']],
+                QueryType::One,
+            );
+            $doc['next'] = $this->dbh->read(
+                'posts',
+                'id, title, slug',
                 'type = :type AND created > :created ORDER BY created ASC LIMIT 1',
-                ['type' => 'doc', 'created' => $doc['created']], QueryType::One);
+                ['type' => 'doc', 'created' => $doc['created']],
+                QueryType::One,
+            );
         }
         return $doc;
     }
 
-    #[\Override] public function update(): array {
+    #[\Override]
+    public function update(): array
+    {
         if (!Util::is_usr()) {
             Util::log('Login required');
             Util::redirect('?o=Auth');
         }
 
         $id = filter_var($this->in['id'], FILTER_VALIDATE_INT);
-        $doc = $this->dbh->read('posts', '*', 'id = :id AND type = :type', ['id' => $id, 'type' => 'doc'], QueryType::One);
+        $doc = $this->dbh->read(
+            'posts',
+            '*',
+            'id = :id AND type = :type',
+            ['id' => $id, 'type' => 'doc'],
+            QueryType::One,
+        );
 
         if (!$doc) {
             Util::log('Doc not found');
@@ -114,13 +165,19 @@ final class DocsModel extends Plugin {
             $slug = $this->in['slug'] ?: $this->slugify($this->in['title']);
 
             // Check slug uniqueness (excluding current doc)
-            $existing = $this->dbh->read('posts', 'id', 'slug = :slug AND type = :type AND id != :id', ['slug' => $slug, 'type' => 'doc', 'id' => $id], QueryType::One);
+            $existing = $this->dbh->read(
+                'posts',
+                'id',
+                'slug = :slug AND type = :type AND id != :id',
+                ['slug' => $slug, 'type' => 'doc', 'id' => $id],
+                QueryType::One,
+            );
             if ($existing) {
                 Util::log('A doc with this slug already exists');
                 return array_merge($doc, $this->in, [
                     'slug' => $slug,
                     'all_categories' => CategoriesModel::getAll($this->dbh),
-                    'post_categories' => CategoriesModel::getForPost($this->dbh, $id)
+                    'post_categories' => CategoriesModel::getForPost($this->dbh, $id),
                 ]);
             }
 
@@ -131,7 +188,7 @@ final class DocsModel extends Plugin {
                 'excerpt' => $this->in['excerpt'],
                 'featured_image' => $this->in['featured_image'],
                 'icon' => $this->in['icon'],
-                'updated' => date('Y-m-d H:i:s')
+                'updated' => date('Y-m-d H:i:s'),
             ];
             $this->dbh->update('posts', $data, 'id = :id', ['id' => $id]);
 
@@ -148,14 +205,22 @@ final class DocsModel extends Plugin {
         return $doc;
     }
 
-    #[\Override] public function delete(): array {
+    #[\Override]
+    public function delete(): array
+    {
         if (!Util::is_usr()) {
             Util::log('Login required');
             Util::redirect('?o=Auth');
         }
 
         $id = filter_var($this->in['id'], FILTER_VALIDATE_INT);
-        $doc = $this->dbh->read('posts', '*', 'id = :id AND type = :type', ['id' => $id, 'type' => 'doc'], QueryType::One);
+        $doc = $this->dbh->read(
+            'posts',
+            '*',
+            'id = :id AND type = :type',
+            ['id' => $id, 'type' => 'doc'],
+            QueryType::One,
+        );
 
         if (!$doc) {
             Util::log('Doc not found');
@@ -170,15 +235,18 @@ final class DocsModel extends Plugin {
         Util::redirect('?o=Docs');
     }
 
-    #[\Override] public function list(): array {
+    #[\Override]
+    public function list(): array
+    {
         // Get all docs with their categories
-        $docs = $this->dbh->read('posts', '*', 'type = :type ORDER BY created DESC', ['type' => 'doc'], QueryType::All) ?: [];
+        $docs = $this->dbh->read('posts', '*', 'type = :type ORDER BY created DESC', ['type' => 'doc'], QueryType::All)
+        ?: [];
 
         // Check file existence and group by category
         $grouped = [];
         foreach ($docs as &$doc) {
             $doc['file_exists'] = $this->fileExists($doc['content']);
-            $doc['categories'] = CategoriesModel::getForPost($this->dbh, (int)$doc['id']);
+            $doc['categories'] = CategoriesModel::getForPost($this->dbh, (int) $doc['id']);
 
             // Group by first category or 'Uncategorized'
             $catName = !empty($doc['categories']) ? $doc['categories'][0]['name'] : 'Uncategorized';
@@ -187,12 +255,14 @@ final class DocsModel extends Plugin {
 
         return [
             'items' => $docs,
-            'grouped' => $grouped
+            'grouped' => $grouped,
         ];
     }
 
-    private function readMarkdownFile(string $path): ?string {
-        if (empty($path)) return null;
+    private function readMarkdownFile(string $path): ?string
+    {
+        if (empty($path))
+            return null;
 
         // Handle relative paths (relative to spe project root, not 09-Blog)
         if (!str_starts_with($path, '/')) {
@@ -206,8 +276,10 @@ final class DocsModel extends Plugin {
         return file_get_contents($path);
     }
 
-    private function fileExists(string $path): bool {
-        if (empty($path)) return false;
+    private function fileExists(string $path): bool
+    {
+        if (empty($path))
+            return false;
 
         if (!str_starts_with($path, '/')) {
             $path = dirname(__DIR__, 4) . '/' . $path;
@@ -216,7 +288,8 @@ final class DocsModel extends Plugin {
         return file_exists($path) && is_readable($path);
     }
 
-    private function slugify(string $text): string {
+    private function slugify(string $text): string
+    {
         return strtolower(trim(preg_replace('/[^a-zA-Z0-9]+/', '-', $text), '-'));
     }
 }

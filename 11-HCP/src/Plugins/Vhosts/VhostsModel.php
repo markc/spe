@@ -1,10 +1,13 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Plugins\Vhosts;
 
-use SPE\HCP\Core\{Ctx, Plugin};
-use SPE\HCP\Lib\{VhostOps, Vhosts};
+use SPE\HCP\Core\Ctx;
+use SPE\HCP\Core\Plugin;
+use SPE\HCP\Lib\VhostOps;
+use SPE\HCP\Lib\Vhosts;
 
 /**
  * Virtual hosts management - uses lib/Vhosts.php orchestration layer.
@@ -18,8 +21,9 @@ final class VhostsModel extends Plugin
         'cms' => '', // wp, drupal, laravel, etc.
     ];
 
-    public function __construct(protected Ctx $ctx)
-    {
+    public function __construct(
+        protected Ctx $ctx,
+    ) {
         parent::__construct($ctx);
         foreach ($this->in as $k => &$v) {
             $v = $_REQUEST[$k] ?? $v;
@@ -38,7 +42,7 @@ final class VhostsModel extends Plugin
 
             if ($result['success']) {
                 header('Location: ?o=Vhosts&m=read&domain=' . urlencode($domain));
-                exit;
+                exit();
             }
 
             return ['error' => $result['error']];
@@ -76,17 +80,21 @@ final class VhostsModel extends Plugin
             if ($action === 'toggle') {
                 $active = ($_POST['active'] ?? '0') === '1';
                 $result = Vhosts::setActive($domain, $active);
-                return $result['success']
-                    ? ['success' => ($active ? 'Enabled' : 'Disabled') . " vhost", 'domain' => $domain]
-                    : ['error' => $result['error']];
+                return (
+                    $result['success']
+                        ? ['success' => ($active ? 'Enabled' : 'Disabled') . ' vhost', 'domain' => $domain]
+                        : ['error' => $result['error']]
+                );
             }
 
             if ($action === 'aliases' && isset($_POST['aliases'])) {
                 $aliases = preg_split('/[,\n]+/', $_POST['aliases'], -1, PREG_SPLIT_NO_EMPTY);
                 $result = Vhosts::setAliases($domain, $aliases);
-                return $result['success']
-                    ? ['success' => 'Aliases updated', 'domain' => $domain]
-                    : ['error' => $result['error']];
+                return (
+                    $result['success']
+                        ? ['success' => 'Aliases updated', 'domain' => $domain]
+                        : ['error' => $result['error']]
+                );
             }
         }
 
@@ -105,7 +113,7 @@ final class VhostsModel extends Plugin
 
             if ($result['success']) {
                 header('Location: ?o=Vhosts');
-                exit;
+                exit();
             }
 
             return ['error' => $result['error']];

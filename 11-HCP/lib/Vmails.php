@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Lib;
@@ -79,10 +80,8 @@ final class Vmails
 
         // Insert into database
         try {
-            $stmt = self::db()->prepare(
-                'INSERT INTO vmails (user, pass, home, uid, gid, active, created_at, updated_at)
-                 VALUES (?, ?, ?, ?, ?, 1, datetime("now"), datetime("now"))'
-            );
+            $stmt = self::db()->prepare('INSERT INTO vmails (user, pass, home, uid, gid, active, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, 1, datetime("now"), datetime("now"))');
             $stmt->execute([$email, $hash, $result['home'], $vhost['uid'], $vhost['gid']]);
         } catch (\PDOException $e) {
             // Rollback: remove maildir since DB insert failed
@@ -163,7 +162,7 @@ final class Vmails
                 'home' => $row['home'],
                 'uid' => $row['uid'],
                 'gid' => $row['gid'],
-                'active' => (bool)$row['active'],
+                'active' => (bool) $row['active'],
                 'created_at' => $row['created_at'],
                 'updated_at' => $row['updated_at'],
             ];
@@ -180,10 +179,8 @@ final class Vmails
     {
         $email = strtolower($email);
 
-        $stmt = self::db()->prepare(
-            'SELECT id, user, home, uid, gid, active, created_at, updated_at
-             FROM vmails WHERE user = ?'
-        );
+        $stmt = self::db()->prepare('SELECT id, user, home, uid, gid, active, created_at, updated_at
+             FROM vmails WHERE user = ?');
         $stmt->execute([$email]);
         $row = $stmt->fetch();
 
@@ -214,7 +211,7 @@ final class Vmails
             'home' => $row['home'],
             'uid' => $row['uid'],
             'gid' => $row['gid'],
-            'active' => (bool)$row['active'],
+            'active' => (bool) $row['active'],
             'size' => $size,
             'size_human' => self::formatBytes($size),
             'messages' => $messages,
@@ -242,9 +239,7 @@ final class Vmails
         $hash = VmailOps::hashPassword($password);
 
         // Update database
-        $stmt = self::db()->prepare(
-            'UPDATE vmails SET pass = ?, updated_at = datetime("now") WHERE user = ?'
-        );
+        $stmt = self::db()->prepare('UPDATE vmails SET pass = ?, updated_at = datetime("now") WHERE user = ?');
         $stmt->execute([$hash, $email]);
 
         return ['success' => true, 'email' => $email];
@@ -257,9 +252,7 @@ final class Vmails
     {
         $email = strtolower($email);
 
-        $stmt = self::db()->prepare(
-            'UPDATE vmails SET active = ?, updated_at = datetime("now") WHERE user = ?'
-        );
+        $stmt = self::db()->prepare('UPDATE vmails SET active = ?, updated_at = datetime("now") WHERE user = ?');
         $stmt->execute([$active ? 1 : 0, $email]);
 
         if ($stmt->rowCount() === 0) {

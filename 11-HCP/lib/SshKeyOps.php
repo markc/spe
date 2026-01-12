@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Lib;
@@ -23,12 +24,14 @@ final class SshKeyOps
 
         $keys = [];
         foreach (glob("{$keysDir}/*") as $file) {
-            if (is_dir($file)) continue;
+            if (is_dir($file))
+                continue;
 
             $name = basename($file);
 
             // Skip .pub files (we'll pair them with private keys)
-            if (str_ends_with($name, '.pub')) continue;
+            if (str_ends_with($name, '.pub'))
+                continue;
 
             $keys[] = self::getKeyInfo($name);
         }
@@ -79,10 +82,10 @@ final class SshKeyOps
             $info['comment'] = trim($parts[2] ?? '');
 
             // Get fingerprint
-            $fingerprint = shell_exec("ssh-keygen -lf " . escapeshellarg($pubPath) . " 2>/dev/null");
+            $fingerprint = shell_exec('ssh-keygen -lf ' . escapeshellarg($pubPath) . ' 2>/dev/null');
             if ($fingerprint) {
                 $fpParts = explode(' ', trim($fingerprint));
-                $info['bits'] = (int)($fpParts[0] ?? 0);
+                $info['bits'] = (int) ($fpParts[0] ?? 0);
                 $info['fingerprint'] = $fpParts[1] ?? '';
             }
         }
@@ -97,7 +100,7 @@ final class SshKeyOps
         string $name,
         string $type = 'ed25519',
         ?string $comment = null,
-        ?string $passphrase = null
+        ?string $passphrase = null,
     ): array {
         $name = preg_replace('/[^a-zA-Z0-9_-]/', '', $name);
         if (!$name) {
@@ -131,7 +134,7 @@ final class SshKeyOps
             escapeshellarg($type),
             escapeshellarg($keyPath),
             escapeshellarg($comment),
-            escapeshellarg($passphrase ?? '')
+            escapeshellarg($passphrase ?? ''),
         );
 
         // Add bits for RSA
@@ -140,7 +143,7 @@ final class SshKeyOps
                 'ssh-keygen -t rsa -b 4096 -f %s -C %s -N %s 2>&1',
                 escapeshellarg($keyPath),
                 escapeshellarg($comment),
-                escapeshellarg($passphrase ?? '')
+                escapeshellarg($passphrase ?? ''),
             );
         }
 
@@ -203,7 +206,10 @@ final class SshKeyOps
 
             if (!$publicKey || str_contains($publicKey, 'error')) {
                 unlink($keyPath);
-                return ['success' => false, 'error' => 'Failed to derive public key (invalid or passphrase-protected?)'];
+                return [
+                    'success' => false,
+                    'error' => 'Failed to derive public key (invalid or passphrase-protected?)',
+                ];
             }
         }
 
@@ -243,7 +249,7 @@ final class SshKeyOps
             if ($users) {
                 return [
                     'success' => false,
-                    'error' => "Key in use by: " . implode(', ', $users),
+                    'error' => 'Key in use by: ' . implode(', ', $users),
                 ];
             }
         } catch (\Exception) {
@@ -343,7 +349,7 @@ final class SshKeyOps
         $cmd = sprintf(
             'ssh -o BatchMode=yes -o ConnectTimeout=10 %s "mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo %s >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys" 2>&1',
             escapeshellarg($hostName),
-            escapeshellarg($pubKey)
+            escapeshellarg($pubKey),
         );
 
         $output = trim(shell_exec($cmd) ?? '');

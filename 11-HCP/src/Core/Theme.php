@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Core;
@@ -7,7 +8,10 @@ use SPE\App\Util;
 
 abstract class Theme
 {
-    public function __construct(protected Ctx $ctx, protected array $out) {}
+    public function __construct(
+        protected Ctx $ctx,
+        protected array $out,
+    ) {}
 
     abstract public function render(): string;
 
@@ -19,7 +23,7 @@ abstract class Theme
                 '<a href="%s"%s>%s</a>',
                 $p[1],
                 $this->isActive($p[1], $current) ? ' class="active"' : '',
-                $p[0]
+                $p[0],
             ), $n))
             |> (static fn($a) => implode(' ', $a));
     }
@@ -35,7 +39,8 @@ abstract class Theme
     protected function flash(): string
     {
         $log = Util::log();
-        if (!$log) return '';
+        if (!$log)
+            return '';
 
         $html = '';
         foreach ($log as $type => $msg) {
@@ -65,25 +70,25 @@ abstract class Theme
         $hostname = gethostname() ?: 'HCP';
 
         return <<<HTML
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{$this->out['doc']} - {$hostname}</title>
-    <link rel="stylesheet" href="/spe.css">
-    <link rel="stylesheet" href="/hcp.css">
-{$css}
-</head>
-<body>
-{$flash}
-{$body}
-<script src="/spe.js"></script>
-<script src="/tables.js"></script>
-{$js}
-{$end}
-</body>
-</html>
-HTML;
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>{$this->out['doc']} - {$hostname}</title>
+            <link rel="stylesheet" href="/spe.css">
+            <link rel="stylesheet" href="/hcp.css">
+        {$css}
+        </head>
+        <body>
+        {$flash}
+        {$body}
+        <script src="/spe.js"></script>
+        <script src="/tables.js"></script>
+        {$js}
+        {$end}
+        </body>
+        </html>
+        HTML;
     }
 }

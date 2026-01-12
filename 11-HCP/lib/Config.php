@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Lib;
@@ -33,16 +34,20 @@ final class Config
      */
     public static function loadEnv(): void
     {
-        if (self::$envLoaded) return;
+        if (self::$envLoaded)
+            return;
         self::$envLoaded = true;
 
         $file = self::projectRoot() . '/.env';
-        if (!file_exists($file)) return;
+        if (!file_exists($file))
+            return;
 
         foreach (file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
             $line = trim($line);
-            if ($line === '' || str_starts_with($line, '#')) continue;
-            if (!str_contains($line, '=')) continue;
+            if ($line === '' || str_starts_with($line, '#'))
+                continue;
+            if (!str_contains($line, '='))
+                continue;
 
             [$key, $value] = explode('=', $line, 2);
             $key = trim($key);
@@ -78,7 +83,7 @@ final class Config
     public static function get(string $key): string
     {
         self::loadEnv();
-        return $_ENV[$key] ?? getenv($key) ?: (self::DEFAULTS[$key] ?? '');
+        return $_ENV[$key] ?? getenv($key) ?: self::DEFAULTS[$key] ?? '';
     }
 
     /**

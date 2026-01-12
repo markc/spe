@@ -1,16 +1,22 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Users\Plugins\Users;
 
-use SPE\Users\Core\Ctx;
 use SPE\App\Util;
+use SPE\Users\Core\Ctx;
 
-final class UsersView {
-    public function __construct(private Ctx $ctx, private array $a) {}
+final class UsersView
+{
+    public function __construct(
+        private Ctx $ctx,
+        private array $a,
+    ) {}
 
     // Auth views
-    public function login(): string {
+    public function login(): string
+    {
         $login = htmlspecialchars($this->a['login'] ?? '');
         $csrf = Util::csrfField();
         return <<<HTML
@@ -35,13 +41,16 @@ final class UsersView {
         HTML;
     }
 
-    public function logout(): string {
+    public function logout(): string
+    {
         return '';
     }
 
-    public function profile(): string {
+    public function profile(): string
+    {
         $a = $this->a;
-        if (!$a) return '<div class="card mt-4"><p>Profile not found.</p></div>';
+        if (!$a)
+            return '<div class="card mt-4"><p>Profile not found.</p></div>';
 
         $fname = htmlspecialchars($a['fname'] ?? '');
         $lname = htmlspecialchars($a['lname'] ?? '');
@@ -86,21 +95,26 @@ final class UsersView {
     }
 
     // Admin views
-    public function create(): string {
+    public function create(): string
+    {
         return $_SERVER['REQUEST_METHOD'] === 'POST' ? '' : $this->form();
     }
 
-    public function update(): string {
+    public function update(): string
+    {
         return $_SERVER['REQUEST_METHOD'] === 'POST' ? '' : $this->form($this->a);
     }
 
-    public function delete(): string {
+    public function delete(): string
+    {
         return '';
     }
 
-    public function read(): string {
+    public function read(): string
+    {
         $a = $this->a;
-        if (!$a) return '<div class="card mt-4"><p class=text-muted>User not found.</p><a href="?o=Users" class=btn>« Back</a></div>';
+        if (!$a)
+            return '<div class="card mt-4"><p class=text-muted>User not found.</p><a href="?o=Users" class=btn>« Back</a></div>';
         $anote = Util::nlbr($a['anote'] ?? '');
         return "<div class='card mt-4'><h2>👤 {$a['login']}</h2>
             <div class=mt-2>
@@ -118,7 +132,8 @@ final class UsersView {
             <a href='?o=Users&m=delete&i={$a['id']}' class='btn btn-danger' onclick='return confirm(\"Delete this user?\")'>🗑️</a></div></div>";
     }
 
-    public function list(): string {
+    public function list(): string
+    {
         $a = $this->a;
         $q = htmlspecialchars($_GET['q'] ?? '');
         $cl = $q ? "<a href='?o=Users' class=btn>✕</a>" : '';
@@ -147,27 +162,32 @@ final class UsersView {
         return $h;
     }
 
-    private function pg(array $p): string {
-        if ($p['pages'] <= 1) return '';
+    private function pg(array $p): string
+    {
+        if ($p['pages'] <= 1)
+            return '';
         $q = htmlspecialchars($_GET['q'] ?? '');
         $sq = $q ? "&q=$q" : '';
         $h = "<div class='flex mt-2 justify-center gap-sm'>";
-        if ($p['page'] > 1) $h .= "<a href='?o=Users&page=" . ($p['page'] - 1) . "$sq' class=btn>« Prev</a>";
+        if ($p['page'] > 1)
+            $h .= "<a href='?o=Users&page=" . ($p['page'] - 1) . "$sq' class=btn>« Prev</a>";
         $h .= "<span class=td>Page {$p['page']} of {$p['pages']}</span>";
-        if ($p['page'] < $p['pages']) $h .= "<a href='?o=Users&page=" . ($p['page'] + 1) . "$sq' class=btn>Next »</a>";
+        if ($p['page'] < $p['pages'])
+            $h .= "<a href='?o=Users&page=" . ($p['page'] + 1) . "$sq' class=btn>Next »</a>";
         return $h . '</div>';
     }
 
-    private function form(array $d = []): string {
+    private function form(array $d = []): string
+    {
         $id = $d['id'] ?? 0;
         $login = htmlspecialchars($d['login'] ?? '');
         $fname = htmlspecialchars($d['fname'] ?? '');
         $lname = htmlspecialchars($d['lname'] ?? '');
         $altemail = htmlspecialchars($d['altemail'] ?? '');
-        $grp = (int)($d['grp'] ?? 0);
-        $acl = (int)($d['acl'] ?? 0);
+        $grp = (int) ($d['grp'] ?? 0);
+        $acl = (int) ($d['acl'] ?? 0);
         $anote = htmlspecialchars($d['anote'] ?? '');
-        $act = $id ? "?o=Users&m=update&i=$id" : "?o=Users&m=create";
+        $act = $id ? "?o=Users&m=update&i=$id" : '?o=Users&m=create';
         $hd = $id ? '✏️ Edit User' : '+ Create User';
         $bt = $id ? 'Update' : 'Create';
 

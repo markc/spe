@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\App;
@@ -38,9 +39,7 @@ final class Schema
 
     public static function path(string $db): string
     {
-        return Env::get('DB_TYPE', 'sqlite') === 'sqlite'
-            ? self::sqlitePath($db)
-            : Env::get("DB_{$db}_NAME", $db);
+        return Env::get('DB_TYPE', 'sqlite') === 'sqlite' ? self::sqlitePath($db) : Env::get("DB_{$db}_NAME", $db);
     }
 
     private static function sqlitePath(string $db): string
@@ -66,10 +65,17 @@ final class Schema
     {
         return match ($type) {
             'sqlite' => 'sqlite:' . self::sqlitePath($db),
-            'mariadb' => 'mysql:' . (($sock = Env::get('DB_SOCK'))
-                ? "unix_socket=$sock"
-                : 'host=' . Env::get('DB_HOST', 'localhost') . ';port=' . Env::get('DB_PORT', '3306'))
-                . ';dbname=' . Env::get("DB_{$db}_NAME", $db),
+            'mariadb' => 'mysql:'
+                . (
+                    ($sock = Env::get('DB_SOCK'))
+                        ? "unix_socket=$sock"
+                        : 'host='
+                        . Env::get('DB_HOST', 'localhost')
+                        . ';port='
+                        . Env::get('DB_PORT', '3306')
+                )
+                . ';dbname='
+                . Env::get("DB_{$db}_NAME", $db),
             default => throw new \RuntimeException("Unsupported DB type: $type"),
         };
     }

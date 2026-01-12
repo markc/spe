@@ -1,23 +1,28 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Plugins\Docs;
 
 use SPE\App\Util;
-use SPE\Blog\Core\{ Theme};
+use SPE\Blog\Core\Theme;
 
-final class DocsView extends Theme {
-
-    private function t(): string {
+final class DocsView extends Theme
+{
+    private function t(): string
+    {
         return '&t=' . $this->ctx->in['t'];
     }
 
-    public function create(): string {
-        if (Util::is_post()) return '';
+    public function create(): string
+    {
+        if (Util::is_post())
+            return '';
         return $this->form();
     }
 
-    public function read(): string {
+    public function read(): string
+    {
         $a = $this->ctx->ary;
         $t = $this->t();
 
@@ -48,9 +53,9 @@ final class DocsView extends Theme {
         // Categories
         $cats = '';
         if (!empty($a['categories'])) {
-            $cats = implode('', array_map(static fn($c) =>
-                '<span class="tag">' . htmlspecialchars($c['name']) . '</span>',
-                $a['categories']
+            $cats = implode('', array_map(
+                static fn($c) => '<span class="tag">' . htmlspecialchars($c['name']) . '</span>',
+                $a['categories'],
             ));
             $cats = "<div class=\"blog-categories\">$cats</div>";
         }
@@ -82,16 +87,20 @@ final class DocsView extends Theme {
         HTML;
     }
 
-    public function update(): string {
-        if (Util::is_post()) return '';
+    public function update(): string
+    {
+        if (Util::is_post())
+            return '';
         return $this->form($this->ctx->ary);
     }
 
-    public function delete(): string {
+    public function delete(): string
+    {
         return '';
     }
 
-    public function list(): string {
+    public function list(): string
+    {
         $a = $this->ctx->ary;
         $t = $this->t();
 
@@ -154,12 +163,13 @@ final class DocsView extends Theme {
         return $html . '</div>';
     }
 
-    private function form(array $data = []): string {
+    private function form(array $data = []): string
+    {
         $id = $data['id'] ?? 0;
         $t = $this->t();
         $title = htmlspecialchars($data['title'] ?? '');
         $slug = htmlspecialchars($data['slug'] ?? '');
-        $content = htmlspecialchars($data['content'] ?? '');  // This is the PATH
+        $content = htmlspecialchars($data['content'] ?? ''); // This is the PATH
         $excerpt = htmlspecialchars($data['excerpt'] ?? '');
         $featuredImage = htmlspecialchars($data['featured_image'] ?? '');
         $icon = htmlspecialchars($data['icon'] ?? '');
@@ -176,7 +186,7 @@ final class DocsView extends Theme {
         if (!empty($allCategories)) {
             $catCheckboxes = '<div class="form-group"><label>Categories</label><div class="checkbox-group">';
             foreach ($allCategories as $cat) {
-                $catId = (int)$cat['id'];
+                $catId = (int) $cat['id'];
                 $catName = htmlspecialchars($cat['name']);
                 $checked = in_array($catId, $postCatIds) ? ' checked' : '';
                 $catCheckboxes .= <<<CB
@@ -232,7 +242,8 @@ final class DocsView extends Theme {
         HTML;
     }
 
-    private function buildPrevNext(array|false|null $prev, array|false|null $next): string {
+    private function buildPrevNext(array|false|null $prev, array|false|null $next): string
+    {
         $t = $this->t();
         $prevHtml = $prev
             ? "<a href=\"?o=Docs&m=read&slug={$prev['slug']}$t\" class=\"blog-nav-prev\"><span>← Previous</span><strong>{$prev['title']}</strong></a>"

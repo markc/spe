@@ -1,9 +1,11 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Plugins\Valias;
 
-use SPE\HCP\Core\{Ctx, Plugin};
+use SPE\HCP\Core\Ctx;
+use SPE\HCP\Core\Plugin;
 use SPE\HCP\Lib\Valias;
 
 /**
@@ -17,8 +19,9 @@ final class ValiasModel extends Plugin
         'domain' => '',
     ];
 
-    public function __construct(protected Ctx $ctx)
-    {
+    public function __construct(
+        protected Ctx $ctx,
+    ) {
         parent::__construct($ctx);
         foreach ($this->in as $k => &$v) {
             $v = $_REQUEST[$k] ?? $v;
@@ -43,7 +46,7 @@ final class ValiasModel extends Plugin
 
             if ($result['success']) {
                 header('Location: ?o=Valias');
-                exit;
+                exit();
             }
 
             return ['error' => $result['error']];
@@ -85,17 +88,21 @@ final class ValiasModel extends Plugin
                 $targets = array_map('trim', $targets);
 
                 $result = Valias::update($source, $targets);
-                return $result['success']
-                    ? ['success' => 'Alias updated', 'source' => $source]
-                    : ['error' => $result['error']];
+                return (
+                    $result['success']
+                        ? ['success' => 'Alias updated', 'source' => $source]
+                        : ['error' => $result['error']]
+                );
             }
 
             if ($action === 'toggle') {
                 $active = ($_POST['active'] ?? '0') === '1';
                 $result = Valias::setActive($source, $active);
-                return $result['success']
-                    ? ['success' => ($active ? 'Enabled' : 'Disabled') . " alias", 'source' => $source]
-                    : ['error' => $result['error']];
+                return (
+                    $result['success']
+                        ? ['success' => ($active ? 'Enabled' : 'Disabled') . ' alias', 'source' => $source]
+                        : ['error' => $result['error']]
+                );
             }
         }
 
@@ -115,7 +122,7 @@ final class ValiasModel extends Plugin
 
             if ($result['success']) {
                 header('Location: ?o=Valias');
-                exit;
+                exit();
             }
 
             return ['error' => $result['error']];

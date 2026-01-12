@@ -1,9 +1,12 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Plugins\System;
 
-use SPE\HCP\Core\{Ctx, Plugin, Shell};
+use SPE\HCP\Core\Ctx;
+use SPE\HCP\Core\Plugin;
+use SPE\HCP\Core\Shell;
 
 /**
  * System overview - dashboard with stats and service status.
@@ -61,9 +64,7 @@ final class SystemModel extends Plugin
 
     private function getOsInfo(): array
     {
-        $release = file_exists('/etc/os-release')
-            ? parse_ini_file('/etc/os-release')
-            : [];
+        $release = file_exists('/etc/os-release') ? parse_ini_file('/etc/os-release') : [];
 
         return [
             'name' => $release['PRETTY_NAME'] ?? php_uname('s'),
@@ -86,17 +87,20 @@ final class SystemModel extends Plugin
                 $pdo = new \PDO('sqlite:' . $dbPath);
                 $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
-                $vhosts = (int)$pdo->query('SELECT COUNT(*) FROM vhosts')->fetchColumn();
-                $mailboxes = (int)$pdo->query('SELECT COUNT(*) FROM vmails')->fetchColumn();
+                $vhosts = (int) $pdo->query('SELECT COUNT(*) FROM vhosts')->fetchColumn();
+                $mailboxes = (int) $pdo->query('SELECT COUNT(*) FROM vmails')->fetchColumn();
             } catch (\PDOException $e) {
                 // Database not available, keep defaults
             }
         }
 
         // Count databases from MariaDB if available
-        $result = Shell::run('mysql', ['-Nse', 'SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name NOT IN ("information_schema","mysql","performance_schema","sys")']);
+        $result = Shell::run('mysql', [
+            '-Nse',
+            'SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name NOT IN ("information_schema","mysql","performance_schema","sys")',
+        ]);
         if ($result['success']) {
-            $databases = (int)trim($result['output']);
+            $databases = (int) trim($result['output']);
         }
 
         return [

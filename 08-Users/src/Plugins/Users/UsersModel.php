@@ -1,28 +1,46 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Users\Plugins\Users;
 
-use SPE\App\{Db, QueryType, Util};
+use SPE\App\Db;
+use SPE\App\QueryType;
+use SPE\App\Util;
 use SPE\Users\Core\Ctx;
 
-final class UsersModel {
+final class UsersModel
+{
     private Db $db;
     private array $f = [
-        'i' => 0, 'grp' => 0, 'acl' => 0, 'login' => '', 'fname' => '', 'lname' => '',
-        'altemail' => '', 'webpw' => '', 'otp' => '', 'otpttl' => 0, 'cookie' => '', 'anote' => ''
+        'i' => 0,
+        'grp' => 0,
+        'acl' => 0,
+        'login' => '',
+        'fname' => '',
+        'lname' => '',
+        'altemail' => '',
+        'webpw' => '',
+        'otp' => '',
+        'otpttl' => 0,
+        'cookie' => '',
+        'anote' => '',
     ];
 
-    public function __construct(private Ctx $ctx) {
-        foreach ($this->f as $k => &$v) $v = $_REQUEST[$k] ?? $v;
+    public function __construct(
+        private Ctx $ctx,
+    ) {
+        foreach ($this->f as $k => &$v)
+            $v = $_REQUEST[$k] ?? $v;
         $this->db = new Db('users');
     }
 
     // Auth: login form and processing
-    public function login(): array {
+    public function login(): array
+    {
         if (Util::is_usr()) {
             header('Location: /');
-            exit;
+            exit();
         }
 
         if (!Util::is_post()) {
@@ -44,7 +62,7 @@ final class UsersModel {
             return ['action' => 'login', 'login' => $login];
         }
 
-        if ((int)$usr['acl'] === 9) {
+        if ((int) $usr['acl'] === 9) {
             Util::log('Account is disabled');
             return ['action' => 'login', 'login' => $login];
         }
@@ -54,41 +72,43 @@ final class UsersModel {
             'login' => $usr['login'],
             'fname' => $usr['fname'],
             'lname' => $usr['lname'],
-            'acl' => $usr['acl']
+            'acl' => $usr['acl'],
         ];
 
         // Set "remember me" cookie if requested
         if (!empty($_POST['remember'])) {
-            Util::setRemember($this->db, (int)$usr['id']);
+            Util::setRemember($this->db, (int) $usr['id']);
         }
 
         Util::log(($usr['fname'] ?: $usr['login']) . ' logged in', 'success');
         header('Location: /');
-        exit;
+        exit();
     }
 
     // Auth: logout
-    public function logout(): array {
+    public function logout(): array
+    {
         if (Util::is_usr()) {
             // Clear remember cookie
-            Util::clearRemember($this->db, (int)$_SESSION['usr']['id']);
+            Util::clearRemember($this->db, (int) $_SESSION['usr']['id']);
             unset($_SESSION['usr']);
             session_regenerate_id(true);
             Util::log('Logged out', 'success');
         }
         header('Location: /');
-        exit;
+        exit();
     }
 
     // Auth: user profile
-    public function profile(): array {
-        $id = (int)$_SESSION['usr']['id'];
+    public function profile(): array
+    {
+        $id = (int) $_SESSION['usr']['id'];
         if (Util::is_post()) {
             $data = [
                 'fname' => trim($_POST['fname'] ?? ''),
                 'lname' => trim($_POST['lname'] ?? ''),
                 'altemail' => trim($_POST['altemail'] ?? ''),
-                'updated' => date('Y-m-d H:i:s')
+                'updated' => date('Y-m-d H:i:s'),
             ];
             if (!empty($_POST['webpw'])) {
                 $data['webpw'] = password_hash($_POST['webpw'], PASSWORD_DEFAULT);
@@ -101,61 +121,80 @@ final class UsersModel {
 
             Util::log('Profile updated', 'success');
             header('Location: ?o=Users&m=profile');
-            exit;
+            exit();
         }
         return $this->db->read('users', '*', 'id = :id', ['id' => $id], QueryType::One) ?: [];
     }
 
     // Admin CRUD methods
-    public function create(): array {
+    public function create(): array
+    {
         if (Util::is_post()) {
             $this->db->create('users', [
-                'grp' => (int)$this->f['grp'], 'acl' => (int)$this->f['acl'],
-                'login' => $this->f['login'], 'fname' => $this->f['fname'], 'lname' => $this->f['lname'],
+                'grp' => (int) $this->f['grp'],
+                'acl' => (int) $this->f['acl'],
+                'login' => $this->f['login'],
+                'fname' => $this->f['fname'],
+                'lname' => $this->f['lname'],
                 'altemail' => $this->f['altemail'],
                 'webpw' => $this->f['webpw'] ? password_hash($this->f['webpw'], PASSWORD_DEFAULT) : '',
-                'otp' => $this->f['otp'], 'otpttl' => (int)$this->f['otpttl'],
-                'cookie' => $this->f['cookie'], 'anote' => $this->f['anote'],
-                'created' => date('Y-m-d H:i:s'), 'updated' => date('Y-m-d H:i:s')
+                'otp' => $this->f['otp'],
+                'otpttl' => (int) $this->f['otpttl'],
+                'cookie' => $this->f['cookie'],
+                'anote' => $this->f['anote'],
+                'created' => date('Y-m-d H:i:s'),
+                'updated' => date('Y-m-d H:i:s'),
             ]);
             Util::log('User created successfully', 'success');
             header('Location: ?o=Users');
-            exit;
+            exit();
         }
         return [];
     }
 
-    public function read(): array {
-        return $this->db->read('users', '*', 'id = :id', ['id' => (int)$this->f['i']], QueryType::One) ?: [];
+    public function read(): array
+    {
+        return $this->db->read('users', '*', 'id = :id', ['id' => (int) $this->f['i']], QueryType::One) ?: [];
     }
 
-    public function update(): array {
-        $id = (int)$this->f['i'];
+    public function update(): array
+    {
+        $id = (int) $this->f['i'];
         if (Util::is_post()) {
             $data = [
-                'grp' => (int)$this->f['grp'], 'acl' => (int)$this->f['acl'],
-                'login' => $this->f['login'], 'fname' => $this->f['fname'], 'lname' => $this->f['lname'],
-                'altemail' => $this->f['altemail'], 'otp' => $this->f['otp'], 'otpttl' => (int)$this->f['otpttl'],
-                'cookie' => $this->f['cookie'], 'anote' => $this->f['anote'], 'updated' => date('Y-m-d H:i:s')
+                'grp' => (int) $this->f['grp'],
+                'acl' => (int) $this->f['acl'],
+                'login' => $this->f['login'],
+                'fname' => $this->f['fname'],
+                'lname' => $this->f['lname'],
+                'altemail' => $this->f['altemail'],
+                'otp' => $this->f['otp'],
+                'otpttl' => (int) $this->f['otpttl'],
+                'cookie' => $this->f['cookie'],
+                'anote' => $this->f['anote'],
+                'updated' => date('Y-m-d H:i:s'),
             ];
-            if ($this->f['webpw']) $data['webpw'] = password_hash($this->f['webpw'], PASSWORD_DEFAULT);
+            if ($this->f['webpw'])
+                $data['webpw'] = password_hash($this->f['webpw'], PASSWORD_DEFAULT);
             $this->db->update('users', $data, 'id = :id', ['id' => $id]);
             Util::log('User updated successfully', 'success');
             header("Location: ?o=Users&m=read&i=$id");
-            exit;
+            exit();
         }
         return $this->db->read('users', '*', 'id = :id', ['id' => $id], QueryType::One) ?: [];
     }
 
-    public function delete(): array {
-        $this->db->delete('users', 'id = :id', ['id' => (int)$this->f['i']]);
+    public function delete(): array
+    {
+        $this->db->delete('users', 'id = :id', ['id' => (int) $this->f['i']]);
         Util::log('User deleted', 'success');
         header('Location: ?o=Users');
-        exit;
+        exit();
     }
 
-    public function list(): array {
-        $page = (int)($_REQUEST['page'] ?? 1) ?: 1;
+    public function list(): array
+    {
+        $page = (int) ($_REQUEST['page'] ?? 1) ?: 1;
         $pp = $this->ctx->perp;
         $q = trim($_GET['q'] ?? '');
 
@@ -163,8 +202,12 @@ final class UsersModel {
         $total = $this->db->read('users', 'COUNT(*)', $where, $params, QueryType::Col);
 
         return [
-            'items' => $this->db->read('users', '*', "$where ORDER BY updated DESC LIMIT :l OFFSET :o", [...$params, 'l' => $pp, 'o' => ($page - 1) * $pp]),
-            'pagination' => ['page' => $page, 'perPage' => $pp, 'total' => $total, 'pages' => (int)ceil($total / $pp)]
+            'items' => $this->db->read('users', '*', "$where ORDER BY updated DESC LIMIT :l OFFSET :o", [
+                ...$params,
+                'l' => $pp,
+                'o' => ($page - 1) * $pp,
+            ]),
+            'pagination' => ['page' => $page, 'perPage' => $pp, 'total' => $total, 'pages' => (int) ceil($total / $pp)],
         ];
     }
 }

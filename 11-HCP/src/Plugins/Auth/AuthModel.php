@@ -1,10 +1,14 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Plugins\Auth;
 
-use SPE\App\{Acl, QueryType, Util};
-use SPE\HCP\Core\{Ctx, HcpDb};
+use SPE\App\Acl;
+use SPE\App\QueryType;
+use SPE\App\Util;
+use SPE\HCP\Core\Ctx;
+use SPE\HCP\Core\HcpDb;
 
 /**
  * Auth plugin - handles authentication flows
@@ -31,9 +35,11 @@ final class AuthModel
         'altemail' => '',
     ];
 
-    public function __construct(private Ctx $ctx)
-    {
-        foreach ($this->f as $k => &$v) $v = $_REQUEST[$k] ?? $v;
+    public function __construct(
+        private Ctx $ctx,
+    ) {
+        foreach ($this->f as $k => &$v)
+            $v = $_REQUEST[$k] ?? $v;
         $this->db = new HcpDb();
     }
 
@@ -46,7 +52,7 @@ final class AuthModel
         // Already logged in
         if (Util::is_usr()) {
             header('Location: ?o=System');
-            exit;
+            exit();
         }
 
         if (!Util::is_post()) {
@@ -68,7 +74,7 @@ final class AuthModel
             return ['action' => 'login', 'login' => $login];
         }
 
-        $acl = Acl::tryFrom((int)$usr['acl']) ?? Acl::Anonymous;
+        $acl = Acl::tryFrom((int) $usr['acl']) ?? Acl::Anonymous;
 
         if ($acl === Acl::Suspended) {
             Util::log('Account is suspended. Contact administrator.');
@@ -97,7 +103,7 @@ final class AuthModel
 
         Util::log(($usr['fname'] ?: $usr['login']) . ' logged in', 'success');
         header('Location: ?o=System');
-        exit;
+        exit();
     }
 
     // === Logout ===
@@ -108,7 +114,7 @@ final class AuthModel
 
         if (Util::is_usr()) {
             $login = $_SESSION['usr']['login'] ?? 'User';
-            $id = (int)$_SESSION['usr']['id'];
+            $id = (int) $_SESSION['usr']['id'];
 
             // TODO: Clear remember cookie - needs HcpDb-compatible implementation
             // Util::clearRemember($this->db, $id);
@@ -125,7 +131,7 @@ final class AuthModel
         }
 
         header('Location: ?o=System');
-        exit;
+        exit();
     }
 
     // === Forgot Password (request reset) ===
@@ -136,7 +142,7 @@ final class AuthModel
 
         if (Util::is_usr()) {
             header('Location: ?o=System');
-            exit;
+            exit();
         }
 
         if (!Util::is_post()) {
@@ -156,16 +162,21 @@ final class AuthModel
         $successMsg = 'If that email exists, a password reset link has been sent';
 
         if ($usr) {
-            $acl = Acl::tryFrom((int)$usr['acl']) ?? Acl::Anonymous;
+            $acl = Acl::tryFrom((int) $usr['acl']) ?? Acl::Anonymous;
 
             if ($acl !== Acl::Suspended && $acl !== Acl::Anonymous) {
                 $otp = Util::genOtp();
 
-                $this->db->update('users', [
-                    'otp' => $otp,
-                    'otpttl' => time(),
-                    'updated' => date('Y-m-d H:i:s')
-                ], 'id = :id', ['id' => $usr['id']]);
+                $this->db->update(
+                    'users',
+                    [
+                        'otp' => $otp,
+                        'otpttl' => time(),
+                        'updated' => date('Y-m-d H:i:s'),
+                    ],
+                    'id = :id',
+                    ['id' => $usr['id']],
+                );
 
                 if (Util::mailResetPw($login, $otp, $this->ctx->email)) {
                     Util::elog("Password reset email sent to $login");
@@ -177,7 +188,7 @@ final class AuthModel
 
         Util::log($successMsg, 'success');
         header('Location: ?o=Auth&m=login');
-        exit;
+        exit();
     }
 
     // === Reset Password (via OTP link) ===
@@ -196,14 +207,14 @@ final class AuthModel
             if (!$usr) {
                 Util::log('Invalid or expired reset link');
                 header('Location: ?o=Auth&m=login');
-                exit;
+                exit();
             }
 
-            if (!Util::chkOtp((int)$usr['otpttl'])) {
+            if (!Util::chkOtp((int) $usr['otpttl'])) {
                 // Clear expired OTP
                 $this->db->update('users', ['otp' => '', 'otpttl' => 0], 'id = :id', ['id' => $usr['id']]);
                 header('Location: ?o=Auth&m=login');
-                exit;
+                exit();
             }
 
             // Store in session for form submission
@@ -219,14 +230,14 @@ final class AuthModel
         if (!isset($_SESSION['resetpw'])) {
             Util::log('Session expired. Please request a new reset link.');
             header('Location: ?o=Auth&m=forgotpw');
-            exit;
+            exit();
         }
 
         if (!Util::is_post()) {
             return ['action' => 'resetpw', 'login' => $_SESSION['resetpw']['login']];
         }
 
-        $id = (int)$_SESSION['resetpw']['id'];
+        $id = (int) $_SESSION['resetpw']['id'];
         $p1 = Util::decpw($this->f['passwd1']);
         $p2 = Util::decpw($this->f['passwd2']);
 
@@ -237,25 +248,30 @@ final class AuthModel
         // Verify OTP hasn't expired during form fill
         $usr = $this->db->read('users', 'otpttl', 'id = :id', ['id' => $id], QueryType::One);
 
-        if (!$usr || !Util::chkOtp((int)$usr['otpttl'])) {
+        if (!$usr || !Util::chkOtp((int) $usr['otpttl'])) {
             unset($_SESSION['resetpw']);
             Util::log('Reset link expired. Please request a new one.');
             header('Location: ?o=Auth&m=forgotpw');
-            exit;
+            exit();
         }
 
         // Update password and clear OTP
-        $this->db->update('users', [
-            'webpw' => password_hash($p1, PASSWORD_DEFAULT),
-            'otp' => '',
-            'otpttl' => 0,
-            'updated' => date('Y-m-d H:i:s')
-        ], 'id = :id', ['id' => $id]);
+        $this->db->update(
+            'users',
+            [
+                'webpw' => password_hash($p1, PASSWORD_DEFAULT),
+                'otp' => '',
+                'otpttl' => 0,
+                'updated' => date('Y-m-d H:i:s'),
+            ],
+            'id = :id',
+            ['id' => $id],
+        );
 
         unset($_SESSION['resetpw']);
         Util::log('Password reset successfully. Please login.', 'success');
         header('Location: ?o=Auth&m=login');
-        exit;
+        exit();
     }
 
     // === Change Password (logged-in user) ===
@@ -266,10 +282,10 @@ final class AuthModel
 
         if (!Util::is_usr()) {
             header('Location: ?o=Auth&m=login');
-            exit;
+            exit();
         }
 
-        $id = (int)$_SESSION['usr']['id'];
+        $id = (int) $_SESSION['usr']['id'];
         $login = $_SESSION['usr']['login'];
 
         if (!Util::is_post()) {
@@ -292,14 +308,19 @@ final class AuthModel
             return ['action' => 'changepw', 'login' => $login];
         }
 
-        $this->db->update('users', [
-            'webpw' => password_hash($p1, PASSWORD_DEFAULT),
-            'updated' => date('Y-m-d H:i:s')
-        ], 'id = :id', ['id' => $id]);
+        $this->db->update(
+            'users',
+            [
+                'webpw' => password_hash($p1, PASSWORD_DEFAULT),
+                'updated' => date('Y-m-d H:i:s'),
+            ],
+            'id = :id',
+            ['id' => $id],
+        );
 
         Util::log('Password changed successfully', 'success');
         header('Location: ?o=Auth&m=profile');
-        exit;
+        exit();
     }
 
     // === User Profile ===
@@ -310,17 +331,17 @@ final class AuthModel
 
         if (!Util::is_usr()) {
             header('Location: ?o=Auth&m=login');
-            exit;
+            exit();
         }
 
-        $id = (int)$_SESSION['usr']['id'];
+        $id = (int) $_SESSION['usr']['id'];
 
         if (Util::is_post()) {
             $data = [
                 'fname' => trim($this->f['fname']),
                 'lname' => trim($this->f['lname']),
                 'altemail' => trim($this->f['altemail']),
-                'updated' => date('Y-m-d H:i:s')
+                'updated' => date('Y-m-d H:i:s'),
             ];
 
             $this->db->update('users', $data, 'id = :id', ['id' => $id]);
@@ -331,7 +352,7 @@ final class AuthModel
 
             Util::log('Profile updated', 'success');
             header('Location: ?o=Auth&m=profile');
-            exit;
+            exit();
         }
 
         return $this->db->read('users', '*', 'id = :id', ['id' => $id], QueryType::One) ?: [];

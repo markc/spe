@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\YouTube\Plugins\Dashboard;
 
-use SPE\YouTube\Core\{ Theme};
-
+use SPE\YouTube\Core\Theme;
 
 /**
  * Dashboard view - Channel overview UI
@@ -169,14 +169,26 @@ final class DashboardView extends Theme
     }
 
     #[\Override]
-    public function create(): string { return $this->list(); }
+    public function create(): string
+    {
+        return $this->list();
+    }
 
     #[\Override]
-    public function read(): string { return $this->list(); }
+    public function read(): string
+    {
+        return $this->list();
+    }
 
     #[\Override]
-    public function update(): string { return $this->list(); }
+    public function update(): string
+    {
+        return $this->list();
+    }
 
     #[\Override]
-    public function delete(): string { return $this->list(); }
+    public function delete(): string
+    {
+        return $this->list();
+    }
 }

@@ -1,9 +1,11 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Session\Core;
 
-final class Ctx {
+final class Ctx
+{
     public array $in;
     public array $out;
 
@@ -11,8 +13,16 @@ final class Ctx {
         public string $email = 'mc@netserva.org',
         array $in = ['o' => 'Home', 'm' => 'list', 't' => 'Simple', 'x' => ''],
         array $out = ['doc' => 'SPE::06', 'head' => '', 'main' => '', 'foot' => ''],
-        public array $nav = [['🏠 Home', 'Home'], ['📖 About', 'About'], ['✉️ Contact', 'Contact']],
-        public array $themes = [['🎨 Simple', 'Simple'], ['🎨 TopNav', 'TopNav'], ['🎨 SideBar', 'SideBar']]
+        public array $nav = [
+            ['🏠 Home',    'Home'],
+            ['📖 About',   'About'],
+            ['✉️ Contact', 'Contact'],
+        ],
+        public array $themes = [
+            ['🎨 Simple',  'Simple'],
+            ['🎨 TopNav',  'TopNav'],
+            ['🎨 SideBar', 'SideBar'],
+        ],
     ) {
         session_status() === PHP_SESSION_NONE && session_start();
 
@@ -23,14 +33,16 @@ final class Ctx {
     }
 
     // Get/set session value: URL param overrides, else use session, else use default
-    public function ses(string $k, mixed $v = ''): mixed {
+    public function ses(string $k, mixed $v = ''): mixed
+    {
         return $_SESSION[$k] = isset($_REQUEST[$k])
-            ? (is_array($_REQUEST[$k]) ? $_REQUEST[$k] : trim($_REQUEST[$k]) |> htmlspecialchars(...))
-            : ($_SESSION[$k] ?? $v);
+            ? (is_array($_REQUEST[$k]) ? $_REQUEST[$k] : (trim($_REQUEST[$k]) |> htmlspecialchars(...)))
+            : $_SESSION[$k] ?? $v;
     }
 
     // Flash message: set message, retrieve once, then clear
-    public function flash(string $k, ?string $msg = null): ?string {
+    public function flash(string $k, ?string $msg = null): ?string
+    {
         if ($msg !== null) {
             $_SESSION["_flash_{$k}"] = $msg;
             return $msg;

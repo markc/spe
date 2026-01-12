@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Core;
@@ -36,7 +37,7 @@ final class Shell
         return [
             'success' => $code === 0,
             'output' => implode("\n", $output),
-            'code' => $code
+            'code' => $code,
         ];
     }
 
@@ -67,15 +68,15 @@ final class Shell
      */
     public static function systemStats(): array
     {
-        $disk = disk_free_space('/') / disk_total_space('/') * 100;
+        $disk = (disk_free_space('/') / disk_total_space('/')) * 100;
 
         $meminfo = file_get_contents('/proc/meminfo');
         preg_match('/MemTotal:\s+(\d+)/', $meminfo, $total);
         preg_match('/MemAvailable:\s+(\d+)/', $meminfo, $avail);
-        $memUsed = 100 - (($avail[1] ?? 0) / ($total[1] ?? 1) * 100);
+        $memUsed = 100 - ((($avail[1] ?? 0) / ($total[1] ?? 1)) * 100);
 
         $load = sys_getloadavg();
-        $uptime = (int)(file_get_contents('/proc/uptime') ?: 0);
+        $uptime = (int) (file_get_contents('/proc/uptime') ?: 0);
 
         return [
             'disk_used_pct' => round(100 - $disk, 1),
@@ -96,7 +97,7 @@ final class Shell
         return [
             'name' => $service,
             'active' => $active,
-            'status' => $active ? 'running' : 'stopped'
+            'status' => $active ? 'running' : 'stopped',
         ];
     }
 

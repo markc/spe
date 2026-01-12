@@ -1,11 +1,15 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\YouTube\Plugins\Playlists;
 
 use SPE\App\Util;
-use SPE\YouTube\Core\{Ctx, Plugin};
-use SPE\YouTube\Services\{YouTubeService, YouTubeException, Privacy};
+use SPE\YouTube\Core\Ctx;
+use SPE\YouTube\Core\Plugin;
+use SPE\YouTube\Services\Privacy;
+use SPE\YouTube\Services\YouTubeException;
+use SPE\YouTube\Services\YouTubeService;
 
 /**
  * Playlists plugin - CRUD for YouTube playlists
@@ -14,8 +18,9 @@ final class PlaylistsModel extends Plugin
 {
     private YouTubeService $youtube;
 
-    public function __construct(protected Ctx $ctx)
-    {
+    public function __construct(
+        protected Ctx $ctx,
+    ) {
         parent::__construct($ctx);
         $this->youtube = new YouTubeService();
     }
@@ -59,10 +64,12 @@ final class PlaylistsModel extends Plugin
         $playlists = $this->youtube->listPlaylists(50);
         $playlist = null;
         foreach ($playlists as $pl) {
-            if ($pl->id !== $id) { continue; }
+            if ($pl->id !== $id) {
+                continue;
+            }
 
-$playlist = $pl;
-                break;
+            $playlist = $pl;
+            break;
         }
 
         if (!$playlist) {

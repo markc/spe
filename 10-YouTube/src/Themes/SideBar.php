@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\YouTube\Themes;
 
-use SPE\YouTube\Core\{ Theme};
+use SPE\YouTube\Core\Theme;
 
 /**
  * SideBar theme for YouTube Manager - vertical sidebar navigation
@@ -54,10 +55,13 @@ final class SideBar extends Theme
                     '<a href="?o=%s"%s>%s</a>',
                     $n[1],
                     $n[1] === $current ? ' class="active"' : '',
-                    $n[0]
+                    $n[0],
                 ), $items))
                 |> (static fn($l) => implode('', $l));
-            $html .= '<div class="sidebar-group"><div class="sidebar-group-title">Navigation</div><nav>' . $links . '</nav></div>';
+            $html .=
+                '<div class="sidebar-group"><div class="sidebar-group-title">Navigation</div><nav>'
+                . $links
+                . '</nav></div>';
         }
 
         // Themes section - preserves current URL params
@@ -67,12 +71,18 @@ final class SideBar extends Theme
             $links = $themes
                 |> (static fn($items) => array_map(static fn($n) => sprintf(
                     '<a href="%s"%s>%s</a>',
-                    $_GET |> (static fn($p) => [...$p, 't' => $n[1]]) |> http_build_query(...) |> (static fn($q) => "?$q"),
+                    $_GET
+                        |> (static fn($p) => [...$p, 't' => $n[1]])
+                        |> http_build_query(...)
+                        |> (static fn($q) => "?$q"),
                     $n[1] === $currentTheme ? ' class="active"' : '',
-                    $n[0]
+                    $n[0],
                 ), $items))
                 |> (static fn($l) => implode('', $l));
-            $html .= '<div class="sidebar-group"><div class="sidebar-group-title">Themes</div><nav>' . $links . '</nav></div>';
+            $html .=
+                '<div class="sidebar-group"><div class="sidebar-group-title">Themes</div><nav>'
+                . $links
+                . '</nav></div>';
         }
 
         return $html;

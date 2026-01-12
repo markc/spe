@@ -1,32 +1,42 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Plugins\Posts;
 
 use SPE\App\Util;
-use SPE\Blog\Core\{ Theme};
+use SPE\Blog\Core\Theme;
 
-final class PostsView extends Theme {
-
-    private function t(): string {
+final class PostsView extends Theme
+{
+    private function t(): string
+    {
         return '&t=' . $this->ctx->in['t'];
     }
 
-    public function create(): string {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') return '';
+    public function create(): string
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST')
+            return '';
         return $this->form();
     }
 
-    public function read(): string {
+    public function read(): string
+    {
         $a = $this->ctx->ary;
-        if (empty($a)) return '<div class="card"><p>Post not found.</p><a href="?o=Posts' . $this->t() . '" class="btn">« Back</a></div>';
+        if (empty($a))
+            return (
+                '<div class="card"><p>Post not found.</p><a href="?o=Posts'
+                . $this->t()
+                . '" class="btn">« Back</a></div>'
+            );
         $t = $this->t();
         $content = Util::md($a['content'] ?? '');
         $canEdit = $a['can_edit'] ?? false;
         $editBtns = $canEdit ? <<<HTML
-                <a href="?o=Posts&m=update&id={$a['id']}$t" class="btn">Edit</a>
-                <a href="?o=Posts&m=delete&id={$a['id']}$t" class="btn btn-danger" onclick="return confirm('Delete this post?')">Delete</a>
-        HTML : '';
+                    <a href="?o=Posts&m=update&id={$a['id']}$t" class="btn">Edit</a>
+                    <a href="?o=Posts&m=delete&id={$a['id']}$t" class="btn btn-danger" onclick="return confirm('Delete this post?')">Delete</a>
+            HTML : '';
 
         // Build category tags
         $categories = $a['categories'] ?? [];
@@ -54,16 +64,20 @@ final class PostsView extends Theme {
         HTML;
     }
 
-    public function update(): string {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') return '';
+    public function update(): string
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST')
+            return '';
         return $this->form($this->ctx->ary);
     }
 
-    public function delete(): string {
+    public function delete(): string
+    {
         return '';
     }
 
-    public function list(): string {
+    public function list(): string
+    {
         $a = $this->ctx->ary;
         $t = $this->t();
         $q = htmlspecialchars($_GET['q'] ?? '');
@@ -102,7 +116,7 @@ final class PostsView extends Theme {
         foreach ($a['items'] as $item) {
             $title = htmlspecialchars($item['title']);
             $author = htmlspecialchars($item['author']);
-            $canEdit = $isAdmin || ((int)$item['author_id'] === (int)$userId);
+            $canEdit = $isAdmin || (int) $item['author_id'] === (int) $userId;
             $actions = $canEdit
                 ? "<a href=\"?o=Posts&m=update&id={$item['id']}$t\" title=\"Edit\" class=\"icon\">✏️</a> <a href=\"?o=Posts&m=delete&id={$item['id']}$t\" title=\"Delete\" class=\"icon\" onclick=\"return confirm('Delete this post?')\">🗑️</a>"
                 : '';
@@ -134,7 +148,8 @@ final class PostsView extends Theme {
         return $html . '</div>';
     }
 
-    private function form(array $data = []): string {
+    private function form(array $data = []): string
+    {
         $id = $data['id'] ?? 0;
         $t = $this->t();
         $title = htmlspecialchars($data['title'] ?? '');
@@ -154,7 +169,7 @@ final class PostsView extends Theme {
         if (!empty($allCategories)) {
             $catCheckboxes = '<div class="form-group"><label>Categories</label><div class="checkbox-group">';
             foreach ($allCategories as $cat) {
-                $catId = (int)$cat['id'];
+                $catId = (int) $cat['id'];
                 $catName = htmlspecialchars($cat['name']);
                 $checked = in_array($catId, $postCatIds) ? ' checked' : '';
                 $catCheckboxes .= <<<HTML

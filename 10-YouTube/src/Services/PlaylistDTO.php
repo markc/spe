@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\YouTube\Services;
@@ -25,17 +26,14 @@ readonly class PlaylistDTO
         $details = $data['contentDetails'] ?? [];
 
         $thumbnails = $snippet['thumbnails'] ?? [];
-        $thumbnail = $thumbnails['high']['url']
-            ?? $thumbnails['medium']['url']
-            ?? $thumbnails['default']['url']
-            ?? '';
+        $thumbnail = $thumbnails['high']['url'] ?? $thumbnails['medium']['url'] ?? $thumbnails['default']['url'] ?? '';
 
         return new self(
             id: $data['id'] ?? '',
             title: $snippet['title'] ?? 'Untitled',
             description: $snippet['description'] ?? '',
             thumbnail: $thumbnail,
-            itemCount: (int)($details['itemCount'] ?? 0),
+            itemCount: (int) ($details['itemCount'] ?? 0),
             privacy: Privacy::fromString($status['privacyStatus'] ?? 'private'),
             publishedAt: $snippet['publishedAt'] ?? '',
         );
@@ -48,8 +46,6 @@ readonly class PlaylistDTO
 
     public function formattedDate(): string
     {
-        return $this->publishedAt
-            |> strtotime(...)
-            |> (static fn($ts) => date('M j, Y', $ts));
+        return $this->publishedAt |> strtotime(...) |> (static fn($ts) => date('M j, Y', $ts));
     }
 }

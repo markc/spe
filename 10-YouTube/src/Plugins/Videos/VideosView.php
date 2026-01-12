@@ -1,10 +1,12 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\YouTube\Plugins\Videos;
 
-use SPE\YouTube\Core\{ Theme};
-use SPE\YouTube\Services\{Privacy, YouTubeService};
+use SPE\YouTube\Core\Theme;
+use SPE\YouTube\Services\Privacy;
+use SPE\YouTube\Services\YouTubeService;
 
 /**
  * Videos view - Video grid and detail UI
@@ -188,8 +190,14 @@ final class VideosView extends Theme
     }
 
     #[\Override]
-    public function update(): string { return $this->read(); }
+    public function update(): string
+    {
+        return $this->read();
+    }
 
     #[\Override]
-    public function delete(): string { return $this->list(); }
+    public function delete(): string
+    {
+        return $this->list();
+    }
 }

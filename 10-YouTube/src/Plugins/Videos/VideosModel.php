@@ -1,11 +1,14 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\YouTube\Plugins\Videos;
 
 use SPE\App\Util;
-use SPE\YouTube\Core\{Ctx, Plugin};
-use SPE\YouTube\Services\{YouTubeService, Privacy};
+use SPE\YouTube\Core\Ctx;
+use SPE\YouTube\Core\Plugin;
+use SPE\YouTube\Services\Privacy;
+use SPE\YouTube\Services\YouTubeService;
 
 /**
  * Videos plugin - List and view uploaded videos
@@ -14,8 +17,9 @@ final class VideosModel extends Plugin
 {
     private YouTubeService $youtube;
 
-    public function __construct(protected Ctx $ctx)
-    {
+    public function __construct(
+        protected Ctx $ctx,
+    ) {
         parent::__construct($ctx);
         $this->youtube = new YouTubeService();
     }

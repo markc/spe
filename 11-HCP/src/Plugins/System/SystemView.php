@@ -1,9 +1,11 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Plugins\System;
 
-use SPE\HCP\Core\{Ctx, Plugin};
+use SPE\HCP\Core\Ctx;
+use SPE\HCP\Core\Plugin;
 
 /**
  * System dashboard view - stats, services, quick actions.
@@ -12,7 +14,7 @@ final class SystemView extends Plugin
 {
     public function __construct(
         protected Ctx $ctx,
-        private array $data = []
+        private array $data = [],
     ) {
         parent::__construct($ctx);
     }
@@ -36,7 +38,9 @@ final class SystemView extends Plugin
         // Progress bar helper
         $bar = fn($pct, $label) => sprintf(
             '<div class="progress"><div class="progress-bar" style="width:%d%%">%s: %d%%</div></div>',
-            min(100, $pct), $label, $pct
+            min(100, $pct),
+            $label,
+            $pct,
         );
 
         $load = implode(' / ', array_map(fn($l) => number_format($l, 2), $stats['load']));

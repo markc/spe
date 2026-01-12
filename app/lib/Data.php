@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\App;
@@ -33,10 +34,10 @@ final class Data
 
     public function __construct(
         private Db $db,
-        private string $table
+        private string $table,
     ) {
         // Read URL params
-        $this->page = max(1, (int)($_GET['page'] ?? 1));
+        $this->page = max(1, (int) ($_GET['page'] ?? 1));
         $this->sortCol = $_GET['sort'] ?? $this->sortCol;
         $this->sortDir = strtoupper($_GET['dir'] ?? $this->sortDir) === 'ASC' ? 'ASC' : 'DESC';
     }
@@ -94,14 +95,14 @@ final class Data
         [$where, $params] = $this->buildWhere();
 
         // Count total
-        $total = (int)$this->db->read($this->table, 'COUNT(*)', $where, $params, QueryType::Col);
+        $total = (int) $this->db->read($this->table, 'COUNT(*)', $where, $params, QueryType::Col);
 
         // Build query
         $sql = "$where ORDER BY {$this->sortCol} {$this->sortDir}";
 
         if ($this->paginate) {
             $offset = ($this->page - 1) * $this->perPage;
-            $sql .= " LIMIT :_limit OFFSET :_offset";
+            $sql .= ' LIMIT :_limit OFFSET :_offset';
             $params['_limit'] = $this->perPage;
             $params['_offset'] = $offset;
         }
@@ -121,7 +122,7 @@ final class Data
                 'page' => $this->page,
                 'perPage' => $this->perPage,
                 'total' => $total,
-                'pages' => $this->paginate ? (int)ceil($total / $this->perPage) : 1,
+                'pages' => $this->paginate ? (int) ceil($total / $this->perPage) : 1,
             ],
         ];
     }
@@ -148,7 +149,7 @@ final class Data
                     $placeholders[] = ":$key";
                     $params[$key] = $v;
                 }
-                $conditions[] = "$col IN (" . implode(',', $placeholders) . ")";
+                $conditions[] = "$col IN (" . implode(',', $placeholders) . ')';
             } else {
                 $params["_f_$col"] = $value;
                 $conditions[] = "$col = :_f_$col";
@@ -169,7 +170,7 @@ final class Data
         $dir = $data['sort']['dir'] ?? 'DESC';
 
         $isActive = $current === $col;
-        $newDir = ($isActive && $dir === 'ASC') ? 'DESC' : 'ASC';
+        $newDir = $isActive && $dir === 'ASC' ? 'DESC' : 'ASC';
         $arrow = $isActive ? ($dir === 'ASC' ? ' ▲' : ' ▼') : '';
 
         $params = $_GET;
@@ -198,7 +199,8 @@ final class Data
      */
     public static function pg(array $p, string $class = 'flex mt-2 justify-center gap-sm'): string
     {
-        if ($p['pages'] <= 1) return '';
+        if ($p['pages'] <= 1)
+            return '';
 
         $params = $_GET;
         $html = "<div class=\"$class\">";
@@ -231,12 +233,16 @@ final class Data
         unset($params['q'], $params['page']);
         $hidden = '';
         foreach ($params as $k => $v) {
-            if (is_array($v)) { continue; }
+            if (is_array($v)) {
+                continue;
+            }
 
-$hidden .= "<input type=\"hidden\" name=\"$k\" value=\"" . htmlspecialchars($v) . "\">";
+            $hidden .= "<input type=\"hidden\" name=\"$k\" value=\"" . htmlspecialchars($v) . "\">";
         }
 
-        $clear = $q ? '<button type="button" class="btn" onclick="this.form.q.value=\'\';this.form.submit()">✕</button>' : '';
+        $clear = $q
+            ? '<button type="button" class="btn" onclick="this.form.q.value=\'\';this.form.submit()">✕</button>'
+            : '';
 
         return <<<HTML
         <form class="flex gap-sm">

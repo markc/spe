@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\YouTube\Plugins\Auth;
 
-use SPE\YouTube\Core\{ Theme};
+use SPE\YouTube\Core\Theme;
 
 /**
  * Auth view - Google OAuth login UI

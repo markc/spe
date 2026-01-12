@@ -1,58 +1,103 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\PDO\Plugins\Blog;
 
-use SPE\PDO\Core\Ctx;
 use SPE\App\Util;
+use SPE\PDO\Core\Ctx;
 
-final class BlogView {
+final class BlogView
+{
     private const array ICO = [
-        '' => 'None', '🏠' => 'Home', '📋' => 'About', '✉️' => 'Contact', '📰' => 'Blog', '📝' => 'Post', '📄' => 'Page',
-        '⭐' => 'Star', '🔥' => 'Fire', '💡' => 'Idea', '🎯' => 'Target', '🚀' => 'Launch', '💻' => 'Tech', '📸' => 'Photo',
-        '🎨' => 'Art', '🎵' => 'Music', '📚' => 'Docs', '🔧' => 'Tools', '🌟' => 'Highlight', '💬' => 'Chat', '🔒' => 'Private',
-        '❤️' => 'Love', '✅' => 'Done', '⚠️' => 'Alert', '🎉' => 'News', '👤' => 'User', '📅' => 'Event'
+        '' => 'None',
+        '🏠' => 'Home',
+        '📋' => 'About',
+        '✉️' => 'Contact',
+        '📰' => 'Blog',
+        '📝' => 'Post',
+        '📄' => 'Page',
+        '⭐' => 'Star',
+        '🔥' => 'Fire',
+        '💡' => 'Idea',
+        '🎯' => 'Target',
+        '🚀' => 'Launch',
+        '💻' => 'Tech',
+        '📸' => 'Photo',
+        '🎨' => 'Art',
+        '🎵' => 'Music',
+        '📚' => 'Docs',
+        '🔧' => 'Tools',
+        '🌟' => 'Highlight',
+        '💬' => 'Chat',
+        '🔒' => 'Private',
+        '❤️' => 'Love',
+        '✅' => 'Done',
+        '⚠️' => 'Alert',
+        '🎉' => 'News',
+        '👤' => 'User',
+        '📅' => 'Event',
     ];
 
-    public function __construct(private Ctx $ctx, private array $a) {}
+    public function __construct(
+        private Ctx $ctx,
+        private array $a,
+    ) {}
 
-    public function create(): string {
+    public function create(): string
+    {
         return $_SERVER['REQUEST_METHOD'] === 'POST' ? '' : $this->form();
     }
 
-    public function update(): string {
+    public function update(): string
+    {
         return $_SERVER['REQUEST_METHOD'] === 'POST' ? '' : $this->form($this->a);
     }
 
-    public function delete(): string {
+    public function delete(): string
+    {
         return '';
     }
 
-    public function read(): string {
+    public function read(): string
+    {
         $a = $this->a;
-        $ti = ($a['icon'] ?? '') ? "{$a['icon']} {$a['title']}" : $a['title'];
-        return "<div class='card mt-4'><h2>$ti</h2>
+        $ti = $a['icon'] ?? '' ? "{$a['icon']} {$a['title']}" : $a['title'];
+        return (
+            "<div class='card mt-4'><h2>$ti</h2>
             <p class=text-muted><small>By {$a['author']} | {$a['created']} | {$a['updated']}</small></p>
-            <div class='prose mt-2'>" . Util::md($a['content']) . "</div>
+            <div class='prose mt-2'>"
+            . Util::md($a['content'])
+            . "</div>
             <div class='flex mt-3 gap-sm justify-end'><a href='?o=Blog' class=btn>« Back</a>
             <a href='?o=Blog&m=update&id={$a['id']}' class=btn>✏️ Edit</a>
-            <a href='?o=Blog&m=delete&id={$a['id']}' class='btn btn-danger' onclick='return confirm(\"Delete?\")'>🗑️</a></div></div>";
+            <a href='?o=Blog&m=delete&id={$a['id']}' class='btn btn-danger' onclick='return confirm(\"Delete?\")'>🗑️</a></div></div>"
+        );
     }
 
-    public function page(): string {
+    public function page(): string
+    {
         $a = $this->a;
-        if (!$a) return '<div class="card mt-4"><p class=text-muted>Page not found.</p></div>';
-        $ti = ($a['icon'] ?? '') ? "{$a['icon']} {$a['title']}" : $a['title'];
-        return "<div class='card mt-4'><h2>$ti</h2><div class=prose>" . Util::md($a['content'] ?? '') . "</div>
-            <div class='mt-2 text-right'><a href='?o=Blog&m=update&id={$a['id']}' class=btn>✏️ Edit</a></div></div>";
+        if (!$a)
+            return '<div class="card mt-4"><p class=text-muted>Page not found.</p></div>';
+        $ti = $a['icon'] ?? '' ? "{$a['icon']} {$a['title']}" : $a['title'];
+        return (
+            "<div class='card mt-4'><h2>$ti</h2><div class=prose>"
+            . Util::md($a['content'] ?? '')
+            . "</div>
+            <div class='mt-2 text-right'><a href='?o=Blog&m=update&id={$a['id']}' class=btn>✏️ Edit</a></div></div>"
+        );
     }
 
-    public function list(): string {
-        return ($this->a['edit'] ?? false) ? $this->le($this->a) : $this->lp($this->a);
+    public function list(): string
+    {
+        return $this->a['edit'] ?? false ? $this->le($this->a) : $this->lp($this->a);
     }
 
-    private function lp(array $a): string {
-        if (!$a['items']) return "<div class=card><p class=text-muted>No posts yet.</p></div>";
+    private function lp(array $a): string
+    {
+        if (!$a['items'])
+            return '<div class=card><p class=text-muted>No posts yet.</p></div>';
         $h = '<div>';
         foreach ($a['items'] as $i) {
             $ti = trim(($i['icon'] ?? '') . ' ' . htmlspecialchars($i['title']));
@@ -66,7 +111,8 @@ final class BlogView {
         return $h . "<div class='text-right mt-2'><a href='?o=Blog&edit' class=btn>✏️ Manage Posts</a></div></div>";
     }
 
-    private function le(array $a): string {
+    private function le(array $a): string
+    {
         $q = htmlspecialchars($_GET['q'] ?? '');
         $cl = $q ? "<a href='?o=Blog&edit' class=btn>✕</a>" : '';
         $h = "<div class='card mt-4'><div class='flex justify-between mb-2'>
@@ -80,7 +126,11 @@ final class BlogView {
         foreach ($a['items'] as $i) {
             $ti = htmlspecialchars($i['title']);
             $tp = $i['type'] ?? 'post';
-            $ic = match ($tp) { 'page' => '📄', 'doc' => '📚', default => '📝' };
+            $ic = match ($tp) {
+                'page' => '📄',
+                'doc' => '📚',
+                default => '📝',
+            };
             $h .= "<tr class=tr><td class=td><a href='?o=Blog&m=read&id={$i['id']}'>$ti</a></td>
                 <td class=td><small>$ic $tp</small></td><td class=td><small>{$i['updated']}</small></td>
                 <td class=td-right><a href='?o=Blog&m=update&id={$i['id']}'>✏️</a>
@@ -89,18 +139,23 @@ final class BlogView {
         return $h . '</tbody></table>' . $this->pg($a['pagination'], '&edit') . '</div>';
     }
 
-    private function pg(array $p, string $x): string {
-        if ($p['pages'] <= 1) return '';
+    private function pg(array $p, string $x): string
+    {
+        if ($p['pages'] <= 1)
+            return '';
         $q = htmlspecialchars($_GET['q'] ?? '');
         $sq = $q ? "&q=$q" : '';
         $h = "<div class='flex mt-2 justify-center gap-sm'>";
-        if ($p['page'] > 1) $h .= "<a href='?o=Blog&page=" . ($p['page'] - 1) . "$x$sq' class=btn>« Prev</a>";
+        if ($p['page'] > 1)
+            $h .= "<a href='?o=Blog&page=" . ($p['page'] - 1) . "$x$sq' class=btn>« Prev</a>";
         $h .= "<span class=td>Page {$p['page']} of {$p['pages']}</span>";
-        if ($p['page'] < $p['pages']) $h .= "<a href='?o=Blog&page=" . ($p['page'] + 1) . "$x$sq' class=btn>Next »</a>";
+        if ($p['page'] < $p['pages'])
+            $h .= "<a href='?o=Blog&page=" . ($p['page'] + 1) . "$x$sq' class=btn>Next »</a>";
         return $h . '</div>';
     }
 
-    private function form(array $d = []): string {
+    private function form(array $d = []): string
+    {
         $id = $d['id'] ?? 0;
         $ti = htmlspecialchars($d['title'] ?? '');
         $sl = htmlspecialchars($d['slug'] ?? '');
@@ -113,7 +168,7 @@ final class BlogView {
             $dp = $e ? "$e $l" : $l;
             $io .= "<option value='$e' $s>$dp</option>";
         }
-        $act = $id ? "?o=Blog&m=update&id=$id" : "?o=Blog&m=create";
+        $act = $id ? "?o=Blog&m=update&id=$id" : '?o=Blog&m=create';
         $hd = $id ? '✏️ Edit' : '+ Create';
         $bt = $id ? 'Update' : 'Create';
         $ps = $ty === 'post' ? 'selected' : '';

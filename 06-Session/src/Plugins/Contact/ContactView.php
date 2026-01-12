@@ -1,12 +1,16 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Session\Plugins\Contact;
 
 use SPE\Session\Core\View;
 
-final class ContactView extends View {
-    #[\Override] public function list(): string {
+final class ContactView extends View
+{
+    #[\Override]
+    public function list(): string
+    {
         return <<<HTML
         <div class="card">
             <h2>{$this->ary['head']}</h2>

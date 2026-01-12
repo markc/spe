@@ -1,15 +1,22 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Users\Core;
 
-use SPE\App\{Db, QueryType, Util};
+use SPE\App\Db;
+use SPE\App\QueryType;
+use SPE\App\Util;
 
-final readonly class Init {
+final readonly class Init
+{
     private const string NS = 'SPE\\Users\\';
+
     private array $out;
 
-    public function __construct(private Ctx $ctx) {
+    public function __construct(
+        private Ctx $ctx,
+    ) {
         Util::elog(__METHOD__);
 
         // Restore session from "remember me" cookie
@@ -28,27 +35,29 @@ final readonly class Init {
             $ary = [];
         } elseif (!$path || $path === 'index.php') {
             // Root: show home page (slug=home) or fallback to id=1
-            $ary = $ctx->db->read('posts', '*', "slug='home' AND type='page'", [], QueryType::One)
-                ?: $ctx->db->read('posts', '*', 'id=1', [], QueryType::One)
-                ?: [];
+            $ary = $ctx->db->read('posts', '*', "slug='home' AND type='page'", [], QueryType::One) ?: $ctx->db->read(
+                'posts',
+                '*',
+                'id=1',
+                [],
+                QueryType::One,
+            ) ?: [];
             $view = self::NS . 'Plugins\\Blog\\BlogView';
-            $main = $ary ? (new $view($ctx, $ary))->page() : '<div class="card"><p>No content found.</p></div>';
+            $main = $ary ? new $view($ctx, $ary)->page() : '<div class="card"><p>No content found.</p></div>';
         } elseif ($path === 'blog') {
             // Blog listing (public view, supports ?page= for pagination)
             $o = 'Blog';
             $m = 'list';
             $model = self::NS . 'Plugins\\Blog\\BlogModel';
-            $ary = (new $model($ctx))->list();
+            $ary = new $model($ctx)->list();
             $view = self::NS . 'Plugins\\Blog\\BlogView';
-            $main = (new $view($ctx, $ary))->list();
+            $main = new $view($ctx, $ary)->list();
         } else {
             // Clean URL: look up by slug (any type)
             $ary = $ctx->db->read('posts', '*', 'slug=:s', ['s' => $path], QueryType::One) ?: [];
             $view = self::NS . 'Plugins\\Blog\\BlogView';
             if ($ary) {
-                $main = $ary['type'] === 'page'
-                    ? (new $view($ctx, $ary))->page()
-                    : (new $view($ctx, $ary))->read();
+                $main = $ary['type'] === 'page' ? new $view($ctx, $ary)->page() : new $view($ctx, $ary)->read();
             } else {
                 $main = '<div class="card"><p>Page not found.</p></div>';
             }
@@ -57,7 +66,8 @@ final readonly class Init {
         $this->out = [...$ctx->out, ...(is_array($ary) ? $ary : []), 'main' => $main];
     }
 
-    private function routePlugin(string $o, string $m, int $i): string {
+    private function routePlugin(string $o, string $m, int $i): string
+    {
         $ctx = $this->ctx;
 
         // Users plugin - includes auth methods
@@ -72,19 +82,19 @@ final readonly class Init {
             if (in_array($m, $adminMethods) && !Util::is_adm()) {
                 Util::log('Admin access required');
                 header('Location: ?o=Users&m=login');
-                exit;
+                exit();
             }
 
             if (in_array($m, $userMethods) && !Util::is_usr()) {
                 Util::log('Please login');
                 header('Location: ?o=Users&m=login');
-                exit;
+                exit();
             }
 
             $model = self::NS . 'Plugins\\Users\\UsersModel';
-            $ary = (new $model($ctx))->$m();
+            $ary = new $model($ctx)->$m();
             $view = self::NS . 'Plugins\\Users\\UsersView';
-            return (new $view($ctx, $ary))->$m();
+            return new $view($ctx, $ary)->$m();
         }
 
         // Blog plugin - admin operations
@@ -93,19 +103,20 @@ final readonly class Init {
             if (in_array($m, $writeMethods) && !Util::is_adm()) {
                 Util::log('Admin access required');
                 header('Location: /blog');
-                exit;
+                exit();
             }
 
             $model = self::NS . 'Plugins\\Blog\\BlogModel';
-            $ary = (new $model($ctx))->$m();
+            $ary = new $model($ctx)->$m();
             $view = self::NS . 'Plugins\\Blog\\BlogView';
-            return (new $view($ctx, $ary))->$m();
+            return new $view($ctx, $ary)->$m();
         }
 
         return '<div class="card"><p>Plugin not found.</p></div>';
     }
 
-    public function __toString(): string {
+    public function __toString(): string
+    {
         Util::elog(__METHOD__);
 
         $x = $this->ctx->in['x'];
@@ -130,7 +141,7 @@ final readonly class Init {
         // Default: render HTML via theme
         $t = $this->ctx->in['t'];
         $theme = self::NS . "Themes\\{$t}";
-        $html = (new $theme($this->ctx, $this->out))->render();
+        $html = new $theme($this->ctx, $this->out)->render();
 
         // Performance logging (when DEBUG=true)
         Util::perfLog(__FILE__);

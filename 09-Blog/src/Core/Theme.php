@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Core;
@@ -7,7 +8,10 @@ use SPE\App\Util;
 
 abstract class Theme
 {
-    public function __construct(protected Ctx $ctx, protected array $out) {}
+    public function __construct(
+        protected Ctx $ctx,
+        protected array $out,
+    ) {}
 
     abstract public function render(): string;
 
@@ -19,7 +23,7 @@ abstract class Theme
                 '<a href="%s"%s>%s</a>',
                 $p[1],
                 $this->isActive($p[1], $path) ? ' class="active"' : '',
-                $p[0]
+                $p[0],
             ), $n))
             |> (static fn($a) => implode(' ', $a));
     }
@@ -28,7 +32,7 @@ abstract class Theme
     {
         // Clean URL match
         if (str_starts_with($href, '/')) {
-            return $href === $path || ($href === '/' && $path === '/');
+            return $href === $path || $href === '/' && $path === '/';
         }
         // Query string match
         if (str_starts_with($href, '?o=')) {
@@ -44,7 +48,9 @@ abstract class Theme
         $links = $this->ctx->themes
             |> (static fn($n) => array_map(static fn($p) => sprintf(
                 '<a href="?t=%s"%s>%s</a>',
-                $p[1], $t === $p[1] ? ' class="active"' : '', $p[0]
+                $p[1],
+                $t === $p[1] ? ' class="active"' : '',
+                $p[0],
             ), $n))
             |> (static fn($a) => implode('', $a));
         return "<div class=\"dropdown\"><span class=\"dropdown-toggle\">🎨 Themes</span><div class=\"dropdown-menu\">$links</div></div>";
@@ -53,7 +59,8 @@ abstract class Theme
     protected function flash(): string
     {
         $log = Util::log();
-        if (!$log) return '';
+        if (!$log)
+            return '';
 
         $html = '';
         foreach ($log as $type => $msg) {
@@ -81,23 +88,23 @@ abstract class Theme
         $js = $this->out['js'] ?? '';
         $end = $this->out['end'] ?? '';
         return <<<HTML
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{$this->out['doc']} [$theme]</title>
-    <link rel="stylesheet" href="/spe.css">
-$css
-</head>
-<body>
-$body
-<script src="/spe.js"></script>
-$js
-$flash
-$end
-</body>
-</html>
-HTML;
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>{$this->out['doc']} [$theme]</title>
+            <link rel="stylesheet" href="/spe.css">
+        $css
+        </head>
+        <body>
+        $body
+        <script src="/spe.js"></script>
+        $js
+        $flash
+        $end
+        </body>
+        </html>
+        HTML;
     }
 }

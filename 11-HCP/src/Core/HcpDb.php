@@ -1,11 +1,12 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Core;
 
 use PDO;
 use PDOStatement;
-use SPE\App\Db;  // Load this first to get QueryType
+use SPE\App\Db; // Load this first to get QueryType
 use SPE\App\QueryType;
 
 /**
@@ -51,14 +52,20 @@ final class HcpDb extends PDO
         $stmt = $this->prepare("INSERT INTO `$tbl` ($cols) VALUES ($vals)");
         $this->bind($stmt, $data);
         $stmt->execute();
-        return (int)$this->lastInsertId();
+        return (int) $this->lastInsertId();
     }
 
-    public function read(string $tbl, string $cols = '*', string $where = '', array $params = [], QueryType $type = QueryType::All): mixed
-    {
+    public function read(
+        string $tbl,
+        string $cols = '*',
+        string $where = '',
+        array $params = [],
+        QueryType $type = QueryType::All,
+    ): mixed {
         $sql = "SELECT $cols FROM `$tbl`" . ($where ? " WHERE $where" : '');
         $stmt = $this->prepare($sql);
-        if ($params) $this->bind($stmt, $params);
+        if ($params)
+            $this->bind($stmt, $params);
         $stmt->execute();
 
         return match ($type) {
@@ -86,7 +93,8 @@ final class HcpDb extends PDO
     public function qry(string $sql, array $params = [], QueryType $type = QueryType::All): mixed
     {
         $stmt = $this->prepare($sql);
-        if ($params) $this->bind($stmt, $params);
+        if ($params)
+            $this->bind($stmt, $params);
         $stmt->execute();
 
         return match ($type) {

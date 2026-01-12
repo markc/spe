@@ -1,11 +1,14 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\YouTube\Plugins\Auth;
 
 use SPE\App\Util;
-use SPE\YouTube\Core\{Ctx, Plugin};
-use SPE\YouTube\Services\{YouTubeService, YouTubeException};
+use SPE\YouTube\Core\Ctx;
+use SPE\YouTube\Core\Plugin;
+use SPE\YouTube\Services\YouTubeException;
+use SPE\YouTube\Services\YouTubeService;
 
 /**
  * Google OAuth authentication plugin
@@ -15,8 +18,9 @@ final class AuthModel extends Plugin
 {
     private YouTubeService $youtube;
 
-    public function __construct(protected Ctx $ctx)
-    {
+    public function __construct(
+        protected Ctx $ctx,
+    ) {
         parent::__construct($ctx);
         $this->youtube = new YouTubeService();
     }
@@ -123,7 +127,7 @@ final class AuthModel extends Plugin
 
     private function getRedirectUri(): string
     {
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $protocol = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http';
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost:8010';
         // When running standalone (port 8010), redirect to root
         $path = str_contains($host, ':8010') ? '/' : '/10-YouTube/public/';

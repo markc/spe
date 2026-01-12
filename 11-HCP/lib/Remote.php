@@ -1,10 +1,11 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Lib;
 
-use phpseclib3\Net\SSH2;
 use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib3\Net\SSH2;
 
 /**
  * SSH Transport Layer
@@ -44,7 +45,7 @@ final class Remote
 
         if ($host) {
             $hostname = $host['hostname'];
-            $port = (int)$host['port'];
+            $port = (int) $host['port'];
             $user = $host['user'];
             $keyName = $host['ssh_key'];
         } else {
@@ -154,7 +155,7 @@ final class Remote
             return ['uid' => 0, 'gid' => 0];
         }
         [$uid, $gid] = explode(' ', $result);
-        return ['uid' => (int)$uid, 'gid' => (int)$gid];
+        return ['uid' => (int) $uid, 'gid' => (int) $gid];
     }
 
     /**
@@ -164,9 +165,9 @@ final class Remote
     {
         $result = self::exec(
             "for i in \$(seq {$min} {$max}); do getent passwd \$i >/dev/null 2>&1 || { echo \$i; break; }; done",
-            $host
+            $host,
         );
-        return $result ? (int)$result : null;
+        return $result ? (int) $result : null;
     }
 
     /**

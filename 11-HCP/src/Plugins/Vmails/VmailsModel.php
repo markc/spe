@@ -1,9 +1,11 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Plugins\Vmails;
 
-use SPE\HCP\Core\{Ctx, Plugin};
+use SPE\HCP\Core\Ctx;
+use SPE\HCP\Core\Plugin;
 use SPE\HCP\Lib\Vmails;
 
 /**
@@ -17,8 +19,9 @@ final class VmailsModel extends Plugin
         'domain' => '',
     ];
 
-    public function __construct(protected Ctx $ctx)
-    {
+    public function __construct(
+        protected Ctx $ctx,
+    ) {
         parent::__construct($ctx);
         foreach ($this->in as $k => &$v) {
             $v = $_REQUEST[$k] ?? $v;
@@ -39,7 +42,7 @@ final class VmailsModel extends Plugin
                 // Store password temporarily to show user
                 $_SESSION['new_password'] = $result['password'];
                 header('Location: ?o=Vmails&m=read&email=' . urlencode($email));
-                exit;
+                exit();
             }
 
             return ['error' => $result['error']];
@@ -83,17 +86,21 @@ final class VmailsModel extends Plugin
 
             if ($action === 'password' && !empty($_POST['password'])) {
                 $result = Vmails::passwd($email, $_POST['password']);
-                return $result['success']
-                    ? ['success' => 'Password updated', 'email' => $email]
-                    : ['error' => $result['error']];
+                return (
+                    $result['success']
+                        ? ['success' => 'Password updated', 'email' => $email]
+                        : ['error' => $result['error']]
+                );
             }
 
             if ($action === 'toggle') {
                 $active = ($_POST['active'] ?? '0') === '1';
                 $result = Vmails::setActive($email, $active);
-                return $result['success']
-                    ? ['success' => ($active ? 'Enabled' : 'Disabled') . " mailbox", 'email' => $email]
-                    : ['error' => $result['error']];
+                return (
+                    $result['success']
+                        ? ['success' => ($active ? 'Enabled' : 'Disabled') . ' mailbox', 'email' => $email]
+                        : ['error' => $result['error']]
+                );
             }
         }
 
@@ -112,7 +119,7 @@ final class VmailsModel extends Plugin
 
             if ($result['success']) {
                 header('Location: ?o=Vmails');
-                exit;
+                exit();
             }
 
             return ['error' => $result['error']];

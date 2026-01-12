@@ -1,11 +1,14 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Core;
 
 abstract class Plugin
 {
-    public function __construct(protected Ctx $ctx) {}
+    public function __construct(
+        protected Ctx $ctx,
+    ) {}
 
     public function create(): array|string
     {

@@ -1,10 +1,12 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\YouTube\Plugins\Playlists;
 
-use SPE\YouTube\Core\{ Theme};
-use SPE\YouTube\Services\{Privacy, YouTubeService};
+use SPE\YouTube\Core\Theme;
+use SPE\YouTube\Services\Privacy;
+use SPE\YouTube\Services\YouTubeService;
 
 /**
  * Playlists view - Playlist list and detail UI
@@ -190,8 +192,14 @@ final class PlaylistsView extends Theme
     }
 
     #[\Override]
-    public function update(): string { return ''; }
+    public function update(): string
+    {
+        return '';
+    }
 
     #[\Override]
-    public function delete(): string { return ''; }
+    public function delete(): string
+    {
+        return '';
+    }
 }

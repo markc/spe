@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Plugins\Auth;
@@ -11,7 +12,10 @@ use SPE\HCP\Core\Ctx;
  */
 final class AuthView
 {
-    public function __construct(private Ctx $ctx, private array $a) {}
+    public function __construct(
+        private Ctx $ctx,
+        private array $a,
+    ) {}
 
     public function login(): string
     {
@@ -132,7 +136,8 @@ final class AuthView
     public function profile(): string
     {
         $a = $this->a;
-        if (!$a) return '<div class="card mt-4"><p>Profile not found.</p></div>';
+        if (!$a)
+            return '<div class="card mt-4"><p>Profile not found.</p></div>';
 
         $fname = htmlspecialchars($a['fname'] ?? '');
         $lname = htmlspecialchars($a['lname'] ?? '');

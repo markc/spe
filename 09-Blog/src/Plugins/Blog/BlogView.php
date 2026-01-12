@@ -1,19 +1,22 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Plugins\Blog;
 
 use SPE\App\Util;
-use SPE\Blog\Core\{ Theme};
+use SPE\Blog\Core\Theme;
 
-final class BlogView extends Theme {
-
-    private function t(): string {
+final class BlogView extends Theme
+{
+    private function t(): string
+    {
         return '&t=' . $this->ctx->in['t'];
     }
 
     // Public blog index - 3x3 card grid
-    public function list(): string {
+    public function list(): string
+    {
         $a = $this->ctx->ary;
         $t = $this->t();
 
@@ -66,16 +69,24 @@ final class BlogView extends Theme {
     }
 
     // Single post view with prev/next navigation
-    public function read(): string {
+    public function read(): string
+    {
         $a = $this->ctx->ary;
-        if (empty($a)) return '<div class="card"><p>Post not found.</p><a href="?o=Blog' . $this->t() . '" class="btn">« Back to Blog</a></div>';
+        if (empty($a))
+            return (
+                '<div class="card"><p>Post not found.</p><a href="?o=Blog'
+                . $this->t()
+                . '" class="btn">« Back to Blog</a></div>'
+            );
 
         $t = $this->t();
         $title = htmlspecialchars($a['title']);
         $content = Util::md($a['content'] ?? '');
         $author = htmlspecialchars($a['author']);
         $date = date('F j, Y', strtotime($a['created']));
-        $image = $a['featured_image'] ? "<img src=\"{$a['featured_image']}\" alt=\"$title\" class=\"blog-featured-image\">" : '';
+        $image = $a['featured_image']
+            ? "<img src=\"{$a['featured_image']}\" alt=\"$title\" class=\"blog-featured-image\">"
+            : '';
 
         // Build category tags
         $categories = $a['categories'] ?? [];
@@ -117,7 +128,18 @@ final class BlogView extends Theme {
         HTML;
     }
 
-    public function create(): string { return ''; }
-    public function update(): string { return ''; }
-    public function delete(): string { return ''; }
+    public function create(): string
+    {
+        return '';
+    }
+
+    public function update(): string
+    {
+        return '';
+    }
+
+    public function delete(): string
+    {
+        return '';
+    }
 }

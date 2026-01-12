@@ -1,9 +1,11 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Core;
 
-use SPE\App\{Acl, Util};
+use SPE\App\Acl;
+use SPE\App\Util;
 
 final class Ctx
 {
@@ -15,7 +17,10 @@ final class Ctx
     public function __construct(
         public string $email = 'noreply@localhost',
         array $out = ['doc' => 'HCP', 'head' => '', 'main' => '', 'foot' => '', 'css' => '', 'js' => '', 'end' => ''],
-        public array $themes = [['TopNav', 'TopNav'], ['SideBar', 'SideBar']]
+        public array $themes = [
+            ['TopNav',  'TopNav'],
+            ['SideBar', 'SideBar'],
+        ],
     ) {
         session_status() === PHP_SESSION_NONE && session_start();
 
@@ -30,7 +35,7 @@ final class Ctx
             'm' => $_REQUEST['m'] ?? 'list',
             't' => $this->ses('t', 'TopNav'),
             'x' => $_REQUEST['x'] ?? '',
-            'i' => (int)($_REQUEST['i'] ?? 0),
+            'i' => (int) ($_REQUEST['i'] ?? 0),
         ];
         $this->out = $out;
 
@@ -52,11 +57,11 @@ final class Ctx
         if ($acl->can(Acl::Admin)) {
             $nav = [
                 ['📊 Dashboard', '?o=System'],
-                ['🌐 Vhosts', '?o=Vhosts'],
-                ['📧 Mail', '?o=Vmails'],
-                ['🔗 DNS', '?o=Vdns'],
-                ['🔒 SSL', '?o=Ssl'],
-                ['📈 Stats', '?o=Stats'],
+                ['🌐 Vhosts',    '?o=Vhosts'],
+                ['📧 Mail',      '?o=Vmails'],
+                ['🔗 DNS',       '?o=Vdns'],
+                ['🔒 SSL',       '?o=Ssl'],
+                ['📈 Stats',     '?o=Stats'],
             ];
         }
 
@@ -66,7 +71,7 @@ final class Ctx
     public function ses(string $k, mixed $v = ''): mixed
     {
         return $_SESSION[$k] = isset($_REQUEST[$k])
-            ? (is_array($_REQUEST[$k]) ? $_REQUEST[$k] : trim($_REQUEST[$k]) |> htmlspecialchars(...))
-            : ($_SESSION[$k] ?? $v);
+            ? (is_array($_REQUEST[$k]) ? $_REQUEST[$k] : (trim($_REQUEST[$k]) |> htmlspecialchars(...)))
+            : $_SESSION[$k] ?? $v;
     }
 }

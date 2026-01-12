@@ -1,9 +1,11 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Plugins\Vhosts;
 
-use SPE\HCP\Core\{Ctx, Plugin};
+use SPE\HCP\Core\Ctx;
+use SPE\HCP\Core\Plugin;
 
 /**
  * Virtual hosts view - HTML rendering for vhost management.
@@ -12,7 +14,7 @@ final class VhostsView extends Plugin
 {
     public function __construct(
         protected Ctx $ctx,
-        private array $data = []
+        private array $data = [],
     ) {
         parent::__construct($ctx);
     }
@@ -62,7 +64,9 @@ final class VhostsView extends Plugin
             return $this->error($d['error']);
         }
 
-        $ssl = $d['ssl'] ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-warning">None</span>';
+        $ssl = $d['ssl']
+            ? '<span class="badge badge-success">Active</span>'
+            : '<span class="badge badge-warning">None</span>';
 
         return <<<HTML
         <div class="card">

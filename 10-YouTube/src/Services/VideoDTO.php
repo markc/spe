@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\YouTube\Services;
@@ -33,10 +34,7 @@ readonly class VideoDTO
         $details = $data['contentDetails'] ?? [];
 
         $thumbnails = $snippet['thumbnails'] ?? [];
-        $thumbnail = $thumbnails['high']['url']
-            ?? $thumbnails['medium']['url']
-            ?? $thumbnails['default']['url']
-            ?? '';
+        $thumbnail = $thumbnails['high']['url'] ?? $thumbnails['medium']['url'] ?? $thumbnails['default']['url'] ?? '';
 
         return new self(
             id: $data['id'] ?? '',
@@ -45,9 +43,9 @@ readonly class VideoDTO
             thumbnail: $thumbnail,
             publishedAt: $snippet['publishedAt'] ?? '',
             privacy: Privacy::fromString($status['privacyStatus'] ?? 'private'),
-            viewCount: (int)($stats['viewCount'] ?? 0),
-            likeCount: (int)($stats['likeCount'] ?? 0),
-            commentCount: (int)($stats['commentCount'] ?? 0),
+            viewCount: (int) ($stats['viewCount'] ?? 0),
+            likeCount: (int) ($stats['likeCount'] ?? 0),
+            commentCount: (int) ($stats['commentCount'] ?? 0),
             duration: $details['duration'] ?? '',
         );
     }
@@ -64,9 +62,7 @@ readonly class VideoDTO
 
     public function formattedDate(): string
     {
-        return $this->publishedAt
-            |> strtotime(...)
-            |> (static fn($ts) => date('M j, Y', $ts));
+        return $this->publishedAt |> strtotime(...) |> (static fn($ts) => date('M j, Y', $ts));
     }
 
     public function shortDescription(int $length = 150): string

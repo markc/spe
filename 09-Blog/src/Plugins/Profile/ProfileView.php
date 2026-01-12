@@ -1,14 +1,15 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Plugins\Profile;
 
+use SPE\Blog\Core\Theme;
 
-use SPE\Blog\Core\{ Theme};
-
-final class ProfileView extends Theme {
-
-    public function list(): string {
+final class ProfileView extends Theme
+{
+    public function list(): string
+    {
         $usr = $this->ctx->ary['usr'] ?? [];
         $login = htmlspecialchars($usr['login'] ?? '');
         $fname = htmlspecialchars($usr['fname'] ?? '');
@@ -18,10 +19,10 @@ final class ProfileView extends Theme {
         $updated = $usr['updated'] ?? '';
         $t = '&t=' . $this->ctx->in['t'];
 
-        $role = match((int)($usr['acl'] ?? 1)) {
+        $role = match ((int) ($usr['acl'] ?? 1)) {
             0 => 'Administrator',
             9 => 'Disabled',
-            default => 'User'
+            default => 'User',
         };
 
         return <<<HTML

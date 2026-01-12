@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\YouTube\Plugins\Channel;
 
-use SPE\YouTube\Core\{ Theme};
+use SPE\YouTube\Core\Theme;
 
 /**
  * Channel view - Channel statistics UI
@@ -27,9 +28,7 @@ final class ChannelView extends Theme
         $views = $channel->formattedViews();
         // Use actual count (API stats can be delayed by hours/days)
         $videos = number_format($this->ctx->ary['actualVideoCount'] ?? $channel->videoCount);
-        $joined = $channel->publishedAt
-            ? date('F j, Y', strtotime($channel->publishedAt))
-            : 'Unknown';
+        $joined = $channel->publishedAt ? date('F j, Y', strtotime($channel->publishedAt)) : 'Unknown';
 
         return <<<HTML
         <div class="card">
@@ -86,14 +85,26 @@ final class ChannelView extends Theme
     }
 
     #[\Override]
-    public function read(): string { return $this->list(); }
+    public function read(): string
+    {
+        return $this->list();
+    }
 
     #[\Override]
-    public function create(): string { return $this->list(); }
+    public function create(): string
+    {
+        return $this->list();
+    }
 
     #[\Override]
-    public function update(): string { return $this->list(); }
+    public function update(): string
+    {
+        return $this->list();
+    }
 
     #[\Override]
-    public function delete(): string { return $this->list(); }
+    public function delete(): string
+    {
+        return $this->list();
+    }
 }

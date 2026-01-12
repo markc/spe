@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\YouTube\Services;
@@ -26,10 +27,7 @@ readonly class ChannelDTO
         $stats = $data['statistics'] ?? [];
 
         $thumbnails = $snippet['thumbnails'] ?? [];
-        $thumbnail = $thumbnails['high']['url']
-            ?? $thumbnails['medium']['url']
-            ?? $thumbnails['default']['url']
-            ?? '';
+        $thumbnail = $thumbnails['high']['url'] ?? $thumbnails['medium']['url'] ?? $thumbnails['default']['url'] ?? '';
 
         return new self(
             id: $data['id'] ?? '',
@@ -37,9 +35,9 @@ readonly class ChannelDTO
             description: $snippet['description'] ?? '',
             thumbnail: $thumbnail,
             customUrl: $snippet['customUrl'] ?? '',
-            subscriberCount: (int)($stats['subscriberCount'] ?? 0),
-            videoCount: (int)($stats['videoCount'] ?? 0),
-            viewCount: (int)($stats['viewCount'] ?? 0),
+            subscriberCount: (int) ($stats['subscriberCount'] ?? 0),
+            videoCount: (int) ($stats['videoCount'] ?? 0),
+            viewCount: (int) ($stats['viewCount'] ?? 0),
             publishedAt: $snippet['publishedAt'] ?? '',
         );
     }
@@ -67,7 +65,7 @@ readonly class ChannelDTO
             $num >= 1_000_000_000 => round($num / 1_000_000_000, 1) . 'B',
             $num >= 1_000_000 => round($num / 1_000_000, 1) . 'M',
             $num >= 1_000 => round($num / 1_000, 1) . 'K',
-            default => (string)$num,
+            default => (string) $num,
         };
     }
 }

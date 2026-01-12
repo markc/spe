@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Lib;
@@ -50,7 +51,7 @@ final class VhostOps
         Remote::run("chown {$uid}:{$uid} {$docroot}/index.html");
 
         // Find PHP version and create FPM pool
-        $phpVer = Remote::exec("ls /etc/php/ 2>/dev/null | sort -rV | head -1");
+        $phpVer = Remote::exec('ls /etc/php/ 2>/dev/null | sort -rV | head -1');
         if ($phpVer) {
             $fpmConf = self::fpmConfig($domain, $uname, $home);
             Remote::run("cat > /etc/php/{$phpVer}/fpm/pool.d/{$domain}.conf << 'EOF'\n{$fpmConf}\nEOF");
@@ -89,7 +90,7 @@ final class VhostOps
         Remote::run("rm -f /etc/nginx/sites-available/{$domain}");
 
         // Remove PHP-FPM pool
-        $phpVer = Remote::exec("ls /etc/php/ 2>/dev/null | sort -rV | head -1");
+        $phpVer = Remote::exec('ls /etc/php/ 2>/dev/null | sort -rV | head -1');
         if ($phpVer) {
             Remote::run("rm -f /etc/php/{$phpVer}/fpm/pool.d/{$domain}.conf");
         }
@@ -119,9 +120,9 @@ final class VhostOps
         $stat = Remote::stat($home);
         $user = Remote::exec("stat -c '%U' {$home}");
         $size = Remote::exec("du -sh {$home} | cut -f1");
-        $mboxes = (int)Remote::exec("ls -1 {$home}/msg 2>/dev/null | wc -l");
+        $mboxes = (int) Remote::exec("ls -1 {$home}/msg 2>/dev/null | wc -l");
         $nginx = Remote::exists("/etc/nginx/sites-enabled/{$domain}") ? 'enabled' : 'disabled';
-        $phpVer = Remote::exec("ls /etc/php/ 2>/dev/null | sort -rV | head -1");
+        $phpVer = Remote::exec('ls /etc/php/ 2>/dev/null | sort -rV | head -1');
 
         return [
             'success' => true,
@@ -149,7 +150,7 @@ final class VhostOps
             return ['success' => false, 'error' => 'Vhost not found'];
         }
 
-        $phpVer = Remote::exec("ls /etc/php/ 2>/dev/null | sort -rV | head -1");
+        $phpVer = Remote::exec('ls /etc/php/ 2>/dev/null | sort -rV | head -1');
 
         switch ($action) {
             case 'enable':
@@ -157,16 +158,16 @@ final class VhostOps
                     return ['success' => false, 'error' => 'Nginx config not found'];
                 }
                 Remote::run("ln -sf /etc/nginx/sites-available/{$domain} /etc/nginx/sites-enabled/{$domain}");
-                Remote::run("nginx -t && systemctl reload nginx");
+                Remote::run('nginx -t && systemctl reload nginx');
                 return ['success' => true, 'action' => 'enabled', 'domain' => $domain];
 
             case 'disable':
                 Remote::run("rm -f /etc/nginx/sites-enabled/{$domain}");
-                Remote::run("systemctl reload nginx");
+                Remote::run('systemctl reload nginx');
                 return ['success' => true, 'action' => 'disabled', 'domain' => $domain];
 
             case 'restart':
-                Remote::run("systemctl reload nginx");
+                Remote::run('systemctl reload nginx');
                 if ($phpVer) {
                     Remote::run("systemctl reload php{$phpVer}-fpm");
                 }
@@ -184,58 +185,58 @@ final class VhostOps
     private static function nginxConfig(string $domain, string $home, string $docroot): string
     {
         return <<<NGINX
-server {
-    listen 80;
-    server_name {$domain} www.{$domain};
-    root {$docroot};
-    index index.html index.php;
+        server {
+            listen 80;
+            server_name {$domain} www.{$domain};
+            root {$docroot};
+            index index.html index.php;
 
-    access_log {$home}/var/log/access.log;
-    error_log {$home}/var/log/error.log;
+            access_log {$home}/var/log/access.log;
+            error_log {$home}/var/log/error.log;
 
-    location / {
-        try_files \$uri \$uri/ /index.php?\$query_string;
-    }
+            location / {
+                try_files \$uri \$uri/ /index.php?\$query_string;
+            }
 
-    location ~ \\.php\$ {
-        fastcgi_pass unix:{$home}/var/run/fpm.sock;
-        fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
-        include fastcgi_params;
-    }
+            location ~ \\.php\$ {
+                fastcgi_pass unix:{$home}/var/run/fpm.sock;
+                fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
+                include fastcgi_params;
+            }
 
-    location ~ /\\.ht {
-        deny all;
-    }
-}
-NGINX;
+            location ~ /\\.ht {
+                deny all;
+            }
+        }
+        NGINX;
     }
 
     private static function fpmConfig(string $domain, string $uname, string $home): string
     {
         return <<<FPM
-[{$domain}]
-user = {$uname}
-group = {$uname}
-listen = {$home}/var/run/fpm.sock
-listen.owner = www-data
-listen.group = www-data
-pm = ondemand
-pm.max_children = 3
-pm.process_idle_timeout = 60s
-FPM;
+        [{$domain}]
+        user = {$uname}
+        group = {$uname}
+        listen = {$home}/var/run/fpm.sock
+        listen.owner = www-data
+        listen.group = www-data
+        pm = ondemand
+        pm.max_children = 3
+        pm.process_idle_timeout = 60s
+        FPM;
     }
 
     private static function indexHtml(string $domain): string
     {
         return <<<HTML
-<!DOCTYPE html>
-<html>
-<head><title>Welcome to {$domain}</title></head>
-<body>
-<h1>Welcome to {$domain}</h1>
-<p>This site is under construction.</p>
-</body>
-</html>
-HTML;
+        <!DOCTYPE html>
+        <html>
+        <head><title>Welcome to {$domain}</title></head>
+        <body>
+        <h1>Welcome to {$domain}</h1>
+        <p>This site is under construction.</p>
+        </body>
+        </html>
+        HTML;
     }
 }

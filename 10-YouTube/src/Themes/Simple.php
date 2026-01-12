@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\YouTube\Themes;
 
-
-use SPE\YouTube\Core\{ Theme};
+use SPE\YouTube\Core\Theme;
 
 /**
  * Simple theme for YouTube Manager - minimal layout

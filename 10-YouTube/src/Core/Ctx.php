@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\YouTube\Core;
@@ -7,7 +8,8 @@ namespace SPE\YouTube\Core;
  * Context container for YouTube Manager
  * Includes navigation arrays for themes
  */
-final class Ctx {
+final class Ctx
+{
     public function __construct(
         public string $buf = '',
         public array $ary = [],
@@ -17,7 +19,7 @@ final class Ctx {
             'm' => 'list',
             'o' => 'Dashboard',
             't' => 'Simple',
-            'x' => ''
+            'x' => '',
         ],
         public array $out = [
             'doc' => 'SPE::10',
@@ -26,19 +28,19 @@ final class Ctx {
             'main' => 'Error: missing plugin!',
             'head' => 'YouTube Manager',
             'foot' => '© 2015-2025 Mark Constable (MIT License)',
-            'js' => ''
+            'js' => '',
         ],
         // Navigation items for YouTube Manager
         public array $navPages = [
             ['🏠 Dashboard', 'Dashboard'],
-            ['📹 Videos', 'Videos'],
+            ['📹 Videos',    'Videos'],
             ['📋 Playlists', 'Playlists'],
-            ['📊 Channel', 'Channel'],
+            ['📊 Channel',   'Channel'],
         ],
         // Theme options
         public array $nav2 = [
-            ['🎨 Simple', 'Simple'],
-            ['📍 TopNav', 'TopNav'],
+            ['🎨 Simple',  'Simple'],
+            ['📍 TopNav',  'TopNav'],
             ['📂 SideBar', 'SideBar'],
         ],
     ) {}

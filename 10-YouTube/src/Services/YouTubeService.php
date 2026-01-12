@@ -1,16 +1,21 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\YouTube\Services;
 
 use Google\Client;
-use Google\Service\YouTube as GoogleYouTube;
-use Google\Service\YouTube\{
-    Video, VideoSnippet, VideoStatus,
-    Playlist, PlaylistSnippet, PlaylistStatus,
-    PlaylistItem, PlaylistItemSnippet, ResourceId
-};
 use Google\Http\MediaFileUpload;
+use Google\Service\YouTube as GoogleYouTube;
+use Google\Service\YouTube\Playlist;
+use Google\Service\YouTube\PlaylistItem;
+use Google\Service\YouTube\PlaylistItemSnippet;
+use Google\Service\YouTube\PlaylistSnippet;
+use Google\Service\YouTube\PlaylistStatus;
+use Google\Service\YouTube\ResourceId;
+use Google\Service\YouTube\Video;
+use Google\Service\YouTube\VideoSnippet;
+use Google\Service\YouTube\VideoStatus;
 
 /**
  * YouTube API Service - Shared between CLI and Web
@@ -41,8 +46,8 @@ final class YouTubeService
         private Client $client = new Client(),
         ?string $configDir = null,
     ) {
-        $home = getenv('HOME') ?: ($_SERVER['HOME'] ?? '');
-        $this->configPath = $configDir ?? ($home . self::CONFIG_DIR);
+        $home = getenv('HOME') ?: $_SERVER['HOME'] ?? '';
+        $this->configPath = $configDir ?? $home . self::CONFIG_DIR;
         $this->clientSecretPath = $this->configPath . self::CLIENT_SECRET;
         $this->tokenPath = $this->configPath . self::TOKEN_FILE;
 
@@ -122,8 +127,7 @@ final class YouTubeService
     {
         $token = $this->client->getAccessToken();
         if ($token) {
-            $this->tokenPath
-                |> (static fn($path) => file_put_contents($path, json_encode($token, JSON_PRETTY_PRINT)));
+            $this->tokenPath |> (static fn($path) => file_put_contents($path, json_encode($token, JSON_PRETTY_PRINT)));
             chmod($this->tokenPath, 0o600);
         }
     }
@@ -146,10 +150,7 @@ final class YouTubeService
 
     public function getChannel(): ?ChannelDTO
     {
-        $response = $this->getService()->channels->listChannels(
-            'snippet,statistics',
-            ['mine' => true]
-        );
+        $response = $this->getService()->channels->listChannels('snippet,statistics', ['mine' => true]);
 
         $items = $response->getItems();
         if (empty($items)) {
@@ -187,32 +188,23 @@ final class YouTubeService
      */
     public function listVideos(int $maxResults = 25): array
     {
-        $channelResponse = $this->getService()->channels->listChannels(
-            'contentDetails',
-            ['mine' => true]
-        );
+        $channelResponse = $this->getService()->channels->listChannels('contentDetails', ['mine' => true]);
 
         $items = $channelResponse->getItems();
         if (empty($items)) {
             return [];
         }
 
-        $uploadsPlaylistId = $items[0]
-            ->getContentDetails()
-            ->getRelatedPlaylists()
-            ->getUploads();
+        $uploadsPlaylistId = $items[0]->getContentDetails()->getRelatedPlaylists()->getUploads();
 
-        $playlistResponse = $this->getService()->playlistItems->listPlaylistItems(
-            'snippet,contentDetails',
-            [
-                'playlistId' => $uploadsPlaylistId,
-                'maxResults' => $maxResults,
-            ]
-        );
+        $playlistResponse = $this->getService()->playlistItems->listPlaylistItems('snippet,contentDetails', [
+            'playlistId' => $uploadsPlaylistId,
+            'maxResults' => $maxResults,
+        ]);
 
         return $playlistResponse->getItems()
             |> (fn($items) => array_map(fn($item) => $this->fetchVideoDetails(
-                $item->getSnippet()->getResourceId()->getVideoId()
+                $item->getSnippet()->getResourceId()->getVideoId(),
             ), $items))
             |> array_filter(...);
     }
@@ -224,10 +216,9 @@ final class YouTubeService
 
     private function fetchVideoDetails(string $videoId): ?VideoDTO
     {
-        $response = $this->getService()->videos->listVideos(
-            'snippet,statistics,status,contentDetails',
-            ['id' => $videoId]
-        );
+        $response = $this->getService()->videos->listVideos('snippet,statistics,status,contentDetails', [
+            'id' => $videoId,
+        ]);
 
         $items = $response->getItems();
         if (empty($items)) {
@@ -254,7 +245,8 @@ final class YouTubeService
             'contentDetails' => [
                 'duration' => $video->getContentDetails()->getDuration(),
             ],
-        ] |> VideoDTO::fromApi(...);
+        ]
+            |> VideoDTO::fromApi(...);
     }
 
     public function uploadVideo(
@@ -289,14 +281,7 @@ final class YouTubeService
 
         $request = $this->getService()->videos->insert('snippet,status', $video);
 
-        $media = new MediaFileUpload(
-            $this->client,
-            $request,
-            'video/*',
-            null,
-            true,
-            $chunkSize
-        );
+        $media = new MediaFileUpload($this->client, $request, 'video/*', null, true, $chunkSize);
         $media->setFileSize($fileSize);
 
         $handle = fopen($filePath, 'rb');
@@ -309,7 +294,7 @@ final class YouTubeService
             $uploaded += strlen($chunk);
 
             if ($progressCallback) {
-                $percent = (int)round(($uploaded / $fileSize) * 100);
+                $percent = (int) round(($uploaded / $fileSize) * 100);
                 $progressCallback($percent, $uploaded, $fileSize);
             }
         }
@@ -327,37 +312,35 @@ final class YouTubeService
      */
     public function listPlaylists(int $maxResults = 25): array
     {
-        $response = $this->getService()->playlists->listPlaylists(
-            'snippet,contentDetails,status',
-            [
-                'mine' => true,
-                'maxResults' => $maxResults,
-            ]
-        );
+        $response = $this->getService()->playlists->listPlaylists('snippet,contentDetails,status', [
+            'mine' => true,
+            'maxResults' => $maxResults,
+        ]);
 
         return $response->getItems()
-            |> (fn($items) => array_map(fn($pl) => [
-                'id' => $pl->getId(),
-                'snippet' => [
-                    'title' => $pl->getSnippet()->getTitle(),
-                    'description' => $pl->getSnippet()->getDescription(),
-                    'publishedAt' => $pl->getSnippet()->getPublishedAt(),
-                    'thumbnails' => $this->extractThumbnails($pl->getSnippet()->getThumbnails()),
-                ],
-                'contentDetails' => [
-                    'itemCount' => $pl->getContentDetails()->getItemCount(),
-                ],
-                'status' => [
-                    'privacyStatus' => $pl->getStatus()->getPrivacyStatus(),
-                ],
-            ] |> PlaylistDTO::fromApi(...), $items));
+            |> (fn($items) => array_map(
+                fn($pl) => [
+                    'id' => $pl->getId(),
+                    'snippet' => [
+                        'title' => $pl->getSnippet()->getTitle(),
+                        'description' => $pl->getSnippet()->getDescription(),
+                        'publishedAt' => $pl->getSnippet()->getPublishedAt(),
+                        'thumbnails' => $this->extractThumbnails($pl->getSnippet()->getThumbnails()),
+                    ],
+                    'contentDetails' => [
+                        'itemCount' => $pl->getContentDetails()->getItemCount(),
+                    ],
+                    'status' => [
+                        'privacyStatus' => $pl->getStatus()->getPrivacyStatus(),
+                    ],
+                ]
+                    |> PlaylistDTO::fromApi(...),
+                $items,
+            ));
     }
 
-    public function createPlaylist(
-        string $title,
-        string $description = '',
-        Privacy $privacy = Privacy::Public,
-    ): ?string {
+    public function createPlaylist(string $title, string $description = '', Privacy $privacy = Privacy::Public): ?string
+    {
         $snippet = new PlaylistSnippet();
         $snippet->setTitle($title);
         $snippet->setDescription($description);
@@ -427,17 +410,14 @@ final class YouTubeService
      */
     public function getPlaylistVideos(string $playlistId, int $maxResults = 50): array
     {
-        $response = $this->getService()->playlistItems->listPlaylistItems(
-            'snippet,contentDetails',
-            [
-                'playlistId' => $playlistId,
-                'maxResults' => $maxResults,
-            ]
-        );
+        $response = $this->getService()->playlistItems->listPlaylistItems('snippet,contentDetails', [
+            'playlistId' => $playlistId,
+            'maxResults' => $maxResults,
+        ]);
 
         return $response->getItems()
             |> (fn($items) => array_map(fn($item) => $this->fetchVideoDetails(
-                $item->getSnippet()->getResourceId()->getVideoId()
+                $item->getSnippet()->getResourceId()->getVideoId(),
             ), $items))
             |> array_filter(...);
     }
@@ -476,9 +456,9 @@ final class YouTubeService
         // PT1H2M3S -> 1:02:03
         preg_match('/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/', $isoDuration, $matches);
 
-        $hours = (int)($matches[1] ?? 0);
-        $minutes = (int)($matches[2] ?? 0);
-        $seconds = (int)($matches[3] ?? 0);
+        $hours = (int) ($matches[1] ?? 0);
+        $minutes = (int) ($matches[2] ?? 0);
+        $seconds = (int) ($matches[3] ?? 0);
 
         return $hours > 0
             ? sprintf('%d:%02d:%02d', $hours, $minutes, $seconds)

@@ -1,9 +1,11 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Plugins\Vmails;
 
-use SPE\HCP\Core\{Ctx, Plugin};
+use SPE\HCP\Core\Ctx;
+use SPE\HCP\Core\Plugin;
 
 /**
  * Virtual mailbox view - HTML rendering for mailbox management.
@@ -12,7 +14,7 @@ final class VmailsView extends Plugin
 {
     public function __construct(
         protected Ctx $ctx,
-        private array $data = []
+        private array $data = [],
     ) {
         parent::__construct($ctx);
     }

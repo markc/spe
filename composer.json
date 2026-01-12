@@ -24,7 +24,9 @@
             "SPE\\PDO\\": "07-PDO/src",
             "SPE\\Users\\": "08-Users/src",
             "SPE\\Blog\\": "09-Blog/src",
-            "SPE\\YouTube\\": "10-YouTube/src"
+            "SPE\\YouTube\\": "10-YouTube/src",
+            "SPE\\HCP\\": "11-HCP/src",
+            "SPE\\HCP\\Lib\\": "11-HCP/lib"
         }
     },
     "minimum-stability": "stable",
@@ -42,5 +44,16 @@
             "pestphp/pest-plugin": true,
             "carthage-software/mago": true
         }
+    },
+    "scripts": {
+        "lint": "mago lint --semantics",
+        "lint:all": "mago lint",
+        "format": "mago format",
+        "test": "pest",
+        "check": [
+            "@lint",
+            "@test"
+        ],
+        "fix": "@format"
     }
 }

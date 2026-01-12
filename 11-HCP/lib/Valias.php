@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Lib;
@@ -75,10 +76,8 @@ final class Valias
 
         // Insert into database
         try {
-            $stmt = self::db()->prepare(
-                'INSERT INTO valias (source, target, active, created_at, updated_at)
-                 VALUES (?, ?, 1, datetime("now"), datetime("now"))'
-            );
+            $stmt = self::db()->prepare('INSERT INTO valias (source, target, active, created_at, updated_at)
+                 VALUES (?, ?, 1, datetime("now"), datetime("now"))');
             $stmt->execute([$source, $targetStr]);
         } catch (\PDOException $e) {
             return ['success' => false, 'error' => 'Database error: ' . $e->getMessage()];
@@ -134,7 +133,7 @@ final class Valias
             $aliases[] = [
                 'source' => $row['source'],
                 'target' => explode(',', $row['target']),
-                'active' => (bool)$row['active'],
+                'active' => (bool) $row['active'],
                 'created_at' => $row['created_at'],
                 'updated_at' => $row['updated_at'],
             ];
@@ -150,10 +149,8 @@ final class Valias
     {
         $source = strtolower(trim($source));
 
-        $stmt = self::db()->prepare(
-            'SELECT id, source, target, active, created_at, updated_at
-             FROM valias WHERE source = ?'
-        );
+        $stmt = self::db()->prepare('SELECT id, source, target, active, created_at, updated_at
+             FROM valias WHERE source = ?');
         $stmt->execute([$source]);
         $row = $stmt->fetch();
 
@@ -166,7 +163,7 @@ final class Valias
             'id' => $row['id'],
             'source' => $row['source'],
             'target' => explode(',', $row['target']),
-            'active' => (bool)$row['active'],
+            'active' => (bool) $row['active'],
             'created_at' => $row['created_at'],
             'updated_at' => $row['updated_at'],
         ];
@@ -191,9 +188,7 @@ final class Valias
             }
         }
 
-        $stmt = self::db()->prepare(
-            'UPDATE valias SET target = ?, updated_at = datetime("now") WHERE source = ?'
-        );
+        $stmt = self::db()->prepare('UPDATE valias SET target = ?, updated_at = datetime("now") WHERE source = ?');
         $stmt->execute([$targetStr, $source]);
 
         if ($stmt->rowCount() === 0) {
@@ -210,9 +205,7 @@ final class Valias
     {
         $source = strtolower(trim($source));
 
-        $stmt = self::db()->prepare(
-            'UPDATE valias SET active = ?, updated_at = datetime("now") WHERE source = ?'
-        );
+        $stmt = self::db()->prepare('UPDATE valias SET active = ?, updated_at = datetime("now") WHERE source = ?');
         $stmt->execute([$active ? 1 : 0, $source]);
 
         if ($stmt->rowCount() === 0) {

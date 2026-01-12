@@ -1,12 +1,16 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Session\Plugins\Home;
 
 use SPE\Session\Core\View;
 
-final class HomeView extends View {
-    #[\Override] public function list(): string {
+final class HomeView extends View
+{
+    #[\Override]
+    public function list(): string
+    {
         ['head' => $h, 'main' => $m, 'time_ago' => $t, 'visit_count' => $v, 'session_id' => $sid] = $this->ary;
         return <<<HTML
         <div class="card">
@@ -25,7 +29,8 @@ final class HomeView extends View {
         HTML;
     }
 
-    public function reset(): string {
+    public function reset(): string
+    {
         return $this->list();
     }
 }

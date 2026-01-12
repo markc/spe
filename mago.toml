@@ -13,4 +13,7 @@ paths = [
     "08-Users/src",
     "09-Blog/src",
     "10-YouTube/src",
+    "11-HCP/src",
+    "11-HCP/lib",
+    "11-HCP/bin",
 ]

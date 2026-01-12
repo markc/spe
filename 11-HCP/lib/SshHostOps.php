@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Lib;
@@ -33,7 +34,7 @@ final class SshHostOps
         int $port = 22,
         string $user = 'root',
         ?string $sshKey = null,
-        ?string $label = null
+        ?string $label = null,
     ): array {
         $name = strtolower(trim($name));
         $hostname = strtolower(trim($hostname));
@@ -59,10 +60,8 @@ final class SshHostOps
         }
 
         // Insert into database
-        $stmt = self::db()->prepare(
-            'INSERT INTO vnodes (name, hostname, port, user, ssh_key, label)
-             VALUES (?, ?, ?, ?, ?, ?)'
-        );
+        $stmt = self::db()->prepare('INSERT INTO vnodes (name, hostname, port, user, ssh_key, label)
+             VALUES (?, ?, ?, ?, ?, ?)');
         $stmt->execute([$name, $hostname, $port, $user, $sshKey, $label]);
 
         // Generate SSH config file
@@ -109,9 +108,7 @@ final class SshHostOps
      */
     public static function get(string $name): ?array
     {
-        $stmt = self::db()->prepare(
-            'SELECT * FROM vnodes WHERE name = ?'
-        );
+        $stmt = self::db()->prepare('SELECT * FROM vnodes WHERE name = ?');
         $stmt->execute([strtolower(trim($name))]);
         return $stmt->fetch() ?: null;
     }
@@ -122,13 +119,11 @@ final class SshHostOps
     public static function list(?string $group = null): array
     {
         if ($group) {
-            $stmt = self::db()->prepare(
-                'SELECT v.* FROM vnodes v
+            $stmt = self::db()->prepare('SELECT v.* FROM vnodes v
                  JOIN vnode_group_members m ON v.id = m.vnode_id
                  JOIN vnode_groups g ON m.group_id = g.id
                  WHERE g.name = ?
-                 ORDER BY v.name'
-            );
+                 ORDER BY v.name');
             $stmt->execute([$group]);
         } else {
             $stmt = self::db()->query('SELECT * FROM vnodes ORDER BY name');
@@ -209,7 +204,8 @@ final class SshHostOps
     public static function generateHostFile(string $name): bool
     {
         $host = self::get($name);
-        if (!$host) return false;
+        if (!$host)
+            return false;
 
         $config = "Host {$host['name']}\n";
         $config .= "    Hostname {$host['hostname']}\n";
@@ -252,10 +248,12 @@ final class SshHostOps
         $skipped = [];
 
         foreach (glob("{$hostsDir}/*") as $file) {
-            if (is_dir($file)) continue;
+            if (is_dir($file))
+                continue;
 
             $name = basename($file);
-            if (str_starts_with($name, '.')) continue;
+            if (str_starts_with($name, '.'))
+                continue;
 
             // Parse SSH config file
             $content = file_get_contents($file);
@@ -275,13 +273,7 @@ final class SshHostOps
             }
 
             // Import
-            $result = self::add(
-                $name,
-                $host['hostname'],
-                $host['port'],
-                $host['user'],
-                $host['ssh_key']
-            );
+            $result = self::add($name, $host['hostname'], $host['port'], $host['user'], $host['ssh_key']);
 
             if ($result['success']) {
                 $imported[] = $name;
@@ -307,12 +299,13 @@ final class SshHostOps
 
         foreach (explode("\n", $content) as $line) {
             $line = trim($line);
-            if (!$line || str_starts_with($line, '#')) continue;
+            if (!$line || str_starts_with($line, '#'))
+                continue;
 
             if (preg_match('/^\s*Hostname\s+(.+)$/i', $line, $m)) {
                 $host['hostname'] = trim($m[1]);
             } elseif (preg_match('/^\s*Port\s+(\d+)$/i', $line, $m)) {
-                $host['port'] = (int)$m[1];
+                $host['port'] = (int) $m[1];
             } elseif (preg_match('/^\s*User\s+(.+)$/i', $line, $m)) {
                 $host['user'] = trim($m[1]);
             } elseif (preg_match('/^\s*IdentityFile\s+(.+)$/i', $line, $m)) {
@@ -340,13 +333,13 @@ final class SshHostOps
         // Use ssh with timeout
         $cmd = sprintf(
             'ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=no %s "echo ok" 2>&1',
-            escapeshellarg($name)
+            escapeshellarg($name),
         );
 
         $output = trim(shell_exec($cmd) ?? '');
         $elapsed = round((microtime(true) - $startTime) * 1000);
 
-        $success = ($output === 'ok');
+        $success = $output === 'ok';
 
         // Update last_seen_at if successful
         if ($success) {
@@ -389,9 +382,7 @@ final class SshHostOps
         }
 
         // Add membership
-        $stmt = self::db()->prepare(
-            'INSERT OR IGNORE INTO vnode_group_members (vnode_id, group_id) VALUES (?, ?)'
-        );
+        $stmt = self::db()->prepare('INSERT OR IGNORE INTO vnode_group_members (vnode_id, group_id) VALUES (?, ?)');
         $stmt->execute([$host['id'], $groupId]);
 
         return ['success' => true, 'name' => $name, 'group' => $group];
@@ -402,11 +393,9 @@ final class SshHostOps
      */
     public static function removeFromGroup(string $name, string $group): array
     {
-        $stmt = self::db()->prepare(
-            'DELETE FROM vnode_group_members
+        $stmt = self::db()->prepare('DELETE FROM vnode_group_members
              WHERE vnode_id = (SELECT id FROM vnodes WHERE name = ?)
-             AND group_id = (SELECT id FROM vnode_groups WHERE name = ?)'
-        );
+             AND group_id = (SELECT id FROM vnode_groups WHERE name = ?)');
         $stmt->execute([$name, $group]);
 
         return ['success' => true, 'name' => $name, 'group' => $group];
@@ -417,13 +406,11 @@ final class SshHostOps
      */
     public static function listGroups(): array
     {
-        $stmt = self::db()->query(
-            'SELECT g.*, COUNT(m.vnode_id) as member_count
+        $stmt = self::db()->query('SELECT g.*, COUNT(m.vnode_id) as member_count
              FROM vnode_groups g
              LEFT JOIN vnode_group_members m ON g.id = m.group_id
              GROUP BY g.id
-             ORDER BY g.name'
-        );
+             ORDER BY g.name');
         return $stmt->fetchAll();
     }
 }

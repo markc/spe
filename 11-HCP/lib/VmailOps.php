@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Lib;
@@ -94,8 +95,8 @@ final class VmailOps
         }
 
         $stat = Remote::stat($home);
-        $size = (int)Remote::exec("du -sb {$home} | cut -f1");
-        $msgs = (int)Remote::exec("find {$home}/Maildir -type f 2>/dev/null | wc -l");
+        $size = (int) Remote::exec("du -sb {$home} | cut -f1");
+        $msgs = (int) Remote::exec("find {$home}/Maildir -type f 2>/dev/null | wc -l");
 
         return [
             'success' => true,
@@ -113,7 +114,7 @@ final class VmailOps
      */
     public static function hashPassword(string $password): string
     {
-        $hash = Remote::exec("doveadm pw -s SHA512-CRYPT -p " . escapeshellarg($password) . " 2>/dev/null");
+        $hash = Remote::exec('doveadm pw -s SHA512-CRYPT -p ' . escapeshellarg($password) . ' 2>/dev/null');
 
         if (!$hash) {
             // Fallback: generate locally
@@ -131,15 +132,15 @@ final class VmailOps
     private static function sieveScript(): string
     {
         return <<<'SIEVE'
-require ["fileinto", "mailbox"];
+        require ["fileinto", "mailbox"];
 
-# Example: Move spam to Junk folder
-# if header :contains "X-Spam-Flag" "YES" {
-#     fileinto :create "Junk";
-#     stop;
-# }
+        # Example: Move spam to Junk folder
+        # if header :contains "X-Spam-Flag" "YES" {
+        #     fileinto :create "Junk";
+        #     stop;
+        # }
 
-keep;
-SIEVE;
+        keep;
+        SIEVE;
     }
 }

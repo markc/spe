@@ -1,25 +1,35 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Plugins\Users;
 
 use SPE\App\Util;
-use SPE\Blog\Core\{ Theme};
+use SPE\Blog\Core\Theme;
 
-final class UsersView extends Theme {
-
-    private function t(): string {
+final class UsersView extends Theme
+{
+    private function t(): string
+    {
         return '&t=' . $this->ctx->in['t'];
     }
 
-    public function create(): string {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') return '';
+    public function create(): string
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST')
+            return '';
         return $this->form();
     }
 
-    public function read(): string {
+    public function read(): string
+    {
         $a = $this->ctx->ary;
-        if (empty($a)) return '<div class="card"><p>User not found.</p><a href="?o=Users' . $this->t() . '" class="btn">« Back</a></div>';
+        if (empty($a))
+            return (
+                '<div class="card"><p>User not found.</p><a href="?o=Users'
+                . $this->t()
+                . '" class="btn">« Back</a></div>'
+            );
         $t = $this->t();
         $anote = Util::nlbr($a['anote'] ?? '');
         return <<<HTML
@@ -44,16 +54,20 @@ final class UsersView extends Theme {
         HTML;
     }
 
-    public function update(): string {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') return '';
+    public function update(): string
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST')
+            return '';
         return $this->form($this->ctx->ary);
     }
 
-    public function delete(): string {
+    public function delete(): string
+    {
         return '';
     }
 
-    public function list(): string {
+    public function list(): string
+    {
         $a = $this->ctx->ary;
         $t = $this->t();
         $q = htmlspecialchars($_GET['q'] ?? '');
@@ -119,15 +133,16 @@ final class UsersView extends Theme {
         return $html . '</div>';
     }
 
-    private function form(array $data = []): string {
+    private function form(array $data = []): string
+    {
         $id = $data['id'] ?? 0;
         $t = $this->t();
         $login = htmlspecialchars($data['login'] ?? '');
         $fname = htmlspecialchars($data['fname'] ?? '');
         $lname = htmlspecialchars($data['lname'] ?? '');
         $altemail = htmlspecialchars($data['altemail'] ?? '');
-        $grp = (int)($data['grp'] ?? 0);
-        $acl = (int)($data['acl'] ?? 0);
+        $grp = (int) ($data['grp'] ?? 0);
+        $acl = (int) ($data['acl'] ?? 0);
         $anote = htmlspecialchars($data['anote'] ?? '');
         $action = $id ? "?o=Users&m=update&id=$id$t" : "?o=Users&m=create$t";
         $heading = $id ? 'Edit User' : 'Create User';

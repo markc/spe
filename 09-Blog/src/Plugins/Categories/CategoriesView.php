@@ -1,25 +1,31 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Plugins\Categories;
 
 use SPE\App\Util;
-use SPE\Blog\Core\{ Theme};
+use SPE\Blog\Core\Theme;
 
-final class CategoriesView extends Theme {
-
-    private function t(): string {
+final class CategoriesView extends Theme
+{
+    private function t(): string
+    {
         return '&t=' . $this->ctx->in['t'];
     }
 
-    public function create(): string {
-        if (Util::is_post()) return '';
+    public function create(): string
+    {
+        if (Util::is_post())
+            return '';
         return $this->form();
     }
 
-    public function read(): string {
+    public function read(): string
+    {
         $a = $this->ctx->ary;
-        if (empty($a)) return '<div class="card"><p>Category not found.</p></div>';
+        if (empty($a))
+            return '<div class="card"><p>Category not found.</p></div>';
         $t = $this->t();
 
         $name = htmlspecialchars($a['name']);
@@ -52,16 +58,20 @@ final class CategoriesView extends Theme {
         HTML;
     }
 
-    public function update(): string {
-        if (Util::is_post()) return '';
+    public function update(): string
+    {
+        if (Util::is_post())
+            return '';
         return $this->form($this->ctx->ary);
     }
 
-    public function delete(): string {
+    public function delete(): string
+    {
         return '';
     }
 
-    public function list(): string {
+    public function list(): string
+    {
         $a = $this->ctx->ary;
         $t = $this->t();
 
@@ -108,7 +118,8 @@ final class CategoriesView extends Theme {
         return $html . '</tbody></table></div>';
     }
 
-    private function form(array $data = []): string {
+    private function form(array $data = []): string
+    {
         $id = $data['id'] ?? 0;
         $t = $this->t();
         $name = htmlspecialchars($data['name'] ?? '');

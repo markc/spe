@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\App;
@@ -61,7 +62,7 @@ enum Acl: int
     public static function current(): self
     {
         $acl = $_SESSION['usr']['acl'] ?? 9;
-        return self::tryFrom((int)$acl) ?? self::Anonymous;
+        return self::tryFrom((int) $acl) ?? self::Anonymous;
     }
 
     /**
@@ -77,9 +78,10 @@ enum Acl: int
      */
     public static function options(): array
     {
-        return array_map(
-            static fn(self $a) => ['value' => $a->value, 'label' => $a->label(), 'icon' => $a->icon()],
-            self::cases()
-        );
+        return array_map(static fn(self $a) => [
+            'value' => $a->value,
+            'label' => $a->label(),
+            'icon' => $a->icon(),
+        ], self::cases());
     }
 }

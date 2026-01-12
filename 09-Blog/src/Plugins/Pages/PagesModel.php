@@ -1,23 +1,33 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Plugins\Pages;
 
-use SPE\App\{Db, QueryType, Util};
-use SPE\Blog\Core\{Ctx, Plugin};
+use SPE\App\Db;
+use SPE\App\QueryType;
+use SPE\App\Util;
+use SPE\Blog\Core\Ctx;
+use SPE\Blog\Core\Plugin;
 use SPE\Blog\Plugins\Categories\CategoriesModel;
 
-final class PagesModel extends Plugin {
+final class PagesModel extends Plugin
+{
     private ?Db $dbh = null;
     private array $in = ['id' => 0, 'title' => '', 'slug' => '', 'content' => '', 'icon' => ''];
 
-    public function __construct(protected Ctx $ctx) {
+    public function __construct(
+        protected Ctx $ctx,
+    ) {
         parent::__construct($ctx);
-        foreach ($this->in as $k => &$v) $v = $_REQUEST[$k] ?? $v;
+        foreach ($this->in as $k => &$v)
+            $v = $_REQUEST[$k] ?? $v;
         $this->dbh = new Db('blog');
     }
 
-    #[\Override] public function create(): array {
+    #[\Override]
+    public function create(): array
+    {
         if (!Util::is_adm()) {
             Util::log('Admin access required');
             Util::redirect('?o=Home');
@@ -27,13 +37,21 @@ final class PagesModel extends Plugin {
             $slug = $this->in['slug'] ?: $this->slugify($this->in['title']);
 
             // Check slug uniqueness
-            $existing = $this->dbh->read('posts', 'id', 'slug = :slug AND type = :type', ['slug' => $slug, 'type' => 'page'], QueryType::One);
+            $existing = $this->dbh->read(
+                'posts',
+                'id',
+                'slug = :slug AND type = :type',
+                ['slug' => $slug, 'type' => 'page'],
+                QueryType::One,
+            );
             if ($existing) {
                 Util::log('A page with this slug already exists');
                 return [
-                    'title' => $this->in['title'], 'slug' => $slug, 'content' => $this->in['content'],
+                    'title' => $this->in['title'],
+                    'slug' => $slug,
+                    'content' => $this->in['content'],
                     'all_categories' => CategoriesModel::getAll($this->dbh),
-                    'post_categories' => []
+                    'post_categories' => [],
                 ];
             }
 
@@ -46,7 +64,7 @@ final class PagesModel extends Plugin {
                 'author_id' => $_SESSION['usr']['id'],
                 'type' => 'page',
                 'created' => date('Y-m-d H:i:s'),
-                'updated' => date('Y-m-d H:i:s')
+                'updated' => date('Y-m-d H:i:s'),
             ];
             $pageId = $this->dbh->create('posts', $data);
 
@@ -59,35 +77,57 @@ final class PagesModel extends Plugin {
         }
         return [
             'all_categories' => CategoriesModel::getAll($this->dbh),
-            'post_categories' => []
+            'post_categories' => [],
         ];
     }
 
-    #[\Override] public function read(): array {
+    #[\Override]
+    public function read(): array
+    {
         // Can read by id or slug
-        $slug = $this->in['slug'] ?? ($_GET['slug'] ?? '');
+        $slug = $this->in['slug'] ?? $_GET['slug'] ?? '';
         $id = filter_var($this->in['id'], FILTER_VALIDATE_INT);
 
         if ($slug) {
-            $page = $this->dbh->read('posts', '*', 'slug = :slug AND type = :type', ['slug' => $slug, 'type' => 'page'], QueryType::One) ?: [];
+            $page = $this->dbh->read(
+                'posts',
+                '*',
+                'slug = :slug AND type = :type',
+                ['slug' => $slug, 'type' => 'page'],
+                QueryType::One,
+            ) ?: [];
         } else {
-            $page = $this->dbh->read('posts', '*', 'id = :id AND type = :type', ['id' => $id, 'type' => 'page'], QueryType::One) ?: [];
+            $page = $this->dbh->read(
+                'posts',
+                '*',
+                'id = :id AND type = :type',
+                ['id' => $id, 'type' => 'page'],
+                QueryType::One,
+            ) ?: [];
         }
 
         if ($page) {
-            $page['categories'] = CategoriesModel::getForPost($this->dbh, (int)$page['id']);
+            $page['categories'] = CategoriesModel::getForPost($this->dbh, (int) $page['id']);
         }
         return $page;
     }
 
-    #[\Override] public function update(): array {
+    #[\Override]
+    public function update(): array
+    {
         if (!Util::is_adm()) {
             Util::log('Admin access required');
             Util::redirect('?o=Home');
         }
 
         $id = filter_var($this->in['id'], FILTER_VALIDATE_INT);
-        $page = $this->dbh->read('posts', '*', 'id = :id AND type = :type', ['id' => $id, 'type' => 'page'], QueryType::One);
+        $page = $this->dbh->read(
+            'posts',
+            '*',
+            'id = :id AND type = :type',
+            ['id' => $id, 'type' => 'page'],
+            QueryType::One,
+        );
 
         if (!$page) {
             Util::log('Page not found');
@@ -98,13 +138,21 @@ final class PagesModel extends Plugin {
             $slug = $this->in['slug'] ?: $this->slugify($this->in['title']);
 
             // Check slug uniqueness (excluding current page)
-            $existing = $this->dbh->read('posts', 'id', 'slug = :slug AND type = :type AND id != :id', ['slug' => $slug, 'type' => 'page', 'id' => $id], QueryType::One);
+            $existing = $this->dbh->read(
+                'posts',
+                'id',
+                'slug = :slug AND type = :type AND id != :id',
+                ['slug' => $slug, 'type' => 'page', 'id' => $id],
+                QueryType::One,
+            );
             if ($existing) {
                 Util::log('A page with this slug already exists');
                 return array_merge($page, [
-                    'title' => $this->in['title'], 'slug' => $slug, 'content' => $this->in['content'],
+                    'title' => $this->in['title'],
+                    'slug' => $slug,
+                    'content' => $this->in['content'],
                     'all_categories' => CategoriesModel::getAll($this->dbh),
-                    'post_categories' => CategoriesModel::getForPost($this->dbh, $id)
+                    'post_categories' => CategoriesModel::getForPost($this->dbh, $id),
                 ]);
             }
 
@@ -113,7 +161,7 @@ final class PagesModel extends Plugin {
                 'slug' => $slug,
                 'content' => $this->in['content'],
                 'icon' => $this->in['icon'],
-                'updated' => date('Y-m-d H:i:s')
+                'updated' => date('Y-m-d H:i:s'),
             ];
             $this->dbh->update('posts', $data, 'id = :id', ['id' => $id]);
 
@@ -130,14 +178,22 @@ final class PagesModel extends Plugin {
         return $page;
     }
 
-    #[\Override] public function delete(): array {
+    #[\Override]
+    public function delete(): array
+    {
         if (!Util::is_adm()) {
             Util::log('Admin access required');
             Util::redirect('?o=Home');
         }
 
         $id = filter_var($this->in['id'], FILTER_VALIDATE_INT);
-        $page = $this->dbh->read('posts', '*', 'id = :id AND type = :type', ['id' => $id, 'type' => 'page'], QueryType::One);
+        $page = $this->dbh->read(
+            'posts',
+            '*',
+            'id = :id AND type = :type',
+            ['id' => $id, 'type' => 'page'],
+            QueryType::One,
+        );
 
         if (!$page) {
             Util::log('Page not found');
@@ -155,13 +211,22 @@ final class PagesModel extends Plugin {
         Util::redirect('?o=Pages');
     }
 
-    #[\Override] public function list(): array {
+    #[\Override]
+    public function list(): array
+    {
         return [
-            'items' => $this->dbh->read('posts', '*', 'type = :type ORDER BY title ASC', ['type' => 'page'], QueryType::All)
+            'items' => $this->dbh->read(
+                'posts',
+                '*',
+                'type = :type ORDER BY title ASC',
+                ['type' => 'page'],
+                QueryType::All,
+            ),
         ];
     }
 
-    private function slugify(string $text): string {
+    private function slugify(string $text): string
+    {
         return strtolower(trim(preg_replace('/[^a-zA-Z0-9]+/', '-', $text), '-'));
     }
 }

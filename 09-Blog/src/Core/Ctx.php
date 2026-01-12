@@ -1,9 +1,13 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Core;
 
-use SPE\App\{Acl, Db, QueryType, Util};
+use SPE\App\Acl;
+use SPE\App\Db;
+use SPE\App\QueryType;
+use SPE\App\Util;
 
 final class Ctx
 {
@@ -13,12 +17,24 @@ final class Ctx
     public Db $db;
 
     // Centralized config
-    public int $perp = 10;  // Items per page
+    public int $perp = 10; // Items per page
 
     public function __construct(
         public string $email = 'noreply@localhost',
-        array $out = ['doc' => 'SPE::09', 'head' => '', 'main' => '', 'foot' => '', 'css' => '', 'js' => '', 'end' => ''],
-        public array $themes = [['🎨 Simple', 'Simple'], ['🎨 TopNav', 'TopNav'], ['🎨 SideBar', 'SideBar']]
+        array $out = [
+            'doc' => 'SPE::09',
+            'head' => '',
+            'main' => '',
+            'foot' => '',
+            'css' => '',
+            'js' => '',
+            'end' => '',
+        ],
+        public array $themes = [
+            ['🎨 Simple',  'Simple'],
+            ['🎨 TopNav',  'TopNav'],
+            ['🎨 SideBar', 'SideBar'],
+        ],
     ) {
         session_status() === PHP_SESSION_NONE && session_start();
 
@@ -33,8 +49,8 @@ final class Ctx
             'm' => $_REQUEST['m'] ?? 'list',
             't' => $this->ses('t', 'Simple'),
             'x' => $_REQUEST['x'] ?? '',
-            'i' => (int)($_REQUEST['i'] ?? 0),
-            'g' => (int)($_REQUEST['g'] ?? 0),  // Category filter
+            'i' => (int) ($_REQUEST['i'] ?? 0),
+            'g' => (int) ($_REQUEST['g'] ?? 0), // Category filter
         ];
         $this->out = $out;
 
@@ -52,7 +68,7 @@ final class Ctx
         // Base navigation from pages table
         $pages = array_map(
             static fn($r) => [trim(($r['icon'] ?? '') . ' ' . $r['title']), '/' . $r['slug']],
-            $this->db->read('posts', 'id,title,slug,icon', "type='page' ORDER BY id", [], QueryType::All)
+            $this->db->read('posts', 'id,title,slug,icon', "type='page' ORDER BY id", [], QueryType::All),
         );
         $pages[] = ['📝 Blog', '/blog'];
 
@@ -71,7 +87,7 @@ final class Ctx
     public function ses(string $k, mixed $v = ''): mixed
     {
         return $_SESSION[$k] = isset($_REQUEST[$k])
-            ? (is_array($_REQUEST[$k]) ? $_REQUEST[$k] : trim($_REQUEST[$k]) |> htmlspecialchars(...))
-            : ($_SESSION[$k] ?? $v);
+            ? (is_array($_REQUEST[$k]) ? $_REQUEST[$k] : (trim($_REQUEST[$k]) |> htmlspecialchars(...)))
+            : $_SESSION[$k] ?? $v;
     }
 }

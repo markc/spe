@@ -1,17 +1,21 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Core;
 
-use SPE\App\{Acl, Util};
+use SPE\App\Acl;
+use SPE\App\Util;
 
 final readonly class Init
 {
     private const string NS = 'SPE\\HCP\\';
+
     private array $out;
 
-    public function __construct(private Ctx $ctx)
-    {
+    public function __construct(
+        private Ctx $ctx,
+    ) {
         Util::elog(__METHOD__);
 
         // TODO: Implement remember cookie with HcpDb
@@ -27,9 +31,8 @@ final readonly class Init
         elseif (!Acl::check(Acl::Admin)) {
             Util::log('Admin access required');
             header('Location: ?o=Auth&m=login');
-            exit;
-        }
-        else {
+            exit();
+        } else {
             $main = $this->routePlugin($o, $m);
         }
 
@@ -67,7 +70,7 @@ final readonly class Init
         $model = new $modelClass($ctx);
         if (!method_exists($model, $m)) {
             // Auth defaults to login, others to list
-            $m = ($o === 'Auth') ? 'login' : 'list';
+            $m = $o === 'Auth' ? 'login' : 'list';
         }
         if (!method_exists($model, $m)) {
             return '<div class="card"><p>Method not found: ' . htmlspecialchars($m) . '</p></div>';
@@ -109,7 +112,7 @@ final readonly class Init
             $theme = self::NS . "Themes\\TopNav";
         }
 
-        $html = (new $theme($this->ctx, $this->out))->render();
+        $html = new $theme($this->ctx, $this->out)->render();
 
         Util::perfLog(__FILE__);
 

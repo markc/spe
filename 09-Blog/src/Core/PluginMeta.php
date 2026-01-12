@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Core;
@@ -7,7 +8,8 @@ namespace SPE\Blog\Core;
  * Immutable value object representing plugin metadata
  * Uses PHP 8.4 property hooks for validation
  */
-final readonly class PluginMeta {
+final readonly class PluginMeta
+{
     public function __construct(
         public string $name,
         public string $description = '',
@@ -26,8 +28,10 @@ final readonly class PluginMeta {
     ) {}
 
     /** Create from JSON file */
-    public static function fromFile(string $path): ?self {
-        if (!file_exists($path)) return null;
+    public static function fromFile(string $path): ?self
+    {
+        if (!file_exists($path))
+            return null;
 
         $data = json_decode(file_get_contents($path), true) ?? [];
         $data['path'] = dirname($path);
@@ -41,27 +45,32 @@ final readonly class PluginMeta {
     }
 
     /** Create from array */
-    public static function fromArray(array $data): self {
+    public static function fromArray(array $data): self
+    {
         return new self(...$data);
     }
 
     /** Navigation label with emoji */
-    public function label(): string {
+    public function label(): string
+    {
         return trim("{$this->emoji} {$this->name}");
     }
 
     /** Full href with method if not default */
-    public function url(): string {
+    public function url(): string
+    {
         return $this->href ?: "?o={$this->name}" . ($this->method !== 'list' ? "&m={$this->method}" : '');
     }
 
     /** CSS class for AJAX links */
-    public function linkClass(): string {
+    public function linkClass(): string
+    {
         return $this->ajax ? 'ajax-link' : '';
     }
 
     /** Convert to nav array format [label, name] for backwards compatibility */
-    public function toNavItem(): array {
+    public function toNavItem(): array
+    {
         return [$this->label(), $this->name];
     }
 }

@@ -1,10 +1,12 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\YouTube\Plugins\Dashboard;
 
 use SPE\App\Util;
-use SPE\YouTube\Core\{Ctx, Plugin};
+use SPE\YouTube\Core\Ctx;
+use SPE\YouTube\Core\Plugin;
 use SPE\YouTube\Services\YouTubeService;
 
 /**
@@ -14,8 +16,9 @@ final class DashboardModel extends Plugin
 {
     private YouTubeService $youtube;
 
-    public function __construct(protected Ctx $ctx)
-    {
+    public function __construct(
+        protected Ctx $ctx,
+    ) {
         parent::__construct($ctx);
         $this->youtube = new YouTubeService();
     }

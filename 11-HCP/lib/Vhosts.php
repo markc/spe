@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Lib;
@@ -65,10 +66,8 @@ final class Vhosts
 
         // Insert into database
         try {
-            $stmt = self::db()->prepare(
-                'INSERT INTO vhosts (domain, uname, uid, gid, active, aliases, created_at, updated_at)
-                 VALUES (?, ?, ?, ?, 1, ?, datetime("now"), datetime("now"))'
-            );
+            $stmt = self::db()->prepare('INSERT INTO vhosts (domain, uname, uid, gid, active, aliases, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, 1, ?, datetime("now"), datetime("now"))');
             $stmt->execute([$domain, $uname, $result['uid'], $result['gid'], '']);
         } catch (\PDOException $e) {
             // Rollback: remove vhost filesystem since DB insert failed
@@ -126,10 +125,8 @@ final class Vhosts
      */
     public static function list(): array
     {
-        $stmt = self::db()->query(
-            'SELECT domain, uname, uid, gid, active, aliases, created_at, updated_at
-             FROM vhosts ORDER BY domain'
-        );
+        $stmt = self::db()->query('SELECT domain, uname, uid, gid, active, aliases, created_at, updated_at
+             FROM vhosts ORDER BY domain');
         $rows = $stmt->fetchAll();
 
         $vhosts = [];
@@ -139,7 +136,7 @@ final class Vhosts
                 'uname' => $row['uname'],
                 'uid' => $row['uid'],
                 'gid' => $row['gid'],
-                'active' => (bool)$row['active'],
+                'active' => (bool) $row['active'],
                 'aliases' => $row['aliases'] ? explode(',', $row['aliases']) : [],
                 'created_at' => $row['created_at'],
                 'updated_at' => $row['updated_at'],
@@ -157,10 +154,8 @@ final class Vhosts
     {
         $domain = strtolower(trim($domain));
 
-        $stmt = self::db()->prepare(
-            'SELECT id, domain, uname, uid, gid, active, aliases, created_at, updated_at
-             FROM vhosts WHERE domain = ?'
-        );
+        $stmt = self::db()->prepare('SELECT id, domain, uname, uid, gid, active, aliases, created_at, updated_at
+             FROM vhosts WHERE domain = ?');
         $stmt->execute([$domain]);
         $row = $stmt->fetch();
 
@@ -182,12 +177,12 @@ final class Vhosts
         // Get mailbox count from DB
         $stmt = self::db()->prepare('SELECT COUNT(*) as cnt FROM vmails WHERE user LIKE ?');
         $stmt->execute(["%@{$domain}"]);
-        $dbMailCount = (int)$stmt->fetch()['cnt'];
+        $dbMailCount = (int) $stmt->fetch()['cnt'];
 
         // Get alias count
         $stmt = self::db()->prepare('SELECT COUNT(*) as cnt FROM valias WHERE source LIKE ?');
         $stmt->execute(["%@{$domain}"]);
-        $aliasCount = (int)$stmt->fetch()['cnt'];
+        $aliasCount = (int) $stmt->fetch()['cnt'];
 
         return [
             'success' => true,
@@ -196,7 +191,7 @@ final class Vhosts
             'uname' => $row['uname'],
             'uid' => $row['uid'],
             'gid' => $row['gid'],
-            'active' => (bool)$row['active'],
+            'active' => (bool) $row['active'],
             'aliases' => $row['aliases'] ? explode(',', $row['aliases']) : [],
             'disk_usage' => $diskUsage,
             'mailbox_count' => $dbMailCount ?: $mailboxCount,
@@ -214,9 +209,7 @@ final class Vhosts
     {
         $domain = strtolower(trim($domain));
 
-        $stmt = self::db()->prepare(
-            'UPDATE vhosts SET active = ?, updated_at = datetime("now") WHERE domain = ?'
-        );
+        $stmt = self::db()->prepare('UPDATE vhosts SET active = ?, updated_at = datetime("now") WHERE domain = ?');
         $stmt->execute([$active ? 1 : 0, $domain]);
 
         if ($stmt->rowCount() === 0) {
@@ -234,9 +227,7 @@ final class Vhosts
         $domain = strtolower(trim($domain));
         $aliasStr = implode(',', array_map('strtolower', array_map('trim', $aliases)));
 
-        $stmt = self::db()->prepare(
-            'UPDATE vhosts SET aliases = ?, updated_at = datetime("now") WHERE domain = ?'
-        );
+        $stmt = self::db()->prepare('UPDATE vhosts SET aliases = ?, updated_at = datetime("now") WHERE domain = ?');
         $stmt->execute([$aliasStr, $domain]);
 
         if ($stmt->rowCount() === 0) {

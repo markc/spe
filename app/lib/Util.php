@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\App;
@@ -37,7 +38,7 @@ final class Util
     {
         return $_SESSION[$k] = isset($_REQUEST[$k])
             ? (is_array($_REQUEST[$k]) ? $_REQUEST[$k] : self::enc($_REQUEST[$k]))
-            : ($_SESSION[$k] ?? $x ?? $v);
+            : $_SESSION[$k] ?? $x ?? $v;
     }
 
     // === Authentication ===
@@ -46,7 +47,7 @@ final class Util
     {
         return is_null($id)
             ? isset($_SESSION['usr'])
-            : isset($_SESSION['usr']['id']) && (int)$_SESSION['usr']['id'] === $id;
+            : isset($_SESSION['usr']['id']) && (int) $_SESSION['usr']['id'] === $id;
     }
 
     public static function is_adm(): bool
@@ -56,7 +57,7 @@ final class Util
 
     public static function is_acl(int|Acl $acl): bool
     {
-        $required = $acl instanceof Acl ? $acl : (Acl::tryFrom($acl) ?? Acl::Anonymous);
+        $required = $acl instanceof Acl ? $acl : Acl::tryFrom($acl) ?? Acl::Anonymous;
         return Acl::check($required);
     }
 
@@ -131,7 +132,7 @@ final class Util
     // === OTP (One Time Password) for password reset (from HCP pattern) ===
 
     private const int OTP_LENGTH = 10;
-    private const int OTP_TTL = 3600;  // 1 hour
+    private const int OTP_TTL = 3600; // 1 hour
 
     public static function genOtp(): string
     {
@@ -160,14 +161,14 @@ final class Util
 
         $subject = "Password reset for {$host}";
         $body = <<<MAIL
-Here is your one-time password reset link, valid for 1 hour.
+        Here is your one-time password reset link, valid for 1 hour.
 
-Click below to reset your password:
+        Click below to reset your password:
 
-{$link}
+        {$link}
 
-If you did not request this, please ignore this message.
-MAIL;
+        If you did not request this, please ignore this message.
+        MAIL;
 
         $headers = $from ? "From: {$from}" : '';
         return mail($email, $subject, $body, $headers);
@@ -192,7 +193,7 @@ MAIL;
             'expires' => time() + $exp,
             'path' => '/',
             'httponly' => true,
-            'samesite' => 'Lax'
+            'samesite' => 'Lax',
         ]);
     }
 
@@ -207,13 +208,14 @@ MAIL;
     {
         if ($delay > 0) {
             header("Refresh: $delay; url=$url");
-            echo "<!DOCTYPE html><title>Redirecting...</title>";
+            echo '<!DOCTYPE html><title>Redirecting...</title>';
             echo "<h2 style='text-align:center'>Redirecting in $delay seconds...</h2>";
-            if ($msg) echo "<pre style='width:50em;margin:0 auto'>$msg</pre>";
-            exit;
+            if ($msg)
+                echo "<pre style='width:50em;margin:0 auto'>$msg</pre>";
+            exit();
         }
         header("Location: $url");
-        exit;
+        exit();
     }
 
     // === Flash Messages (accumulating, dual-use) ===
@@ -222,9 +224,7 @@ MAIL;
     {
         if ($msg) {
             // Write mode
-            $_SESSION['log'][$type] = empty($_SESSION['log'][$type])
-                ? $msg
-                : $_SESSION['log'][$type] . '<br>' . $msg;
+            $_SESSION['log'][$type] = empty($_SESSION['log'][$type]) ? $msg : $_SESSION['log'][$type] . '<br>' . $msg;
         } elseif (!empty($_SESSION['log'])) {
             // Read mode (no $msg passed) - return and clear
             $log = $_SESSION['log'];
@@ -237,14 +237,18 @@ MAIL;
     public static function toast(): string
     {
         $log = self::log();
-        if (!$log) return '';
+        if (!$log)
+            return '';
 
         $html = '';
         foreach ($log as $type => $msg) {
             $ok = $type === 'success';
             $bg = $ok ? '#d4edda' : '#f8d7da';
             $fg = $ok ? '#155724' : '#721c24';
-            $html .= "<div style=\"margin-bottom:1rem;padding:1rem;border-radius:4px;background:$bg;color:$fg\">" . $msg . "</div>";
+            $html .=
+                "<div style=\"margin-bottom:1rem;padding:1rem;border-radius:4px;background:$bg;color:$fg\">"
+                . $msg
+                . '</div>';
         }
         return $html;
     }
@@ -253,22 +257,30 @@ MAIL;
 
     public static function timeAgo(int|string $date): string
     {
-        $ts = is_numeric($date) ? (int)$date : strtotime($date);
+        $ts = is_numeric($date) ? (int) $date : strtotime($date);
         $d = abs(time() - $ts);
 
-        if ($d < 10) return 'just now';
+        if ($d < 10)
+            return 'just now';
 
         $units = [
-            ['year', 31536000], ['month', 2678400], ['week', 604800],
-            ['day', 86400], ['hour', 3600], ['min', 60], ['sec', 1]
+            ['year', 31536000],
+            ['month', 2678400],
+            ['week', 604800],
+            ['day', 86400],
+            ['hour', 3600],
+            ['min', 60],
+            ['sec', 1],
         ];
         $parts = [];
         foreach ($units as [$name, $secs]) {
-            if (!($d >= $secs && count($parts) < 2)) { continue; }
+            if (!($d >= $secs && count($parts) < 2)) {
+                continue;
+            }
 
-$amt = (int)($d / $secs);
-                $parts[] = "$amt $name" . ($amt > 1 ? 's' : '');
-                $d %= $secs;
+            $amt = (int) ($d / $secs);
+            $parts[] = "$amt $name" . ($amt > 1 ? 's' : '');
+            $d %= $secs;
         }
         return implode(' ', $parts) . ' ago';
     }
@@ -277,11 +289,16 @@ $amt = (int)($d / $secs);
 
     public static function numfmt(float $size, int $precision = null): string
     {
-        if ($size == 0) return '0';
-        if ($size >= 1e12) return round($size / 1e12, $precision ?? 3) . ' TB';
-        if ($size >= 1e9) return round($size / 1e9, $precision ?? 2) . ' GB';
-        if ($size >= 1e6) return round($size / 1e6, $precision ?? 1) . ' MB';
-        if ($size >= 1e3) return round($size / 1e3, $precision ?? 0) . ' KB';
+        if ($size == 0)
+            return '0';
+        if ($size >= 1e12)
+            return round($size / 1e12, $precision ?? 3) . ' TB';
+        if ($size >= 1e9)
+            return round($size / 1e9, $precision ?? 2) . ' GB';
+        if ($size >= 1e6)
+            return round($size / 1e6, $precision ?? 1) . ' MB';
+        if ($size >= 1e3)
+            return round($size / 1e3, $precision ?? 0) . ' KB';
         return $size . ' B';
     }
 
@@ -297,15 +314,18 @@ $amt = (int)($d / $secs);
     public static function remember(Db $db): void
     {
         // Already logged in
-        if (self::is_usr()) return;
+        if (self::is_usr())
+            return;
 
         // Check for remember cookie
         $cookie = self::getCookie('remember');
-        if (!$cookie) return;
+        if (!$cookie)
+            return;
 
         // Look up user by cookie token
         $usr = $db->read('users', '*', 'cookie = :cookie', ['cookie' => $cookie], QueryType::One);
-        if (!$usr || (int)$usr['acl'] === 9) return;
+        if (!$usr || (int) $usr['acl'] === 9)
+            return;
 
         // Restore session
         $_SESSION['usr'] = [
@@ -313,7 +333,7 @@ $amt = (int)($d / $secs);
             'login' => $usr['login'],
             'fname' => $usr['fname'],
             'lname' => $usr['lname'],
-            'acl' => $usr['acl']
+            'acl' => $usr['acl'],
         ];
     }
 
@@ -364,7 +384,7 @@ $amt = (int)($d / $secs);
 
     public static function elapsed(): float
     {
-        return round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']), 4);
+        return round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 4);
     }
 
     public static function perfLog(string $label = ''): void
@@ -379,10 +399,11 @@ $amt = (int)($d / $secs);
 
     public static function dbg(mixed ...$vars): string
     {
-        if (Env::get('DEBUG', '') !== 'true') return '';
+        if (Env::get('DEBUG', '') !== 'true')
+            return '';
 
         $out = "<pre style='background:#1e1e1e;color:#d4d4d4;padding:1rem;margin:1rem 0;overflow:auto;font-size:12px'>";
-        $out .= "<b>DEBUG</b> " . self::elapsed() . "s | " . self::numfmt(memory_get_peak_usage(true)) . "\n";
+        $out .= '<b>DEBUG</b> ' . self::elapsed() . 's | ' . self::numfmt(memory_get_peak_usage(true)) . "\n";
         $out .= str_repeat('─', 60) . "\n";
 
         foreach ($vars as $i => $var) {
@@ -390,9 +411,9 @@ $amt = (int)($d / $secs);
         }
 
         $out .= str_repeat('─', 60) . "\n";
-        $out .= "GET: " . self::enc(print_r($_GET, true));
-        $out .= "POST: " . self::enc(print_r($_POST, true));
-        $out .= "SESSION: " . self::enc(print_r($_SESSION ?? [], true));
-        return $out . "</pre>";
+        $out .= 'GET: ' . self::enc(print_r($_GET, true));
+        $out .= 'POST: ' . self::enc(print_r($_POST, true));
+        $out .= 'SESSION: ' . self::enc(print_r($_SESSION ?? [], true));
+        return $out . '</pre>';
     }
 }
