@@ -6,52 +6,83 @@ namespace SPE\HCP\Lib;
 /**
  * NS 3.0 Global Configuration
  *
- * Central path definitions for the NetServa 3.0 hosting structure.
- * Used by lib/ classes. CLI scripts use /etc/ns3/config.php.
- *
- * Directory structure:
- *   /srv/domain/
- *   ├── var/{log,run}/
- *   ├── msg/user/Maildir/{cur,new,tmp}
- *   └── web/app/public/
+ * Loads configuration from .env file at project root.
+ * Falls back to sensible defaults if not set.
  */
 final class Config
 {
-    // === Primary Host ===
-    public const string ADMIN = 'sysadm';
+    private static bool $envLoaded = false;
 
-    // === Base Paths ===
-    public const string VPATH = '/srv';
-    public const string WPATH = '/srv/%s/web/app/public';
-    public const string MPATH = '/srv/%s/msg';
-    public const string UPATH = '/srv/%s/msg/%s';
-
-    // === Database ===
-    public const string DTYPE = 'sqlite';
-    public const string SYSADM_DB = '/srv/.local/sqlite/sysadm.db';
-    public const string HCP_DB = '/srv/.local/sqlite/hcp.db';
-
-    // === Nginx ===
-    public const string NGINX_AVAILABLE = '/etc/nginx/sites-available';
-    public const string NGINX_ENABLED = '/etc/nginx/sites-enabled';
-
-    // === PHP ===
-    public const string V_PHP = '8.4';
-    public const array PHP_VERSIONS = ['8.5', '8.4', '8.3'];
-
-    // === UID/GID Range ===
-    public const int UID_MIN = 1001;
-    public const int UID_MAX = 1999;
-    public const string WUGID = 'www-data';
-
-    // === SSH Target Host ===
-    public const string DEFAULT_HOST = '127.0.0.1';
+    // === Defaults ===
+    private const array DEFAULTS = [
+        'SYSADM_DB' => '/srv/.local/hcp/sysadm.db',
+        'HCP_DB' => '/srv/.local/hcp/hcp.db',
+        'SSH_HOSTS_DIR' => '~/.ssh/hosts',
+        'SSH_KEYS_DIR' => '~/.ssh/keys',
+        'TARGET_HOST' => '',
+        'VPATH' => '/srv',
+        'ADMIN' => 'sysadm',
+    ];
 
     // === Cached Values ===
     private static ?string $hostname = null;
+    private static ?string $projectRoot = null;
 
     /**
-     * Get primary hostname (VHOST).
+     * Load .env file from project root.
+     */
+    public static function loadEnv(): void
+    {
+        if (self::$envLoaded) return;
+        self::$envLoaded = true;
+
+        $file = self::projectRoot() . '/.env';
+        if (!file_exists($file)) return;
+
+        foreach (file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+            $line = trim($line);
+            if ($line === '' || str_starts_with($line, '#')) continue;
+            if (!str_contains($line, '=')) continue;
+
+            [$key, $value] = explode('=', $line, 2);
+            $key = trim($key);
+            $value = trim(trim($value), '"\'');
+
+            // Expand ~ to HOME
+            if (str_starts_with($value, '~/')) {
+                $value = getenv('HOME') . substr($value, 1);
+            }
+
+            // Don't override existing environment
+            if (!getenv($key)) {
+                putenv("{$key}={$value}");
+                $_ENV[$key] = $value;
+            }
+        }
+    }
+
+    /**
+     * Get project root directory.
+     */
+    public static function projectRoot(): string
+    {
+        if (self::$projectRoot === null) {
+            self::$projectRoot = dirname(__DIR__);
+        }
+        return self::$projectRoot;
+    }
+
+    /**
+     * Get config value with fallback.
+     */
+    public static function get(string $key): string
+    {
+        self::loadEnv();
+        return $_ENV[$key] ?? getenv($key) ?: (self::DEFAULTS[$key] ?? '');
+    }
+
+    /**
+     * Get primary hostname.
      */
     public static function hostname(): string
     {
@@ -62,99 +93,130 @@ final class Config
     }
 
     /**
-     * Get target SSH host (from env or default).
+     * Get target SSH host.
+     * Priority: ENV > active vnode from DB > default
      */
     public static function targetHost(): string
     {
-        return $_ENV['TARGET_HOST'] ?? getenv('TARGET_HOST') ?: self::DEFAULT_HOST;
+        self::loadEnv();
+
+        // 1. Environment variable
+        if ($host = getenv('TARGET_HOST')) {
+            return $host;
+        }
+
+        // 2. Active vnode from database (if available)
+        try {
+            $db = new \PDO('sqlite:' . self::sysadmDb(), null, null, [
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            ]);
+            $stmt = $db->query('SELECT hostname FROM vnodes WHERE is_active = 1 LIMIT 1');
+            if ($row = $stmt->fetch()) {
+                return $row['hostname'];
+            }
+        } catch (\Exception) {
+            // DB not available, use default
+        }
+
+        // 3. Default
+        return self::DEFAULTS['TARGET_HOST'] ?: '127.0.0.1';
     }
 
     /**
-     * Get vhost home directory: /srv/domain
+     * Get active vnode name.
      */
+    public static function activeVnode(): ?string
+    {
+        self::loadEnv();
+
+        try {
+            $db = new \PDO('sqlite:' . self::sysadmDb(), null, null, [
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            ]);
+            $stmt = $db->query('SELECT name FROM vnodes WHERE is_active = 1 LIMIT 1');
+            if ($row = $stmt->fetch()) {
+                return $row['name'];
+            }
+        } catch (\Exception) {
+            // DB not available
+        }
+
+        return null;
+    }
+
+    // === Path Helpers ===
+
     public static function vhostPath(string $domain): string
     {
-        return self::VPATH . '/' . $domain;
+        return self::get('VPATH') . '/' . $domain;
     }
 
-    /**
-     * Get web document root: /srv/domain/web/app/public
-     */
     public static function webPath(string $domain): string
     {
-        return sprintf(self::WPATH, $domain);
+        return self::get('VPATH') . "/{$domain}/web/app/public";
     }
 
-    /**
-     * Get mail base directory: /srv/domain/msg
-     */
     public static function mailPath(string $domain): string
     {
-        return sprintf(self::MPATH, $domain);
+        return self::get('VPATH') . "/{$domain}/msg";
     }
 
-    /**
-     * Get user maildir path: /srv/domain/msg/user
-     */
     public static function userPath(string $domain, string $user): string
     {
-        return sprintf(self::UPATH, $domain, $user);
+        return self::get('VPATH') . "/{$domain}/msg/{$user}";
     }
 
-    /**
-     * Get sysadm database path (from env or default).
-     */
+    // === Database Paths ===
+
     public static function sysadmDb(): string
     {
-        return $_ENV['SYSADM_DB'] ?? getenv('SYSADM_DB') ?: self::SYSADM_DB;
+        self::loadEnv();
+        $path = $_ENV['SYSADM_DB'] ?? getenv('SYSADM_DB') ?: self::DEFAULTS['SYSADM_DB'];
+
+        // Expand ~
+        if (str_starts_with($path, '~/')) {
+            $path = getenv('HOME') . substr($path, 1);
+        }
+
+        return $path;
     }
 
-    /**
-     * Get HCP database path (from env or default).
-     */
     public static function hcpDb(): string
     {
-        return $_ENV['HCP_DB'] ?? getenv('HCP_DB') ?: self::HCP_DB;
+        self::loadEnv();
+        $path = $_ENV['HCP_DB'] ?? getenv('HCP_DB') ?: self::DEFAULTS['HCP_DB'];
+
+        // Expand ~
+        if (str_starts_with($path, '~/')) {
+            $path = getenv('HOME') . substr($path, 1);
+        }
+
+        return $path;
     }
 
-    /**
-     * Find first available PHP-FPM pool directory.
-     */
-    public static function phpFpmPoolDir(): ?string
+    // === SSH Paths ===
+
+    public static function sshHostsDir(): string
     {
-        foreach (self::PHP_VERSIONS as $ver) {
-            $path = "/etc/php/{$ver}/fpm/pool.d";
-            if (is_dir($path)) {
-                return $path;
-            }
+        self::loadEnv();
+        $path = $_ENV['SSH_HOSTS_DIR'] ?? getenv('SSH_HOSTS_DIR') ?: self::DEFAULTS['SSH_HOSTS_DIR'];
+
+        if (str_starts_with($path, '~/')) {
+            $path = getenv('HOME') . substr($path, 1);
         }
-        return null;
+
+        return $path;
     }
 
-    /**
-     * Get active PHP version.
-     */
-    public static function phpVersion(): ?string
+    public static function sshKeysDir(): string
     {
-        foreach (self::PHP_VERSIONS as $ver) {
-            $path = "/etc/php/{$ver}/fpm/pool.d";
-            if (is_dir($path)) {
-                return $ver;
-            }
-        }
-        return null;
-    }
+        self::loadEnv();
+        $path = $_ENV['SSH_KEYS_DIR'] ?? getenv('SSH_KEYS_DIR') ?: self::DEFAULTS['SSH_KEYS_DIR'];
 
-    /**
-     * Find first available UID in range.
-     */
-    public static function nextUid(): ?int
-    {
-        for ($i = self::UID_MIN; $i <= self::UID_MAX; $i++) {
-            if (!posix_getpwuid($i)) {
-                return $i;
-            }
+        if (str_starts_with($path, '~/')) {
+            $path = getenv('HOME') . substr($path, 1);
         }
-        return null;
+
+        return $path;
     }
 }

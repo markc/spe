@@ -1,0 +1,264 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Run commands on multiple SSH hosts (parallel execution)
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+use SPE\HCP\Lib\SshHostOps;
+
+$usage = <<<USAGE
+Usage: runssh [targets] -- <command>
+
+Targets (at least one required):
+  -h, --host <name>     Target specific host(s) (repeatable)
+  -g, --group <name>    Target group(s) (repeatable)
+  -a, --all             Target all enabled hosts
+
+Options:
+  -p, --parallel <n>    Max parallel connections (default: 5)
+  -t, --timeout <sec>   Command timeout in seconds (default: 60)
+  -q, --quiet           Only show errors
+  -v, --verbose         Show detailed output
+
+Examples:
+  runssh -h ns3 -- uptime
+  runssh -h ns3 -h web1 -- "df -h"
+  runssh -g production -- "apt update && apt upgrade -y"
+  runssh -a -- "cat /etc/os-release"
+  runssh -g webservers -p 10 -- "systemctl restart nginx"
+
+USAGE;
+
+if ($argc < 2 || in_array($argv[1] ?? '', ['-h', '--help']) && $argc === 2) {
+    echo $usage;
+    exit($argc < 2 ? 1 : 0);
+}
+
+$hosts = [];
+$groups = [];
+$allHosts = false;
+$parallel = 5;
+$timeout = 60;
+$quiet = false;
+$verbose = false;
+$command = '';
+
+// Find -- separator
+$cmdStart = array_search('--', $argv);
+if ($cmdStart === false) {
+    fprintf(STDERR, "Error: Command must follow -- separator\n");
+    fprintf(STDERR, "Example: runssh -h ns3 -- uptime\n");
+    exit(1);
+}
+
+// Extract command (everything after --)
+$command = implode(' ', array_slice($argv, $cmdStart + 1));
+if (!$command) {
+    fprintf(STDERR, "Error: No command specified\n");
+    exit(1);
+}
+
+// Parse options before --
+for ($i = 1; $i < $cmdStart; $i++) {
+    switch ($argv[$i]) {
+        case '-h':
+        case '--host':
+            $hosts[] = $argv[++$i] ?? '';
+            break;
+        case '-g':
+        case '--group':
+            $groups[] = $argv[++$i] ?? '';
+            break;
+        case '-a':
+        case '--all':
+            $allHosts = true;
+            break;
+        case '-p':
+        case '--parallel':
+            $parallel = max(1, (int)($argv[++$i] ?? 5));
+            break;
+        case '-t':
+        case '--timeout':
+            $timeout = max(1, (int)($argv[++$i] ?? 60));
+            break;
+        case '-q':
+        case '--quiet':
+            $quiet = true;
+            break;
+        case '-v':
+        case '--verbose':
+            $verbose = true;
+            break;
+    }
+}
+
+// Resolve targets
+$targetHosts = [];
+
+if ($allHosts) {
+    foreach (SshHostOps::list() as $h) {
+        if ($h['enabled']) {
+            $targetHosts[$h['name']] = $h;
+        }
+    }
+}
+
+foreach ($groups as $group) {
+    foreach (SshHostOps::list($group) as $h) {
+        if ($h['enabled']) {
+            $targetHosts[$h['name']] = $h;
+        }
+    }
+}
+
+foreach ($hosts as $name) {
+    $h = SshHostOps::get($name);
+    if ($h && $h['enabled']) {
+        $targetHosts[$h['name']] = $h;
+    } elseif (!$h) {
+        fprintf(STDERR, "Warning: Host not found: %s\n", $name);
+    } elseif (!$h['enabled']) {
+        fprintf(STDERR, "Warning: Host disabled: %s\n", $name);
+    }
+}
+
+if (empty($targetHosts)) {
+    fprintf(STDERR, "Error: No target hosts specified or found\n");
+    exit(1);
+}
+
+$targetList = array_keys($targetHosts);
+$hostCount = count($targetList);
+
+if (!$quiet) {
+    echo "Running on {$hostCount} host(s): " . implode(', ', $targetList) . "\n";
+    echo "Command: {$command}\n";
+    echo str_repeat('-', 60) . "\n";
+}
+
+// Execute in parallel using proc_open
+$running = [];
+$results = [];
+$index = 0;
+
+while ($index < $hostCount || !empty($running)) {
+    // Start new processes up to parallel limit
+    while (count($running) < $parallel && $index < $hostCount) {
+        $hostName = $targetList[$index];
+        $host = $targetHosts[$hostName];
+
+        $sshCmd = sprintf(
+            'ssh -o BatchMode=yes -o ConnectTimeout=10 -o StrictHostKeyChecking=no %s %s 2>&1',
+            escapeshellarg($hostName),
+            escapeshellarg($command)
+        );
+
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+
+        $process = proc_open($sshCmd, $descriptors, $pipes);
+        if (is_resource($process)) {
+            fclose($pipes[0]); // Close stdin
+            stream_set_blocking($pipes[1], false);
+            stream_set_blocking($pipes[2], false);
+
+            $running[$hostName] = [
+                'process' => $process,
+                'pipes' => $pipes,
+                'output' => '',
+                'start' => time(),
+            ];
+
+            if ($verbose) {
+                echo "[{$hostName}] Started\n";
+            }
+        }
+
+        $index++;
+    }
+
+    // Check running processes
+    foreach ($running as $hostName => &$job) {
+        // Read output
+        $out = fread($job['pipes'][1], 8192);
+        $err = fread($job['pipes'][2], 8192);
+        if ($out) $job['output'] .= $out;
+        if ($err) $job['output'] .= $err;
+
+        // Check if done
+        $status = proc_get_status($job['process']);
+        if (!$status['running']) {
+            fclose($job['pipes'][1]);
+            fclose($job['pipes'][2]);
+            proc_close($job['process']);
+
+            $elapsed = time() - $job['start'];
+            $results[$hostName] = [
+                'success' => $status['exitcode'] === 0,
+                'exitcode' => $status['exitcode'],
+                'output' => trim($job['output']),
+                'elapsed' => $elapsed,
+            ];
+
+            unset($running[$hostName]);
+            continue;
+        }
+
+        // Check timeout
+        if (time() - $job['start'] > $timeout) {
+            proc_terminate($job['process']);
+            fclose($job['pipes'][1]);
+            fclose($job['pipes'][2]);
+            proc_close($job['process']);
+
+            $results[$hostName] = [
+                'success' => false,
+                'exitcode' => -1,
+                'output' => 'Timeout after ' . $timeout . 's',
+                'elapsed' => $timeout,
+            ];
+
+            unset($running[$hostName]);
+        }
+    }
+    unset($job);
+
+    // Small delay to prevent busy loop
+    if (!empty($running)) {
+        usleep(100000); // 100ms
+    }
+}
+
+// Display results
+$successes = 0;
+$failures = 0;
+
+foreach ($targetList as $hostName) {
+    $result = $results[$hostName] ?? ['success' => false, 'output' => 'Unknown error', 'elapsed' => 0];
+
+    if ($result['success']) {
+        $successes++;
+        if (!$quiet) {
+            echo "\n[{$hostName}] ✓ ({$result['elapsed']}s)\n";
+            if ($result['output']) {
+                echo $result['output'] . "\n";
+            }
+        }
+    } else {
+        $failures++;
+        echo "\n[{$hostName}] ✗ (exit: {$result['exitcode']}, {$result['elapsed']}s)\n";
+        if ($result['output']) {
+            echo $result['output'] . "\n";
+        }
+    }
+}
+
+// Summary
+echo "\n" . str_repeat('-', 60) . "\n";
+echo "Summary: {$successes} succeeded, {$failures} failed\n";
+
+exit($failures > 0 ? 1 : 0);

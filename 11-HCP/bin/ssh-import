@@ -1,0 +1,87 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Import existing SSH host configs from ~/.ssh/hosts/ into database
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+use SPE\HCP\Lib\{SshHostOps, Config};
+
+$usage = <<<USAGE
+Usage: ssh-import [options]
+
+Import existing SSH host configuration files from ~/.ssh/hosts/ into the
+database. Files are parsed for Host, Hostname, Port, User, and IdentityFile.
+
+Options:
+  -d, --dry-run      Show what would be imported without making changes
+  -f, --force        Re-import hosts that already exist (update)
+  --regen            Regenerate all ~/.ssh/hosts/* files from database
+
+Examples:
+  ssh-import              # Import new hosts
+  ssh-import -d           # Preview import
+  ssh-import --regen      # Regenerate host files from DB
+
+USAGE;
+
+if (in_array($argv[1] ?? '', ['-h', '--help'])) {
+    echo $usage;
+    exit(0);
+}
+
+$dryRun = in_array('-d', $argv) || in_array('--dry-run', $argv);
+$force = in_array('-f', $argv) || in_array('--force', $argv);
+$regen = in_array('--regen', $argv);
+
+$hostsDir = Config::sshHostsDir();
+
+// Regenerate mode
+if ($regen) {
+    echo "Regenerating SSH host files from database...\n";
+    $count = SshHostOps::regenerateAllHostFiles();
+    echo "Regenerated {$count} host file(s) in {$hostsDir}\n";
+    exit(0);
+}
+
+// Import mode
+if (!is_dir($hostsDir)) {
+    fprintf(STDERR, "Error: Hosts directory not found: %s\n", $hostsDir);
+    exit(1);
+}
+
+echo "Scanning {$hostsDir} for SSH host configs...\n\n";
+
+$result = SshHostOps::importFromFiles();
+
+if ($dryRun) {
+    echo "[DRY RUN - No changes made]\n\n";
+}
+
+// Show imported
+if (!empty($result['imported'])) {
+    echo "Imported (" . count($result['imported']) . "):\n";
+    foreach ($result['imported'] as $name) {
+        $host = SshHostOps::get($name);
+        printf("  ✓ %-15s -> %s\n", $name, $host['hostname'] ?? '?');
+    }
+    echo "\n";
+}
+
+// Show skipped
+if (!empty($result['skipped'])) {
+    echo "Skipped (" . count($result['skipped']) . "):\n";
+    foreach ($result['skipped'] as $name) {
+        printf("  - %-15s (exists or invalid)\n", $name);
+    }
+    echo "\n";
+}
+
+// Summary
+$total = count($result['imported']) + count($result['skipped']);
+echo "Summary: {$total} files scanned, " . count($result['imported']) . " imported, " . count($result['skipped']) . " skipped\n";
+
+if (!$dryRun && !empty($result['imported'])) {
+    echo "\nSSH host files have been regenerated in {$hostsDir}\n";
+    echo "You can now use these hosts with: ssh <hostname>\n";
+}

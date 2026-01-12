@@ -1,0 +1,84 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Change (rename) an SSH key or copy to remote host
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+use SPE\HCP\Lib\SshKeyOps;
+
+$usage = <<<USAGE
+Usage: chkey <name> [options]
+
+Options:
+  -r, --rename <new>      Rename key (updates vnodes using it)
+  -c, --copy-to <host>    Copy public key to remote host
+
+Examples:
+  chkey mykey -r newkey           # Rename key
+  chkey mykey -c ns3              # Copy public key to ns3
+
+USAGE;
+
+if ($argc < 2 || in_array($argv[1] ?? '', ['-h', '--help'])) {
+    echo $usage;
+    exit($argc < 2 ? 1 : 0);
+}
+
+$name = $argv[1];
+
+// Check key exists
+$key = SshKeyOps::get($name);
+if (!$key) {
+    fprintf(STDERR, "Error: Key not found: %s\n", $name);
+    exit(1);
+}
+
+$actions = [];
+
+// Parse options
+for ($i = 2; $i < $argc; $i++) {
+    switch ($argv[$i]) {
+        case '-r':
+        case '--rename':
+            $newName = $argv[++$i] ?? '';
+            if (!$newName) {
+                fprintf(STDERR, "Error: New name required\n");
+                exit(1);
+            }
+            $result = SshKeyOps::rename($name, $newName);
+            if ($result['success']) {
+                $actions[] = "Renamed to: {$newName}";
+                $name = $newName; // Update for subsequent operations
+            } else {
+                $actions[] = "Rename failed: {$result['error']}";
+            }
+            break;
+
+        case '-c':
+        case '--copy-to':
+            $host = $argv[++$i] ?? '';
+            if (!$host) {
+                fprintf(STDERR, "Error: Host name required\n");
+                exit(1);
+            }
+            echo "Copying public key to {$host}...\n";
+            $result = SshKeyOps::copyToHost($name, $host);
+            if ($result['success']) {
+                $actions[] = "Public key copied to: {$host}";
+            } else {
+                $actions[] = "Copy failed: {$result['error']}";
+            }
+            break;
+    }
+}
+
+if (empty($actions)) {
+    echo "No changes specified. Use -h for help.\n";
+    exit(1);
+}
+
+echo "Key: {$name}\n";
+foreach ($actions as $action) {
+    echo "  - {$action}\n";
+}

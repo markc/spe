@@ -1,0 +1,91 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Generate or import an SSH key
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+use SPE\HCP\Lib\SshKeyOps;
+
+$usage = <<<USAGE
+Usage: addkey <name> [options]
+
+Options:
+  -t, --type <type>       Key type: ed25519 (default), rsa, ecdsa
+  -c, --comment <text>    Key comment
+  -P, --passphrase <pass> Passphrase (empty for none)
+  -i, --import <file>     Import existing private key file
+
+Examples:
+  addkey mykey                           # Generate ed25519 key
+  addkey mykey -t rsa                    # Generate RSA-4096 key
+  addkey mykey -c "user@example.com"     # With comment
+  addkey mykey -i ~/.ssh/id_rsa          # Import existing key
+
+USAGE;
+
+if ($argc < 2 || in_array($argv[1] ?? '', ['-h', '--help'])) {
+    echo $usage;
+    exit($argc < 2 ? 1 : 0);
+}
+
+$name = $argv[1];
+$type = 'ed25519';
+$comment = null;
+$passphrase = null;
+$importFile = null;
+
+// Parse options
+for ($i = 2; $i < $argc; $i++) {
+    switch ($argv[$i]) {
+        case '-t':
+        case '--type':
+            $type = $argv[++$i] ?? 'ed25519';
+            break;
+        case '-c':
+        case '--comment':
+            $comment = $argv[++$i] ?? null;
+            break;
+        case '-P':
+        case '--passphrase':
+            $passphrase = $argv[++$i] ?? '';
+            break;
+        case '-i':
+        case '--import':
+            $importFile = $argv[++$i] ?? null;
+            break;
+    }
+}
+
+// Import existing key
+if ($importFile) {
+    if (!file_exists($importFile)) {
+        fprintf(STDERR, "Error: File not found: %s\n", $importFile);
+        exit(1);
+    }
+
+    $privateKey = file_get_contents($importFile);
+    $publicKey = null;
+
+    // Try to read corresponding .pub file
+    if (file_exists("{$importFile}.pub")) {
+        $publicKey = trim(file_get_contents("{$importFile}.pub"));
+    }
+
+    $result = SshKeyOps::import($name, $privateKey, $publicKey);
+} else {
+    // Generate new key
+    $result = SshKeyOps::generate($name, $type, $comment, $passphrase);
+}
+
+if (!$result['success']) {
+    fprintf(STDERR, "Error: %s\n", $result['error']);
+    exit(1);
+}
+
+echo "Created SSH key: {$result['name']}\n";
+echo "Path: {$result['path']}\n";
+
+if (isset($result['public_key'])) {
+    echo "\nPublic key:\n{$result['public_key']}\n";
+}

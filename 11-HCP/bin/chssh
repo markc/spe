@@ -1,0 +1,144 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Change SSH host properties, set active, manage groups
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+use SPE\HCP\Lib\SshHostOps;
+
+$usage = <<<USAGE
+Usage: chssh <name> [options]
+
+Options:
+  -H, --hostname <host>   Change hostname
+  -p, --port <port>       Change port
+  -u, --user <user>       Change user
+  -k, --key <keyname>     Change SSH key
+  -l, --label <label>     Change label
+  -n, --notes <notes>     Change notes
+  -a, --active            Set as active host
+  -e, --enable            Enable host
+  -d, --disable           Disable host
+  -g, --add-group <name>  Add to group
+  -G, --del-group <name>  Remove from group
+  --regen                 Regenerate SSH config file
+
+Examples:
+  chssh ns3 -a                  # Set ns3 as active
+  chssh ns3 -H 192.168.1.101    # Change hostname
+  chssh ns3 -k newkey           # Change SSH key
+  chssh ns3 -g production       # Add to production group
+  chssh ns3 -d                  # Disable host
+
+USAGE;
+
+if ($argc < 2 || in_array($argv[1] ?? '', ['-h', '--help'])) {
+    echo $usage;
+    exit($argc < 2 ? 1 : 0);
+}
+
+$name = $argv[1];
+
+// Verify host exists
+$host = SshHostOps::get($name);
+if (!$host) {
+    fprintf(STDERR, "Error: Host not found: %s\n", $name);
+    exit(1);
+}
+
+$changes = [];
+
+// Parse options
+for ($i = 2; $i < $argc; $i++) {
+    switch ($argv[$i]) {
+        case '-H':
+        case '--hostname':
+            $value = $argv[++$i] ?? '';
+            $result = SshHostOps::update($name, 'hostname', $value);
+            $changes[] = $result['success'] ? "hostname -> {$value}" : "hostname failed: {$result['error']}";
+            break;
+
+        case '-p':
+        case '--port':
+            $value = $argv[++$i] ?? '22';
+            $result = SshHostOps::update($name, 'port', $value);
+            $changes[] = $result['success'] ? "port -> {$value}" : "port failed: {$result['error']}";
+            break;
+
+        case '-u':
+        case '--user':
+            $value = $argv[++$i] ?? 'root';
+            $result = SshHostOps::update($name, 'user', $value);
+            $changes[] = $result['success'] ? "user -> {$value}" : "user failed: {$result['error']}";
+            break;
+
+        case '-k':
+        case '--key':
+            $value = $argv[++$i] ?? '';
+            $result = SshHostOps::update($name, 'ssh_key', $value);
+            $changes[] = $result['success'] ? "ssh_key -> {$value}" : "ssh_key failed: {$result['error']}";
+            break;
+
+        case '-l':
+        case '--label':
+            $value = $argv[++$i] ?? '';
+            $result = SshHostOps::update($name, 'label', $value);
+            $changes[] = $result['success'] ? "label -> {$value}" : "label failed: {$result['error']}";
+            break;
+
+        case '-n':
+        case '--notes':
+            $value = $argv[++$i] ?? '';
+            $result = SshHostOps::update($name, 'notes', $value);
+            $changes[] = $result['success'] ? "notes updated" : "notes failed: {$result['error']}";
+            break;
+
+        case '-a':
+        case '--active':
+            $result = SshHostOps::setActive($name);
+            $changes[] = $result['success'] ? "set as active" : "active failed: {$result['error']}";
+            break;
+
+        case '-e':
+        case '--enable':
+            $result = SshHostOps::update($name, 'enabled', '1');
+            $changes[] = $result['success'] ? "enabled" : "enable failed: {$result['error']}";
+            break;
+
+        case '-d':
+        case '--disable':
+            $result = SshHostOps::update($name, 'enabled', '0');
+            $changes[] = $result['success'] ? "disabled" : "disable failed: {$result['error']}";
+            break;
+
+        case '-g':
+        case '--add-group':
+            $group = $argv[++$i] ?? '';
+            $result = SshHostOps::addToGroup($name, $group);
+            $changes[] = $result['success'] ? "added to group '{$group}'" : "group add failed: {$result['error']}";
+            break;
+
+        case '-G':
+        case '--del-group':
+            $group = $argv[++$i] ?? '';
+            $result = SshHostOps::removeFromGroup($name, $group);
+            $changes[] = $result['success'] ? "removed from group '{$group}'" : "group remove failed: {$result['error']}";
+            break;
+
+        case '--regen':
+            $result = SshHostOps::generateHostFile($name);
+            $changes[] = $result ? "SSH config regenerated" : "SSH config regeneration failed";
+            break;
+    }
+}
+
+if (empty($changes)) {
+    echo "No changes specified. Use -h for help.\n";
+    exit(1);
+}
+
+echo "Host: {$name}\n";
+foreach ($changes as $change) {
+    echo "  - {$change}\n";
+}

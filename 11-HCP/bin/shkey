@@ -1,0 +1,122 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Show SSH key(s) from ~/.ssh/keys/
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+use SPE\HCP\Lib\{SshKeyOps, Config};
+
+$usage = <<<USAGE
+Usage: shkey [name] [options]
+
+Options:
+  -p, --pub           Show public key content
+  -f, --fingerprint   Show fingerprint only
+  -u, --usage         Show hosts using this key
+
+Examples:
+  shkey               # List all keys
+  shkey mykey         # Show key details
+  shkey mykey -p      # Show public key
+  shkey mykey -u      # Show hosts using this key
+
+USAGE;
+
+if (in_array($argv[1] ?? '', ['-h', '--help'])) {
+    echo $usage;
+    exit(0);
+}
+
+$name = null;
+$showPub = false;
+$showFingerprint = false;
+$showUsage = false;
+
+// Parse arguments
+for ($i = 1; $i < $argc; $i++) {
+    switch ($argv[$i]) {
+        case '-p':
+        case '--pub':
+            $showPub = true;
+            break;
+        case '-f':
+        case '--fingerprint':
+            $showFingerprint = true;
+            break;
+        case '-u':
+        case '--usage':
+            $showUsage = true;
+            break;
+        default:
+            if (!str_starts_with($argv[$i], '-')) {
+                $name = $argv[$i];
+            }
+    }
+}
+
+// Show single key
+if ($name) {
+    $key = SshKeyOps::get($name);
+    if (!$key) {
+        fprintf(STDERR, "Error: Key not found: %s\n", $name);
+        exit(1);
+    }
+
+    if ($showPub) {
+        $pub = SshKeyOps::getPublicKey($name);
+        echo $pub ? "{$pub}\n" : "No public key found\n";
+        exit(0);
+    }
+
+    if ($showFingerprint) {
+        echo ($key['fingerprint'] ?? 'Unknown') . "\n";
+        exit(0);
+    }
+
+    echo "Name:        {$key['name']}\n";
+    echo "Path:        {$key['path']}\n";
+    echo "Type:        " . ($key['type'] ?? 'unknown') . "\n";
+    echo "Bits:        " . ($key['bits'] ?? '-') . "\n";
+    echo "Fingerprint: " . ($key['fingerprint'] ?? '-') . "\n";
+    echo "Comment:     " . ($key['comment'] ?? '-') . "\n";
+    echo "Permissions: {$key['permissions']}\n";
+    echo "Modified:    {$key['modified']}\n";
+
+    if ($showUsage) {
+        $hosts = SshKeyOps::getHostsUsingKey($name);
+        echo "\nUsed by hosts:\n";
+        if (empty($hosts)) {
+            echo "  (none)\n";
+        } else {
+            foreach ($hosts as $h) {
+                echo "  - {$h['name']} ({$h['hostname']})\n";
+            }
+        }
+    }
+
+    exit(0);
+}
+
+// List all keys
+$keys = SshKeyOps::list();
+
+if (empty($keys)) {
+    echo "No SSH keys found in " . Config::sshKeysDir() . "\n";
+    exit(0);
+}
+
+printf("%-15s %-12s %-6s %-47s\n", "NAME", "TYPE", "BITS", "FINGERPRINT");
+printf("%s\n", str_repeat('-', 85));
+
+foreach ($keys as $k) {
+    printf(
+        "%-15s %-12s %-6s %s\n",
+        $k['name'],
+        $k['type'] ?? 'unknown',
+        $k['bits'] ?? '-',
+        $k['fingerprint'] ?? '-'
+    );
+}
+
+echo "\nTotal: " . count($keys) . " key(s) in " . Config::sshKeysDir() . "\n";

@@ -1,0 +1,145 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Show SSH host(s) from database
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+use SPE\HCP\Lib\SshHostOps;
+
+$usage = <<<USAGE
+Usage: shssh [name] [options]
+
+Options:
+  -g, --group <name>    Filter by group
+  -a, --active          Show active host only
+  -t, --test            Test connectivity
+  --groups              List all groups
+
+Examples:
+  shssh                 # List all hosts
+  shssh ns3             # Show details for ns3
+  shssh -g production   # List hosts in production group
+  shssh -a              # Show active host
+  shssh ns3 -t          # Test connectivity to ns3
+
+USAGE;
+
+if (in_array($argv[1] ?? '', ['-h', '--help'])) {
+    echo $usage;
+    exit(0);
+}
+
+$name = null;
+$group = null;
+$showActive = false;
+$testConnectivity = false;
+$listGroups = false;
+
+// Parse arguments
+for ($i = 1; $i < $argc; $i++) {
+    switch ($argv[$i]) {
+        case '-g':
+        case '--group':
+            $group = $argv[++$i] ?? null;
+            break;
+        case '-a':
+        case '--active':
+            $showActive = true;
+            break;
+        case '-t':
+        case '--test':
+            $testConnectivity = true;
+            break;
+        case '--groups':
+            $listGroups = true;
+            break;
+        default:
+            if (!str_starts_with($argv[$i], '-')) {
+                $name = $argv[$i];
+            }
+    }
+}
+
+// List groups
+if ($listGroups) {
+    $groups = SshHostOps::listGroups();
+    if (empty($groups)) {
+        echo "No groups defined\n";
+        exit(0);
+    }
+
+    printf("%-20s %s\n", "GROUP", "MEMBERS");
+    printf("%s\n", str_repeat('-', 40));
+    foreach ($groups as $g) {
+        printf("%-20s %d\n", $g['name'], $g['member_count']);
+    }
+    exit(0);
+}
+
+// Show active host
+if ($showActive) {
+    $host = SshHostOps::getActive();
+    if (!$host) {
+        echo "No active host set\n";
+        exit(1);
+    }
+    $name = $host['name'];
+}
+
+// Show single host
+if ($name) {
+    $host = SshHostOps::get($name);
+    if (!$host) {
+        fprintf(STDERR, "Error: Host not found: %s\n", $name);
+        exit(1);
+    }
+
+    echo "Name:       {$host['name']}\n";
+    echo "Hostname:   {$host['hostname']}\n";
+    echo "Port:       {$host['port']}\n";
+    echo "User:       {$host['user']}\n";
+    echo "SSH Key:    " . ($host['ssh_key'] ?: '(default)') . "\n";
+    echo "Label:      " . ($host['label'] ?: '-') . "\n";
+    echo "Active:     " . ($host['is_active'] ? 'Yes' : 'No') . "\n";
+    echo "Enabled:    " . ($host['enabled'] ? 'Yes' : 'No') . "\n";
+    echo "Last Seen:  " . ($host['last_seen_at'] ?: 'Never') . "\n";
+
+    if ($testConnectivity) {
+        echo "\nTesting connectivity...\n";
+        $result = SshHostOps::test($name);
+        if ($result['success']) {
+            echo "✓ Connected in {$result['elapsed_ms']}ms\n";
+        } else {
+            echo "✗ Failed: {$result['output']}\n";
+            exit(1);
+        }
+    }
+
+    exit(0);
+}
+
+// List all hosts
+$hosts = SshHostOps::list($group);
+
+if (empty($hosts)) {
+    echo "No SSH hosts configured\n";
+    exit(0);
+}
+
+printf("%-12s %-25s %-5s %-10s %-8s %s\n", "NAME", "HOSTNAME", "PORT", "USER", "ACTIVE", "LABEL");
+printf("%s\n", str_repeat('-', 80));
+
+foreach ($hosts as $h) {
+    printf(
+        "%-12s %-25s %-5d %-10s %-8s %s\n",
+        $h['name'],
+        substr($h['hostname'], 0, 25),
+        $h['port'],
+        $h['user'],
+        $h['is_active'] ? '*' : '',
+        $h['label'] ?? ''
+    );
+}
+
+echo "\nTotal: " . count($hosts) . " host(s)\n";

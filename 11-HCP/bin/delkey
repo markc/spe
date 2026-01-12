@@ -1,0 +1,71 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Delete an SSH key pair
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+use SPE\HCP\Lib\{SshKeyOps, Config};
+
+$usage = <<<USAGE
+Usage: delkey <name> [-f|--force]
+
+Options:
+  -f, --force    Delete without confirmation
+
+Examples:
+  delkey mykey
+  delkey mykey -f
+
+USAGE;
+
+if ($argc < 2 || in_array($argv[1] ?? '', ['-h', '--help'])) {
+    echo $usage;
+    exit($argc < 2 ? 1 : 0);
+}
+
+$name = $argv[1];
+$force = in_array('-f', $argv) || in_array('--force', $argv);
+
+// Check key exists
+$key = SshKeyOps::get($name);
+if (!$key) {
+    fprintf(STDERR, "Error: Key not found: %s\n", $name);
+    exit(1);
+}
+
+// Check if key is in use
+$hosts = SshKeyOps::getHostsUsingKey($name);
+if (!empty($hosts)) {
+    echo "Warning: Key is used by these hosts:\n";
+    foreach ($hosts as $h) {
+        echo "  - {$h['name']} ({$h['hostname']})\n";
+    }
+    echo "\n";
+}
+
+// Confirm deletion
+if (!$force) {
+    echo "Delete SSH key pair: {$name}?\n";
+    echo "Files to be deleted:\n";
+    echo "  - {$key['path']}\n";
+    if ($key['has_pub']) {
+        echo "  - {$key['path']}.pub\n";
+    }
+    echo "\nType 'yes' to confirm: ";
+
+    $confirm = trim(fgets(STDIN));
+    if ($confirm !== 'yes') {
+        echo "Cancelled.\n";
+        exit(1);
+    }
+}
+
+$result = SshKeyOps::del($name);
+
+if (!$result['success']) {
+    fprintf(STDERR, "Error: %s\n", $result['error']);
+    exit(1);
+}
+
+echo "Deleted SSH key: {$name}\n";

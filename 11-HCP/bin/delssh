@@ -1,0 +1,57 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Delete an SSH host from database
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+use SPE\HCP\Lib\SshHostOps;
+
+$usage = <<<USAGE
+Usage: delssh <name> [-f|--force]
+
+Options:
+  -f, --force    Delete without confirmation
+
+Examples:
+  delssh ns3
+  delssh ns3 -f
+
+USAGE;
+
+if ($argc < 2 || in_array($argv[1] ?? '', ['-h', '--help'])) {
+    echo $usage;
+    exit($argc < 2 ? 1 : 0);
+}
+
+$name = $argv[1];
+$force = in_array('-f', $argv) || in_array('--force', $argv);
+
+// Check host exists
+$host = SshHostOps::get($name);
+if (!$host) {
+    fprintf(STDERR, "Error: Host not found: %s\n", $name);
+    exit(1);
+}
+
+// Confirm deletion
+if (!$force) {
+    echo "Delete SSH host: {$name} ({$host['hostname']})?\n";
+    echo "This will remove the database entry and ~/.ssh/hosts/{$name} file.\n";
+    echo "Type 'yes' to confirm: ";
+
+    $confirm = trim(fgets(STDIN));
+    if ($confirm !== 'yes') {
+        echo "Cancelled.\n";
+        exit(1);
+    }
+}
+
+$result = SshHostOps::del($name);
+
+if (!$result['success']) {
+    fprintf(STDERR, "Error: %s\n", $result['error']);
+    exit(1);
+}
+
+echo "Deleted SSH host: {$name}\n";

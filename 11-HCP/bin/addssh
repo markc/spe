@@ -1,0 +1,78 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Add an SSH host to the database
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+use SPE\HCP\Lib\SshHostOps;
+
+$usage = <<<USAGE
+Usage: addssh <name> <hostname> [options]
+
+Options:
+  -p, --port <port>     SSH port (default: 22)
+  -u, --user <user>     SSH user (default: root)
+  -k, --key <keyname>   SSH key name from ~/.ssh/keys/
+  -l, --label <label>   Descriptive label
+  -a, --active          Set as active host
+
+Examples:
+  addssh ns3 192.168.1.100
+  addssh web1 web1.example.com -u admin -k mykey
+  addssh db1 db.example.com -p 2222 -l "Database Server" -a
+
+USAGE;
+
+if ($argc < 3 || in_array($argv[1] ?? '', ['-h', '--help'])) {
+    echo $usage;
+    exit($argc < 3 ? 1 : 0);
+}
+
+$name = $argv[1];
+$hostname = $argv[2];
+$port = 22;
+$user = 'root';
+$key = null;
+$label = null;
+$setActive = false;
+
+// Parse options
+for ($i = 3; $i < $argc; $i++) {
+    switch ($argv[$i]) {
+        case '-p':
+        case '--port':
+            $port = (int)($argv[++$i] ?? 22);
+            break;
+        case '-u':
+        case '--user':
+            $user = $argv[++$i] ?? 'root';
+            break;
+        case '-k':
+        case '--key':
+            $key = $argv[++$i] ?? null;
+            break;
+        case '-l':
+        case '--label':
+            $label = $argv[++$i] ?? null;
+            break;
+        case '-a':
+        case '--active':
+            $setActive = true;
+            break;
+    }
+}
+
+$result = SshHostOps::add($name, $hostname, $port, $user, $key, $label);
+
+if (!$result['success']) {
+    fprintf(STDERR, "Error: %s\n", $result['error']);
+    exit(1);
+}
+
+echo "Added SSH host: {$result['name']} -> {$result['hostname']}\n";
+
+if ($setActive) {
+    SshHostOps::setActive($name);
+    echo "Set as active host\n";
+}
