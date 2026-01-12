@@ -35,6 +35,11 @@
 
     /* SPE brand */
     --php: #777BB4;
+
+    /* Glass morphism */
+    --glass: rgb(255 255 255 / 0.7);
+    --glass-border: rgb(255 255 255 / 0.3);
+    --accent-glow: rgb(9 105 218 / 0.3);
 }
 
 /* === Dark Theme (System Preference) === */
@@ -73,6 +78,11 @@
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
         --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
         --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+
+        /* Glass morphism (dark) */
+        --glass: rgb(22 27 34 / 0.8);
+        --glass-border: rgb(48 54 61 / 0.5);
+        --accent-glow: rgb(88 166 255 / 0.3);
     }
 }
 
@@ -104,6 +114,11 @@ html.light {
     --danger-subtle: #ffebe9;
     --warning: #9a6700;
     --warning-subtle: #fff8c5;
+
+    /* Glass morphism (light) */
+    --glass: rgb(255 255 255 / 0.7);
+    --glass-border: rgb(255 255 255 / 0.3);
+    --accent-glow: rgb(9 105 218 / 0.3);
 }
 
 /* === Explicit Dark Theme (Toggle Override) === */
@@ -141,6 +156,11 @@ html.dark {
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
     --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+
+    /* Glass morphism (dark) */
+    --glass: rgb(22 27 34 / 0.8);
+    --glass-border: rgb(48 54 61 / 0.5);
+    --accent-glow: rgb(88 166 255 / 0.3);
 }
 
 /* === SPE Brand === */
