@@ -1,68 +1,39 @@
 #!/usr/bin/env php
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
-// Filesystem operations for mailbox info (runs as root via SSH)
-// Usage: shvmail user@domain.tld [--size]
+// CLI wrapper for VmailOps::show - same code as web UI
 
 if (php_sapi_name() !== 'cli') {
     die("CLI only\n");
 }
 
-// Load config or use defaults
-$config = is_file('/etc/ns3/config.php') ? require '/etc/ns3/config.php' : [];
-define('VPATH', $config['VPATH'] ?? '/srv');
-define('UPATH', $config['UPATH'] ?? VPATH . '/%s/msg/%s');
+require __DIR__ . '/../vendor/autoload.php';
 
-$email = $argv[1] ?? null;
-$showSize = in_array('--size', $argv);
+use SPE\HCP\Lib\VmailOps;
 
-if (!$email || $email === '--size') {
-    fwrite(STDERR, "Usage: shvmail <email> [--size]\n");
+if ($argc < 2) {
+    fwrite(STDERR, "Usage: shvmail <email> [host]\n");
     exit(1);
 }
 
-$email = strtolower($email);
-[$user, $domain] = explode('@', $email);
+$email = $argv[1];
+$host = $argv[2] ?? null;
 
-$home = sprintf(UPATH, $domain, $user);
+if ($host) {
+    putenv("TARGET_HOST={$host}");
+}
 
-if (!is_dir($home)) {
-    fwrite(STDERR, "Error: Maildir not found: {$home}\n");
+$result = VmailOps::show($email);
+
+if (!$result['success']) {
+    fwrite(STDERR, "Error: {$result['error']}\n");
     exit(1);
 }
 
-// Get directory size
-function dirSize(string $path): int {
-    $size = 0;
-    $iterator = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS)
-    );
-    foreach ($iterator as $file) {
-        $size += $file->getSize();
-    }
-    return $size;
-}
-
-$stat = stat($home);
-$size = dirSize($home);
-
-// Count messages
-$msgCount = 0;
-$maildir = "{$home}/Maildir";
-if (is_dir($maildir)) {
-    foreach (['cur', 'new'] as $folder) {
-        $folderPath = "{$maildir}/{$folder}";
-        if (is_dir($folderPath)) {
-            $msgCount += count(array_diff(scandir($folderPath), ['.', '..']));
-        }
-    }
-}
-
-echo "OK\n";
-echo "Email: {$email}\n";
-echo "Home: {$home}\n";
-echo "UID: {$stat['uid']}\n";
-echo "GID: {$stat['gid']}\n";
-echo "Size: {$size}\n";
-echo "Messages: {$msgCount}\n";
+echo "Email: {$result['email']}\n";
+echo "Home: {$result['home']}\n";
+echo "UID: {$result['uid']}\n";
+echo "GID: {$result['gid']}\n";
+echo "Size: {$result['size']}\n";
+echo "Messages: {$result['messages']}\n";
 exit(0);

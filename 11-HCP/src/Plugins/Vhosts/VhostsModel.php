@@ -4,7 +4,7 @@
 namespace SPE\HCP\Plugins\Vhosts;
 
 use SPE\HCP\Core\{Ctx, Plugin};
-use SPE\HCP\Lib\{Exec, Vhosts};
+use SPE\HCP\Lib\{VhostOps, Vhosts};
 
 /**
  * Virtual hosts management - uses lib/Vhosts.php orchestration layer.
@@ -137,10 +137,8 @@ final class VhostsModel extends Plugin
         }
 
         if ($_POST) {
-            $result = Exec::run('addssl', [$domain]);
-            return $result['success']
-                ? ['success' => "SSL certificate installed for {$domain}"]
-                : ['error' => $result['output']];
+            // TODO: Implement SSL via VhostOps when certbot integration is added
+            return ['error' => 'SSL installation not yet implemented'];
         }
 
         return ['domain' => $domain, 'action' => 'ssl'];
@@ -152,9 +150,9 @@ final class VhostsModel extends Plugin
         $action = $_POST['action'] ?? 'status'; // enable, disable, restart
 
         if ($action === 'enable' || $action === 'disable' || $action === 'restart') {
-            $result = Exec::run('chvhost', [$domain, $action]);
+            $result = VhostOps::manage($domain, $action);
             if (!$result['success']) {
-                return ['error' => $result['output']];
+                return ['error' => $result['error']];
             }
         }
 

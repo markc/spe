@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 // NS 3.0 Server Configuration
 // Install to: /etc/ns3/config.php
 

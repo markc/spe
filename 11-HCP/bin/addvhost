@@ -1,178 +1,37 @@
 #!/usr/bin/env php
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
-// Filesystem-only vhost creation - runs as root via SSH
+// CLI wrapper for VhostOps::add - same code as web UI
 
 if (php_sapi_name() !== 'cli') {
     die("CLI only\n");
 }
 
-// Load config or use defaults
-$config = is_file('/etc/ns3/config.php') ? require '/etc/ns3/config.php' : [];
-define('VPATH', $config['VPATH'] ?? '/srv');
-define('WPATH', $config['WPATH'] ?? VPATH . '/%s/web/app/public');
-define('MPATH', $config['MPATH'] ?? VPATH . '/%s/msg');
-define('NGINX_AVAILABLE', $config['NGINX_AVAILABLE'] ?? '/etc/nginx/sites-available');
-define('NGINX_ENABLED', $config['NGINX_ENABLED'] ?? '/etc/nginx/sites-enabled');
-define('PHP_VERSIONS', $config['PHP_VERSIONS'] ?? ['8.5', '8.4', '8.3']);
-define('UID_MIN', $config['UID_MIN'] ?? 1001);
-define('UID_MAX', $config['UID_MAX'] ?? 1999);
+require __DIR__ . '/../vendor/autoload.php';
+
+use SPE\HCP\Lib\VhostOps;
 
 if ($argc < 2) {
-    die("Usage: addvhost <domain> [uname]\n");
-}
-
-$domain = strtolower($argv[1]);
-$uname = $argv[2] ?? preg_replace('/[^a-z0-9]/', '', explode('.', $domain)[0]);
-
-$home = VPATH . "/{$domain}";
-$docroot = sprintf(WPATH, $domain);
-$maildir = sprintf(MPATH, $domain);
-
-// Check if already exists
-if (is_dir($home)) {
-    fwrite(STDERR, "Error: vhost directory already exists: {$home}\n");
+    fwrite(STDERR, "Usage: addvhost <domain> [uname] [host]\n");
     exit(1);
 }
 
-// Create system user (using first available UID in range)
-$uid = null;
-for ($i = UID_MIN; $i <= UID_MAX; $i++) {
-    if (!posix_getpwuid($i)) {
-        $uid = $i;
-        break;
-    }
+$domain = $argv[1];
+$uname = $argv[2] ?? null;
+$host = $argv[3] ?? null;
+
+if ($host) {
+    putenv("TARGET_HOST={$host}");
 }
 
-if ($uid === null) {
-    fwrite(STDERR, "Error: no available UID in range " . UID_MIN . "-" . UID_MAX . "\n");
+$result = VhostOps::add($domain, $uname);
+
+if (!$result['success']) {
+    fwrite(STDERR, "Error: {$result['error']}\n");
     exit(1);
 }
 
-$gid = $uid; // Same as UID for simplicity
-
-// Create group
-exec("groupadd -g {$gid} {$uname} 2>&1", $output, $code);
-if ($code !== 0 && $code !== 9) { // 9 = already exists
-    fwrite(STDERR, "Error creating group: " . implode("\n", $output) . "\n");
-    exit(1);
-}
-
-// Create user
-exec("useradd -u {$uid} -g {$gid} -d {$home} -s /bin/bash {$uname} 2>&1", $output, $code);
-if ($code !== 0 && $code !== 9) {
-    fwrite(STDERR, "Error creating user: " . implode("\n", $output) . "\n");
-    exit(1);
-}
-
-// NS 3.0 directory structure
-$dirs = [
-    $home,
-    "{$home}/.ssh",
-    "{$home}/var",
-    "{$home}/var/log",
-    "{$home}/var/run",
-    $maildir,                         // Mailboxes: /srv/domain/msg
-    "{$home}/web",                    // Web apps
-    "{$home}/web/app",                // Primary app
-    $docroot,                         // Document root
-];
-
-foreach ($dirs as $dir) {
-    if (!is_dir($dir)) {
-        mkdir($dir, 0755, true);
-    }
-}
-
-// Set ownership
-exec("chown -R {$uid}:{$gid} {$home}");
-
-// Set specific permissions
-chmod("{$home}/.ssh", 0700);
-chmod("{$home}/var/log", 0755);
-
-// Create default index.html
-$indexPath = "{$docroot}/index.html";
-$indexContent = <<<HTML
-<!DOCTYPE html>
-<html>
-<head><title>Welcome to {$domain}</title></head>
-<body>
-<h1>Welcome to {$domain}</h1>
-<p>This site is under construction.</p>
-</body>
-</html>
-HTML;
-
-file_put_contents($indexPath, $indexContent);
-chown($indexPath, $uid);
-chgrp($indexPath, $gid);
-
-// Create PHP-FPM pool config
-$poolConfig = <<<CONF
-[{$domain}]
-user = {$uname}
-group = {$uname}
-listen = {$home}/var/run/fpm.sock
-listen.owner = www-data
-listen.group = www-data
-pm = ondemand
-pm.max_children = 3
-pm.process_idle_timeout = 60s
-php_admin_value[error_log] = {$home}/var/log/php-error.log
-CONF;
-
-// Find PHP-FPM pool directory
-$poolPath = null;
-foreach (PHP_VERSIONS as $phpVer) {
-    $testPath = "/etc/php/{$phpVer}/fpm/pool.d";
-    if (is_dir($testPath)) {
-        $poolPath = "{$testPath}/{$domain}.conf";
-        break;
-    }
-}
-
-if ($poolPath) {
-    file_put_contents($poolPath, $poolConfig);
-}
-
-// Create nginx vhost config
-$nginxConfig = <<<CONF
-server {
-    listen 80;
-    server_name {$domain} www.{$domain};
-    root {$docroot};
-    index index.html index.php;
-
-    access_log {$home}/var/log/access.log;
-    error_log {$home}/var/log/error.log;
-
-    location / {
-        try_files \$uri \$uri/ /index.php?\$query_string;
-    }
-
-    location ~ \.php$ {
-        fastcgi_pass unix:{$home}/var/run/fpm.sock;
-        fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
-        include fastcgi_params;
-    }
-
-    location ~ /\.ht {
-        deny all;
-    }
-}
-CONF;
-
-$nginxPath = NGINX_AVAILABLE . "/{$domain}";
-file_put_contents($nginxPath, $nginxConfig);
-
-// Enable site
-$enablePath = NGINX_ENABLED . "/{$domain}";
-if (!file_exists($enablePath)) {
-    symlink($nginxPath, $enablePath);
-}
-
-echo "Created vhost: {$domain}\n";
-echo "uid={$uid} gid={$gid}\n";
-echo "Home: {$home}\n";
-echo "Docroot: {$docroot}\n";
+echo "Created vhost: {$result['domain']}\n";
+echo "uid={$result['uid']} gid={$result['gid']}\n";
+echo "Home: {$result['home']}\n";
+exit(0);

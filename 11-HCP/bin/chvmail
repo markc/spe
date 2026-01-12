@@ -1,26 +1,31 @@
 #!/usr/bin/env php
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
-// Password hashing for mailbox (runs as root via SSH)
-// Usage: chvmail user@domain.tld newpassword
+// CLI wrapper for VmailOps::hashPassword - same code as web UI
 
-$email = $argv[1] ?? null;
-$password = $argv[2] ?? null;
+if (php_sapi_name() !== 'cli') {
+    die("CLI only\n");
+}
 
-if (!$email || !$password) {
-    fwrite(STDERR, "Usage: chvmail <email> <password>\n");
+require __DIR__ . '/../vendor/autoload.php';
+
+use SPE\HCP\Lib\VmailOps;
+
+if ($argc < 3) {
+    fwrite(STDERR, "Usage: chvmail <email> <password> [host]\n");
     exit(1);
 }
 
-// Generate hash using doveadm if available
-$hash = trim(shell_exec("doveadm pw -s SHA512-CRYPT -p " . escapeshellarg($password) . " 2>/dev/null") ?? '');
+$email = $argv[1];
+$password = $argv[2];
+$host = $argv[3] ?? null;
 
-if (!$hash) {
-    // Fallback to PHP crypt
-    $salt = '$6$rounds=5000$' . bin2hex(random_bytes(8)) . '$';
-    $hash = '{SHA512-CRYPT}' . crypt($password, $salt);
+if ($host) {
+    putenv("TARGET_HOST={$host}");
 }
 
-echo "OK\n";
+$hash = VmailOps::hashPassword($password);
+
+echo "Email: {$email}\n";
 echo "Hash: {$hash}\n";
 exit(0);

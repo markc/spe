@@ -1,89 +1,41 @@
 #!/usr/bin/env php
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
-// Filesystem-only vhost info display - runs as root via SSH
+// CLI wrapper for VhostOps::show - same code as web UI
 
 if (php_sapi_name() !== 'cli') {
     die("CLI only\n");
 }
 
-// Load config or use defaults
-$config = is_file('/etc/ns3/config.php') ? require '/etc/ns3/config.php' : [];
-define('VPATH', $config['VPATH'] ?? '/srv');
-define('WPATH', $config['WPATH'] ?? VPATH . '/%s/web/app/public');
-define('MPATH', $config['MPATH'] ?? VPATH . '/%s/msg');
-define('NGINX_ENABLED', $config['NGINX_ENABLED'] ?? '/etc/nginx/sites-enabled');
-define('PHP_VERSIONS', $config['PHP_VERSIONS'] ?? ['8.5', '8.4', '8.3']);
+require __DIR__ . '/../vendor/autoload.php';
+
+use SPE\HCP\Lib\VhostOps;
 
 if ($argc < 2) {
-    die("Usage: shvhost <domain> [--size]\n");
-}
-
-$domain = strtolower($argv[1]);
-$showSize = in_array('--size', $argv);
-
-$home = VPATH . "/{$domain}";
-$docroot = sprintf(WPATH, $domain);
-$maildir = sprintf(MPATH, $domain);
-
-if (!is_dir($home)) {
-    fwrite(STDERR, "Error: vhost directory not found: {$home}\n");
+    fwrite(STDERR, "Usage: shvhost <domain> [host]\n");
     exit(1);
 }
 
-$stat = stat($home);
-$uid = $stat['uid'];
-$gid = $stat['gid'];
+$domain = $argv[1];
+$host = $argv[2] ?? null;
 
-$userInfo = posix_getpwuid($uid);
-$groupInfo = posix_getgrgid($gid);
-
-$uname = $userInfo ? $userInfo['name'] : '?';
-$gname = $groupInfo ? $groupInfo['name'] : '?';
-
-echo "Domain: {$domain}\n";
-echo "Home: {$home}\n";
-echo "Docroot: {$docroot}\n";
-echo "User: {$uname} (uid={$uid})\n";
-echo "Group: {$gname} (gid={$gid})\n";
-
-// Check if nginx config exists
-$nginxEnabled = file_exists(NGINX_ENABLED . "/{$domain}");
-echo "Nginx: " . ($nginxEnabled ? "enabled" : "disabled") . "\n";
-
-// Check PHP-FPM pool
-$fpmActive = false;
-foreach (PHP_VERSIONS as $phpVer) {
-    if (file_exists("/etc/php/{$phpVer}/fpm/pool.d/{$domain}.conf")) {
-        $fpmActive = $phpVer;
-        break;
-    }
-}
-echo "PHP-FPM: " . ($fpmActive ? "PHP {$fpmActive}" : "none") . "\n";
-
-// Calculate disk usage if requested
-if ($showSize) {
-    exec("du -sb " . escapeshellarg($home) . " 2>/dev/null", $output);
-    if (!empty($output[0])) {
-        $size = (int)explode("\t", $output[0])[0];
-        echo "Size: {$size}\n";
-        echo "Size (human): " . formatBytes($size) . "\n";
-    }
+if ($host) {
+    putenv("TARGET_HOST={$host}");
 }
 
-// List mailboxes in msg/
-if (is_dir($maildir)) {
-    $mailboxes = array_filter(scandir($maildir), fn($d) => $d !== '.' && $d !== '..');
-    echo "Mailboxes: " . count($mailboxes) . "\n";
+$result = VhostOps::show($domain);
+
+if (!$result['success']) {
+    fwrite(STDERR, "Error: {$result['error']}\n");
+    exit(1);
 }
 
-function formatBytes(int $bytes): string
-{
-    $units = ['B', 'KB', 'MB', 'GB'];
-    $i = 0;
-    while ($bytes >= 1024 && $i < 3) {
-        $bytes /= 1024;
-        $i++;
-    }
-    return round($bytes, 1) . ' ' . $units[$i];
-}
+echo "Domain: {$result['domain']}\n";
+echo "Home: {$result['home']}\n";
+echo "User: {$result['user']} (uid={$result['uid']})\n";
+echo "Group: gid={$result['gid']}\n";
+echo "Size: {$result['size']}\n";
+echo "Nginx: {$result['nginx']}\n";
+echo "PHP-FPM: PHP {$result['php']}\n";
+echo "Mailboxes: {$result['mailboxes']}\n";
+exit(0);

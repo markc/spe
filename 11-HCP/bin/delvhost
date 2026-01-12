@@ -1,74 +1,34 @@
 #!/usr/bin/env php
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
-// Filesystem-only vhost deletion - runs as root via SSH
+// CLI wrapper for VhostOps::del - same code as web UI
 
 if (php_sapi_name() !== 'cli') {
     die("CLI only\n");
 }
 
-// Load config or use defaults
-$config = is_file('/etc/ns3/config.php') ? require '/etc/ns3/config.php' : [];
-define('VPATH', $config['VPATH'] ?? '/srv');
-define('NGINX_AVAILABLE', $config['NGINX_AVAILABLE'] ?? '/etc/nginx/sites-available');
-define('NGINX_ENABLED', $config['NGINX_ENABLED'] ?? '/etc/nginx/sites-enabled');
-define('PHP_VERSIONS', $config['PHP_VERSIONS'] ?? ['8.5', '8.4', '8.3']);
+require __DIR__ . '/../vendor/autoload.php';
+
+use SPE\HCP\Lib\VhostOps;
 
 if ($argc < 2) {
-    die("Usage: delvhost <domain> [--keep-db]\n");
-}
-
-$domain = strtolower($argv[1]);
-$keepDb = in_array('--keep-db', $argv);
-
-$home = VPATH . "/{$domain}";
-
-// Get username from directory ownership
-if (!is_dir($home)) {
-    fwrite(STDERR, "Error: vhost directory not found: {$home}\n");
+    fwrite(STDERR, "Usage: delvhost <domain> [host]\n");
     exit(1);
 }
 
-$stat = stat($home);
-$uid = $stat['uid'];
-$userInfo = posix_getpwuid($uid);
-$uname = $userInfo ? $userInfo['name'] : null;
+$domain = $argv[1];
+$host = $argv[2] ?? null;
 
-// Remove nginx config
-$nginxAvailable = NGINX_AVAILABLE . "/{$domain}";
-$nginxEnabled = NGINX_ENABLED . "/{$domain}";
-
-if (file_exists($nginxEnabled)) {
-    unlink($nginxEnabled);
-}
-if (file_exists($nginxAvailable)) {
-    unlink($nginxAvailable);
+if ($host) {
+    putenv("TARGET_HOST={$host}");
 }
 
-// Remove PHP-FPM pool
-foreach (PHP_VERSIONS as $phpVer) {
-    $poolPath = "/etc/php/{$phpVer}/fpm/pool.d/{$domain}.conf";
-    if (file_exists($poolPath)) {
-        unlink($poolPath);
-        break;
-    }
+$result = VhostOps::del($domain);
+
+if (!$result['success']) {
+    fwrite(STDERR, "Error: {$result['error']}\n");
+    exit(1);
 }
 
-// Remove home directory
-exec("rm -rf " . escapeshellarg($home), $output, $code);
-if ($code !== 0) {
-    fwrite(STDERR, "Warning: failed to remove {$home}\n");
-}
-
-// Remove system user if exists
-if ($uname && $uname !== 'root' && $uid >= 1000) {
-    exec("userdel " . escapeshellarg($uname) . " 2>&1", $output, $code);
-    exec("groupdel " . escapeshellarg($uname) . " 2>&1", $output, $code);
-}
-
-echo "Deleted vhost: {$domain}\n";
-echo "Removed: {$home}\n";
-
-if (!$keepDb) {
-    echo "Note: database records should be removed separately\n";
-}
+echo "Deleted vhost: {$result['domain']}\n";
+exit(0);

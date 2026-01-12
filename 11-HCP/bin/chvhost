@@ -1,89 +1,42 @@
 #!/usr/bin/env php
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
-// Filesystem-only vhost modification - runs as root via SSH
+// CLI wrapper for VhostOps::manage - same code as web UI
 
 if (php_sapi_name() !== 'cli') {
     die("CLI only\n");
 }
 
-// Load config or use defaults
-$config = is_file('/etc/ns3/config.php') ? require '/etc/ns3/config.php' : [];
-define('VPATH', $config['VPATH'] ?? '/srv');
-define('NGINX_AVAILABLE', $config['NGINX_AVAILABLE'] ?? '/etc/nginx/sites-available');
-define('NGINX_ENABLED', $config['NGINX_ENABLED'] ?? '/etc/nginx/sites-enabled');
-define('PHP_VERSIONS', $config['PHP_VERSIONS'] ?? ['8.5', '8.4', '8.3']);
+require __DIR__ . '/../vendor/autoload.php';
+
+use SPE\HCP\Lib\VhostOps;
 
 if ($argc < 3) {
-    die("Usage: chvhost <domain> <action> [args...]\n\nActions:\n  enable   - Enable nginx site\n  disable  - Disable nginx site\n  restart  - Reload nginx and php-fpm\n");
-}
-
-$domain = strtolower($argv[1]);
-$action = $argv[2];
-
-$home = VPATH . "/{$domain}";
-
-if (!is_dir($home)) {
-    fwrite(STDERR, "Error: vhost directory not found: {$home}\n");
+    fwrite(STDERR, "Usage: chvhost <domain> <action> [host]\n");
+    fwrite(STDERR, "\nActions:\n");
+    fwrite(STDERR, "  enable   - Enable nginx site\n");
+    fwrite(STDERR, "  disable  - Disable nginx site\n");
+    fwrite(STDERR, "  restart  - Reload nginx and php-fpm\n");
     exit(1);
 }
 
-switch ($action) {
-    case 'enable':
-        $available = NGINX_AVAILABLE . "/{$domain}";
-        $enabled = NGINX_ENABLED . "/{$domain}";
+$domain = $argv[1];
+$action = $argv[2];
+$host = $argv[3] ?? null;
 
-        if (!file_exists($available)) {
-            fwrite(STDERR, "Error: nginx config not found: {$available}\n");
-            exit(1);
-        }
-
-        if (file_exists($enabled)) {
-            echo "Already enabled: {$domain}\n";
-            exit(0);
-        }
-
-        symlink($available, $enabled);
-        exec("nginx -t 2>&1 && systemctl reload nginx", $output, $code);
-
-        if ($code === 0) {
-            echo "Enabled: {$domain}\n";
-        } else {
-            unlink($enabled);
-            fwrite(STDERR, "Error: nginx config test failed\n");
-            exit(1);
-        }
-        break;
-
-    case 'disable':
-        $enabled = NGINX_ENABLED . "/{$domain}";
-
-        if (!file_exists($enabled)) {
-            echo "Already disabled: {$domain}\n";
-            exit(0);
-        }
-
-        unlink($enabled);
-        exec("systemctl reload nginx");
-        echo "Disabled: {$domain}\n";
-        break;
-
-    case 'restart':
-        exec("systemctl reload nginx");
-
-        // Find and reload PHP-FPM
-        foreach (PHP_VERSIONS as $phpVer) {
-            if (file_exists("/etc/php/{$phpVer}/fpm/pool.d/{$domain}.conf")) {
-                exec("systemctl reload php{$phpVer}-fpm");
-                echo "Reloaded nginx and php{$phpVer}-fpm\n";
-                exit(0);
-            }
-        }
-
-        echo "Reloaded nginx (no PHP-FPM pool found)\n";
-        break;
-
-    default:
-        fwrite(STDERR, "Unknown action: {$action}\n");
-        exit(1);
+if ($host) {
+    putenv("TARGET_HOST={$host}");
 }
+
+$result = VhostOps::manage($domain, $action);
+
+if (!$result['success']) {
+    fwrite(STDERR, "Error: {$result['error']}\n");
+    exit(1);
+}
+
+echo ucfirst($result['action']) . ": {$result['domain']}\n";
+if (isset($result['php'])) {
+    echo "PHP: {$result['php']}\n";
+}
+exit(0);

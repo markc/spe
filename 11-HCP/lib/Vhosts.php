@@ -8,7 +8,7 @@ namespace SPE\HCP\Lib;
  *
  * Orchestrates vhost operations:
  * - Database operations run as web user (SQLite group-writable)
- * - Filesystem operations run as root via Exec (SSH)
+ * - Filesystem operations run via VhostOps (SSH)
  *
  * Schema: vhosts(id, domain, uname, uid, gid, active, aliases, created_at, updated_at)
  */
@@ -34,10 +34,10 @@ final class Vhosts
      * Create a virtual host.
      *
      * 1. Validate domain
-     * 2. Create filesystem structure via SSH (root)
+     * 2. Create filesystem structure via VhostOps
      * 3. Insert into database
      */
-    public static function add(string $domain, ?string $uname = null, ?string $host = null): array
+    public static function add(string $domain, ?string $uname = null): array
     {
         $domain = strtolower(trim($domain));
 
@@ -46,7 +46,7 @@ final class Vhosts
             return ['success' => false, 'error' => "Invalid domain format: {$domain}"];
         }
 
-        // Check if domain already exists
+        // Check if domain already exists in DB
         $stmt = self::db()->prepare('SELECT id FROM vhosts WHERE domain = ?');
         $stmt->execute([$domain]);
         if ($stmt->fetch()) {
@@ -56,18 +56,11 @@ final class Vhosts
         // Generate username from domain if not provided
         $uname = $uname ?: self::domainToUsername($domain);
 
-        // Create vhost via SSH (privileged operation)
-        $result = Exec::run('addvhost', [$domain, $uname], $host);
+        // Create vhost filesystem via VhostOps
+        $result = VhostOps::add($domain, $uname);
 
         if (!$result['success']) {
-            return ['success' => false, 'error' => $result['output']];
-        }
-
-        // Parse uid/gid from output
-        $uid = $gid = 0;
-        if (preg_match('/uid=(\d+)\s+gid=(\d+)/', $result['output'], $m)) {
-            $uid = (int)$m[1];
-            $gid = (int)$m[2];
+            return $result;
         }
 
         // Insert into database
@@ -76,31 +69,24 @@ final class Vhosts
                 'INSERT INTO vhosts (domain, uname, uid, gid, active, aliases, created_at, updated_at)
                  VALUES (?, ?, ?, ?, 1, ?, datetime("now"), datetime("now"))'
             );
-            $stmt->execute([$domain, $uname, $uid, $gid, '']);
+            $stmt->execute([$domain, $uname, $result['uid'], $result['gid'], '']);
         } catch (\PDOException $e) {
-            // Rollback: remove vhost since DB insert failed
-            Exec::run('delvhost', [$domain, '--keep-db'], $host);
+            // Rollback: remove vhost filesystem since DB insert failed
+            VhostOps::del($domain);
             return ['success' => false, 'error' => 'Database error: ' . $e->getMessage()];
         }
 
-        return [
-            'success' => true,
-            'domain' => $domain,
-            'uname' => $uname,
-            'uid' => $uid,
-            'gid' => $gid,
-            'home' => Config::vhostPath($domain),
-        ];
+        return $result;
     }
 
     /**
      * Delete a virtual host.
      *
      * 1. Get vhost info from DB
-     * 2. Delete filesystem via SSH (root)
+     * 2. Delete filesystem via VhostOps
      * 3. Remove from database
      */
-    public static function del(string $domain, bool $removeFiles = true, ?string $host = null): array
+    public static function del(string $domain, bool $removeFiles = true): array
     {
         $domain = strtolower(trim($domain));
 
@@ -113,11 +99,11 @@ final class Vhosts
             return ['success' => false, 'error' => "Domain not found: {$domain}"];
         }
 
-        // Remove filesystem via SSH (privileged operation)
+        // Remove filesystem via VhostOps
         if ($removeFiles) {
-            $result = Exec::run('delvhost', [$domain], $host);
+            $result = VhostOps::del($domain);
             if (!$result['success']) {
-                return ['success' => false, 'error' => $result['output']];
+                return $result;
             }
         }
 
@@ -165,9 +151,9 @@ final class Vhosts
 
     /**
      * Show single vhost details.
-     * Fetches disk usage via SSH if host provided.
+     * Fetches disk usage via VhostOps.
      */
-    public static function show(string $domain, ?string $host = null): array
+    public static function show(string $domain, bool $includeFilesystem = true): array
     {
         $domain = strtolower(trim($domain));
 
@@ -182,21 +168,21 @@ final class Vhosts
             return ['success' => false, 'error' => "Domain not found: {$domain}"];
         }
 
-        // Get disk usage via SSH if host provided
-        $diskUsage = 0;
-        $diskHuman = '0 B';
-        if ($host) {
-            $result = Exec::run('shvhost', [$domain, '--size'], $host);
-            if ($result['success'] && preg_match('/Size:\s*(\d+)/', $result['output'], $m)) {
-                $diskUsage = (int)$m[1];
-                $diskHuman = self::formatBytes($diskUsage);
+        // Get filesystem info via VhostOps if requested
+        $diskUsage = '0';
+        $mailboxCount = 0;
+        if ($includeFilesystem) {
+            $fsInfo = VhostOps::show($domain);
+            if ($fsInfo['success']) {
+                $diskUsage = $fsInfo['size'];
+                $mailboxCount = $fsInfo['mailboxes'];
             }
         }
 
-        // Get mailbox count
+        // Get mailbox count from DB
         $stmt = self::db()->prepare('SELECT COUNT(*) as cnt FROM vmails WHERE user LIKE ?');
         $stmt->execute(["%@{$domain}"]);
-        $mailCount = (int)$stmt->fetch()['cnt'];
+        $dbMailCount = (int)$stmt->fetch()['cnt'];
 
         // Get alias count
         $stmt = self::db()->prepare('SELECT COUNT(*) as cnt FROM valias WHERE source LIKE ?');
@@ -213,8 +199,7 @@ final class Vhosts
             'active' => (bool)$row['active'],
             'aliases' => $row['aliases'] ? explode(',', $row['aliases']) : [],
             'disk_usage' => $diskUsage,
-            'disk_human' => $diskHuman,
-            'mailbox_count' => $mailCount,
+            'mailbox_count' => $dbMailCount ?: $mailboxCount,
             'alias_count' => $aliasCount,
             'home' => Config::vhostPath($row['domain']),
             'created_at' => $row['created_at'],
@@ -270,19 +255,5 @@ final class Vhosts
         $parts = explode('.', $domain);
         $name = preg_replace('/[^a-z0-9]/', '', $parts[0]);
         return substr($name, 0, 16);
-    }
-
-    /**
-     * Format bytes as human readable.
-     */
-    private static function formatBytes(int $bytes): string
-    {
-        $units = ['B', 'KB', 'MB', 'GB'];
-        $i = 0;
-        while ($bytes >= 1024 && $i < 3) {
-            $bytes /= 1024;
-            $i++;
-        }
-        return round($bytes, 1) . ' ' . $units[$i];
     }
 }

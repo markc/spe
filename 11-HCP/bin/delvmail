@@ -1,51 +1,34 @@
 #!/usr/bin/env php
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
-// Filesystem operations for mailbox deletion (runs as root via SSH)
-// Usage: delvmail user@domain.tld [--keep-db]
+// CLI wrapper for VmailOps::del - same code as web UI
 
 if (php_sapi_name() !== 'cli') {
     die("CLI only\n");
 }
 
-// Load config or use defaults
-$config = is_file('/etc/ns3/config.php') ? require '/etc/ns3/config.php' : [];
-define('VPATH', $config['VPATH'] ?? '/srv');
-define('UPATH', $config['UPATH'] ?? VPATH . '/%s/msg/%s');
+require __DIR__ . '/../vendor/autoload.php';
 
-$email = $argv[1] ?? null;
-$keepDb = in_array('--keep-db', $argv);
+use SPE\HCP\Lib\VmailOps;
 
-if (!$email || $email === '--keep-db' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    fwrite(STDERR, "Usage: delvmail <email> [--keep-db]\n");
+if ($argc < 2) {
+    fwrite(STDERR, "Usage: delvmail <email> [host]\n");
     exit(1);
 }
 
-$email = strtolower($email);
-[$user, $domain] = explode('@', $email);
+$email = $argv[1];
+$host = $argv[2] ?? null;
 
-$home = sprintf(UPATH, $domain, $user);
+if ($host) {
+    putenv("TARGET_HOST={$host}");
+}
 
-if (!is_dir($home)) {
-    fwrite(STDERR, "Error: Maildir not found: {$home}\n");
+$result = VmailOps::del($email);
+
+if (!$result['success']) {
+    fwrite(STDERR, "Error: {$result['error']}\n");
     exit(1);
 }
 
-// Recursive delete
-function rrmdir(string $path): void {
-    if (is_dir($path)) {
-        $files = array_diff(scandir($path), ['.', '..']);
-        foreach ($files as $file) {
-            rrmdir("{$path}/{$file}");
-        }
-        rmdir($path);
-    } elseif (is_file($path)) {
-        unlink($path);
-    }
-}
-
-rrmdir($home);
-
-echo "OK\n";
-echo "Removed: {$home}\n";
+echo "Deleted mailbox: {$result['email']}\n";
 exit(0);

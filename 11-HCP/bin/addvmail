@@ -1,91 +1,36 @@
 #!/usr/bin/env php
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
-// Filesystem operations for mailbox creation (runs as root via SSH)
-// Usage: addvmail user@domain.tld [password]
+// CLI wrapper for VmailOps::add - same code as web UI
 
 if (php_sapi_name() !== 'cli') {
     die("CLI only\n");
 }
 
-// Load config or use defaults
-$config = is_file('/etc/ns3/config.php') ? require '/etc/ns3/config.php' : [];
-define('VPATH', $config['VPATH'] ?? '/srv');
-define('MPATH', $config['MPATH'] ?? VPATH . '/%s/msg');
-define('UPATH', $config['UPATH'] ?? VPATH . '/%s/msg/%s');
+require __DIR__ . '/../vendor/autoload.php';
 
-$email = $argv[1] ?? null;
-$password = $argv[2] ?? null;
+use SPE\HCP\Lib\VmailOps;
 
-if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    fwrite(STDERR, "Usage: addvmail <email> [password]\n");
+if ($argc < 2) {
+    fwrite(STDERR, "Usage: addvmail <email> [host]\n");
     exit(1);
 }
 
-$email = strtolower($email);
-[$user, $domain] = explode('@', $email);
+$email = $argv[1];
+$host = $argv[2] ?? null;
 
-$domainPath = VPATH . "/{$domain}";
-$home = sprintf(UPATH, $domain, $user);
+if ($host) {
+    putenv("TARGET_HOST={$host}");
+}
 
-// Check domain exists
-if (!is_dir($domainPath)) {
-    fwrite(STDERR, "Error: Domain path not found: {$domainPath}\n");
+$result = VmailOps::add($email);
+
+if (!$result['success']) {
+    fwrite(STDERR, "Error: {$result['error']}\n");
     exit(1);
 }
 
-// Check mailbox doesn't exist
-if (is_dir($home)) {
-    fwrite(STDERR, "Error: Maildir already exists: {$home}\n");
-    exit(1);
-}
-
-// Get uid/gid from domain directory
-$stat = stat($domainPath);
-$uid = $stat['uid'];
-$gid = $stat['gid'];
-
-// Create maildir structure
-$dirs = [
-    $home,
-    "{$home}/Maildir",
-    "{$home}/Maildir/cur",
-    "{$home}/Maildir/new",
-    "{$home}/Maildir/tmp",
-    "{$home}/sieve",
-];
-
-foreach ($dirs as $dir) {
-    if (!mkdir($dir, 0700, true)) {
-        fwrite(STDERR, "Error: Failed to create {$dir}\n");
-        exit(1);
-    }
-    chown($dir, $uid);
-    chgrp($dir, $gid);
-}
-
-// Create default sieve script
-$sieveScript = <<<'SIEVE'
-require ["fileinto", "mailbox"];
-
-# Example: Move spam to Junk folder
-# if header :contains "X-Spam-Flag" "YES" {
-#     fileinto :create "Junk";
-#     stop;
-# }
-
-keep;
-SIEVE;
-
-$sievePath = "{$home}/sieve/default.sieve";
-file_put_contents($sievePath, $sieveScript);
-chown($sievePath, $uid);
-chgrp($sievePath, $gid);
-chmod($sievePath, 0600);
-
-echo "OK\n";
-echo "Email: {$email}\n";
-echo "Home: {$home}\n";
-echo "UID: {$uid}\n";
-echo "GID: {$gid}\n";
+echo "Created mailbox: {$result['email']}\n";
+echo "uid={$result['uid']} gid={$result['gid']}\n";
+echo "Home: {$result['home']}\n";
 exit(0);

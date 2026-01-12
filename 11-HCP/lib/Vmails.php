@@ -8,7 +8,7 @@ namespace SPE\HCP\Lib;
  *
  * Orchestrates mail operations:
  * - Database operations run as web user (SQLite group-writable)
- * - Filesystem operations run as root via Exec (SSH)
+ * - Filesystem operations run via VmailOps (SSH)
  *
  * Schema: vmails(id, user, pass, home, uid, gid, active, created_at, updated_at)
  */
@@ -35,10 +35,10 @@ final class Vmails
      *
      * 1. Validate input
      * 2. Check domain exists
-     * 3. Create maildir via SSH (root)
+     * 3. Create maildir via VmailOps
      * 4. Insert into database
      */
-    public static function add(string $email, ?string $password = null, ?string $host = null): array
+    public static function add(string $email, ?string $password = null): array
     {
         // Validate email
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -57,7 +57,7 @@ final class Vmails
             return ['success' => false, 'error' => "Domain not found or inactive: {$domain}"];
         }
 
-        // Check if mailbox already exists
+        // Check if mailbox already exists in DB
         $stmt = self::db()->prepare('SELECT id FROM vmails WHERE user = ?');
         $stmt->execute([$email]);
         if ($stmt->fetch()) {
@@ -67,16 +67,15 @@ final class Vmails
         // Generate password if not provided
         $password = $password ?: self::generatePassword();
 
-        // Create maildir via SSH (privileged operation)
-        $result = Exec::run('addvmail', [$email, $password], $host);
+        // Create maildir via VmailOps
+        $result = VmailOps::add($email);
 
         if (!$result['success']) {
-            return ['success' => false, 'error' => $result['output']];
+            return $result;
         }
 
-        // Parse output for hash and home path
-        $home = Config::userPath($domain, $user);
-        $hash = self::hashPassword($password);
+        // Generate password hash
+        $hash = VmailOps::hashPassword($password);
 
         // Insert into database
         try {
@@ -84,10 +83,10 @@ final class Vmails
                 'INSERT INTO vmails (user, pass, home, uid, gid, active, created_at, updated_at)
                  VALUES (?, ?, ?, ?, ?, 1, datetime("now"), datetime("now"))'
             );
-            $stmt->execute([$email, $hash, $home, $vhost['uid'], $vhost['gid']]);
+            $stmt->execute([$email, $hash, $result['home'], $vhost['uid'], $vhost['gid']]);
         } catch (\PDOException $e) {
             // Rollback: remove maildir since DB insert failed
-            Exec::run('delvmail', [$email, '--keep-db'], $host);
+            VmailOps::del($email);
             return ['success' => false, 'error' => 'Database error: ' . $e->getMessage()];
         }
 
@@ -95,7 +94,7 @@ final class Vmails
             'success' => true,
             'email' => $email,
             'password' => $password,
-            'home' => $home,
+            'home' => $result['home'],
         ];
     }
 
@@ -103,10 +102,10 @@ final class Vmails
      * Delete a virtual mailbox.
      *
      * 1. Get mailbox info from DB
-     * 2. Delete maildir via SSH (root)
+     * 2. Delete maildir via VmailOps
      * 3. Remove from database
      */
-    public static function del(string $email, bool $removeFiles = true, ?string $host = null): array
+    public static function del(string $email, bool $removeFiles = true): array
     {
         $email = strtolower($email);
 
@@ -119,11 +118,11 @@ final class Vmails
             return ['success' => false, 'error' => "Mailbox not found: {$email}"];
         }
 
-        // Remove maildir via SSH (privileged operation)
+        // Remove maildir via VmailOps
         if ($removeFiles) {
-            $result = Exec::run('delvmail', [$email], $host);
+            $result = VmailOps::del($email);
             if (!$result['success']) {
-                return ['success' => false, 'error' => $result['output']];
+                return $result;
             }
         }
 
@@ -175,9 +174,9 @@ final class Vmails
 
     /**
      * Show single mailbox details.
-     * Fetches size via SSH if host provided.
+     * Fetches size via VmailOps.
      */
-    public static function show(string $email, ?string $host = null): array
+    public static function show(string $email, bool $includeFilesystem = true): array
     {
         $email = strtolower($email);
 
@@ -192,14 +191,14 @@ final class Vmails
             return ['success' => false, 'error' => "Mailbox not found: {$email}"];
         }
 
-        // Get size via SSH if host provided
+        // Get size via VmailOps if requested
         $size = 0;
-        $sizeHuman = '0 B';
-        if ($host) {
-            $result = Exec::run('shvmail', [$email, '--size'], $host);
-            if ($result['success'] && preg_match('/Size:\s*(\d+)/', $result['output'], $m)) {
-                $size = (int)$m[1];
-                $sizeHuman = self::formatBytes($size);
+        $messages = 0;
+        if ($includeFilesystem) {
+            $fsInfo = VmailOps::show($email);
+            if ($fsInfo['success']) {
+                $size = $fsInfo['size'];
+                $messages = $fsInfo['messages'];
             }
         }
 
@@ -217,7 +216,8 @@ final class Vmails
             'gid' => $row['gid'],
             'active' => (bool)$row['active'],
             'size' => $size,
-            'size_human' => $sizeHuman,
+            'size_human' => self::formatBytes($size),
+            'messages' => $messages,
             'created_at' => $row['created_at'],
             'updated_at' => $row['updated_at'],
             'aliases' => $aliases,
@@ -226,9 +226,8 @@ final class Vmails
 
     /**
      * Change mailbox password.
-     * Updates both DB and Dovecot via SSH.
      */
-    public static function passwd(string $email, string $password, ?string $host = null): array
+    public static function passwd(string $email, string $password): array
     {
         $email = strtolower($email);
 
@@ -239,14 +238,10 @@ final class Vmails
             return ['success' => false, 'error' => "Mailbox not found: {$email}"];
         }
 
-        // Update password via SSH (handles doveadm pw)
-        $result = Exec::run('chvmail', [$email, $password], $host);
-        if (!$result['success']) {
-            return ['success' => false, 'error' => $result['output']];
-        }
+        // Generate password hash via VmailOps (uses doveadm on remote)
+        $hash = VmailOps::hashPassword($password);
 
         // Update database
-        $hash = self::hashPassword($password);
         $stmt = self::db()->prepare(
             'UPDATE vmails SET pass = ?, updated_at = datetime("now") WHERE user = ?'
         );
@@ -272,15 +267,6 @@ final class Vmails
         }
 
         return ['success' => true, 'email' => $email, 'active' => $active];
-    }
-
-    /**
-     * Generate Dovecot-compatible password hash.
-     */
-    private static function hashPassword(string $password): string
-    {
-        $salt = '$6$rounds=5000$' . bin2hex(random_bytes(8)) . '$';
-        return '{SHA512-CRYPT}' . crypt($password, $salt);
     }
 
     /**
