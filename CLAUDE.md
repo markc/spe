@@ -118,11 +118,16 @@ enum QueryType { case All; case One; case Column; }
 ```
 docs/                      # Real files (GitHub Pages source)
 ├── README.md              # Project README
-├── spe.css, spe.js, md.js # Shared CSS/JS
+├── base.css               # Generic CSS framework (layouts, components)
+├── site.css               # SPE-specific branding (colors, fonts)
+├── base.js                # Generic JS (theme toggle, toast, animations)
+├── md.js                  # Markdown rendering
 └── */README.md            # Chapter docs
 
 /README.md                 → symlink → docs/README.md
-/spe.css                   → symlink → docs/spe.css
+/base.css                  → symlink → docs/base.css
+/site.css                  → symlink → docs/site.css
+/base.js                   → symlink → docs/base.js
 /01-Simple/README.md       → symlink → ../docs/01-Simple/README.md
 ```
 
@@ -130,7 +135,28 @@ docs/                      # Real files (GitHub Pages source)
 - **GitHub follows symlinks** for README display
 - **Local symlinks work** on Linux/macOS
 
-All chapters 02-10 reference shared assets via absolute paths (`/spe.css`, `/spe.js`)
+All chapters 02-10 reference shared assets via absolute paths (`/base.css`, `/site.css`, `/base.js`)
+
+### CSS Architecture (base.css + site.css)
+
+**base.css** - Generic reusable framework (~1350 lines):
+- CSS cascade layers: `@layer reset, tokens, base, components, utilities, animations`
+- Design tokens (spacing, typography, colors, shadows, transitions)
+- Layouts: `.container`, `.topnav`, `.sidebar-layout`, `.sidebar`
+- Components: `.card`, `.btn`, `.tag`, `.dropdown`, `.toast`
+- Utilities: flex, grid, spacing, text alignment
+- Animations: fade, scale, reveal, hover effects
+- Accessibility: `prefers-reduced-motion`, `prefers-contrast`, `:focus-visible`
+
+**site.css** - SPE-specific branding (~465 lines):
+- Color tokens (light/dark themes)
+- Brand styles (`.brand` links, `.btn-php`)
+- SPE components: `.prose`, `.chapter-table`, `.blog-*`, `.docs-*`
+
+**Inline theme script** (in `<head>` to prevent FOUC):
+```html
+<script>(function(){const t=localStorage.getItem("base-theme");document.documentElement.className=t||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")})();</script>
+```
 
 ## Icons
 
