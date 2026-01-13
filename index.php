@@ -114,7 +114,7 @@ HTML;
             $body = <<<HTML
 <div class="container">
     <header><h1><a class="brand" href="/">🐘 Simple PHP Examples</a></h1></header>
-    <nav class="card flex">
+    <nav class="card flex mb-4">
         $nav $dd
         <span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span>
     </nav>
