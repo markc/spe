@@ -1482,6 +1482,10 @@
     .pt-3 { padding-block-start: var(--space-3); }
     .pt-4 { padding-block-start: var(--space-4); }
     .pt-6 { padding-block-start: var(--space-6); }
+    .pt-8 { padding-block-start: var(--space-8); }
+    .pt-10 { padding-block-start: var(--space-10); }
+    .pt-12 { padding-block-start: var(--space-12); }
+    .pt-16 { padding-block-start: var(--space-16); }
 
     .pb-0 { padding-block-end: var(--space-0); }
     .pb-1 { padding-block-end: var(--space-1); }
