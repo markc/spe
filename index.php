@@ -142,9 +142,9 @@ HTML;
     <button class="theme-toggle" id="theme-icon">🌙</button>
     <button class="menu-toggle">☰</button>
 </nav>
-<div class="container mt-8">
+<div class="container pt-8">
     <main>
-        <div class="card">
+        <div class="card mt-4">
             <h2>Chapters</h2>
             <p>A progressive PHP 8.5 micro-framework tutorial in 12 chapters</p>
             $list
@@ -185,9 +185,9 @@ HTML;
             <nav>$n2</nav>
         </div>
     </aside>
-    <div class="sidebar-main mt-8">
+    <div class="sidebar-main pt-8">
         <main>
-            <div class="card">
+            <div class="card mt-4">
                 <h2>Chapters</h2>
                 <p>A progressive PHP 8.5 micro-framework tutorial in 12 chapters</p>
                 $list
