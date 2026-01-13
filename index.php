@@ -5,7 +5,7 @@
 namespace {
     $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-    // Static files at root (spe.css, spe.js)
+    // Static files at root (base.css, site.css, base.js)
     if ($uri !== '/' && is_file(__DIR__ . $uri)) return false;
 
     // Chapter pattern: /XX-Name/... -> /XX-Name/public/...
@@ -46,6 +46,7 @@ namespace SPE\Router {
                 ['08', 'Users', 'User management system with full CRUDL operations and profile handling'],
                 ['09', 'Blog', 'Complete CMS featuring authentication, blog posts, static pages, and documentation'],
                 ['10', 'YouTube', 'YouTube API integration with OAuth authentication for video management'],
+                ['11', 'HCP', 'Lightweight hosting control panel for managing Nginx vhosts, DNS zones, and SSL certificates'],
             ],
             public array $themes = [['🎨 Simple', 'Simple'], ['🎨 TopNav', 'TopNav'], ['🎨 SideBar', 'SideBar']]
         ) {
@@ -95,11 +96,12 @@ namespace SPE\Router {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light dark">
     <title>{$this->ctx->out['doc']} [$theme]</title>
-    <link rel="stylesheet" href="/spe.css">
+    <link rel="stylesheet" href="/base.css">
+    <link rel="stylesheet" href="/site.css">
 </head>
 <body>
 $body
-<script src="/spe.js"></script>
+<script src="/base.js"></script>
 </body>
 </html>
 HTML;
@@ -119,7 +121,7 @@ HTML;
     <main>
         <div class="card">
             <h2>Chapters</h2>
-            <p>A progressive PHP 8.5 micro-framework tutorial in 11 chapters</p>
+            <p>A progressive PHP 8.5 micro-framework tutorial in 12 chapters</p>
             $list
         </div>
     </main>
@@ -144,7 +146,7 @@ HTML;
     <main>
         <div class="card">
             <h2>Chapters</h2>
-            <p>A progressive PHP 8.5 micro-framework tutorial in 11 chapters</p>
+            <p>A progressive PHP 8.5 micro-framework tutorial in 12 chapters</p>
             $list
         </div>
     </main>
@@ -187,7 +189,7 @@ HTML;
         <main>
             <div class="card">
                 <h2>Chapters</h2>
-                <p>A progressive PHP 8.5 micro-framework tutorial in 11 chapters</p>
+                <p>A progressive PHP 8.5 micro-framework tutorial in 12 chapters</p>
                 $list
             </div>
         </main>
