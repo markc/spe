@@ -980,7 +980,6 @@
         font-weight: bold;
         color: var(--fg-muted);
         font-size: var(--text-sm);
-        text-transform: uppercase;
         margin-block-end: var(--space-2);
         cursor: pointer;
         display: flex;
