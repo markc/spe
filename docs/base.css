@@ -343,6 +343,11 @@
         }
     }
 
+    .card-static:hover {
+        transform: none;
+        box-shadow: var(--shadow-sm);
+    }
+
     .card-link {
         display: block;
         background-color: var(--bg-primary);

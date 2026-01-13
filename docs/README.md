@@ -17,7 +17,7 @@ A progressive **PHP 8.5 micro-framework tutorial** in 10 chapters. Each chapter 
 
 | Feature | Description |
 |---------|-------------|
-| **Pipe Operator** | PHP 8.5's `\|>` for elegant data transformation chains |
+| **Pipe Operator** | PHP 8.5's `|>` for elegant data transformation chains |
 | **Micro-Framework** | Minimal MVC architecture without heavy dependencies |
 | **CRUD Operations** | Complete Create, Read, Update, Delete, List pattern |
 | **PSR-4 Autoloading** | Modern Composer-based class loading |
@@ -68,7 +68,8 @@ Want to create your own tutorial videos? See [00-Tutorial](00-Tutorial/README.md
 git clone https://github.com/markc/spe
 cd spe
 composer install
-php -S localhost:8000
+php -S localhost:8000 index.php
+# Note: the extra index.php arg is need for routing
 ```
 
 Open http://localhost:8000 to see the chapter index.
@@ -88,6 +89,7 @@ Open http://localhost:8000 to see the chapter index.
 | 08 | [Users](08-Users/README.md) | User management | Full CRUDL operations |
 | 09 | [Blog](09-Blog/README.md) | Complete CMS | Auth, Blog, Docs, Categories |
 | 10 | [YouTube](10-YouTube/README.md) | YouTube Manager | OAuth, API, Shared Services |
+| 11 | [HCP](11-HCP/README.md) | Hosting Control Panel | Mainly for Proxmox VM/CTs |
 
 ## Architecture
 
