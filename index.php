@@ -142,7 +142,7 @@ HTML;
     <button class="theme-toggle" id="theme-icon">🌙</button>
     <button class="menu-toggle">☰</button>
 </nav>
-<div class="container">
+<div class="container mt-8">
     <main>
         <div class="card">
             <h2>Chapters</h2>
@@ -185,7 +185,7 @@ HTML;
             <nav>$n2</nav>
         </div>
     </aside>
-    <div class="sidebar-main">
+    <div class="sidebar-main mt-8">
         <main>
             <div class="card">
                 <h2>Chapters</h2>
