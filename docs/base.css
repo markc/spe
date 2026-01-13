@@ -1080,6 +1080,23 @@
         margin-block: 1em;
     }
 
+    /* Inline badges (shields.io style) - no margin, inline display */
+    .prose a > img[src*="shields.io"],
+    .prose a > img[src*="badge"],
+    .prose img[alt*="badge"],
+    .prose img[alt*="License"],
+    .prose img[alt*="CI"],
+    .prose img[alt*="PHP"],
+    .prose img[alt*="Release"],
+    .prose img[alt*="Website"],
+    .prose img[alt*="Tutorial"],
+    .prose img[alt*="Built with"] {
+        display: inline;
+        margin: 0 0.25em 0.25em 0;
+        border-radius: var(--radius-sm);
+        vertical-align: middle;
+    }
+
     .prose hr {
         margin-block: var(--space-8);
         border: none;
