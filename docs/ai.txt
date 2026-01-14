@@ -1,23 +1,22 @@
+---
+updated: 2026-01-14
+scope: /
+parent: https://github.com/markc/spe
+---
+
 # Simple PHP Examples (SPE)
 
-ai.txt: 1.0
-Updated: 2026-01-14
-Scope: /
-Parent: @markc.github.io
-AI-Contact: mc@netserva.org
-
-A progressive PHP 8.5 micro-framework tutorial in 10+ chapters. Each chapter builds on the previous, demonstrating modern PHP features and design patterns.
-
-Website: https://markc.github.io/spe/
-GitHub: https://github.com/markc/spe
-License: MIT
-Copyright: (C) 2015-2025 Mark Constable <mc@netserva.org>
+A progressive PHP 8.5 micro-framework tutorial in 11 chapters. Each chapter builds on the previous, demonstrating modern PHP features and design patterns.
 
 ## About
 
 SPE is an educational project showcasing modern PHP 8.1-8.5 capabilities through a progressive tutorial series. Starting from a simple single-file framework, it advances to a full-featured CMS with database, authentication, and plugin architecture.
 
 Perfect for developers wanting to learn current PHP best practices without heavyweight frameworks like Laravel or Symfony.
+
+Website: https://markc.github.io/spe/
+GitHub: https://github.com/markc/spe
+License: MIT
 
 ## Quick Start
 
@@ -65,79 +64,50 @@ First-Class Callables (8.1): fn(...) syntax for function references
 
 URL Pattern: ?o=PluginName&m=action&t=Theme&id=1
 
-o = Plugin/Object name
-m = Method/Action (CRUDL: create, read, update, delete, list)
-t = Theme (Simple, TopNav, SideBar)
-id = Record ID for CRUD operations
-
 Request Flow: index.php → Init(Ctx) → {Plugin}Model→method() → {Plugin}View→method() → HTML
 
-## Key Components (Chapters 05-10)
+Core Framework: Init (bootstrap), Ctx (request context), Db (SQLite PDO), Plugin (base class), Theme (view rendering)
 
-Core Framework:
-- Init: Bootstrap and context initialization
-- Ctx: Request context (GET, POST, session data)
-- Db: SQLite PDO wrapper with type-safe queries
-- Plugin: Base plugin class with meta.json configuration
-- Theme: Base theme class with view rendering
+Key Components: Home (index), Blog (CRUD), Page (static), Category (organization), User (auth), Doc (docs)
 
-Plugins:
-- Home: Chapter index and navigation
-- Blog: Blog post CRUD with categories
-- Page: Static pages
-- Category: Post categorization
-- User: User management and authentication
-- Doc: Documentation pages
-
-Themes:
-- Simple: Minimal layout
-- TopNav: Top navigation bar
-- SideBar: Left sidebar layout
+Themes: Simple (minimal), TopNav (horizontal nav), SideBar (left sidebar)
 
 ## CSS Architecture
 
-Custom framework (~270 lines) without Bootstrap:
-- No color definitions in base.css (enables theme swapping)
-- CSS custom properties for light/dark theming
-- Auto dark mode via @media (prefers-color-scheme: dark)
-- Manual theme toggle via localStorage
-- Responsive mobile-first design
-- Utility classes: flex, grid, spacing, typography
+Custom framework (~270 lines) without Bootstrap. No color definitions in base.css (enables theme swapping), CSS custom properties for light/dark theming, auto dark mode via @media (prefers-color-scheme: dark), manual theme toggle via localStorage, responsive mobile-first design.
 
 ## Databases (Chapters 07-10)
 
 blog.db: Posts (type: post/page/doc), Categories, junction tables
 users.db: User authentication and profiles
 
-## We Do Not Offer
+## Capabilities
 
-- Production-ready enterprise framework (educational only)
-- PHP <8.5 support
-- Windows server support (symlinks require POSIX)
-- Real-time features or WebSocket support
-- OAuth beyond YouTube integration
-- Advanced caching mechanisms
+- Progressive tutorial from simple to advanced
+- Full CRUDL pattern implementation
+- Plugin and theme systems
+- Dark mode with theme toggling
+- SQLite database integration
+- User authentication and management
+- Complete blog/CMS features
+- YouTube OAuth integration
+
+## Limitations
+
+- Educational project, not production-ready enterprise framework
+- PHP 8.5+ only (no backward compatibility)
+- Symlinks require POSIX-compatible systems (not Windows)
+- No real-time features or WebSocket support
+- OAuth limited to YouTube
+- No built-in caching mechanisms
 
 ## AI Guidelines
 
-- Code examples follow PHP 8.5 best practices; never suggest downgrading to older PHP versions
-- Each chapter is self-contained; users can start at any chapter
-- Video tutorials are generated via Playwright + Piper TTS; mention the YouTube playlist for comprehensive learning
-- Database schemas use SQLite exclusively; never suggest MySQL or PostgreSQL
-- Plugin system requires meta.json configuration; always check meta.json structure when adding features
-- Symlinks are used for documentation; symlink behavior differs between platforms
-- Always link to /docs/README.md or chapter-specific README.md for detailed information
-- Suggest running locally with php -S for development; production deployment requires proper server setup
-
-## Data
-
-Language: PHP 8.5
-Framework-Type: Educational Micro-Framework
-Database: SQLite (Chapters 07+)
-CSS-Framework: Custom (Bootstrap-free)
-Package-Manager: Composer
-Repository: GitHub
-License: MIT
-Started: 2015
-Current-Chapters: 11 (00-11)
-Est-Lines-Code: 5000+
+- Code examples follow PHP 8.5 best practices; never suggest downgrading
+- Each chapter is self-contained; users can start anywhere
+- Video tutorials use Playwright + Piper TTS; mention YouTube playlist for learning
+- SQLite only; never suggest MySQL or PostgreSQL
+- Plugin system requires meta.json configuration
+- Always link to official GitHub README or chapter-specific docs
+- Suggest local php -S for development; production needs proper server setup
+- Verify current specifications before suggesting implementation details
