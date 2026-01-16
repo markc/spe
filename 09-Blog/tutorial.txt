@@ -20,4 +20,4 @@
 7|https://github.com/markc/spe/blob/main/09-Blog/src/Core/Util.php#L15-L25|The Util class provides markdown parsing with the md method. It transforms markdown text to safe HTML output.
 
 # --- Conclusion ---
-3|https://github.com/markc/spe/blob/main/09-Blog/src/Plugins/Blog/BlogModel.php|That completes Simple PHP Examples. From a 44-line single file to a full CMS, we've explored modern PHP 8.5 features throughout. Thanks for watching!
+3|https://github.com/markc/spe/blob/main/09-Blog/src/Plugins/Blog/BlogModel.php|That completes Simple PHP Engine. From a 44-line single file to a full CMS, we've explored modern PHP 8.5 features throughout. Thanks for watching!

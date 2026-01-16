@@ -1,6 +1,6 @@
 # Contributing to SPE
 
-Thanks for your interest in contributing to Simple PHP Examples!
+Thanks for your interest in contributing to Simple PHP Engine!
 
 ## Getting Started
 

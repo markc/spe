@@ -1,6 +1,6 @@
 {
   "title": "SPE Chapter 05 - Autoload: PSR-4 Autoloading with Composer",
-  "description": "Chapter 05 of Simple PHP Examples - from one file to fourteen with PSR-4 autoloading.\n\nThis tutorial covers:\n• PSR-4 namespace-to-directory mapping\n• Composer autoloader integration\n• Abstract Theme base class with concrete implementations\n• Plugin directory structure (Model/View pairs)\n• Fully qualified class name construction\n• PHP 8.3 typed constants for namespace prefix\n\n🔗 Links:\nGitHub: https://github.com/markc/spe/tree/main/05-Autoload\nDocumentation: https://github.com/markc/spe/blob/main/docs/05-Autoload/README.md\n\n#PHP #PHP85 #Tutorial #PSR4 #Composer #Autoloading",
+  "description": "Chapter 05 of Simple PHP Engine - from one file to fourteen with PSR-4 autoloading.\n\nThis tutorial covers:\n• PSR-4 namespace-to-directory mapping\n• Composer autoloader integration\n• Abstract Theme base class with concrete implementations\n• Plugin directory structure (Model/View pairs)\n• Fully qualified class name construction\n• PHP 8.3 typed constants for namespace prefix\n\n🔗 Links:\nGitHub: https://github.com/markc/spe/tree/main/05-Autoload\nDocumentation: https://github.com/markc/spe/blob/main/docs/05-Autoload/README.md\n\n#PHP #PHP85 #Tutorial #PSR4 #Composer #Autoloading",
   "tags": ["php", "php 8.5", "psr-4", "composer", "autoloading", "tutorial", "namespaces", "abstract classes"],
   "categoryId": "28",
   "privacyStatus": "public",

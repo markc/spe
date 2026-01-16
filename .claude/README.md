@@ -1,6 +1,6 @@
 # SPE Claude Resources
 
-This directory contains Claude Code resources for the Simple PHP Examples project: prompts, runbooks, and slash commands that help maintain consistency across documentation and development.
+This directory contains Claude Code resources for the Simple PHP Engine project: prompts, runbooks, and slash commands that help maintain consistency across documentation and development.
 
 ## Directory Structure
 

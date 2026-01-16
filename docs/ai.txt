@@ -4,7 +4,7 @@ scope: /
 parent: https://github.com/markc/spe
 ---
 
-# Simple PHP Examples (SPE)
+# Simple PHP Engine (SPE)
 
 A progressive PHP 8.5 micro-framework tutorial in 11 chapters. Each chapter builds on the previous, demonstrating modern PHP features and design patterns.
 

@@ -98,7 +98,7 @@ Format: `duration|URL|narration text`
 
 ```txt
 # Comments start with #
-7|http://localhost:8080/01-Simple|Welcome to Simple PHP Examples.
+7|http://localhost:8080/01-Simple|Welcome to Simple PHP Engine.
 6|https://github.com/markc/spe/blob/main/01-Simple/index.php#L5|The application uses PHP 8.5 features.
 ```
 

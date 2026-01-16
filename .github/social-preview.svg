@@ -28,7 +28,7 @@
   <text x="640" y="220" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#fff" text-anchor="middle">PHP</text>
 
   <!-- Main Title -->
-  <text x="640" y="340" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="#fff" text-anchor="middle">Simple PHP Examples</text>
+  <text x="640" y="340" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="#fff" text-anchor="middle">Simple PHP Engine</text>
 
   <!-- Subtitle -->
   <text x="640" y="400" font-family="Arial, sans-serif" font-size="32" fill="#aaa" text-anchor="middle">A Progressive PHP 8.5 Micro-Framework Tutorial</text>

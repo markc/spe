@@ -4,7 +4,7 @@ A progressive PHP 8.5 micro-framework tutorial demonstrating modern PHP patterns
 
 ## What This Is
 
-SPE (Simple PHP Examples) teaches PHP development through incremental complexity. Each chapter builds on the previous, introducing one new concept while maintaining a minimal codebase. The target audience is developers learning modern PHP or those wanting a lightweight alternative to heavy frameworks.
+SPE (Simple PHP Engine) teaches PHP development through incremental complexity. Each chapter builds on the previous, introducing one new concept while maintaining a minimal codebase. The target audience is developers learning modern PHP or those wanting a lightweight alternative to heavy frameworks.
 
 ## Technology Stack
 

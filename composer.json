@@ -1,6 +1,6 @@
 {
     "name": "markc/spe",
-    "description": "Simple PHP Examples (SPE)",
+    "description": "Simple PHP Engine (SPE)",
     "type": "project",
     "license": "MIT",
     "authors": [

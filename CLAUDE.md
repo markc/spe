@@ -4,7 +4,7 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Project Overview
 
-**SPE (Simple PHP Examples)** is a progressive PHP 8.5 micro-framework tutorial in 10 chapters (00-10). Each chapter builds on the previous, demonstrating modern PHP features and design patterns.
+**SPE (Simple PHP Engine)** is a progressive PHP 8.5 micro-framework tutorial in 10 chapters (00-10). Each chapter builds on the previous, demonstrating modern PHP features and design patterns.
 
 **For tutorial video generation**, see [00-Tutorial/CLAUDE.md](00-Tutorial/CLAUDE.md).
 

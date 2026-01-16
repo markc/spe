@@ -2,7 +2,7 @@
 
 ## Project Context
 
-SPE (Simple PHP Examples) is an **educational tutorial project** designed to teach modern PHP development patterns. It is intended for local development and learning purposes, not production deployment.
+SPE (Simple PHP Engine) is an **educational tutorial project** designed to teach modern PHP development patterns. It is intended for local development and learning purposes, not production deployment.
 
 ## Supported Versions
 

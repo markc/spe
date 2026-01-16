@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-SPE Tutorial Video Generator is a complete pipeline for creating 4K screencast tutorials with AI voiceover for the **Simple PHP Examples** (SPE) project. The pipeline uses bash scripts for orchestration and TypeScript/Bun with Playwright for automated browser capture. Designed for KDE Plasma Wayland on CachyOS/Arch Linux with Intel Arc GPU hardware acceleration.
+SPE Tutorial Video Generator is a complete pipeline for creating 4K screencast tutorials with AI voiceover for the **Simple PHP Engine** (SPE) project. The pipeline uses bash scripts for orchestration and TypeScript/Bun with Playwright for automated browser capture. Designed for KDE Plasma Wayland on CachyOS/Arch Linux with Intel Arc GPU hardware acceleration.
 
 ### Project Location
 
@@ -279,7 +279,7 @@ Narration scripts use `duration|URL|text|action` format:
 # Comments start with #
 # Format: duration|URL|text|action (action is optional)
 
-5|https://github.com/user/repo/blob/main/file.php|Welcome to Simple PHP Examples.
+5|https://github.com/user/repo/blob/main/file.php|Welcome to Simple PHP Engine.
 6|https://github.com/user/repo/blob/main/file.php#L5|The application is a single anonymous class.
 8|http://localhost:8080/|Let's see the demo in action.
 5|http://localhost:8080/|Toggle dark mode.|click:.theme-toggle
@@ -419,7 +419,7 @@ kdenlive ~/Dev/spe/01-Simple/01-Simple.kdenlive
 ```txt
 # Audio segment timings
 # segment|start_ms|duration_ms|text
-1|0|6383|Welcome to Simple PHP Examples.
+1|0|6383|Welcome to Simple PHP Engine.
 2|6383|8496|This tutorial demonstrates modern PHP.
 3|14879|6557|Let's look at the source code.
 ```

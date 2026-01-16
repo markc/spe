@@ -1,4 +1,4 @@
-# Simple PHP Examples (SPE)
+# Simple PHP Engine (SPE)
 
 [![PHP 8.5](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
