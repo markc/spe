@@ -1,0 +1,59 @@
+---
+updated: 2026-01-16
+scope: /04-Themes
+parent: ../ai.txt
+---
+
+# Chapter 04: Themes - Model/View/Theme Separation
+
+Separating data from presentation with three switchable layout themes.
+
+## Learning Objectives
+
+- Implement Model/View/Theme three-layer separation
+- Create Models that return semantic data arrays (no HTML)
+- Build Views that render HTML fragments from model data
+- Design switchable layout themes (Simple, TopNav, SideBar)
+- Implement CSS-only dropdown menus
+
+## Key Files
+
+public/index.php: Complete application with Theme class and three layouts
+
+## Architecture
+
+Model: Returns data arrays (no HTML knowledge)
+View: Renders HTML fragments from model data
+Theme: Wraps content in complete page layout
+
+## Themes Available
+
+Simple: Minimal centered layout
+TopNav: Horizontal navigation bar
+SideBar: Left sidebar navigation
+
+## URL Parameters
+
+?t=ThemeName: Select layout theme (Simple, TopNav, SideBar)
+?o=PluginName: Select plugin
+?m=method: Select method
+
+## CSS Features
+
+Dropdown menu using pure CSS (:hover, :focus-within)
+No JavaScript required for theme selector
+
+## Running
+
+```
+cd 04-Themes/public
+php -S localhost:8080
+```
+
+## AI Guidelines
+
+- Same visual output as Chapters 02-03, deeper architecture
+- Models never generate HTML; Views never contain business logic
+- Theme class has nav(), dropdown(), and layout methods
+- Theme selection persists via URL parameter (no session yet)
+- Dropdown uses CSS visibility and opacity transitions

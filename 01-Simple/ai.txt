@@ -1,0 +1,51 @@
+---
+updated: 2026-01-16
+scope: /01-Simple
+parent: ../ai.txt
+---
+
+# Chapter 01: Simple - Self-Rendering PHP Application
+
+A complete web application in ~45 lines demonstrating the "echo new class" pattern.
+
+## Learning Objectives
+
+- Understand the self-rendering object pattern (echo new class)
+- Use PHP 8.5 pipe operator for data transformation
+- Apply PHP 8.4 asymmetric visibility (public private(set))
+- Implement PHP 8.3 typed constants
+- Use first-class callables with spread syntax
+
+## Key Files
+
+public/index.php: The entire application in one file
+
+## PHP Features Demonstrated
+
+Pipe Operator (8.5): $_REQUEST['m'] |> trim(...) |> htmlspecialchars(...)
+Asymmetric Visibility (8.4): public private(set) string $page
+Typed Constants (8.3): private const string DEFAULT = 'home'
+First-Class Callables (8.1): trim(...), htmlspecialchars(...)
+Anonymous Class: echo new class { ... };
+
+## Architecture
+
+Single anonymous class with:
+- Constructor: processes request, sanitizes input
+- __toString(): generates HTML response
+- $pages array: content management (route => [title, content])
+
+## Running
+
+```
+cd 01-Simple/public
+php -S localhost:8080
+```
+
+## AI Guidelines
+
+- This is the foundation chapter; all patterns established here carry forward
+- No external dependencies (no CSS, no JS)
+- Dark mode via color-scheme meta tag only
+- Input always sanitized through pipe operator chain
+- Navigation generated dynamically from $pages array keys

@@ -1,0 +1,73 @@
+---
+updated: 2026-01-16
+scope: /11-HCP
+parent: ../ai.txt
+---
+
+# Chapter 11: HCP - Hosting Control Panel
+
+Lightweight hosting control panel for managing Nginx vhosts, DNS zones, and SSL certificates.
+
+## Learning Objectives
+
+- Build server administration interfaces
+- Manage Nginx virtual host configurations
+- Handle DNS zone file generation
+- Integrate Let's Encrypt SSL certificates
+- Execute system commands safely from PHP
+
+## Directory Structure
+
+```
+11-HCP/
+├── bin/                # CLI management scripts
+├── data/               # SQLite database, generated configs
+├── docs/               # Documentation
+├── etc/                # Configuration templates
+├── lib/                # Shared library classes
+├── public/index.php
+├── schema/             # Database schema files
+├── src/
+│   ├── Core/
+│   └── Plugins/        # Vhosts/, DNS/, SSL/, System/
+└── vendor/
+```
+
+## Plugins
+
+Vhosts: Nginx virtual host management
+DNS: Zone file generation and management
+SSL: Let's Encrypt certificate management
+System: Server status, logs, processes
+
+## Features
+
+Vhost Templates: Generate Nginx configs from templates
+DNS Zones: Create and manage DNS zone files
+SSL Automation: Request and renew Let's Encrypt certificates
+System Commands: Safe execution of whitelisted commands
+
+## Security Considerations
+
+- Runs with elevated privileges (manages system configs)
+- Designed for Proxmox VM/container environments
+- Not for shared hosting (single-tenant only)
+- Whitelist approach for system commands
+
+## Running
+
+```
+cd 11-HCP
+composer install
+cp .env.example .env  # Configure environment
+php -S localhost:8080 -t public
+```
+
+## AI Guidelines
+
+- This is an INFRASTRUCTURE chapter, not typical web app
+- Requires root/sudo access for config file management
+- Designed for Proxmox VMs/CTs (Linux only)
+- Uses bin/ scripts for actual system operations
+- PHP interface is control plane; bin scripts are data plane
+- Namespace: SPE\HCP\

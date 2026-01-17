@@ -1,0 +1,59 @@
+---
+updated: 2026-01-16
+scope: /05-Autoload
+parent: ../ai.txt
+---
+
+# Chapter 05: Autoload - PSR-4 with Composer
+
+From single file to proper directory structure with PSR-4 autoloading.
+
+## Learning Objectives
+
+- Implement PSR-4 namespace-to-directory mapping
+- Configure Composer autoloader
+- Create abstract Theme base class with concrete implementations
+- Organize plugins into Model/View pairs with meta.json
+- Build fully qualified class names dynamically
+
+## Directory Structure
+
+```
+05-Autoload/
+├── public/index.php      # 7-line entry point
+├── src/
+│   ├── Core/             # Init, Ctx, Plugin, Theme (base classes)
+│   ├── Plugins/          # Home/, Contact/ (each with Model, View, meta.json)
+│   └── Themes/           # Simple.php, TopNav.php, SideBar.php
+└── composer.json         # Root composer handles all chapters
+```
+
+## Namespace Convention
+
+SPE\Autoload\Core\Init
+SPE\Autoload\Plugins\Home\HomeModel
+SPE\Autoload\Themes\TopNav
+
+## Key Files
+
+public/index.php: Minimal bootstrap (require autoload, echo new Init)
+src/Core/Init.php: Application bootstrap
+src/Core/Ctx.php: Request context
+src/Core/Plugin.php: Abstract plugin base
+src/Core/Theme.php: Abstract theme base
+
+## Running
+
+```
+cd 05-Autoload
+composer install  # From root, or use root composer.json
+php -S localhost:8080 -t public
+```
+
+## AI Guidelines
+
+- First chapter with src/ directory structure
+- Composer autoload configured in root composer.json
+- Each plugin has meta.json for configuration (nav order, icon, etc.)
+- Abstract classes define contracts; concrete classes implement
+- Namespace prefix: SPE\Autoload\

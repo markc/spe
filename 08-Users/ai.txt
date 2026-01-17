@@ -1,0 +1,75 @@
+---
+updated: 2026-01-16
+scope: /08-Users
+parent: ../ai.txt
+---
+
+# Chapter 08: Users - User Management CRUDL
+
+Full user management system with authentication foundation.
+
+## Learning Objectives
+
+- Implement complete CRUDL for user records
+- Use password_hash() and password_verify() for secure passwords
+- Build user profile management
+- Create admin role separation
+- Design user listing with pagination
+
+## Directory Structure
+
+```
+08-Users/
+├── public/index.php
+└── src/
+    ├── Core/           # Init, Ctx, Db, Plugin, Theme
+    ├── Plugins/        # Home/, Users/ (full CRUDL)
+    └── Themes/
+```
+
+## User Features
+
+Create: Registration form with validation
+Read: User profile display
+Update: Edit user details, change password
+Delete: Remove user (admin only)
+List: Paginated user directory
+
+## Security
+
+Password Hashing: password_hash() with PASSWORD_DEFAULT
+Role System: 'user' and 'admin' roles
+Permission Checks: Admin-only operations protected
+
+## Key Files
+
+src/Plugins/Users/UsersModel.php: CRUDL methods with validation
+src/Plugins/Users/UsersView.php: Forms and listings
+
+## Database Schema
+
+```sql
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    name TEXT,
+    role TEXT DEFAULT 'user',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+## Running
+
+```
+cd 08-Users
+php -S localhost:8080 -t public
+```
+
+## AI Guidelines
+
+- Full CRUDL pattern implementation
+- Never store plain text passwords
+- Role-based access control (admin vs user)
+- Email used as unique identifier
+- Namespace: SPE\Users\

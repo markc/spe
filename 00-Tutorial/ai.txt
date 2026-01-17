@@ -1,0 +1,47 @@
+---
+updated: 2026-01-16
+scope: /00-Tutorial
+parent: ../ai.txt
+---
+
+# Chapter 00: Tutorial Video Generation
+
+Video generation pipeline for creating 4K screencast tutorials with AI voiceover.
+
+## Purpose
+
+This chapter provides the tooling infrastructure for generating tutorial videos, not PHP code. It's Chapter 00 because it's prerequisite tooling, not part of the progressive PHP tutorial.
+
+## Technology Stack
+
+- Bun runtime with TypeScript
+- Playwright for automated browser capture
+- Piper TTS for AI voiceover
+- FFmpeg/MLT for video assembly
+- KDE Plasma Wayland on CachyOS/Arch Linux
+
+## Key Files
+
+scripts/spe-tutorial.sh: Main pipeline orchestrator (audio, slides, assembly, render)
+scripts/capture.ts: Playwright screenshot automation from tutorial.txt URLs
+scripts/demo.ts: Interactive demo capture for forms and CRUD operations
+package.json: Bun dependencies (Playwright)
+
+## Workflow
+
+1. Edit tutorial.txt in chapter directory (format: duration|URL|narration)
+2. Generate audio: ./scripts/spe-tutorial.sh 01-Simple audio
+3. Capture frames: bun run capture 01-Simple
+4. Assemble video: ./scripts/spe-tutorial.sh 01-Simple assemble
+
+## Output
+
+4K UHD (3840x2160) MP4 videos at 30fps with AAC audio.
+
+## AI Guidelines
+
+- This is NOT a PHP chapter; it's video tooling
+- Requires KDE Plasma Wayland (not wlroots compositors)
+- Tutorial.txt files in each chapter are the narration scripts
+- Piper TTS is local and free; produces good quality voiceover
+- Videos are uploaded to YouTube playlist

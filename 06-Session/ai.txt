@@ -1,0 +1,62 @@
+---
+updated: 2026-01-16
+scope: /06-Session
+parent: ../ai.txt
+---
+
+# Chapter 06: Session - PHP Session Management
+
+Adding persistent state with PHP sessions for sticky parameters and flash messages.
+
+## Learning Objectives
+
+- Implement PHP session management
+- Create sticky URL parameters (theme persists across requests)
+- Build flash message system for one-time notifications
+- Track visit information with timestamps
+- Apply three-tier fallback: URL → session → default
+
+## Directory Structure
+
+```
+06-Session/
+├── public/index.php
+└── src/
+    ├── Core/           # Init, Ctx (with session handling), Plugin, Theme
+    ├── Plugins/        # Home/, Contact/
+    └── Themes/         # Simple, TopNav, SideBar
+```
+
+## Session Features
+
+Sticky Parameters: Theme choice remembered across page loads
+Flash Messages: One-time notifications (success, error, warning)
+Visit Tracking: First visit timestamp, visit count
+Session Reset: Clear all session data
+
+## Key Additions
+
+Ctx class: Session initialization and parameter resolution
+Flash messages: $_SESSION['flash'] consumed on display
+timeAgo() helper: Human-readable timestamps using match expression
+
+## Parameter Resolution
+
+1. Check URL parameter (?t=TopNav)
+2. Fall back to session value ($_SESSION['t'])
+3. Fall back to default ('Simple')
+
+## Running
+
+```
+cd 06-Session
+php -S localhost:8080 -t public
+```
+
+## AI Guidelines
+
+- Session started in Ctx constructor
+- Flash messages displayed once then cleared
+- Theme and other parameters "stick" via session
+- timeAgo() uses match expression for readable time differences
+- Namespace: SPE\Session\

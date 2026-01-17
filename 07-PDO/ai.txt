@@ -1,0 +1,65 @@
+---
+updated: 2026-01-16
+scope: /07-PDO
+parent: ../ai.txt
+---
+
+# Chapter 07: PDO - Database Integration
+
+Adding SQLite database access with PDO wrapper and QueryType enum.
+
+## Learning Objectives
+
+- Implement PDO database wrapper class
+- Use QueryType enum for fetch modes (All, One, Col)
+- Create dynamic navigation from database
+- Build Blog plugin with full CRUD operations
+- Integrate shared library code from app/lib/
+
+## Directory Structure
+
+```
+07-PDO/
+├── public/index.php
+├── src/
+│   ├── Core/           # Init, Ctx, Db, Plugin, Theme
+│   ├── Plugins/        # Home/, Blog/ (with CRUD)
+│   └── Themes/
+└── data/               # SQLite database created here
+```
+
+## Database Features
+
+Db class: PDO wrapper with qry() method
+QueryType enum: All (fetchAll), One (fetch), Col (fetchColumn)
+Auto-creation: Database and tables created if missing
+Prepared statements: All queries use parameter binding
+
+## Key Files
+
+src/Core/Db.php: PDO wrapper with CRUD methods
+src/Plugins/Blog/BlogModel.php: Full CRUDL implementation
+app/lib/Schema.php: Shared database schema definitions
+
+## QueryType Enum
+
+```php
+enum QueryType { case All; case One; case Col; }
+$rows = $db->qry("SELECT * FROM posts", QueryType::All);
+$post = $db->qry("SELECT * FROM posts WHERE id=?", QueryType::One, [$id]);
+```
+
+## Running
+
+```
+cd 07-PDO
+php -S localhost:8080 -t public
+```
+
+## AI Guidelines
+
+- First chapter with database (SQLite only)
+- Uses shared app/lib/ for Db, Util, Schema classes
+- QueryType enum replaces PDO fetch mode constants
+- Navigation can now come from database pages table
+- Namespace: SPE\PDO\

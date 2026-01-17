@@ -1,0 +1,52 @@
+---
+updated: 2026-01-16
+scope: /02-Styled
+parent: ../ai.txt
+---
+
+# Chapter 02: Styled - External CSS and JavaScript
+
+Adding visual polish with external stylesheets and interactive features.
+
+## Learning Objectives
+
+- Integrate external CSS and JavaScript files
+- Implement CSS custom properties for theming
+- Add automatic dark mode via prefers-color-scheme
+- Create manual theme toggle with localStorage
+- Build toast notification system
+
+## Key Files
+
+public/index.php: PHP application (same structure as Chapter 01)
+/base.css: Shared CSS framework (color-agnostic)
+/site.css: Theme colors (light/dark definitions)
+/base.js: Theme toggle and toast notifications
+
+## What's New from Chapter 01
+
+- External stylesheet and script links
+- Three-element pages array: [icon+label, title, content]
+- Contact form with JavaScript email handler
+- Toast notifications for user feedback
+- CSS-driven dark mode with manual toggle
+
+## CSS Architecture
+
+base.css: Layout, components, utilities (no colors)
+site.css: All color definitions for light and dark themes
+
+## Running
+
+```
+cd 02-Styled/public
+php -S localhost:8080
+```
+
+## AI Guidelines
+
+- Same PHP patterns as Chapter 01, visual layer added
+- CSS custom properties (--bg, --fg, --accent) enable theming
+- Toast notifications use data-* attributes for messages
+- Theme preference stored in localStorage
+- No Bootstrap or external CSS frameworks

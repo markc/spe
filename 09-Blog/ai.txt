@@ -1,0 +1,71 @@
+---
+updated: 2026-01-16
+scope: /09-Blog
+parent: ../ai.txt
+---
+
+# Chapter 09: Blog - Complete CMS
+
+Full content management system with authentication, blog, pages, categories, and documentation.
+
+## Learning Objectives
+
+- Build complete authentication system (login, logout, register)
+- Implement blog with posts, categories, and tags
+- Create static pages with markdown support
+- Design category management with post associations
+- Generate documentation from filesystem markdown
+
+## Directory Structure
+
+```
+09-Blog/
+├── public/
+│   ├── index.php
+│   └── data/           # SQLite databases
+└── src/
+    ├── Core/           # Init, Ctx, Db, Plugin, Theme, Util
+    ├── Plugins/        # Auth/, Blog/, Posts/, Pages/, Categories/, Users/, Docs/
+    └── Themes/
+```
+
+## Plugins
+
+Auth: Login, logout, registration, password reset
+Blog: Public blog view with excerpts and pagination
+Posts: Admin CRUD for blog posts
+Pages: Static page management
+Categories: Category CRUD with post associations
+Users: User management (from Chapter 08)
+Docs: Filesystem-based documentation viewer
+
+## Features
+
+Markdown Support: Posts and pages support markdown content
+Featured Images: Posts can have featured images
+Excerpts: Auto-generated or custom excerpts
+Category Tags: Posts associated with multiple categories
+Post Types: post, page, doc (polymorphic posts table)
+
+## Database Schema
+
+posts: id, user_id, title, slug, content, excerpt, type, status, featured_image, created_at
+categories: id, name, slug, description
+post_categories: post_id, category_id (junction table)
+users: id, email, password, name, role, created_at
+
+## Running
+
+```
+cd 09-Blog/public
+php -S localhost:8080
+```
+
+## AI Guidelines
+
+- This is the "production-ready" chapter
+- Complete auth flow with session management
+- Posts table uses 'type' field for polymorphism (post/page/doc)
+- Markdown rendered via Util::md() method
+- Most complex chapter; includes all previous patterns
+- Namespace: SPE\Blog\

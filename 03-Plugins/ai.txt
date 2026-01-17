@@ -1,0 +1,56 @@
+---
+updated: 2026-01-16
+scope: /03-Plugins
+parent: ../ai.txt
+---
+
+# Chapter 03: Plugins - Architecture Refactoring
+
+Same interface as Chapter 02, completely restructured with plugin architecture.
+
+## Learning Objectives
+
+- Understand the plugin architecture pattern
+- Implement CRUDL method convention (Create, Read, Update, Delete, List)
+- Use PHP 8.3 #[Override] attribute
+- Build automatic JSON API via query parameter
+- Apply convention over configuration principles
+
+## Key Files
+
+public/index.php: Entry point with four named classes (Ctx, Init, Plugin, Home, Contact)
+
+## PHP Features Demonstrated
+
+Override Attribute (8.3): #[\Override] public function list()
+Readonly Classes (8.2): readonly class Ctx
+Match Expression: match(true) for routing
+Dynamic Dispatch: new $plugin($this->ctx)
+
+## Architecture
+
+Ctx: Configuration context (readonly, immutable)
+Init: Request processing and plugin dispatch
+Plugin: Abstract base class with CRUDL stubs
+Home/Contact: Concrete plugins extending Plugin
+
+## URL Parameters
+
+?o=PluginName: Select plugin (Home, Contact)
+?m=method: Select method (list, create, read, update, delete)
+?x=json: Output as JSON instead of HTML
+
+## Running
+
+```
+cd 03-Plugins/public
+php -S localhost:8080
+```
+
+## AI Guidelines
+
+- Visual output identical to Chapter 02
+- Code structure completely different (four classes vs one)
+- CRUDL pattern: every plugin can implement five standard methods
+- JSON API automatic via ?x=json parameter
+- Plugin dispatch uses string-to-class instantiation

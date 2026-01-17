@@ -1,0 +1,70 @@
+---
+updated: 2026-01-16
+scope: /10-YouTube
+parent: ../ai.txt
+---
+
+# Chapter 10: YouTube - OAuth and API Integration
+
+YouTube channel management with OAuth authentication and API integration.
+
+## Learning Objectives
+
+- Implement OAuth 2.0 authentication flow
+- Integrate with external APIs (YouTube Data API v3)
+- Manage OAuth tokens (access, refresh)
+- Build video listing and management interface
+- Handle API rate limits and errors
+
+## Directory Structure
+
+```
+10-YouTube/
+├── public/index.php
+├── src/
+│   ├── Core/           # Init, Ctx, Db, Plugin, Theme
+│   ├── Plugins/        # Home/, YouTube/, Auth/
+│   └── Themes/
+├── composer.json       # Chapter-specific dependencies
+└── vendor/             # Google API client library
+```
+
+## OAuth Flow
+
+1. User clicks "Connect YouTube"
+2. Redirect to Google OAuth consent screen
+3. Google redirects back with authorization code
+4. Exchange code for access + refresh tokens
+5. Store tokens securely
+6. Use access token for API calls
+7. Refresh token when access token expires
+
+## Features
+
+Channel Info: Display connected channel details
+Video Listing: List uploaded videos
+Video Management: Update titles, descriptions, privacy
+Upload: Upload new videos (if quota allows)
+
+## Configuration
+
+Requires Google Cloud Console project with:
+- YouTube Data API v3 enabled
+- OAuth 2.0 credentials (client ID, client secret)
+- Authorized redirect URIs configured
+
+## Running
+
+```
+cd 10-YouTube
+composer install
+php -S localhost:8080 -t public
+```
+
+## AI Guidelines
+
+- OAuth tokens stored in session or database
+- Never expose client secret in frontend code
+- Handle token refresh automatically
+- Respect YouTube API quotas (10,000 units/day default)
+- Namespace: SPE\YouTube\
