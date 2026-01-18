@@ -1,0 +1,15 @@
+{
+    "name": "SideBar",
+    "description": "Theme with sidebar navigation",
+    "version": "1.0.0",
+    "icon": "bi bi-palette",
+    "emoji": "🎨",
+    "href": "?t=SideBar",
+    "method": "list",
+    "ajax": false,
+    "order": 3,
+    "group": "themes",
+    "auth": false,
+    "admin": false,
+    "enabled": true
+}

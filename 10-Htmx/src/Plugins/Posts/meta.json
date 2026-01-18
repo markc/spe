@@ -1,0 +1,15 @@
+{
+    "name": "Posts",
+    "description": "Manage blog posts",
+    "version": "1.0.0",
+    "icon": "bi bi-journal-text",
+    "emoji": "📝",
+    "href": "?o=Posts",
+    "method": "list",
+    "ajax": false,
+    "order": 11,
+    "group": "admin",
+    "auth": true,
+    "admin": false,
+    "enabled": true
+}

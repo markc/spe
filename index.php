@@ -45,7 +45,7 @@ namespace SPE\Router {
                 ['07', 'PDO', 'SQLite database integration using PDO wrapper class and QueryType enum for fetch modes'],
                 ['08', 'Users', 'User management system with full CRUDL operations and profile handling'],
                 ['09', 'Blog', 'Complete CMS featuring authentication, blog posts, static pages, and documentation'],
-                ['10', 'YouTube', 'YouTube API integration with OAuth authentication for video management'],
+                ['10', 'Htmx', 'SPA-like blog with htmx for partial page updates, live search, and inline CRUD'],
                 ['11', 'HCP', 'Lightweight hosting control panel for managing Nginx vhosts, DNS zones, and SSL certificates'],
             ],
             public array $themes = [['🎨 Simple', 'Simple'], ['🎨 TopNav', 'TopNav'], ['🎨 SideBar', 'SideBar']]
