@@ -13,15 +13,31 @@
         "php": "^8.2",
         "phpseclib/phpseclib": "^3.0"
     },
+    "require-dev": {
+        "pestphp/pest": "^4.0",
+        "pestphp/pest-plugin-arch": "^4.0"
+    },
     "autoload": {
         "psr-4": {
             "SPE\\HCP\\": "src/",
             "SPE\\HCP\\Lib\\": "lib/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "config": {
         "sort-packages": true,
-        "optimize-autoloader": true
+        "optimize-autoloader": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "scripts": {
+        "test": "pest",
+        "test:coverage": "pest --coverage"
+    }
 }
