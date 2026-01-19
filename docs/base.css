@@ -892,6 +892,10 @@
     .tr-header { border-block-end: 2px solid var(--border); }
     .tr { border-block-end: 1px solid var(--border); }
 
+    .chapter-table { width: 100%; border-collapse: collapse; }
+    .chapter-table td { padding: var(--space-2) var(--space-3); }
+    .chapter-table tr { border-block-start: 1px solid var(--border); }
+
     /* === TopNav Layout === */
     .topnav {
         position: fixed;
