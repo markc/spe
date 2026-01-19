@@ -16,7 +16,7 @@ final class Simple extends Theme
         $colors = $this->colors();
         $body = <<<HTML
         <div class="container">
-            <header><h1><a class="brand" href="/"><i data-lucide="elephant"></i> Autoload PHP Example</a></h1></header>
+            <header class="mt-4"><h1><a class="brand" href="/"><i data-lucide="chevron-left"></i> <span>Autoload PHP Example</span></a></h1></header>
             <nav class="card flex">
                 $nav $dd $colors
                 <span class="ml-auto"><button class="theme-toggle" id="theme-icon"><i data-lucide="moon"></i></button></span>

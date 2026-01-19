@@ -16,7 +16,7 @@ final class TopNav extends Theme
         $colors = $this->colors();
         $body = <<<HTML
         <nav class="topnav">
-            <h1><a class="brand" href="/"><i data-lucide="chevron-left"></i> Autoload PHP Example</a></h1>
+            <h1><a class="brand" href="/"><i data-lucide="chevron-left"></i> <span>Autoload PHP Example</span></a></h1>
             <div class="topnav-links">$nav $dd $colors</div>
             <button class="theme-toggle" id="theme-icon"><i data-lucide="moon"></i></button>
             <button class="menu-toggle"><i data-lucide="menu"></i></button>

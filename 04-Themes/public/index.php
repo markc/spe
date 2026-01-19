@@ -156,7 +156,7 @@ final class Theme {
                 $o, $p[1], $t === $p[1] ? ' class="active"' : '', $p[0]
             ), $n))
             |> (static fn($a) => implode('', $a));
-        return "<div class=\"dropdown\"><span class=\"dropdown-toggle\">🎨 Themes</span><div class=\"dropdown-menu\">{$links}</div></div>";
+        return "<div class=\"dropdown\"><span class=\"dropdown-toggle\">📐 Layout</span><div class=\"dropdown-menu\">{$links}</div></div>";
     }
 
     private function colors(): string {
@@ -260,7 +260,7 @@ HTML;
             <nav>{$n1}</nav>
         </div>
         <div class="sidebar-group">
-            <div class="sidebar-group-title" data-icon="🎨">Themes</div>
+            <div class="sidebar-group-title" data-icon="📐">Layout</div>
             <nav>{$n2}</nav>
         </div>
         <div class="sidebar-group">

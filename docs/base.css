@@ -907,13 +907,51 @@
         border-block-end: 1px solid var(--border);
     }
 
-    .topnav h1 {
+    /* === Brand Link (shared by all themes) === */
+    h1:has(.brand) {
         margin: 0;
-        font-size: var(--text-2xl);
+        font-size: var(--text-3xl);
+        font-weight: 500;
     }
 
-    .topnav .brand {
+    .container > header h1 {
+        margin-block-end: var(--space-4);
+    }
+
+    a.brand {
         color: var(--accent);
+        text-decoration: none;
+    }
+
+    a.brand:hover,
+    a.brand:focus {
+        text-decoration: none;
+    }
+
+    a.brand::after {
+        display: none;
+    }
+
+    .brand span {
+        position: relative;
+    }
+
+    .brand span::after {
+        content: '';
+        position: absolute;
+        inset-inline: 0;
+        block-size: 2px;
+        inset-block-end: -2px;
+        background: currentColor;
+        transform: scaleX(0);
+        transform-origin: right;
+        transition: transform var(--transition-hover);
+    }
+
+    .brand:hover span::after,
+    .brand:focus span::after {
+        transform: scaleX(1);
+        transform-origin: left;
     }
 
     .topnav + .container { margin-block-start: var(--space-20); }
@@ -1693,9 +1731,23 @@
             justify-content: center;
         }
 
+        /* Emoji fallback for chapters without Lucide */
         .sidebar.collapsed .sidebar-group-title::before {
             content: attr(data-icon);
             font-size: var(--text-base);
+        }
+
+        /* Hide emoji when Lucide icon present */
+        .sidebar.collapsed .sidebar-group-title:has([data-lucide])::before,
+        .sidebar.collapsed .sidebar-group-title:has(svg.lucide)::before {
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-group-title [data-lucide],
+        .sidebar.collapsed .sidebar-group-title svg.lucide {
+            font-size: var(--text-base);
+            width: 1.25em;
+            height: 1.25em;
         }
 
         .sidebar.collapsed .sidebar-group-title::after {
@@ -1709,10 +1761,24 @@
             position: relative;
         }
 
+        /* Emoji fallback for chapters without Lucide */
         .sidebar.collapsed nav a::before {
             content: attr(data-icon);
             font-size: var(--text-lg);
             display: block;
+        }
+
+        /* Hide emoji when Lucide icon present */
+        .sidebar.collapsed nav a:has([data-lucide])::before,
+        .sidebar.collapsed nav a:has(svg.lucide)::before {
+            display: none;
+        }
+
+        .sidebar.collapsed nav a [data-lucide],
+        .sidebar.collapsed nav a svg.lucide {
+            font-size: var(--text-lg);
+            width: 1.25em;
+            height: 1.25em;
         }
 
         .sidebar.collapsed nav a:hover {

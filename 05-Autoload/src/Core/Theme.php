@@ -41,7 +41,7 @@ abstract class Theme
                 $p[1],
             ), $n))
             |> (static fn($a) => implode('', $a));
-        return "<div class=\"dropdown\"><span class=\"dropdown-toggle\"><i data-lucide=\"palette\"></i> Themes</span><div class=\"dropdown-menu\">$links</div></div>";
+        return "<div class=\"dropdown\"><span class=\"dropdown-toggle\"><i data-lucide=\"layout-grid\"></i> Layout</span><div class=\"dropdown-menu\">$links</div></div>";
     }
 
     protected function colors(): string

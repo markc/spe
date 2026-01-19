@@ -27,7 +27,7 @@ final class SideBar extends Theme
         $body = <<<HTML
         <nav class="topnav">
             <button class="menu-toggle"><i data-lucide="menu"></i></button>
-            <a class="brand" href="/"><i data-lucide="chevron-left"></i> Autoload PHP Example</a>
+            <h1><a class="brand" href="/"><i data-lucide="chevron-left"></i> <span>Autoload PHP Example</span></a></h1>
             <button class="theme-toggle" id="theme-icon"><i data-lucide="moon"></i></button>
         </nav>
         <div class="sidebar-layout">
@@ -37,7 +37,7 @@ final class SideBar extends Theme
                     <nav>$n1</nav>
                 </div>
                 <div class="sidebar-group">
-                    <div class="sidebar-group-title" data-icon="palette"><i data-lucide="palette"></i> Themes</div>
+                    <div class="sidebar-group-title" data-icon="layout-grid"><i data-lucide="layout-grid"></i> Layout</div>
                     <nav>$n2</nav>
                 </div>
                 <div class="sidebar-group">
