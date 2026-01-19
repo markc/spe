@@ -84,6 +84,30 @@ const Base = {
         }
     },
 
+    // Initialize tooltips for collapsed sidebar links
+    initSidebarTooltips() {
+        const sidebar = document.querySelector('.sidebar');
+        if (!sidebar) return;
+
+        const tooltip = document.createElement('div');
+        tooltip.className = 'sidebar-tooltip';
+        document.body.appendChild(tooltip);
+
+        sidebar.querySelectorAll('nav a[title]').forEach(link => {
+            link.addEventListener('mouseenter', () => {
+                if (!sidebar.classList.contains('collapsed')) return;
+                tooltip.textContent = link.getAttribute('title');
+                const rect = link.getBoundingClientRect();
+                tooltip.style.top = `${rect.top + rect.height / 2}px`;
+                tooltip.style.left = `${rect.right + 8}px`;
+                tooltip.classList.add('visible');
+            });
+            link.addEventListener('mouseleave', () => {
+                tooltip.classList.remove('visible');
+            });
+        });
+    },
+
     // Toggle sidebar collapsed state (desktop)
     collapseSidebar() {
         const sidebar = document.querySelector('.sidebar');
@@ -235,6 +259,9 @@ const Base = {
 
         // Initialize sidebar collapsed state
         this.initSidebar();
+
+        // Initialize sidebar tooltips
+        this.initSidebarTooltips();
 
         // Theme toggle buttons
         document.querySelectorAll('.theme-toggle').forEach(btn => {
