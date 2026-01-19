@@ -1673,6 +1673,7 @@
         /* Tooltip on hover when collapsed */
         .sidebar.collapsed nav a::after {
             content: attr(data-label);
+            display: block;
             position: absolute;
             left: 100%;
             top: 50%;
@@ -1682,7 +1683,7 @@
             color: var(--fg-primary);
             padding: var(--space-1) var(--space-2);
             border-radius: var(--radius-sm);
-            font-size: var(--text-sm);
+            font-size: 0.875rem;
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
