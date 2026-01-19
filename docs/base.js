@@ -4,8 +4,9 @@
  */
 
 const Base = {
-    // Storage key for theme
+    // Storage keys
     storageKey: 'base-theme',
+    sidebarKey: 'base-sidebar',
 
     // Initialize theme (called inline in head to prevent FOUC)
     initTheme() {
@@ -70,6 +71,27 @@ const Base = {
             // Toggle body scroll lock
             document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
         }
+    },
+
+    // Initialize sidebar collapsed state from localStorage
+    initSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        if (!sidebar) return;
+
+        const stored = localStorage.getItem(this.sidebarKey);
+        if (stored === 'collapsed') {
+            sidebar.classList.add('collapsed');
+        }
+    },
+
+    // Toggle sidebar collapsed state (desktop)
+    collapseSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        if (!sidebar) return;
+
+        sidebar.classList.toggle('collapsed');
+        const isCollapsed = sidebar.classList.contains('collapsed');
+        localStorage.setItem(this.sidebarKey, isCollapsed ? 'collapsed' : 'expanded');
     },
 
     // Toggle mobile nav menu
@@ -211,9 +233,17 @@ const Base = {
         // Theme is already initialized inline, just update icon
         this.updateThemeIcon();
 
+        // Initialize sidebar collapsed state
+        this.initSidebar();
+
         // Theme toggle buttons
         document.querySelectorAll('.theme-toggle').forEach(btn => {
             btn.addEventListener('click', () => this.toggleTheme());
+        });
+
+        // Sidebar collapse toggle (desktop)
+        document.querySelectorAll('.sidebar-toggle').forEach(btn => {
+            btn.addEventListener('click', () => this.collapseSidebar());
         });
 
         // Collapsible sidebar groups

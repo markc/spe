@@ -180,6 +180,21 @@ describe('Theme Dropdown', function () {
         expect($html)->toContain('Themes');
     });
 
+    test('SideBar theme has collapse toggle button', function () {
+        $html = renderPage(themesIndexPath(), ['t' => 'SideBar']);
+
+        expect($html)->toContain('sidebar-toggle');
+        expect($html)->toContain('aria-label="Toggle sidebar"');
+    });
+
+    test('SideBar theme links have data attributes for collapsed tooltips', function () {
+        $html = renderPage(themesIndexPath(), ['t' => 'SideBar']);
+
+        expect($html)->toContain('data-icon="🏠"');
+        expect($html)->toContain('data-label="Home"');
+        expect($html)->toContain('data-icon="🎨"');
+    });
+
 });
 
 describe('Input Sanitization', function () {

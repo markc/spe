@@ -922,6 +922,8 @@
     }
 
     .sidebar {
+        display: flex;
+        flex-direction: column;
         width: 100%;
         background: var(--bg-secondary);
         padding: var(--space-4);
@@ -934,8 +936,13 @@
         left: -100%;
         height: calc(100vh - 3.5rem);
         overflow-y: auto;
-        transition: left var(--transition-slow);
+        transition: left var(--transition-slow), width var(--transition-slow);
         z-index: calc(var(--z-fixed) - 1);
+    }
+
+    /* Hide sidebar toggle on mobile */
+    .sidebar-toggle {
+        display: none;
     }
 
     .sidebar.open { left: 0; }
@@ -1595,6 +1602,110 @@
         .sidebar-main {
             margin-block-start: 0;
             padding-block-start: var(--space-8);
+            transition: margin-inline-start var(--transition-slow);
+        }
+
+        /* Sidebar toggle button */
+        .sidebar-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: var(--space-2);
+            margin-block-start: auto;
+            background: transparent;
+            border: none;
+            border-block-start: 1px solid var(--border);
+            color: var(--fg-muted);
+            cursor: pointer;
+            font-size: var(--text-lg);
+            transition: color var(--transition-base), background var(--transition-base);
+        }
+
+        .sidebar-toggle:hover {
+            color: var(--accent);
+            background: var(--bg-primary);
+        }
+
+        .sidebar-toggle::before {
+            content: '«';
+            transition: transform var(--transition-base);
+        }
+
+        /* Collapsed sidebar state */
+        .sidebar.collapsed {
+            width: 60px;
+            padding-inline: var(--space-2);
+        }
+
+        .sidebar.collapsed .sidebar-toggle::before {
+            transform: rotate(180deg);
+        }
+
+        .sidebar.collapsed .sidebar-group-title {
+            font-size: 0;
+            justify-content: center;
+        }
+
+        .sidebar.collapsed .sidebar-group-title::before {
+            content: attr(data-icon);
+            font-size: var(--text-base);
+        }
+
+        .sidebar.collapsed .sidebar-group-title::after {
+            display: none;
+        }
+
+        .sidebar.collapsed nav a {
+            font-size: 0;
+            text-align: center;
+            padding-inline-start: 0;
+            position: relative;
+        }
+
+        .sidebar.collapsed nav a::before {
+            content: attr(data-icon);
+            font-size: var(--text-lg);
+            display: block;
+        }
+
+        /* Tooltip on hover when collapsed */
+        .sidebar.collapsed nav a::after {
+            content: attr(data-label);
+            display: block;
+            position: absolute;
+            left: calc(100% + var(--space-2));
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--bg-tertiary);
+            color: var(--fg-primary);
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-sm);
+            font-size: var(--text-sm);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-fast);
+            z-index: var(--z-tooltip);
+            box-shadow: var(--shadow-md);
+        }
+
+        .sidebar.collapsed nav a:hover::after {
+            opacity: 1;
+        }
+
+        .sidebar.collapsed nav a:hover {
+            padding-inline-start: 0;
+            border-inline-start-color: transparent;
+        }
+
+        .sidebar.collapsed nav a.active {
+            padding-inline-start: 0;
+        }
+
+        /* Adjust main content when sidebar is collapsed */
+        .sidebar-layout:has(.sidebar.collapsed) .sidebar-main {
+            margin-inline-start: 0;
         }
 
         /* TopNav links visible on desktop */

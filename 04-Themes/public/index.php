@@ -92,7 +92,7 @@ final class HomeView extends View {
             <p>A fixed navigation bar at the top of the viewport with centered navigation links and a theme dropdown. The content area has extra top margin to account for the fixed navbar. Ideal for sites that need persistent navigation while scrolling.</p>
 
             <h3 class="mt-4">🎨 SideBar</h3>
-            <p>A two-column layout with a sidebar containing grouped navigation links. The sidebar shows "Pages" and "Themes" sections with collapsible groups (click titles to expand/collapse). On mobile, the ☰ button toggles the sidebar visibility. Best for applications with many navigation items or hierarchical content organization.</p>
+            <p>A two-column layout with a collapsible sidebar. Click the « toggle at the bottom to collapse to icons-only mode with hover tooltips (state persists via localStorage). Groups can be collapsed by clicking their titles. On mobile, the ☰ button toggles sidebar visibility. Best for admin dashboards and applications with many navigation items.</p>
 
             <h3 class="mt-4">What's New in This Chapter?</h3>
             <ul class="mt-2" style="list-style:disc;padding-left:1.5rem">
@@ -217,16 +217,22 @@ HTML;
     public function SideBar(): string {
         ['o' => $o, 't' => $t] = $this->ctx->in;
         $n1 = $this->ctx->nav
-            |> (static fn($n) => array_map(static fn($p) => sprintf(
-                '<a href="?o=%s&t=%s"%s>%s</a>',
-                $p[1], $t, $o === $p[1] ? ' class="active"' : '', $p[0]
-            ), $n))
+            |> (static fn($n) => array_map(static function($p) use ($o, $t) {
+                [$icon, $label] = explode(' ', $p[0], 2);
+                return sprintf(
+                    '<a href="?o=%s&t=%s"%s data-icon="%s" data-label="%s">%s</a>',
+                    $p[1], $t, $o === $p[1] ? ' class="active"' : '', $icon, $label, $p[0]
+                );
+            }, $n))
             |> (static fn($a) => implode('', $a));
         $n2 = $this->ctx->themes
-            |> (static fn($n) => array_map(static fn($p) => sprintf(
-                '<a href="?o=%s&t=%s"%s>%s</a>',
-                $o, $p[1], $t === $p[1] ? ' class="active"' : '', $p[0]
-            ), $n))
+            |> (static fn($n) => array_map(static function($p) use ($o, $t) {
+                [$icon, $label] = explode(' ', $p[0], 2);
+                return sprintf(
+                    '<a href="?o=%s&t=%s"%s data-icon="%s" data-label="%s">%s</a>',
+                    $o, $p[1], $t === $p[1] ? ' class="active"' : '', $icon, $label, $p[0]
+                );
+            }, $n))
             |> (static fn($a) => implode('', $a));
         $body = <<<HTML
 <nav class="topnav">
@@ -237,13 +243,14 @@ HTML;
 <div class="sidebar-layout">
     <aside class="sidebar">
         <div class="sidebar-group">
-            <div class="sidebar-group-title">Pages</div>
+            <div class="sidebar-group-title" data-icon="📄">Pages</div>
             <nav>{$n1}</nav>
         </div>
         <div class="sidebar-group">
-            <div class="sidebar-group-title">Themes</div>
+            <div class="sidebar-group-title" data-icon="🎨">Themes</div>
             <nav>{$n2}</nav>
         </div>
+        <button class="sidebar-toggle" aria-label="Toggle sidebar"></button>
     </aside>
     <div class="sidebar-main">
         <main class="mt-4 mb-4">{$this->out['main']}</main>
