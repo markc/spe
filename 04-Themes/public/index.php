@@ -220,8 +220,8 @@ HTML;
             |> (static fn($n) => array_map(static function($p) use ($o, $t) {
                 [$icon, $label] = explode(' ', $p[0], 2);
                 return sprintf(
-                    '<a href="?o=%s&t=%s"%s data-icon="%s" data-label="%s">%s</a>',
-                    $p[1], $t, $o === $p[1] ? ' class="active"' : '', $icon, $label, $p[0]
+                    '<a href="?o=%s&t=%s"%s title="%s" data-icon="%s">%s</a>',
+                    $p[1], $t, $o === $p[1] ? ' class="active"' : '', $label, $icon, $p[0]
                 );
             }, $n))
             |> (static fn($a) => implode('', $a));
@@ -229,8 +229,8 @@ HTML;
             |> (static fn($n) => array_map(static function($p) use ($o, $t) {
                 [$icon, $label] = explode(' ', $p[0], 2);
                 return sprintf(
-                    '<a href="?o=%s&t=%s"%s data-icon="%s" data-label="%s">%s</a>',
-                    $o, $p[1], $t === $p[1] ? ' class="active"' : '', $icon, $label, $p[0]
+                    '<a href="?o=%s&t=%s"%s title="%s" data-icon="%s">%s</a>',
+                    $o, $p[1], $t === $p[1] ? ' class="active"' : '', $label, $icon, $p[0]
                 );
             }, $n))
             |> (static fn($a) => implode('', $a));

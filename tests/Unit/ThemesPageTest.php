@@ -187,12 +187,13 @@ describe('Theme Dropdown', function () {
         expect($html)->toContain('aria-label="Toggle sidebar"');
     });
 
-    test('SideBar theme links have data attributes for collapsed tooltips', function () {
+    test('SideBar theme links have title and data-icon for collapsed state', function () {
         $html = renderPage(themesIndexPath(), ['t' => 'SideBar']);
 
         expect($html)->toContain('data-icon="🏠"');
-        expect($html)->toContain('data-label="Home"');
+        expect($html)->toContain('title="Home"');
         expect($html)->toContain('data-icon="🎨"');
+        expect($html)->toContain('title="Simple"');
     });
 
 });
