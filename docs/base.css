@@ -892,7 +892,7 @@
     }
 
     .topnav + .container { margin-block-start: var(--space-20); }
-    .topnav + .sidebar-layout { margin-block-start: var(--space-10); }
+    .topnav + .sidebar-layout { margin-block-start: var(--space-6); }
 
     .topnav-links {
         display: none;
