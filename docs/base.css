@@ -958,14 +958,15 @@
         padding: 4px 10px;
         background: #1f2937;
         color: #f9fafb;
+        border: 1px solid #6b7280;
         border-radius: 4px;
         font-size: 14px;
         white-space: nowrap;
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.15s ease;
-        z-index: var(--z-tooltip);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        transition: opacity 0.1s ease;
+        z-index: 99999;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     }
 
     .sidebar-tooltip.visible {
