@@ -612,11 +612,13 @@
         gap: var(--space-1);
         cursor: pointer;
         color: var(--accent);
+        line-height: 1;
     }
 
     .dropdown-toggle::after {
         content: '\25BC';
         font-size: 0.6em;
+        line-height: 1;
         transition: transform var(--transition-fast);
     }
 
