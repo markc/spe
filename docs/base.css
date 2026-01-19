@@ -142,6 +142,15 @@
         height: auto;
     }
 
+    /* Lucide icon styling */
+    [data-lucide], .lucide {
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        vertical-align: -0.125em;
+        stroke-width: 2;
+    }
+
     input, button, textarea, select {
         font: inherit;
         color: inherit;

@@ -14,14 +14,14 @@ final class Ctx
         array $in = ['o' => 'Home', 'm' => 'list', 't' => 'Simple', 'x' => ''],
         array $out = ['doc' => 'SPE::05', 'head' => '', 'main' => '', 'foot' => ''],
         public array $nav = [
-            ['🏠 Home',    'Home'],
-            ['📖 About',   'About'],
-            ['✉️ Contact', 'Contact'],
+            ['home',      'Home',    'Home'],
+            ['book-open', 'About',   'About'],
+            ['mail',      'Contact', 'Contact'],
         ],
         public array $themes = [
-            ['🎨 Simple',  'Simple'],
-            ['🎨 TopNav',  'TopNav'],
-            ['🎨 SideBar', 'SideBar'],
+            ['layout-template', 'Simple',  'Simple'],
+            ['navigation',      'TopNav',  'TopNav'],
+            ['panel-left',      'SideBar', 'SideBar'],
         ],
     ) {
         $this->in = array_map(

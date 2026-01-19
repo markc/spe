@@ -44,11 +44,28 @@ const Base = {
 
     // Update theme toggle button icon
     updateThemeIcon() {
-        const icon = document.getElementById('theme-icon');
-        if (icon) {
+        const btn = document.getElementById('theme-icon');
+        if (btn) {
             const isDark = document.documentElement.classList.contains('dark');
-            icon.textContent = isDark ? '☀️' : '🌙';
-            icon.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+            btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+            // Support both emoji (chapters 01-04) and Lucide icons (chapters 05+)
+            const icon = btn.querySelector('i[data-lucide], svg');
+            if (icon) {
+                const newIcon = isDark ? 'sun' : 'moon';
+                if (icon.tagName === 'svg') {
+                    // Replace existing SVG with new icon
+                    const newI = document.createElement('i');
+                    newI.setAttribute('data-lucide', newIcon);
+                    icon.replaceWith(newI);
+                    if (typeof lucide !== 'undefined') lucide.createIcons({ nodes: [newI] });
+                } else {
+                    icon.setAttribute('data-lucide', newIcon);
+                    if (typeof lucide !== 'undefined') lucide.createIcons({ nodes: [icon] });
+                }
+            } else {
+                // Fallback to emoji for chapters without Lucide
+                btn.textContent = isDark ? '☀️' : '🌙';
+            }
         }
     },
 
@@ -423,6 +440,11 @@ const Base = {
                 this.updateThemeIcon();
             }
         });
+
+        // Initialize Lucide icons (if available)
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     }
 };
 
