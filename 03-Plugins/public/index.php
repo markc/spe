@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 if (!class_exists('Ctx')) {
     readonly class Ctx {
@@ -63,8 +63,8 @@ if (!class_exists('Ctx')) {
 <div class="container">
     <header><h1><a class="brand" href="/">🐘 Plugins PHP Example</a></h1></header>
     <nav class="card flex">{$nav}<span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span></nav>
-    <main>{$this->out['main']}</main>
-    <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
+    <main class="mt-4 mb-4">{$this->out['main']}</main>
+    <footer class="text-center"><small>© 2015-2026 Mark Constable (MIT License)</small></footer>
 </div>
 <script src="/base.js"></script>
 </body>
@@ -85,13 +85,13 @@ HTML;
     final class Home extends Plugin {
         #[\Override] public function list(): string {
             return <<<'HTML'
-            <div class="card">
+            <div class="card-hover">
                 <h2>Home Page</h2>
                 <p>Welcome to the <b>Plugins</b> example demonstrating the plugin architecture with CRUDL methods.</p>
             </div>
-            <div class="flex justify-center mt-2">
-                <button class="btn btn-success" onclick="showToast('Success!', 'success')">Success</button>
-                <button class="btn btn-danger" onclick="showToast('Error!', 'danger')">Danger</button>
+            <div class="flex justify-center mt-4">
+                <button class="btn-hover btn-success" onclick="showToast('Success!', 'success')">Success</button>
+                <button class="btn-hover btn-danger" onclick="showToast('Error!', 'danger')">Danger</button>
             </div>
             HTML;
         }
@@ -100,7 +100,7 @@ HTML;
     final class About extends Plugin {
         #[\Override] public function list(): string {
             return <<<HTML
-            <div class="card">
+            <div class="card-hover">
                 <h2>About Page</h2>
                 <p>This chapter adds the <b>plugin architecture</b> with CRUDL methods and JSON API output.</p>
             </div>
@@ -111,7 +111,7 @@ HTML;
     final class Contact extends Plugin {
         #[\Override] public function list(): string {
             return <<<HTML
-            <div class="card">
+            <div class="card-hover">
                 <h2>Contact Page</h2>
                 <p>Get in touch using the <b>email form</b> below.</p>
                 <form class="mt-2" onsubmit="return handleContact(this)">

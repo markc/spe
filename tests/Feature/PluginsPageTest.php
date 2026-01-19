@@ -30,7 +30,7 @@ describe('Full Page Rendering', function () {
         expect($html)->toContain('<div class="container">');
         expect($html)->toContain('<header>');
         expect($html)->toContain('<nav');
-        expect($html)->toContain('<main>');
+        expect($html)->toContain('<main class="mt-4 mb-4">');
         expect($html)->toContain('<footer');
 
         // Plugin content
@@ -97,7 +97,7 @@ describe('CRUDL Workflow', function () {
     test('CRUDL returns proper content in main area', function () {
         $html = renderPage(pluginsIndexPath(), ['o' => 'Home', 'm' => 'create']);
 
-        expect($html)->toMatch('/<main>.*Create: not implemented.*<\/main>/s');
+        expect($html)->toMatch('/<main.*>.*Create: not implemented.*<\/main>/s');
     });
 
 });
@@ -201,7 +201,7 @@ describe('Plugin Architecture', function () {
         foreach (['Home', 'About', 'Contact'] as $plugin) {
             $html = renderPage(pluginsIndexPath(), ['o' => $plugin]);
 
-            expect($html)->toContain('<div class="card">');
+            expect($html)->toContain('<div class="card-hover">');
         }
     });
 
