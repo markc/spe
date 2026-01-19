@@ -77,6 +77,11 @@
         --transition-slow: var(--duration-slow) var(--ease-out);
         --transition-spring: var(--duration-slow) var(--ease-spring);
 
+        /* Unified hover effect */
+        --transition-hover: var(--duration-slow) var(--ease-out);
+        --hover-lift: -4px;
+        --hover-shadow: var(--shadow-lg);
+
         /* Line heights */
         --leading-none: 1;
         --leading-tight: 1.25;
@@ -311,7 +316,7 @@
     .container-xl { max-width: var(--container-xl); }
 
     /* Cards - Mobile-first: no radius, no side borders */
-    .card {
+    .card, .card-hover {
         background-color: var(--bg-secondary);
         padding: var(--space-4);
         border-radius: 0;
@@ -319,33 +324,25 @@
         border-inline: none;
         box-shadow: none;
         transition:
-            transform var(--transition-base),
-            box-shadow var(--transition-base),
+            transform var(--transition-hover),
+            box-shadow var(--transition-hover),
             border-color var(--transition-fast),
             border-radius var(--transition-fast);
     }
 
-    .card:hover {
-        box-shadow: var(--shadow-sm);
-    }
-
     /* Cards - Desktop: add radius, borders, shadow */
     @media (min-width: 600px) {
-        .card {
+        .card, .card-hover {
             border-radius: var(--radius-lg);
             border-inline: 1px solid var(--border);
             box-shadow: var(--shadow-sm);
         }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
     }
 
-    .card-static:hover {
-        transform: none;
-        box-shadow: var(--shadow-sm);
+    /* Card with hover effects (standalone class) */
+    .card-hover:hover {
+        transform: translateY(var(--hover-lift));
+        box-shadow: var(--hover-shadow);
     }
 
     .card-link {
@@ -357,20 +354,20 @@
         text-decoration: none;
         color: inherit;
         transition:
-            transform var(--transition-base),
-            box-shadow var(--transition-base),
+            transform var(--transition-hover),
+            box-shadow var(--transition-hover),
             border-color var(--transition-fast);
     }
 
     .card-link:hover {
-        transform: translateY(-3px);
+        transform: translateY(var(--hover-lift));
         border-color: var(--accent);
-        box-shadow: var(--shadow-lg);
+        box-shadow: var(--hover-shadow);
         text-decoration: none;
     }
 
-    /* Buttons */
-    .btn {
+    /* Buttons - base styles for .btn and .btn-hover */
+    .btn, .btn-hover {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -381,31 +378,38 @@
         line-height: var(--leading-tight);
         text-align: center;
         white-space: nowrap;
-        border-radius: var(--radius-md);
+        border-radius: var(--radius-lg);
         border: 1px solid transparent;
         cursor: pointer;
         transition:
-            transform var(--transition-fast),
-            box-shadow var(--transition-fast),
-            background-color var(--transition-fast),
-            border-color var(--transition-fast);
+            transform var(--transition-hover),
+            box-shadow var(--transition-hover),
+            background-color var(--transition-hover),
+            border-color var(--transition-hover);
         background-color: var(--accent);
         color: white;
     }
 
+    /* Static button - no lift, just color change */
     .btn:hover {
         background-color: var(--accent-hover);
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-md);
         text-decoration: none;
     }
 
-    .btn:active {
+    /* Button with hover lift effect (matches card-hover) */
+    .btn-hover:hover {
+        background-color: var(--accent-hover);
+        transform: translateY(var(--hover-lift));
+        box-shadow: var(--hover-shadow);
+        text-decoration: none;
+    }
+
+    .btn:active, .btn-hover:active {
         transform: translateY(0);
         box-shadow: var(--shadow-sm);
     }
 
-    .btn:focus-visible {
+    .btn:focus-visible, .btn-hover:focus-visible {
         outline: 2px solid var(--accent);
         outline-offset: 2px;
     }
@@ -523,7 +527,7 @@
         height: 2px;
         background-color: var(--accent);
         transform: scaleX(0);
-        transition: transform var(--transition-base) var(--ease-out);
+        transition: transform var(--transition-hover);
     }
 
     nav a:hover {
@@ -831,15 +835,15 @@
         border: 1px solid var(--border);
         border-radius: var(--radius-xl);
         transition:
-            transform var(--transition-base),
-            box-shadow var(--transition-base),
+            transform var(--transition-hover),
+            box-shadow var(--transition-hover),
             border-color var(--transition-fast);
     }
 
     .feature:hover {
-        transform: translateY(-4px);
+        transform: translateY(var(--hover-lift));
         border-color: var(--accent);
-        box-shadow: var(--shadow-lg);
+        box-shadow: var(--hover-shadow);
     }
 
     .feature-icon {
@@ -1166,7 +1170,7 @@
         border-radius: var(--radius-md);
         overflow: hidden;
         border: 1px solid var(--border);
-        transition: border-color var(--transition-base), box-shadow var(--transition-base);
+        transition: border-color var(--transition-hover), box-shadow var(--transition-hover);
         box-shadow: var(--shadow-sm);
     }
 
@@ -1185,7 +1189,7 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform var(--transition-slow);
+        transition: transform var(--transition-hover);
     }
 
     .article-card:hover .article-card-image img { transform: scale(1.03); }
@@ -1756,12 +1760,12 @@
 
     /* Hover animations */
     .hover-lift {
-        transition: transform var(--transition-base), box-shadow var(--transition-base);
+        transition: transform var(--transition-hover), box-shadow var(--transition-hover);
     }
 
     .hover-lift:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-lg);
+        transform: translateY(var(--hover-lift));
+        box-shadow: var(--hover-shadow);
     }
 
     .hover-scale {
@@ -1773,7 +1777,7 @@
     }
 
     .hover-glow {
-        transition: box-shadow var(--transition-base);
+        transition: box-shadow var(--transition-hover);
     }
 
     .hover-glow:hover {
