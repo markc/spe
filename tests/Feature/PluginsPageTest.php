@@ -34,7 +34,7 @@ describe('Full Page Rendering', function () {
         expect($html)->toContain('<footer');
 
         // Plugin content
-        expect($html)->toContain('Home Page');
+        expect($html)->toContain('Plugin Architecture');
         expect($html)->toContain('src="/base.js"');
     });
 
@@ -76,8 +76,8 @@ describe('CRUDL Workflow', function () {
     test('list is the default method', function () {
         $html = renderPage(pluginsIndexPath(), ['o' => 'Home']);
 
-        expect($html)->toContain('Home Page');
-        expect($html)->not->toContain('not implemented');
+        expect($html)->toContain('Plugin Architecture');
+        expect($html)->not->toContain('List: not implemented');
     });
 
     test('all CRUDL methods are accessible', function () {
@@ -87,7 +87,7 @@ describe('CRUDL Workflow', function () {
             $html = renderPage(pluginsIndexPath(), ['o' => 'Home', 'm' => $method]);
 
             if ($method === 'list') {
-                expect($html)->toContain('Home Page');
+                expect($html)->toContain('Plugin Architecture');
             } else {
                 expect($html)->toContain(ucfirst($method) . ': not implemented');
             }
@@ -138,11 +138,12 @@ describe('API Output Modes', function () {
     });
 
     test('json mode works with different plugins', function () {
-        foreach (['Home', 'About', 'Contact'] as $plugin) {
+        $expected = ['Home' => 'Plugin Architecture', 'About' => 'About Page', 'Contact' => 'Contact Page'];
+        foreach ($expected as $plugin => $content) {
             $output = renderPage(pluginsIndexPath(), ['o' => $plugin, 'x' => 'json']);
             $data = json_decode($output, true);
 
-            expect($data['main'])->toContain("{$plugin} Page");
+            expect($data['main'])->toContain($content);
         }
     });
 
@@ -158,12 +159,12 @@ describe('API Output Modes', function () {
 describe('User Journey Scenarios', function () {
 
     test('user can navigate between all plugins', function () {
-        $plugins = ['Home', 'About', 'Contact'];
+        $expected = ['Home' => 'Plugin Architecture', 'About' => 'About Page', 'Contact' => 'Contact Page'];
 
-        foreach ($plugins as $plugin) {
+        foreach ($expected as $plugin => $content) {
             $html = renderPage(pluginsIndexPath(), ['o' => $plugin]);
 
-            expect($html)->toContain("{$plugin} Page");
+            expect($html)->toContain($content);
 
             // All navigation links present
             expect($html)->toContain('href="?o=Home"');
@@ -206,10 +207,11 @@ describe('Plugin Architecture', function () {
     });
 
     test('plugins have h2 headings', function () {
-        foreach (['Home', 'About', 'Contact'] as $plugin) {
+        $expected = ['Home' => 'Plugin Architecture', 'About' => 'About Page', 'Contact' => 'Contact Page'];
+        foreach ($expected as $plugin => $heading) {
             $html = renderPage(pluginsIndexPath(), ['o' => $plugin]);
 
-            expect($html)->toContain("<h2>{$plugin} Page</h2>");
+            expect($html)->toContain("<h2>{$heading}</h2>");
         }
     });
 
@@ -310,7 +312,7 @@ describe('Comparison with Previous Chapters', function () {
         $home = renderPage(pluginsIndexPath(), ['o' => 'Home']);
         $about = renderPage(pluginsIndexPath(), ['o' => 'About']);
 
-        expect($home)->toContain('Home Page');
+        expect($home)->toContain('Plugin Architecture');
         expect($about)->toContain('About Page');
     });
 
@@ -345,13 +347,13 @@ describe('Performance Characteristics', function () {
     test('JSON output is compact', function () {
         $output = renderPage(pluginsIndexPath(), ['o' => 'Home', 'x' => 'json']);
 
-        expect(strlen($output))->toBeLessThan(2000);
+        expect(strlen($output))->toBeLessThan(4000);
     });
 
     test('HTML output size is reasonable', function () {
         $html = renderPage(pluginsIndexPath(), ['o' => 'Home']);
 
-        expect(strlen($html))->toBeLessThan(3000);
+        expect(strlen($html))->toBeLessThan(5000);
     });
 
 });

@@ -86,8 +86,31 @@ HTML;
         #[\Override] public function list(): string {
             return <<<'HTML'
             <div class="card-hover">
-                <h2>Home Page</h2>
-                <p>Welcome to the <b>Plugins</b> example demonstrating the plugin architecture with CRUDL methods.</p>
+                <h2>Plugin Architecture</h2>
+                <p>While this page looks similar to <a href="/02-Styled/">02-Styled</a>, the underlying PHP structure has been completely reorganized to use a <b>plugin-based architecture</b>.</p>
+
+                <h3 class="mt-4">What Changed?</h3>
+                <p>In 02-Styled, page content was stored in a simple array within an anonymous class. Here, each page is now a separate <b>Plugin class</b> that extends an abstract base class with standardized methods.</p>
+
+                <h3 class="mt-4">Core Classes</h3>
+                <ul class="mt-2" style="list-style:disc;padding-left:1.5rem">
+                    <li><b>Ctx</b> — Context class holding configuration: email, input parameters, output array, and navigation items</li>
+                    <li><b>Init</b> — Handles URL routing, plugin dispatch, and HTML/JSON rendering</li>
+                    <li><b>Plugin</b> — Abstract base class defining the CRUDL interface (Create, Read, Update, Delete, List)</li>
+                    <li><b>Home, About, Contact</b> — Concrete plugin classes that override the <code>list()</code> method</li>
+                </ul>
+
+                <h3 class="mt-4">CRUDL Pattern</h3>
+                <p>Each plugin inherits five methods: <code>create()</code>, <code>read()</code>, <code>update()</code>, <code>delete()</code>, and <code>list()</code>. By default, these return "not implemented" — plugins override only what they need. Try: <a href="?o=Home&m=create">?o=Home&m=create</a></p>
+
+                <h3 class="mt-4">URL Routing</h3>
+                <p>The URL parameter <code>?o=</code> selects the plugin (object), and <code>?m=</code> selects the method. Compare this to 02-Styled's simple <code>?m=page</code> approach.</p>
+
+                <h3 class="mt-4">JSON API</h3>
+                <p>Add <code>?x=json</code> to any URL to get JSON output instead of HTML. Try: <a href="?o=Home&x=json">?o=Home&x=json</a></p>
+
+                <h3 class="mt-4">Adding a New Plugin</h3>
+                <p>To add a new page: 1) Create a class extending <code>Plugin</code>, 2) Override the methods you need, 3) Add a nav entry in <code>Ctx::$nav</code>. That's it — no template files, no routing configuration.</p>
             </div>
             <div class="flex justify-center mt-4">
                 <button class="btn-hover btn-success" onclick="showToast('Success!', 'success')">Success</button>

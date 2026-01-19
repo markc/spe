@@ -18,14 +18,14 @@ describe('Plugin Routing', function () {
     test('defaults to Home plugin when no parameter provided', function () {
         $html = renderPage(pluginsIndexPath(), []);
 
-        expect($html)->toContain('Home Page');
-        expect($html)->toContain('plugin architecture');
+        expect($html)->toContain('Plugin Architecture');
+        expect($html)->toContain('plugin-based architecture');
     });
 
     test('routes to Home plugin', function () {
         $html = renderPage(pluginsIndexPath(), ['o' => 'Home']);
 
-        expect($html)->toContain('Home Page');
+        expect($html)->toContain('Plugin Architecture');
     });
 
     test('routes to About plugin', function () {
@@ -52,7 +52,7 @@ describe('Plugin Routing', function () {
         $html = renderPage(pluginsIndexPath(), ['o' => 'home']);
 
         // PHP class names are case-insensitive
-        expect($html)->toContain('Home Page');
+        expect($html)->toContain('Plugin Architecture');
     });
 
 });
@@ -62,13 +62,13 @@ describe('Method Dispatch', function () {
     test('defaults to list method', function () {
         $html = renderPage(pluginsIndexPath(), ['o' => 'Home']);
 
-        expect($html)->toContain('Home Page');
+        expect($html)->toContain('Plugin Architecture');
     });
 
     test('explicit list method works', function () {
         $html = renderPage(pluginsIndexPath(), ['o' => 'Home', 'm' => 'list']);
 
-        expect($html)->toContain('Home Page');
+        expect($html)->toContain('Plugin Architecture');
     });
 
     test('create method returns not implemented', function () {
@@ -114,7 +114,7 @@ describe('Input Sanitization', function () {
     test('trims whitespace from method parameter', function () {
         $html = renderPage(pluginsIndexPath(), ['o' => 'Home', 'm' => '  list  ']);
 
-        expect($html)->toContain('Home Page');
+        expect($html)->toContain('Plugin Architecture');
     });
 
     test('escapes HTML in plugin parameter', function () {
@@ -187,7 +187,7 @@ describe('JSON API Output', function () {
 
         $data = json_decode($output, true);
         expect($data)->toHaveKey('main');
-        expect($data['main'])->toContain('Home Page');
+        expect($data['main'])->toContain('Plugin Architecture');
     });
 
     test('json output for About plugin', function () {
