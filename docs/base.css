@@ -893,6 +893,10 @@
         font-size: var(--text-2xl);
     }
 
+    .topnav .brand {
+        color: var(--accent);
+    }
+
     .topnav + .container { margin-block-start: var(--space-20); }
     .topnav + .sidebar-layout { margin-block-start: var(--space-8); }
 
@@ -1676,20 +1680,20 @@
             display: block;
             position: absolute;
             left: 100%;
-            top: 50%;
-            transform: translateY(-50%);
+            top: 0;
             margin-left: var(--space-2);
-            background: var(--bg-tertiary);
+            background: var(--bg-secondary);
             color: var(--fg-primary);
             padding: var(--space-1) var(--space-2);
             border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
             font-size: 0.875rem;
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
             transition: opacity var(--transition-fast);
             z-index: var(--z-tooltip);
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-lg);
         }
 
         .sidebar.collapsed nav a:hover::after {
