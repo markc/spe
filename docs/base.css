@@ -667,12 +667,22 @@
         display: block;
         padding: var(--space-2) var(--space-4);
         color: var(--fg-primary);
+        text-decoration: none;
         transition: background-color var(--transition-fast);
     }
 
+    .dropdown-menu a::after {
+        display: none;
+    }
+
     .dropdown-menu a:hover {
-        background-color: var(--bg-secondary);
-        text-decoration: none;
+        background-color: var(--bg-tertiary);
+    }
+
+    .dropdown-menu a.active {
+        color: var(--accent);
+        border-inline-start: 2px solid var(--accent);
+        margin-inline-start: -2px;
     }
 
     .dropdown-divider {

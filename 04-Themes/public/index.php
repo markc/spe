@@ -159,6 +159,17 @@ final class Theme {
         return "<div class=\"dropdown\"><span class=\"dropdown-toggle\">🎨 Themes</span><div class=\"dropdown-menu\">{$links}</div></div>";
     }
 
+    private function colors(): string {
+        return <<<HTML
+<div class="dropdown"><span class="dropdown-toggle">🌈 Colors</span><div class="dropdown-menu">
+<a href="#" data-scheme="default">🪨 Stone</a>
+<a href="#" data-scheme="ocean">🌊 Ocean</a>
+<a href="#" data-scheme="forest">🌲 Forest</a>
+<a href="#" data-scheme="sunset">🌅 Sunset</a>
+</div></div>
+HTML;
+    }
+
     private function html(string $theme, string $body): string {
         return <<<HTML
 <!DOCTYPE html>
@@ -169,7 +180,7 @@ final class Theme {
     <title>{$this->out['doc']} [{$theme}]</title>
     <link rel="stylesheet" href="/base.css">
     <link rel="stylesheet" href="/site.css">
-    <script>(function(){const t=localStorage.getItem("base-theme");document.documentElement.className=t||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")})();</script>
+    <script>(function(){const t=localStorage.getItem("base-theme"),s=localStorage.getItem("base-scheme"),c=t||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");document.documentElement.className=c+(s&&s!=="default"?" scheme-"+s:"")})();</script>
 </head>
 <body>
 {$body}
@@ -182,11 +193,12 @@ HTML;
     public function Simple(): string {
         $nav = $this->nav();
         $dd = $this->dropdown();
+        $colors = $this->colors();
         $body = <<<HTML
 <div class="container">
     <header><h1><a class="brand" href="/">🐘 Themes PHP Example</a></h1></header>
     <nav class="card flex">
-        {$nav} {$dd}
+        {$nav} {$dd} {$colors}
         <span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span>
     </nav>
     <main class="mt-4 mb-4">{$this->out['main']}</main>
@@ -199,10 +211,11 @@ HTML;
     public function TopNav(): string {
         $nav = $this->nav();
         $dd = $this->dropdown();
+        $colors = $this->colors();
         $body = <<<HTML
 <nav class="topnav">
     <h1><a class="brand" href="/">🐘 Themes PHP Example</a></h1>
-    <div class="topnav-links">{$nav} {$dd}</div>
+    <div class="topnav-links">{$nav} {$dd} {$colors}</div>
     <button class="theme-toggle" id="theme-icon">🌙</button>
     <button class="menu-toggle">☰</button>
 </nav>
@@ -249,6 +262,15 @@ HTML;
         <div class="sidebar-group">
             <div class="sidebar-group-title" data-icon="🎨">Themes</div>
             <nav>{$n2}</nav>
+        </div>
+        <div class="sidebar-group">
+            <div class="sidebar-group-title" data-icon="🌈">Colors</div>
+            <nav>
+                <a href="#" data-scheme="default" title="Stone" data-icon="🪨">🪨 Stone</a>
+                <a href="#" data-scheme="ocean" title="Ocean" data-icon="🌊">🌊 Ocean</a>
+                <a href="#" data-scheme="forest" title="Forest" data-icon="🌲">🌲 Forest</a>
+                <a href="#" data-scheme="sunset" title="Sunset" data-icon="🌅">🌅 Sunset</a>
+            </nav>
         </div>
         <button class="sidebar-toggle" aria-label="Toggle sidebar"></button>
     </aside>

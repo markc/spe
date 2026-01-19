@@ -7,25 +7,38 @@ const Base = {
     // Storage keys
     storageKey: 'base-theme',
     sidebarKey: 'base-sidebar',
+    schemeKey: 'base-scheme',
 
     // Initialize theme (called inline in head to prevent FOUC)
     initTheme() {
-        const stored = localStorage.getItem(this.storageKey);
-        if (stored) {
-            document.documentElement.className = stored;
+        const html = document.documentElement;
+        const storedTheme = localStorage.getItem(this.storageKey);
+        const storedScheme = localStorage.getItem(this.schemeKey);
+
+        // Set theme
+        html.classList.remove('light', 'dark');
+        if (storedTheme) {
+            html.classList.add(storedTheme);
         } else {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            document.documentElement.className = prefersDark ? 'dark' : 'light';
+            html.classList.add(prefersDark ? 'dark' : 'light');
         }
+
+        // Set scheme
+        if (storedScheme && storedScheme !== 'default') {
+            html.classList.add('scheme-' + storedScheme);
+        }
+
         this.updateThemeIcon();
     },
 
     // Toggle between light and dark themes
     toggleTheme() {
-        const current = document.documentElement.className;
-        const next = current === 'dark' ? 'light' : 'dark';
-        document.documentElement.className = next;
-        localStorage.setItem(this.storageKey, next);
+        const html = document.documentElement;
+        const isDark = html.classList.contains('dark');
+        html.classList.remove('light', 'dark');
+        html.classList.add(isDark ? 'light' : 'dark');
+        localStorage.setItem(this.storageKey, isDark ? 'light' : 'dark');
         this.updateThemeIcon();
     },
 
@@ -33,10 +46,31 @@ const Base = {
     updateThemeIcon() {
         const icon = document.getElementById('theme-icon');
         if (icon) {
-            const isDark = document.documentElement.className === 'dark';
+            const isDark = document.documentElement.classList.contains('dark');
             icon.textContent = isDark ? '☀️' : '🌙';
             icon.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
         }
+    },
+
+    // Set color scheme
+    setScheme(scheme) {
+        const html = document.documentElement;
+        // Remove existing scheme classes
+        html.classList.remove('scheme-ocean', 'scheme-forest', 'scheme-sunset');
+        // Add new scheme if not default
+        if (scheme && scheme !== 'default') {
+            html.classList.add('scheme-' + scheme);
+        }
+        localStorage.setItem(this.schemeKey, scheme || 'default');
+        this.updateSchemeLinks();
+    },
+
+    // Update active state on scheme links
+    updateSchemeLinks() {
+        const currentScheme = localStorage.getItem(this.schemeKey) || 'default';
+        document.querySelectorAll('[data-scheme]').forEach(el => {
+            el.classList.toggle('active', el.dataset.scheme === currentScheme);
+        });
     },
 
     // Show toast notification
@@ -266,9 +300,20 @@ const Base = {
         // Initialize sidebar tooltips
         this.initSidebarTooltips();
 
+        // Update active state on scheme links
+        this.updateSchemeLinks();
+
         // Theme toggle buttons
         document.querySelectorAll('.theme-toggle').forEach(btn => {
             btn.addEventListener('click', () => this.toggleTheme());
+        });
+
+        // Color scheme selectors
+        document.querySelectorAll('[data-scheme]').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.setScheme(el.dataset.scheme);
+            });
         });
 
         // Sidebar collapse toggle (desktop)
@@ -372,7 +417,9 @@ const Base = {
         // Listen for system theme changes
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
             if (!localStorage.getItem(this.storageKey)) {
-                document.documentElement.className = e.matches ? 'dark' : 'light';
+                const html = document.documentElement;
+                html.classList.remove('light', 'dark');
+                html.classList.add(e.matches ? 'dark' : 'light');
                 this.updateThemeIcon();
             }
         });
