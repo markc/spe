@@ -52,7 +52,7 @@ final class SideBar extends Theme
                 <button class="sidebar-toggle" aria-label="Toggle sidebar"></button>
             </aside>
             <div class="sidebar-main">
-                <main class="mt-4">{$this->out['main']}</main>
+                <main class="mt-4 mb-4">{$this->out['main']}</main>
                 <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
             </div>
         </div>

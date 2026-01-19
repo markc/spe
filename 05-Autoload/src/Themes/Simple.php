@@ -21,7 +21,7 @@ final class Simple extends Theme
                 $nav $dd $colors
                 <span class="ml-auto"><button class="theme-toggle" id="theme-icon"><i data-lucide="moon"></i></button></span>
             </nav>
-            <main>{$this->out['main']}</main>
+            <main class="mt-4 mb-4">{$this->out['main']}</main>
             <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
         </div>
         HTML;
