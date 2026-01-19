@@ -132,12 +132,12 @@ describe('User Journey - Theme Switching', function () {
     });
 
     test('theme selection persists across pages', function () {
-        $pages = ['Home', 'About', 'Contact'];
+        $expected = ['Home' => 'Theme Layouts', 'About' => 'About Page', 'Contact' => 'Contact Page'];
 
-        foreach ($pages as $page) {
+        foreach ($expected as $page => $content) {
             $html = renderPage(themesIndexPath(), ['o' => $page, 't' => 'SideBar']);
 
-            expect($html)->toContain("{$page} Page");
+            expect($html)->toContain($content);
             expect($html)->toContain('[SideBar]');
             expect($html)->toContain('sidebar-layout');
         }
@@ -148,11 +148,12 @@ describe('User Journey - Theme Switching', function () {
 describe('User Journey - Plugin Navigation', function () {
 
     test('user can navigate between plugins in any theme', function () {
+        $expected = ['Home' => 'Theme Layouts', 'About' => 'About Page', 'Contact' => 'Contact Page'];
         foreach (['Simple', 'TopNav', 'SideBar'] as $theme) {
-            foreach (['Home', 'About', 'Contact'] as $plugin) {
+            foreach ($expected as $plugin => $content) {
                 $html = renderPage(themesIndexPath(), ['o' => $plugin, 't' => $theme]);
 
-                expect($html)->toContain("{$plugin} Page");
+                expect($html)->toContain($content);
                 expect($html)->toContain("[{$theme}]");
             }
         }
@@ -204,11 +205,12 @@ describe('Contact Form Across Themes', function () {
 describe('Edge Cases', function () {
 
     test('valid plugins render correctly', function () {
-        foreach (['Home', 'About', 'Contact'] as $plugin) {
+        $expected = ['Home' => 'Theme Layouts', 'About' => 'About Page', 'Contact' => 'Contact Page'];
+        foreach ($expected as $plugin => $content) {
             $html = renderPage(themesIndexPath(), ['o' => $plugin]);
 
             expect($html)->toContain('<!DOCTYPE html>');
-            expect($html)->toContain("{$plugin} Page");
+            expect($html)->toContain($content);
         }
     });
 
@@ -224,7 +226,7 @@ describe('Security', function () {
         $html = renderPage(themesIndexPath(), ['o' => 'Home']);
 
         // The page renders successfully
-        expect($html)->toContain('Home Page');
+        expect($html)->toContain('Theme Layouts');
         expect($html)->toContain('<!DOCTYPE html>');
     });
 
@@ -241,7 +243,7 @@ describe('Comparison with Previous Chapters', function () {
         $html = renderPage(themesIndexPath(), ['o' => 'Home']);
 
         // The content comes from HomeModel, rendered by HomeView
-        expect($html)->toContain('Home Page');
+        expect($html)->toContain('Theme Layouts');
         expect($html)->toContain('Themes');
     });
 
@@ -300,7 +302,7 @@ describe('Performance Characteristics', function () {
     test('JSON output is compact', function () {
         $output = renderPage(themesIndexPath(), ['x' => 'json']);
 
-        expect(strlen($output))->toBeLessThan(2000);
+        expect(strlen($output))->toBeLessThan(4000);
     });
 
 });

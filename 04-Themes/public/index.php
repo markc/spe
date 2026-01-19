@@ -49,7 +49,7 @@ abstract class Plugin {
 
 final class HomeModel extends Plugin {
     #[\Override] public function list(): array {
-        return ['head' => 'Home Page', 'main' => 'Welcome to the <b>Themes</b> example with multiple layout options.'];
+        return ['head' => 'Theme Layouts', 'main' => 'This chapter introduces <b>Model/View separation</b> and three switchable theme layouts.'];
     }
 }
 
@@ -84,6 +84,23 @@ final class HomeView extends View {
         <div class="card">
             <h2>{$this->ary['head']}</h2>
             <p>{$this->ary['main']}</p>
+
+            <h3 class="mt-4">🎨 Simple</h3>
+            <p>A clean, centered layout with the navigation in a card below the header. Best for simple sites with minimal navigation. The header, nav card, content, and footer stack vertically in a single column container.</p>
+
+            <h3 class="mt-4">🎨 TopNav</h3>
+            <p>A fixed navigation bar at the top of the viewport with centered navigation links and a theme dropdown. The content area has extra top margin to account for the fixed navbar. Ideal for sites that need persistent navigation while scrolling.</p>
+
+            <h3 class="mt-4">🎨 SideBar</h3>
+            <p>A two-column layout with a collapsible sidebar containing grouped navigation links. The sidebar shows "Pages" and "Themes" sections separately. Best for applications with many navigation items or hierarchical content organization.</p>
+
+            <h3 class="mt-4">What's New in This Chapter?</h3>
+            <ul class="mt-2" style="list-style:disc;padding-left:1.5rem">
+                <li><b>Model/View Separation</b> — Models return data arrays, Views render HTML from that data</li>
+                <li><b>Theme Class</b> — A single Theme class with methods for each layout (Simple, TopNav, SideBar)</li>
+                <li><b>URL Parameter</b> — Use <code>?t=</code> to switch themes: <a href="?t=Simple">Simple</a>, <a href="?t=TopNav">TopNav</a>, <a href="?t=SideBar">SideBar</a></li>
+                <li><b>Dropdown Component</b> — Reusable dropdown menu for theme selection</li>
+            </ul>
         </div>
         <div class="flex justify-center mt-4">
             <button class="btn-hover btn-success" onclick="showToast('Success!', 'success')">Success</button>

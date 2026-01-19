@@ -27,14 +27,14 @@ describe('Plugin Routing', function () {
     test('defaults to Home plugin with Simple theme', function () {
         $html = renderPage(themesIndexPath(), []);
 
-        expect($html)->toContain('Home Page');
+        expect($html)->toContain('Theme Layouts');
         expect($html)->toContain('[Simple]');
     });
 
     test('routes to Home plugin', function () {
         $html = renderPage(themesIndexPath(), ['o' => 'Home']);
 
-        expect($html)->toContain('Home Page');
+        expect($html)->toContain('Theme Layouts');
     });
 
     test('routes to About plugin', function () {
@@ -90,7 +90,7 @@ describe('Model/View Separation', function () {
     test('model returns data array', function () {
         $html = renderPage(themesIndexPath(), ['o' => 'Home']);
 
-        expect($html)->toContain('Home Page');
+        expect($html)->toContain('Theme Layouts');
         expect($html)->toContain('Themes');
     });
 
