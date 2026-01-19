@@ -1080,23 +1080,24 @@
     }
 
     .sidebar-group {
-        margin-block: var(--space-4);
+        margin-block: var(--space-1);
     }
 
     .sidebar-group-title {
         font-weight: bold;
         color: var(--fg-muted);
         font-size: var(--text-sm);
-        margin-block-end: var(--space-2);
+        margin-block-end: var(--space-1);
         cursor: pointer;
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        gap: var(--space-2);
     }
 
     .sidebar-group-title::after {
         content: '\25BC';
         font-size: 0.6em;
+        margin-inline-start: auto;
         transition: transform var(--transition-base);
     }
 
