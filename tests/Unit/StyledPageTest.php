@@ -201,14 +201,14 @@ describe('Toast Notifications', function () {
     test('includes success toast button', function () {
         $html = renderPage(styledIndexPath(), []);
 
-        expect($html)->toContain('class="btn btn-success"');
+        expect($html)->toContain('class="btn-hover btn-success"');
         expect($html)->toContain("showToast('Success!', 'success')");
     });
 
     test('includes danger toast button', function () {
         $html = renderPage(styledIndexPath(), []);
 
-        expect($html)->toContain('class="btn btn-danger"');
+        expect($html)->toContain('class="btn-hover btn-danger"');
         expect($html)->toContain("showToast('Error!', 'danger')");
     });
 

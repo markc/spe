@@ -114,12 +114,12 @@ HTML;
             $body = <<<HTML
 <div class="container">
     <header><h1><a class="brand" href="/">🐘 Simple PHP Engine</a></h1></header>
-    <nav class="card card-static flex mb-4">
+    <nav class="card flex mb-4">
         $nav $dd
         <span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span>
     </nav>
     <main>
-        <div class="card card-static">
+        <div class="card">
             <h2>Chapters</h2>
             <p>A progressive PHP 8.5 micro-framework tutorial in 12 chapters</p>
             $list
@@ -144,7 +144,7 @@ HTML;
 </nav>
 <div class="container pt-6">
     <main>
-        <div class="card card-static mt-4">
+        <div class="card mt-4">
             <h2>Chapters</h2>
             <p>A progressive PHP 8.5 micro-framework tutorial in 12 chapters</p>
             $list
@@ -187,7 +187,7 @@ HTML;
     </aside>
     <div class="sidebar-main pt-12">
         <main>
-            <div class="card card-static mt-4">
+            <div class="card mt-4">
                 <h2>Chapters</h2>
                 <p>A progressive PHP 8.5 micro-framework tutorial in 12 chapters</p>
                 $list

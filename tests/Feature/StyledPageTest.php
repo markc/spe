@@ -33,7 +33,7 @@ describe('Full Page Rendering', function () {
         expect($html)->toContain('<div class="container">');
         expect($html)->toContain('<header>');
         expect($html)->toContain('<nav');
-        expect($html)->toContain('<main>');
+        expect($html)->toContain('<main class="mt-4 mb-4">');
         expect($html)->toContain('<footer');
         expect($html)->toContain('</div>');
         expect($html)->toContain('src="/base.js"');
@@ -92,21 +92,21 @@ describe('Container Layout Structure', function () {
     test('main content is wrapped in card', function () {
         $html = renderPage(styledIndexPath(), []);
 
-        expect($html)->toMatch('/<main>.*<div class="card">.*<\/div>.*<\/main>/s');
+        expect($html)->toMatch('/<main.*>.*<div class="card-hover">.*<\/div>.*<\/main>/s');
     });
 
     test('footer has copyright and centered text', function () {
         $html = renderPage(styledIndexPath(), []);
 
-        expect($html)->toContain('<footer class="text-center mt-3">');
-        expect($html)->toContain('© 2015-2025 Mark Constable');
+        expect($html)->toContain('<footer class="text-center">');
+        expect($html)->toContain('© 2015-2026 Mark Constable');
         expect($html)->toContain('MIT License');
     });
 
     test('toast buttons are centered below content', function () {
         $html = renderPage(styledIndexPath(), []);
 
-        expect($html)->toContain('<div class="flex justify-center mt-2">');
+        expect($html)->toContain('<div class="flex justify-center mt-4">');
         expect($html)->toContain('btn-success');
         expect($html)->toContain('btn-danger');
     });

@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 echo new class {
     private const string DEFAULT = 'home';
@@ -48,17 +48,17 @@ echo new class {
 <div class="container">
     <header><h1><a class="brand" href="/">🐘 Styled PHP Example</a></h1></header>
     <nav class="card flex">{$nav}<span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span></nav>
-    <main>
-        <div class="card">
+    <main class="mt-4 mb-4">
+        <div class="card-hover">
             <h2>{$this->title}</h2>
             {$main}
         </div>
-        <div class="flex justify-center mt-2">
-            <button class="btn btn-success" onclick="showToast('Success!', 'success')">Success</button>
-            <button class="btn btn-danger" onclick="showToast('Error!', 'danger')">Danger</button>
+        <div class="flex justify-center mt-4">
+            <button class="btn-hover btn-success" onclick="showToast('Success!', 'success')">Success</button>
+            <button class="btn-hover btn-danger" onclick="showToast('Error!', 'danger')">Danger</button>
         </div>
     </main>
-    <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
+    <footer class="text-center"><small>© 2015-2026 Mark Constable (MIT License)</small></footer>
 </div>
 <script src="/base.js"></script>
 </body>
