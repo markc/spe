@@ -92,7 +92,7 @@ final class HomeView extends View {
             <p>A fixed navigation bar at the top of the viewport with centered navigation links and a theme dropdown. The content area has extra top margin to account for the fixed navbar. Ideal for sites that need persistent navigation while scrolling.</p>
 
             <h3 class="mt-4">🎨 SideBar</h3>
-            <p>A two-column layout with a collapsible sidebar containing grouped navigation links. The sidebar shows "Pages" and "Themes" sections separately. Best for applications with many navigation items or hierarchical content organization.</p>
+            <p>A two-column layout with a sidebar containing grouped navigation links. The sidebar shows "Pages" and "Themes" sections with collapsible groups (click titles to expand/collapse). On mobile, the ☰ button toggles the sidebar visibility. Best for applications with many navigation items or hierarchical content organization.</p>
 
             <h3 class="mt-4">What's New in This Chapter?</h3>
             <ul class="mt-2" style="list-style:disc;padding-left:1.5rem">
