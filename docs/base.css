@@ -891,7 +891,7 @@
         font-size: var(--text-2xl);
     }
 
-    .topnav + .container { margin-block-start: var(--space-16); }
+    .topnav + .container { margin-block-start: var(--space-20); }
     .topnav + .sidebar-layout { margin-block-start: var(--space-12); }
 
     .topnav-links {
