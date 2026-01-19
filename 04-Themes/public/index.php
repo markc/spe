@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 if (!class_exists('Ctx')) {
 readonly class Ctx {
@@ -85,9 +85,9 @@ final class HomeView extends View {
             <h2>{$this->ary['head']}</h2>
             <p>{$this->ary['main']}</p>
         </div>
-        <div class="flex justify-center mt-2">
-            <button class="btn btn-success" onclick="showToast('Success!', 'success')">Success</button>
-            <button class="btn btn-danger" onclick="showToast('Error!', 'danger')">Danger</button>
+        <div class="flex justify-center mt-4">
+            <button class="btn-hover btn-success" onclick="showToast('Success!', 'success')">Success</button>
+            <button class="btn-hover btn-danger" onclick="showToast('Error!', 'danger')">Danger</button>
         </div>
         HTML;
     }
@@ -172,8 +172,8 @@ HTML;
         {$nav} {$dd}
         <span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span>
     </nav>
-    <main>{$this->out['main']}</main>
-    <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
+    <main class="mt-4 mb-4">{$this->out['main']}</main>
+    <footer class="text-center"><small>© 2015-2026 Mark Constable (MIT License)</small></footer>
 </div>
 HTML;
         return $this->html('Simple', $body);
@@ -190,8 +190,8 @@ HTML;
     <button class="menu-toggle">☰</button>
 </nav>
 <div class="container">
-    <main>{$this->out['main']}</main>
-    <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
+    <main class="mt-4 mb-4">{$this->out['main']}</main>
+    <footer class="text-center"><small>© 2015-2026 Mark Constable (MIT License)</small></footer>
 </div>
 HTML;
         return $this->html('TopNav', $body);
@@ -229,8 +229,8 @@ HTML;
         </div>
     </aside>
     <div class="sidebar-main">
-        <main class="mt-2">{$this->out['main']}</main>
-        <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
+        <main class="mt-4 mb-4">{$this->out['main']}</main>
+        <footer class="text-center"><small>© 2015-2026 Mark Constable (MIT License)</small></footer>
     </div>
 </div>
 HTML;

@@ -33,7 +33,7 @@ describe('Full Page Rendering', function () {
         expect($html)->toContain('<div class="container">');
         expect($html)->toContain('<header>');
         expect($html)->toContain('<nav class="card flex">');
-        expect($html)->toContain('<main>');
+        expect($html)->toContain('<main class="mt-4 mb-4">');
         expect($html)->toContain('<footer');
         expect($html)->toContain('src="/base.js"');
     });
@@ -46,7 +46,7 @@ describe('Full Page Rendering', function () {
         expect($html)->toContain('<nav class="topnav">');
         expect($html)->toContain('topnav-links');
         expect($html)->toContain('menu-toggle');
-        expect($html)->toContain('<main>');
+        expect($html)->toContain('<main class="mt-4 mb-4">');
     });
 
     test('renders complete page with SideBar theme', function () {
