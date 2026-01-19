@@ -22,7 +22,7 @@ final class Simple extends Theme
                 <span class="ml-auto"><button class="theme-toggle" id="theme-icon"><i data-lucide="moon"></i></button></span>
             </nav>
             <main class="mt-4 mb-4">{$this->out['main']}</main>
-            <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
+            <footer class="text-center"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
         </div>
         HTML;
         return $this->html('Simple', $body);

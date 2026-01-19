@@ -53,7 +53,7 @@ final class SideBar extends Theme
             </aside>
             <div class="sidebar-main">
                 <main class="mt-4 mb-4">{$this->out['main']}</main>
-                <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
+                <footer class="text-center"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
             </div>
         </div>
         HTML;
