@@ -202,7 +202,7 @@ describe('Plugin Architecture', function () {
         foreach (['Home', 'About', 'Contact'] as $plugin) {
             $html = renderPage(pluginsIndexPath(), ['o' => $plugin]);
 
-            expect($html)->toContain('<div class="card-hover">');
+            expect($html)->toContain('<div class="card">');
         }
     });
 

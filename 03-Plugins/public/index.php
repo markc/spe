@@ -85,7 +85,7 @@ HTML;
     final class Home extends Plugin {
         #[\Override] public function list(): string {
             return <<<'HTML'
-            <div class="card-hover">
+            <div class="card">
                 <h2>Plugin Architecture</h2>
                 <p>While this page looks similar to <a href="/02-Styled/">02-Styled</a>, the underlying PHP structure has been completely reorganized to use a <b>plugin-based architecture</b>.</p>
 
@@ -123,7 +123,7 @@ HTML;
     final class About extends Plugin {
         #[\Override] public function list(): string {
             return <<<HTML
-            <div class="card-hover">
+            <div class="card">
                 <h2>About Page</h2>
                 <p>This chapter adds the <b>plugin architecture</b> with CRUDL methods and JSON API output.</p>
             </div>
@@ -134,7 +134,7 @@ HTML;
     final class Contact extends Plugin {
         #[\Override] public function list(): string {
             return <<<HTML
-            <div class="card-hover">
+            <div class="card">
                 <h2>Contact Page</h2>
                 <p>Get in touch using the <b>email form</b> below.</p>
                 <form class="mt-2" onsubmit="return handleContact(this)">
