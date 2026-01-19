@@ -1,6 +1,6 @@
 # SPE::04 Themes
 
-_Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)_
+_Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)_
 
 Chapter Four continues the pattern established in Chapter Three: the application looks and behaves identically, but the internal architecture has evolved significantly. Where Chapter Three introduced plugins that returned HTML strings directly, Chapter Four separates data from presentation. Models return arrays of content, Views transform those arrays into HTML fragments, and a dedicated Theme class wraps everything in one of three switchable layouts. The user sees the same pages with the same navigation—plus a new dropdown menu for selecting themes—while the code demonstrates how a single request flows through distinct layers of responsibility.
 

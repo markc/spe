@@ -1,5 +1,5 @@
 -- SPE Users Schema (MariaDB)
--- Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+-- Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,

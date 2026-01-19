@@ -1,6 +1,6 @@
 # SPE::01 Simple
 
-_Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)_
+_Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)_
 
 This chapter presents the most minimal possible PHP web application that still demonstrates real-world patterns. The entire application lives in a single file of around 45 lines, yet it implements proper routing, input sanitization, content management, and dynamic navigation. Understanding how this code works provides the foundation for everything that follows in the SPE series.
 

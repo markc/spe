@@ -1,6 +1,6 @@
 # SPE::08 Users
 
-_Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)_
+_Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)_
 
 Adds user management with full CRUDL operations and a separate users database.
 

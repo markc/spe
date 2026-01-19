@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Session\Themes;
 
@@ -47,7 +47,7 @@ final class SideBar extends Theme
             </aside>
             <div class="sidebar-main">
                 <main class="mt-2">{$this->out['main']}</main>
-                <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
+                <footer class="text-center mt-3"><small>© 2015-2026 Mark Constable (MIT License)</small></footer>
             </div>
         </div>
         HTML;

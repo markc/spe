@@ -1,6 +1,6 @@
 # SPE::09 Blog
 
-_Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)_
+_Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)_
 
 A full-featured blog/CMS system demonstrating the complete SPE framework with authentication, content management, and documentation features.
 

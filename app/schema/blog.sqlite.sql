@@ -1,5 +1,5 @@
 -- SPE Blog Schema (SQLite)
--- Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+-- Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 CREATE TABLE IF NOT EXISTS posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

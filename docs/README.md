@@ -9,7 +9,7 @@
 [![Tutorial](https://img.shields.io/badge/Tutorial-10_Chapters-blue)](https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B)
 [![Built with Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-orange?logo=anthropic)](https://claude.ai/code)
 
-_Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)_
+_Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)_
 
 A progressive **PHP 8.5 micro-framework tutorial** in 10 chapters. Each chapter builds on the previous, demonstrating modern PHP features and design patterns.
 

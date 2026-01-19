@@ -1,6 +1,6 @@
 # SPE::03 Plugins
 
-_Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)_
+_Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)_
 
 Chapter Three presents a paradox: the browser shows exactly the same interface as Chapter Two—the same navigation, the same card layouts, the same dark mode toggle and toast notifications—yet the PHP code behind it has been completely restructured. Where Chapter Two demonstrated a single self-rendering anonymous class, Chapter Three introduces four named classes that separate concerns into distinct responsibilities. This architectural shift produces identical output while establishing the foundation for extensible applications. The visual sameness is intentional; it isolates the structural changes so readers can focus entirely on how the code is organized rather than what it displays.
 

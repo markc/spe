@@ -1,6 +1,6 @@
 # SPE::05 Autoload
 
-_Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)_
+_Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)_
 
 Chapter Five presents a paradox: the application looks and behaves exactly like Chapter Four, yet the underlying code has undergone a fundamental transformation. Where Chapter Four packed all its logic into a single `index.php` file, Chapter Five distributes that same logic across fourteen separate files organized into a proper namespace hierarchy. The user experience remains unchanged—same pages, same themes, same interactions—but the codebase has evolved from a monolithic script into a structured project suitable for real-world development. This chapter demonstrates PSR-4 autoloading through Composer, the industry-standard approach to organizing PHP applications.
 
@@ -157,7 +157,7 @@ final class Simple extends Theme {
         <span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span>
     </nav>
     <main>{$this->out['main']}</main>
-    <footer class="text-center mt-3"><small>© 2015-2025 Mark Constable (MIT License)</small></footer>
+    <footer class="text-center mt-3"><small>© 2015-2026 Mark Constable (MIT License)</small></footer>
 </div>
 HTML;
         return $this->html('Simple', $body);

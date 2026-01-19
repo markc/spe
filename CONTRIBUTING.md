@@ -29,7 +29,7 @@ Use modern PHP features consistently:
 
 ```php
 <?php declare(strict_types=1);
-// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 // PHP 8.5: Pipe operator for transformations
 $value = $input |> trim(...) |> strtolower(...);
@@ -56,7 +56,7 @@ Every PHP file must include:
 
 ```php
 <?php declare(strict_types=1);
-// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 ```
 
 ### Naming Conventions

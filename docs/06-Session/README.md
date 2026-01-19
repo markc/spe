@@ -1,6 +1,6 @@
 # SPE::06 Session
 
-_Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)_
+_Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)_
 
 Chapter Six adds memory to the application. Where previous chapters treated each HTTP request as an isolated event—forgetting everything the moment the response was sent—this chapter introduces PHP sessions to maintain state across requests. The user's theme selection persists. Navigation choices stick. Visit counts accumulate. The application remembers who you are and what you were doing, transforming a stateless protocol into a stateful experience. This chapter demonstrates why sessions remain one of PHP's most valuable features for building interactive web applications.
 

@@ -1,5 +1,5 @@
 // Markdown parser - JS port of PHP Util::md() for identical rendering
-// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 function md(s) {
     const b = [], L = '\x02', R = '\x03';

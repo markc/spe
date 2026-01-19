@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 echo
     new class {
@@ -43,7 +43,7 @@ echo
                 <body>
                     <header><h1><a href="/">« Simple PHP Example</a></h1><hr><nav>{$nav}</nav><hr></header>
                     <main>{$this->main}</main>
-                    <footer><small><em>Copyright © 2015-2025 Mark Constable (MIT License)</em></small></footer>
+                    <footer><small><em>Copyright © 2015-2026 Mark Constable (MIT License)</em></small></footer>
                 </body>
             </html>
             HTML;

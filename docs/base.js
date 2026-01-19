@@ -1,6 +1,6 @@
 /* Base JavaScript Framework
  * Generic utilities for theme, navigation, toasts, and animations
- * Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+ * Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
  */
 
 const Base = {

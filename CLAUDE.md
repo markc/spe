@@ -69,7 +69,7 @@ PSR-4 namespace: `SPE\{Chapter}\` (e.g., `SPE\Blog\Core\Init`)
 
 ```php
 <?php declare(strict_types=1);
-// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 // PHP 8.5 Pipe operator
 $value = $input |> trim(...) |> strtolower(...);
@@ -189,4 +189,4 @@ Unicode emoji instead of icon libraries:
 
 ## License
 
-MIT License - Copyright (C) 2015-2025 Mark Constable <mc@netserva.org>
+MIT License - Copyright (C) 2015-2026 Mark Constable <mc@netserva.org>

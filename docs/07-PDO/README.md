@@ -1,6 +1,6 @@
 # SPE::07 PDO
 
-_Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)_
+_Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)_
 
 Chapter Seven adds persistent storage. Where previous chapters kept all content in PHP code—static navigation arrays, hardcoded page text—this chapter introduces database access through PDO and SQLite. Pages become editable. Blog posts can be created, modified, and deleted. Navigation builds dynamically from database records. The application transforms from a static demonstration into a genuine content management foundation. This chapter also marks a pivotal architectural shift: the first use of shared library code in `app/lib/`, demonstrating why common functionality belongs in reusable components rather than duplicated across chapters.
 

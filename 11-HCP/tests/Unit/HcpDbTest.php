@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-// Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)
+// Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 /**
  * Test the database wrapper functionality using a standalone test PDO

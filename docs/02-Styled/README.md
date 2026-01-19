@@ -1,6 +1,6 @@
 # SPE::02 Styled
 
-_Copyright (C) 2015-2025 Mark Constable <mc@netserva.org> (MIT License)_
+_Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)_
 
 Chapter One demonstrated that a complete web application can exist as a single self-rendering anonymous class. The code worked, but it relied on browser defaults and minimal inline styles. This chapter introduces the external asset layer that all subsequent chapters build upon: a shared CSS file that provides a complete design system, and a JavaScript file that handles theme switching and user feedback. The PHP code remains structurally identical to Chapter One, but the output transforms from plain HTML into a polished, responsive interface.
 

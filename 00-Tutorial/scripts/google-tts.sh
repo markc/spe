@@ -1,6 +1,6 @@
 #!/bin/bash
 # Google Cloud Text-to-Speech wrapper
-# Copyright (C) 2015-2025 Mark Constable (MIT License)
+# Copyright (C) 2015-2026 Mark Constable (MIT License)
 #
 # Usage: ./google-tts.sh "text to speak" output.wav [voice]
 #        ./google-tts.sh list  - List available voices
