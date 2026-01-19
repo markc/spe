@@ -100,8 +100,8 @@ const Base = {
                 link.removeAttribute('title'); // Disable native tooltip
                 tooltip.textContent = title;
                 const rect = link.getBoundingClientRect();
-                tooltip.style.top = `${rect.top + rect.height / 2}px`;
-                tooltip.style.left = `${rect.right + 4}px`;
+                tooltip.style.top = `${rect.top + rect.height / 2 + 2}px`;
+                tooltip.style.left = `${rect.right + 2}px`;
                 tooltip.classList.add('visible');
             });
             link.addEventListener('mouseleave', () => {
