@@ -61,7 +61,7 @@ if (!class_exists('Ctx')) {
 </head>
 <body>
 <div class="container">
-    <header><h1><a class="brand" href="/">🐘 Plugins PHP Example</a></h1></header>
+    <header class="mt-4"><h1><a class="brand" href="/">‹ <span>Plugins PHP Example</span></a></h1></header>
     <nav class="card flex">{$nav}<span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span></nav>
     <main class="mt-4 mb-4">{$this->out['main']}</main>
     <footer class="text-center"><small>© 2015-2026 Mark Constable (MIT License)</small></footer>

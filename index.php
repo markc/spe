@@ -133,7 +133,7 @@ HTML;
             $list = $this->chapterList();
             $body = <<<HTML
 <div class="container">
-    <header class="mt-4"><h1><a class="brand" href="/"><i data-lucide="chevron-left"></i> <span>Simple PHP Engine</span></a></h1></header>
+    <header class="mt-4"><h1><a class="brand" href="/">🐘 <span>Simple PHP Engine</span></a></h1></header>
     <nav class="card flex mb-4">
         $nav $dd $colors
         <span class="ml-auto"><button class="theme-toggle" id="theme-icon"><i data-lucide="moon"></i></button></span>
@@ -158,7 +158,7 @@ HTML;
             $list = $this->chapterList();
             $body = <<<HTML
 <nav class="topnav">
-    <h1><a class="brand" href="/"><i data-lucide="chevron-left"></i> <span>Simple PHP Engine</span></a></h1>
+    <h1><a class="brand" href="/">🐘 <span>Simple PHP Engine</span></a></h1>
     <div class="topnav-links">$nav $dd $colors</div>
     <button class="theme-toggle" id="theme-icon"><i data-lucide="moon"></i></button>
     <button class="menu-toggle"><i data-lucide="menu"></i></button>
@@ -195,7 +195,7 @@ HTML;
             $body = <<<HTML
 <nav class="topnav">
     <button class="menu-toggle"><i data-lucide="menu"></i></button>
-    <h1><a class="brand" href="/"><i data-lucide="chevron-left"></i> <span>Simple PHP Engine</span></a></h1>
+    <h1><a class="brand" href="/">🐘 <span>Simple PHP Engine</span></a></h1>
     <button class="theme-toggle" id="theme-icon"><i data-lucide="moon"></i></button>
 </nav>
 <div class="sidebar-layout">

@@ -28,7 +28,7 @@ describe('Full Page Rendering', function () {
 
         // Body with container
         expect($html)->toContain('<div class="container">');
-        expect($html)->toContain('<header>');
+        expect($html)->toContain('<header');
         expect($html)->toContain('<nav');
         expect($html)->toContain('<main class="mt-4 mb-4">');
         expect($html)->toContain('<footer');
@@ -191,7 +191,7 @@ describe('User Journey Scenarios', function () {
         $html = renderPage(pluginsIndexPath(), ['o' => 'About']);
 
         expect($html)->toContain('<a class="brand" href="/">');
-        expect($html)->toContain('🐘 Plugins PHP Example');
+        expect($html)->toContain('Plugins PHP Example');
     });
 
 });

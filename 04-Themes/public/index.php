@@ -196,7 +196,7 @@ HTML;
         $colors = $this->colors();
         $body = <<<HTML
 <div class="container">
-    <header><h1><a class="brand" href="/">🐘 Themes PHP Example</a></h1></header>
+    <header class="mt-4"><h1><a class="brand" href="/">‹ <span>Themes PHP Example</span></a></h1></header>
     <nav class="card flex">
         {$nav} {$dd} {$colors}
         <span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span>
@@ -214,7 +214,7 @@ HTML;
         $colors = $this->colors();
         $body = <<<HTML
 <nav class="topnav">
-    <h1><a class="brand" href="/">🐘 Themes PHP Example</a></h1>
+    <h1><a class="brand" href="/">‹ <span>Themes PHP Example</span></a></h1>
     <div class="topnav-links">{$nav} {$dd} {$colors}</div>
     <button class="theme-toggle" id="theme-icon">🌙</button>
     <button class="menu-toggle">☰</button>
@@ -250,7 +250,7 @@ HTML;
         $body = <<<HTML
 <nav class="topnav">
     <button class="menu-toggle">☰</button>
-    <h1><a class="brand" href="/">🐘 Themes PHP Example</a></h1>
+    <h1><a class="brand" href="/">‹ <span>Themes PHP Example</span></a></h1>
     <button class="theme-toggle" id="theme-icon">🌙</button>
 </nav>
 <div class="sidebar-layout">

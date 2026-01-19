@@ -31,7 +31,7 @@ describe('Full Page Rendering', function () {
         // Body with container layout
         expect($html)->toContain('<body>');
         expect($html)->toContain('<div class="container">');
-        expect($html)->toContain('<header>');
+        expect($html)->toContain('<header');
         expect($html)->toContain('<nav');
         expect($html)->toContain('<main class="mt-4 mb-4">');
         expect($html)->toContain('<footer');
@@ -68,7 +68,7 @@ describe('Full Page Rendering', function () {
         $html = renderPage(styledIndexPath(), ['m' => 'invalid']);
 
         expect($html)->toContain('<title>SPE::02 Home Page</title>');
-        expect($html)->toContain('Welcome to the <b>Styled</b> example');
+        expect($html)->toContain('Welcome to the <b>Styled</b> chapter');
     });
 
 });
@@ -84,9 +84,9 @@ describe('Container Layout Structure', function () {
     test('header contains brand link', function () {
         $html = renderPage(styledIndexPath(), []);
 
-        expect($html)->toContain('<header>');
+        expect($html)->toContain('<header');
         expect($html)->toContain('<a class="brand" href="/">');
-        expect($html)->toContain('🐘 Styled PHP Example');
+        expect($html)->toContain('Styled PHP Example');
     });
 
     test('main content is wrapped in card', function () {

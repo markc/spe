@@ -19,7 +19,7 @@ describe('Page Routing', function () {
         $html = renderPage(styledIndexPath(), []);
 
         expect($html)->toContain('Home Page');
-        expect($html)->toContain('Welcome to the <b>Styled</b> example');
+        expect($html)->toContain('Welcome to the <b>Styled</b> chapter');
     });
 
     test('defaults to home page when empty parameter provided', function () {
