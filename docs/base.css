@@ -959,7 +959,7 @@
 
     .topnav-links {
         display: none;
-        gap: var(--space-4);
+        gap: var(--space-6);
         align-items: center;
     }
 
@@ -1487,6 +1487,7 @@
     .inline { display: inline; }
     .inline-block { display: inline-block; }
     .flex { display: flex; flex-direction: column; gap: var(--space-4); }
+    nav.flex { gap: var(--space-6); }
     .inline-flex { display: inline-flex; }
     .grid { display: grid; gap: var(--space-4); }
 

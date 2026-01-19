@@ -14,7 +14,7 @@ final class HomeView extends View
         return <<<HTML
         <div class="card">
             <h2>{$this->ary['head']}</h2>
-            <p>{$this->ary['main']}</p>
+            {$this->ary['main']}
         </div>
         <div class="flex justify-center mt-4">
             <button class="btn-hover btn-success" onclick="showToast('Success!', 'success')">Success</button>
