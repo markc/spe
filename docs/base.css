@@ -1636,6 +1636,7 @@
         .sidebar.collapsed {
             width: 60px;
             padding-inline: var(--space-2);
+            overflow: visible;
         }
 
         .sidebar.collapsed .sidebar-toggle::before {
@@ -1672,11 +1673,11 @@
         /* Tooltip on hover when collapsed */
         .sidebar.collapsed nav a::after {
             content: attr(data-label);
-            display: block;
             position: absolute;
-            left: calc(100% + var(--space-2));
+            left: 100%;
             top: 50%;
             transform: translateY(-50%);
+            margin-left: var(--space-2);
             background: var(--bg-tertiary);
             color: var(--fg-primary);
             padding: var(--space-1) var(--space-2);
@@ -1701,6 +1702,11 @@
 
         .sidebar.collapsed nav a.active {
             padding-inline-start: 0;
+        }
+
+        .sidebar.collapsed .sidebar-group,
+        .sidebar.collapsed .sidebar-group nav {
+            overflow: visible;
         }
 
         /* Adjust main content when sidebar is collapsed */
