@@ -17,6 +17,11 @@ final readonly class Init
     ) {
         [$o, $m, $t] = [$ctx->in['o'], $ctx->in['m'], $ctx->in['t']];
 
+        // &edit flag without explicit method implies list
+        if (isset($_GET['edit']) && !isset($_REQUEST['m'])) {
+            $m = 'list';
+        }
+
         // Blog plugin or page from database
         if ($o === 'Blog') {
             $model = self::NS . "Plugins\\Blog\\BlogModel";
