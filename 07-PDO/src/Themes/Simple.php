@@ -13,15 +13,16 @@ final class Simple extends Theme
     {
         $nav = $this->nav();
         $dd = $this->dropdown();
+        $colors = $this->colors();
         $body = <<<HTML
         <div class="container">
-            <header><h1><a class="brand" href="/">🐘 PDO PHP Example</a></h1></header>
+            <header class="mt-4"><h1><a class="brand" href="/"><i data-lucide="chevron-left"></i> <span>PDO PHP Example</span></a></h1></header>
             <nav class="card flex">
-                $nav $dd
-                <span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span>
+                $nav $dd $colors
+                <span class="ml-auto"><button class="theme-toggle" id="theme-icon"><i data-lucide="moon"></i></button></span>
             </nav>
-            <main>{$this->out['main']}</main>
-            <footer class="text-center mt-3"><small>© 2015-2026 Mark Constable (MIT License)</small></footer>
+            <main class="mt-4 mb-4">{$this->out['main']}</main>
+            <footer class="text-center"><small>© 2015-2026 Mark Constable (MIT License)</small></footer>
         </div>
         HTML;
         return $this->html('Simple', $body);

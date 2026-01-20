@@ -8,33 +8,28 @@ use SPE\HCP\Core\Theme;
 
 final class TopNav extends Theme
 {
+    #[\Override]
     public function render(): string
     {
         $nav = $this->nav();
+        $dd = $this->dropdown();
+        $colors = $this->colors();
         $auth = $this->authNav();
-        $main = $this->out['main'];
         $hostname = gethostname() ?: 'HCP';
 
         $body = <<<HTML
-        <header class="topnav">
-            <div class="brand">
-                <a href="?o=System">🖥️ {$hostname}</a>
-            </div>
-            <nav class="nav-links">
-                {$nav}
-            </nav>
-            <div class="nav-auth">
-                {$auth}
-            </div>
-        </header>
-        <main class="container">
-            {$main}
-        </main>
-        <footer class="footer">
-            <p>HCP &copy; 2025 | <a href="https://github.com/markc/spe">SPE Framework</a></p>
-        </footer>
+        <nav class="topnav">
+            <h1><a class="brand" href="?o=System"><i data-lucide="chevron-left"></i> <span>{$hostname}</span></a></h1>
+            <div class="topnav-links">{$nav} $dd $colors | {$auth}</div>
+            <button class="theme-toggle" id="theme-icon"><i data-lucide="moon"></i></button>
+            <button class="menu-toggle"><i data-lucide="menu"></i></button>
+        </nav>
+        <div class="container">
+            <main class="mt-4 mb-4">{$this->out['main']}</main>
+            <footer class="text-center"><small>© 2015-2026 Mark Constable (MIT License)</small></footer>
+        </div>
         HTML;
 
-        return $this->html($body);
+        return $this->html('TopNav', $body);
     }
 }

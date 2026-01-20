@@ -19,9 +19,9 @@ final class Ctx
         array $in = ['o' => 'Home', 'm' => 'list', 't' => 'Simple', 'x' => '', 'id' => 0],
         array $out = ['doc' => 'SPE::07', 'head' => '', 'main' => '', 'foot' => ''],
         public array $themes = [
-            ['🎨 Simple',  'Simple'],
-            ['🎨 TopNav',  'TopNav'],
-            ['🎨 SideBar', 'SideBar'],
+            ['layout-template', 'Simple',  'Simple'],
+            ['navigation',      'TopNav',  'TopNav'],
+            ['panel-left',      'SideBar', 'SideBar'],
         ],
     ) {
         session_status() === PHP_SESSION_NONE && session_start();

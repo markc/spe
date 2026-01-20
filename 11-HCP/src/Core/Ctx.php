@@ -18,8 +18,8 @@ final class Ctx
         public string $email = 'noreply@localhost',
         array $out = ['doc' => 'HCP', 'head' => '', 'main' => '', 'foot' => '', 'css' => '', 'js' => '', 'end' => ''],
         public array $themes = [
-            ['TopNav',  'TopNav'],
-            ['SideBar', 'SideBar'],
+            ['navigation',      'TopNav',  'TopNav'],
+            ['panel-left',      'SideBar', 'SideBar'],
         ],
     ) {
         session_status() === PHP_SESSION_NONE && session_start();

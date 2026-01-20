@@ -13,16 +13,17 @@ final class Simple extends Theme
     {
         $nav = $this->nav();
         $dd = $this->dropdown();
+        $colors = $this->colors();
         $auth = $this->authNav();
         $body = <<<HTML
         <div class="container">
-            <header><h1><a class="brand" href="/" hx-get="/" hx-target="#main" hx-push-url="true">🐘 htmx Blog</a></h1></header>
+            <header class="mt-4"><h1><a class="brand" href="/" hx-get="/" hx-target="#main" hx-push-url="true"><i data-lucide="chevron-left"></i> <span>htmx Blog</span></a></h1></header>
             <nav class="card flex">
-                $nav $dd
-                <span class="ml-auto">$auth <span class="htmx-indicator">⏳</span> <button class="theme-toggle" id="theme-icon">🌙</button></span>
+                $nav $dd $colors
+                <span class="ml-auto">$auth <span class="htmx-indicator"><i data-lucide="loader-2" class="spin"></i></span> <button class="theme-toggle" id="theme-icon"><i data-lucide="moon"></i></button></span>
             </nav>
-            <main id="main">{$this->out['main']}</main>
-            <footer class="text-center mt-3"><small>© 2015-2026 Mark Constable (MIT License)</small></footer>
+            <main id="main" class="mt-4 mb-4">{$this->out['main']}</main>
+            <footer class="text-center"><small>© 2015-2026 Mark Constable (MIT License)</small></footer>
         </div>
         HTML;
         return $this->html('Simple', $body);

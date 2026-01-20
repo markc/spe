@@ -31,9 +31,9 @@ final class Ctx
             'end' => '',
         ],
         public array $themes = [
-            ['🎨 Simple',  'Simple'],
-            ['🎨 TopNav',  'TopNav'],
-            ['🎨 SideBar', 'SideBar'],
+            ['layout-template', 'Simple',  'Simple'],
+            ['navigation',      'TopNav',  'TopNav'],
+            ['panel-left',      'SideBar', 'SideBar'],
         ],
     ) {
         session_status() === PHP_SESSION_NONE && session_start();
