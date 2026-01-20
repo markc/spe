@@ -51,6 +51,8 @@ final class BlogView
 
     public function update(): string
     {
+        if (!$this->a)
+            return '<div class="card mt-4"><p class=text-muted>Post not found.</p><a href="?o=Blog&m=list&edit" class=btn>« Back</a></div>';
         return $_SERVER['REQUEST_METHOD'] === 'POST' ? '' : $this->form($this->a);
     }
 
@@ -62,6 +64,8 @@ final class BlogView
     public function read(): string
     {
         $a = $this->a;
+        if (!$a)
+            return '<div class="card mt-4"><p class=text-muted>Post not found.</p><a href="?o=Blog" class=btn>« Back</a></div>';
         $ti = $a['icon'] ?? '' ? "{$a['icon']} {$a['title']}" : $a['title'];
         return (
             "<div class='card mt-4'><h2>$ti</h2>
@@ -181,7 +185,7 @@ final class BlogView
             <div class=form-group><label for=type>Type</label><select id=type name=type>
             <option value=post $ps>📝 Post</option><option value=page $pgs>📄 Page</option></select></div></div>
             <div class=form-group><label for=content>Content (Markdown)</label><textarea id=content name=content rows=12 required>$co</textarea></div>
-            <div class='flex justify-between'><a href='?o=Blog&edit' class='btn btn-muted'>Cancel</a>
+            <div class='flex justify-between'><a href='?o=Blog&m=list&edit' class='btn btn-muted'>Cancel</a>
             <button type=submit class=btn>$bt</button></div></form></div>";
     }
 }
