@@ -50,7 +50,7 @@ final class BlogModel
 
     public function read(): array
     {
-        return $this->ctx->db->read('posts', '*', 'id=:id', ['id' => (int) $this->f['i']], QueryType::One);
+        return $this->ctx->db->read('posts', '*', 'id=:id', ['id' => (int) $this->f['i']], QueryType::One) ?: [];
     }
 
     public function update(): array
@@ -75,7 +75,7 @@ final class BlogModel
             header('Location: ?o=Blog&edit');
             exit();
         }
-        return $this->ctx->db->read('posts', '*', 'id=:id', ['id' => $id], QueryType::One);
+        return $this->ctx->db->read('posts', '*', 'id=:id', ['id' => $id], QueryType::One) ?: [];
     }
 
     public function delete(): array

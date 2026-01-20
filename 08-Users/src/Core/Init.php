@@ -99,6 +99,11 @@ final readonly class Init
 
         // Blog plugin - admin operations
         if ($o === 'Blog') {
+            // &edit flag without explicit method implies list
+            if (isset($_GET['edit']) && !isset($_REQUEST['m'])) {
+                $m = 'list';
+            }
+
             $writeMethods = ['create', 'update', 'delete'];
             if (in_array($m, $writeMethods) && !Util::is_adm()) {
                 Util::log('Admin access required');
