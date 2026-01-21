@@ -65,12 +65,15 @@ final class Ctx
 
     private function buildNav(): array
     {
+        // Detect base path for root router compatibility
+        $base = preg_match('#^/(\d{2}-[^/]+)/#', $_SERVER['SCRIPT_NAME'] ?? '', $m) ? "/{$m[1]}" : '';
+
         // Base navigation from pages table
         $pages = array_map(
-            static fn($r) => [trim(($r['icon'] ?? '') . ' ' . $r['title']), '/' . $r['slug']],
+            static fn($r) => [trim(($r['icon'] ?? '') . ' ' . $r['title']), "$base/" . $r['slug']],
             $this->db->read('posts', 'id,title,slug,icon', "type='page' ORDER BY id", [], QueryType::All),
         );
-        $pages[] = ['📝 Blog', '/blog'];
+        $pages[] = ['📝 Blog', "$base/blog"];
 
         // Role-based additions
         $acl = Acl::current();
