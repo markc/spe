@@ -17,7 +17,7 @@ final class Ctx
     public Db $db;
 
     // Centralized config
-    public int $perp = 10; // Items per page
+    public int $perp = 6; // Items per page
 
     public function __construct(
         public string $email = 'noreply@localhost',

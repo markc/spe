@@ -1482,6 +1482,106 @@
         opacity: 1;
         text-decoration: none;
     }
+
+    /* === Blog Navigation (Prev/Next) === */
+    .blog-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--space-4);
+        margin-block-end: var(--space-2);
+    }
+
+    .blog-nav a {
+        font-weight: 500;
+    }
+
+    .blog-nav-page {
+        color: var(--fg-muted);
+        font-size: var(--text-sm);
+    }
+
+    .blog-nav-next {
+        margin-inline-start: auto;
+    }
+
+    /* === Blog List (Index) === */
+    .blog-header {
+        margin-block-end: var(--space-6);
+    }
+
+    .blog-header h1 {
+        margin: 0;
+    }
+
+    .blog-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-6);
+    }
+
+    .blog-item {
+        display: flex;
+        gap: var(--space-6);
+    }
+
+    .blog-item-image {
+        flex-shrink: 0;
+        width: 200px;
+    }
+
+    .blog-item-image img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: var(--radius-md);
+    }
+
+    .blog-item-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .blog-item-content h3 {
+        margin: 0 0 var(--space-2);
+    }
+
+    .blog-item-meta,
+    .blog-single-meta {
+        font-size: var(--text-sm);
+        font-style: italic;
+        color: var(--fg-muted);
+        margin: 0 0 var(--space-3);
+    }
+
+    .blog-item-excerpt {
+        margin: 0;
+        color: var(--fg-muted);
+    }
+
+    .blog-pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: var(--space-4);
+        margin-block-start: var(--space-8);
+    }
+
+    /* Mobile: stack image on top */
+    @media (max-width: 599px) {
+        .blog-item {
+            flex-direction: column;
+        }
+
+        .blog-item-image {
+            width: 100%;
+        }
+
+        .blog-item-image img {
+            height: 200px;
+        }
+    }
 }
 
 /* === Utilities === */

@@ -25,13 +25,7 @@ final class BlogView
         $a = $this->a;
         $t = $this->t();
 
-        $html = <<<HTML
-        <div class="blog-header">
-            <h1>Blog</h1>
-            <p class="text-muted">Latest posts and updates</p>
-        </div>
-        <div class="blog-grid">
-        HTML;
+        $html = '<div class="blog-list">';
 
         foreach ($a['items'] as $post) {
             $title = htmlspecialchars($post['title']);
@@ -39,18 +33,17 @@ final class BlogView
             $author = htmlspecialchars($post['author']);
             $date = date('M j, Y', strtotime($post['created']));
             $image = $post['featured_image'] ?: 'https://picsum.photos/seed/' . $post['id'] . '/400/200';
+            $url = "?o=Blog&m=read&id={$post['id']}$t";
 
             $html .= <<<HTML
-            <article class="blog-card">
-                <a href="?o=Blog&m=read&id={$post['id']}$t" class="blog-card-image">
+            <article class="card-hover blog-item">
+                <a href="$url" class="blog-item-image">
                     <img src="$image" alt="$title" loading="lazy">
                 </a>
-                <div class="blog-card-content">
-                    <h3><a href="?o=Blog&m=read&id={$post['id']}$t">$title</a></h3>
-                    <p class="blog-card-excerpt">$excerpt</p>
-                    <p class="blog-card-meta">
-                        <span>$author</span> &bull; <span>$date</span>
-                    </p>
+                <div class="blog-item-content">
+                    <h3><a href="$url">$title</a></h3>
+                    <p class="blog-item-meta">$author &bull; $date</p>
+                    <p class="blog-item-excerpt">$excerpt</p>
                 </div>
             </article>
             HTML;
@@ -58,15 +51,19 @@ final class BlogView
 
         $html .= '</div>';
 
-        // Pagination
+        // Pagination (similar style to single page prev/next)
         $p = $a['pagination'];
         if ($p['pages'] > 1) {
-            $html .= '<div class="blog-pagination">';
-            if ($p['page'] > 1)
-                $html .= "<a href=\"?o=Blog&page=" . ($p['page'] - 1) . "$t\" class=\"btn\">« Newer</a>";
-            $html .= "<span>Page {$p['page']} of {$p['pages']}</span>";
-            if ($p['page'] < $p['pages'])
-                $html .= "<a href=\"?o=Blog&page=" . ($p['page'] + 1) . "$t\" class=\"btn\">Older »</a>";
+            $html .= '<div class="blog-nav">';
+            if ($p['page'] > 1) {
+                $html .= "<a href=\"?o=Blog&page=" . ($p['page'] - 1) . "$t\" class=\"blog-nav-prev\">« Newer Posts</a>";
+            } else {
+                $html .= '<span></span>';
+            }
+            $html .= "<span class=\"blog-nav-page\">Page {$p['page']} of {$p['pages']}</span>";
+            if ($p['page'] < $p['pages']) {
+                $html .= "<a href=\"?o=Blog&page=" . ($p['page'] + 1) . "$t\" class=\"blog-nav-next\">Older Posts »</a>";
+            }
             $html .= '</div>';
         }
 
@@ -90,7 +87,7 @@ final class BlogView
         $author = htmlspecialchars($a['author']);
         $date = date('F j, Y', strtotime($a['created']));
         $image = $a['featured_image']
-            ? "<img src=\"{$a['featured_image']}\" alt=\"$title\" class=\"blog-featured-image\">"
+            ? "<img src=\"{$a['featured_image']}\" alt=\"$title\" class=\"blog-featured-image\" style=\"float:right;width:33%;margin:0 0 1rem 1.5rem;border-radius:var(--radius-md);\">"
             : '';
 
         // Build category tags
@@ -109,25 +106,25 @@ final class BlogView
         $prevNext = '<div class="blog-nav">';
         if ($a['prev']) {
             $prevTitle = htmlspecialchars($a['prev']['title']);
-            $prevNext .= "<a href=\"?o=Blog&m=read&id={$a['prev']['id']}$t\" class=\"blog-nav-prev\"><span>« Previous</span><strong>$prevTitle</strong></a>";
+            $prevNext .= "<a href=\"?o=Blog&m=read&id={$a['prev']['id']}$t\" class=\"blog-nav-prev\">« $prevTitle</a>";
         } else {
             $prevNext .= '<span></span>';
         }
         if ($a['next']) {
             $nextTitle = htmlspecialchars($a['next']['title']);
-            $prevNext .= "<a href=\"?o=Blog&m=read&id={$a['next']['id']}$t\" class=\"blog-nav-next\"><span>Next »</span><strong>$nextTitle</strong></a>";
+            $prevNext .= "<a href=\"?o=Blog&m=read&id={$a['next']['id']}$t\" class=\"blog-nav-next\">$nextTitle »</a>";
         }
         $prevNext .= '</div>';
 
         return <<<HTML
+        $prevNext
         <article class="blog-single">
             <header class="blog-single-header">
                 <h1><a href="?o=Blog$t" class="back-arrow">«</a> $title</h1>
                 <p class="blog-single-meta">By $author &bull; $date</p>
                 $catTags
             </header>
-            $image
-            <div class="prose">$content</div>
+            <div class="prose">$image$content</div>
         </article>
         $prevNext
         HTML;

@@ -13,8 +13,6 @@ use SPE\Htmx\Plugins\Categories\CategoriesModel;
 
 final class BlogModel extends Plugin
 {
-    private const int DEFAULT_PER_PAGE = 9;
-
     private ?Db $dbh = null;
     private array $in = ['id' => 0];
 
@@ -32,7 +30,7 @@ final class BlogModel extends Plugin
     public function list(): array
     {
         $page = filter_var($_REQUEST['page'] ?? 1, FILTER_VALIDATE_INT) ?: 1;
-        $perPage = self::DEFAULT_PER_PAGE;
+        $perPage = $this->ctx->perp;
         $offset = ($page - 1) * $perPage;
 
         $where = 'type = :type';
