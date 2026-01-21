@@ -26,8 +26,9 @@ final readonly class Init
 
         [$o, $m, $t, $i] = [$ctx->in['o'], $ctx->in['m'], $ctx->in['t'], $ctx->in['i']];
 
-        // Clean URL routing: parse path
+        // Clean URL routing: parse path (strip chapter prefix if present)
         $path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+        $path = preg_replace('#^\d{2}-[^/]+/#', '', $path);
 
         // Route based on path (query string ?o= takes priority)
         if (isset($_GET['o'])) {

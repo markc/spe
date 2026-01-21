@@ -5,10 +5,15 @@
 namespace SPE\Blog\Plugins\Blog;
 
 use SPE\App\Util;
-use SPE\Blog\Core\Theme;
+use SPE\Blog\Core\Ctx;
 
-final class BlogView extends Theme
+final class BlogView
 {
+    public function __construct(
+        private Ctx $ctx,
+        private array $a,
+    ) {}
+
     private function t(): string
     {
         return '&t=' . $this->ctx->in['t'];
@@ -17,7 +22,7 @@ final class BlogView extends Theme
     // Public blog index - 3x3 card grid
     public function list(): string
     {
-        $a = $this->ctx->ary;
+        $a = $this->a;
         $t = $this->t();
 
         $html = <<<HTML
@@ -71,7 +76,7 @@ final class BlogView extends Theme
     // Single post view with prev/next navigation
     public function read(): string
     {
-        $a = $this->ctx->ary;
+        $a = $this->a;
         if (empty($a))
             return (
                 '<div class="card"><p>Post not found.</p><a href="?o=Blog'
@@ -125,6 +130,26 @@ final class BlogView extends Theme
             <div class="prose">$content</div>
         </article>
         $prevNext
+        HTML;
+    }
+
+    // Static page view
+    public function page(): string
+    {
+        $a = $this->a;
+        if (empty($a))
+            return '<div class="card"><p>Page not found.</p></div>';
+
+        $title = htmlspecialchars($a['title']);
+        $content = Util::md($a['content'] ?? '');
+        $icon = $a['icon'] ?? '';
+        $heading = $icon ? "$icon $title" : $title;
+
+        return <<<HTML
+        <div class="card">
+            <h2>$heading</h2>
+            <div class="prose">$content</div>
+        </div>
         HTML;
     }
 
