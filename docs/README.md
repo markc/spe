@@ -88,7 +88,7 @@ Open http://localhost:8000 to see the chapter index.
 | 07 | [PDO](07-PDO/README.md) | Database access | SQLite + QueryType enum |
 | 08 | [Users](08-Users/README.md) | User management | Full CRUDL operations |
 | 09 | [Blog](09-Blog/README.md) | Complete CMS | Auth, Blog, Docs, Categories |
-| 10 | [YouTube](10-YouTube/README.md) | YouTube Manager | OAuth, API, Shared Services |
+| 10 | [Htmx](10-Htmx/README.md) | Htmx Integration | Dynamic UI without JavaScript |
 | 11 | [HCP](11-HCP/README.md) | Hosting Control Panel | Mainly for Proxmox VM/CTs |
 
 ## Architecture
