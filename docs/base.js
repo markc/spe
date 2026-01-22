@@ -3,11 +3,17 @@
  * Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
  */
 
+// Prevent redeclaration when htmx re-processes the page
+if (typeof Base !== 'undefined') {
+    // Already loaded, skip
+} else {
+
 const Base = {
     // Storage keys
     storageKey: 'base-theme',
-    sidebarKey: 'base-sidebar',
     schemeKey: 'base-scheme',
+    leftPinnedKey: 'left-pinned',
+    rightPinnedKey: 'right-pinned',
 
     // Initialize theme (called inline in head to prevent FOUC)
     initTheme() {
@@ -114,70 +120,68 @@ const Base = {
         }, duration);
     },
 
-    // Toggle mobile sidebar
-    toggleSidebar() {
-        const sidebar = document.querySelector('.sidebar');
-        if (sidebar) {
-            sidebar.classList.toggle('open');
-            // Toggle body scroll lock
-            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+    // Toggle sidebar open/close
+    toggleSidebar(side) {
+        const sidebar = document.querySelector(`.sidebar-${side}`);
+        if (!sidebar) return;
+
+        const isOpen = sidebar.classList.contains('open');
+        // Close any open sidebar first
+        document.querySelectorAll('.sidebar.open').forEach(s => s.classList.remove('open'));
+        document.body.classList.remove('sidebar-open');
+
+        if (!isOpen) {
+            sidebar.classList.add('open');
+            document.body.classList.add('sidebar-open');
         }
     },
 
-    // Initialize sidebar collapsed state from localStorage
-    initSidebar() {
-        const sidebar = document.querySelector('.sidebar');
+    // Close all sidebars
+    closeSidebars() {
+        document.querySelectorAll('.sidebar.open').forEach(s => s.classList.remove('open'));
+        document.body.classList.remove('sidebar-open');
+    },
+
+    // Pin/unpin sidebar (desktop only)
+    pinSidebar(side) {
+        const sidebar = document.querySelector(`.sidebar-${side}`);
         if (!sidebar) return;
 
-        const stored = localStorage.getItem(this.sidebarKey);
-        if (stored === 'collapsed') {
-            sidebar.classList.add('collapsed');
+        const isPinned = sidebar.classList.toggle('pinned');
+        document.body.classList.toggle(`${side}-pinned`, isPinned);
+        localStorage.setItem(side === 'left' ? this.leftPinnedKey : this.rightPinnedKey, isPinned);
+
+        // If pinning, keep sidebar open; if unpinning, close it
+        if (isPinned) {
+            sidebar.classList.add('open');
+        } else {
+            sidebar.classList.remove('open');
+            document.body.classList.remove('sidebar-open');
+        }
+
+        // Update pin icon
+        const pinBtn = sidebar.querySelector('.pin-toggle i, .pin-toggle svg');
+        if (pinBtn && typeof lucide !== 'undefined') {
+            pinBtn.setAttribute('data-lucide', isPinned ? 'pin-off' : 'pin');
+            lucide.createIcons({ nodes: [pinBtn] });
         }
     },
 
-    // Initialize tooltips for collapsed sidebar links
-    initSidebarTooltips() {
-        const sidebar = document.querySelector('.sidebar');
-        if (!sidebar) return;
-
-        const tooltip = document.createElement('div');
-        tooltip.className = 'sidebar-tooltip';
-        document.body.appendChild(tooltip);
-
-        sidebar.querySelectorAll('nav a[title]').forEach(link => {
-            const title = link.getAttribute('title');
-            link.addEventListener('mouseenter', () => {
-                if (!sidebar.classList.contains('collapsed')) return;
-                link.removeAttribute('title'); // Disable native tooltip
-                tooltip.textContent = title;
-                const rect = link.getBoundingClientRect();
-                tooltip.style.top = `${rect.top + rect.height / 2 + 2}px`;
-                tooltip.style.left = `${rect.right + 2}px`;
-                tooltip.classList.add('visible');
-            });
-            link.addEventListener('mouseleave', () => {
-                link.setAttribute('title', title); // Restore for non-collapsed
-                tooltip.classList.remove('visible');
-            });
+    // Initialize pinned state from localStorage
+    initSidebars() {
+        ['left', 'right'].forEach(side => {
+            const key = side === 'left' ? this.leftPinnedKey : this.rightPinnedKey;
+            const isPinned = localStorage.getItem(key) === 'true';
+            if (isPinned && window.innerWidth >= 1280) {
+                const sidebar = document.querySelector(`.sidebar-${side}`);
+                if (sidebar) {
+                    sidebar.classList.add('pinned', 'open');
+                    document.body.classList.add(`${side}-pinned`);
+                    const pinBtn = sidebar.querySelector('.pin-toggle i');
+                    if (pinBtn) pinBtn.setAttribute('data-lucide', 'pin-off');
+                }
+            }
         });
-    },
-
-    // Toggle sidebar collapsed state (desktop)
-    collapseSidebar() {
-        const sidebar = document.querySelector('.sidebar');
-        if (!sidebar) return;
-
-        sidebar.classList.toggle('collapsed');
-        const isCollapsed = sidebar.classList.contains('collapsed');
-        localStorage.setItem(this.sidebarKey, isCollapsed ? 'collapsed' : 'expanded');
-    },
-
-    // Toggle mobile nav menu
-    toggleMenu() {
-        const menu = document.querySelector('.topnav-links');
-        if (menu) {
-            menu.classList.toggle('open');
-        }
     },
 
     // Toggle dropdown menu
@@ -311,11 +315,8 @@ const Base = {
         // Theme is already initialized inline, just update icon
         this.updateThemeIcon();
 
-        // Initialize sidebar collapsed state
-        this.initSidebar();
-
-        // Initialize sidebar tooltips
-        this.initSidebarTooltips();
+        // Initialize pinned sidebar states
+        this.initSidebars();
 
         // Update active state on scheme links
         this.updateSchemeLinks();
@@ -333,25 +334,25 @@ const Base = {
             });
         });
 
-        // Sidebar collapse toggle (desktop)
-        document.querySelectorAll('.sidebar-toggle').forEach(btn => {
-            btn.addEventListener('click', () => this.collapseSidebar());
-        });
-
-        // Collapsible sidebar groups
-        document.querySelectorAll('.sidebar-group-title').forEach(title => {
-            title.addEventListener('click', () => {
-                title.parentElement.classList.toggle('collapsed');
-            });
-        });
-
-        // Mobile menu toggle
-        document.querySelectorAll('.menu-toggle').forEach(btn => {
+        // Sidebar toggle (hamburger menus)
+        document.querySelectorAll('.menu-toggle[data-sidebar]').forEach(btn => {
             btn.addEventListener('click', () => {
-                this.toggleSidebar();
-                this.toggleMenu();
+                this.toggleSidebar(btn.dataset.sidebar);
             });
         });
+
+        // Sidebar pin toggle
+        document.querySelectorAll('.pin-toggle[data-sidebar]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.pinSidebar(btn.dataset.sidebar);
+            });
+        });
+
+        // Close sidebar when clicking overlay
+        const overlay = document.querySelector('.overlay');
+        if (overlay) {
+            overlay.addEventListener('click', () => this.closeSidebars());
+        }
 
         // Dropdown toggle (click for mobile)
         document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
@@ -385,13 +386,14 @@ const Base = {
             this.loadPage(window.location.href);
         });
 
-        // Close mobile menu when clicking outside
+        // Close non-pinned sidebars when clicking outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.sidebar') && !e.target.closest('.menu-toggle')) {
-                const sidebar = document.querySelector('.sidebar.open');
-                if (sidebar) {
-                    sidebar.classList.remove('open');
-                    document.body.style.overflow = '';
+                document.querySelectorAll('.sidebar.open:not(.pinned)').forEach(s => {
+                    s.classList.remove('open');
+                });
+                if (!document.querySelector('.sidebar.pinned.open')) {
+                    document.body.classList.remove('sidebar-open');
                 }
             }
         });
@@ -408,16 +410,13 @@ const Base = {
             });
         });
 
-        // Escape key to close menus
+        // Escape key to close menus and non-pinned sidebars
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                document.querySelectorAll('.dropdown.open').forEach(d => {
-                    d.classList.remove('open');
-                });
-                const sidebar = document.querySelector('.sidebar.open');
-                if (sidebar) {
-                    sidebar.classList.remove('open');
-                    document.body.style.overflow = '';
+                document.querySelectorAll('.dropdown.open').forEach(d => d.classList.remove('open'));
+                document.querySelectorAll('.sidebar.open:not(.pinned)').forEach(s => s.classList.remove('open'));
+                if (!document.querySelector('.sidebar.pinned.open')) {
+                    document.body.classList.remove('sidebar-open');
                 }
             }
         });
@@ -462,3 +461,5 @@ window.toggleTheme = () => Base.toggleTheme();
 
 // Backwards compatibility aliases
 window.SPE = Base;
+
+} // End of redeclaration guard

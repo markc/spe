@@ -142,11 +142,9 @@ All chapters 02-10 reference shared assets via absolute paths (`/base.css`, `/si
 **Design Principle:** base.css is color-agnostic (never defines colors). site.css defines ALL colors. This separation allows base.min.css to be cached indefinitely while themes are swapped by changing site.css.
 
 **Mobile-First Responsive:** Base styles are mobile, with progressive enhancement via `min-width` breakpoints:
-- **Mobile** (default): Single column, stacked flex, sidebar off-canvas, cards without radius
-- **600px+** (tablet): 2-column grids, cards gain border-radius and shadows
-- **768px+** (small desktop): Flex becomes row, sidebar visible, topnav links centered
-- **900px+** (desktop): 3-column grids
-- **1024px+** (large): 4-column grids
+- **Mobile** (0-767px): Single column, stacked flex, sidebar off-canvas, cards without border/shadow
+- **Tablet** (768px+): Flex row, sidebar visible, `.desktop-only` shown, 2-col grids, cards gain border/shadow
+- **Desktop** (1280px+): 3-col and 4-col grids
 
 **base.css** - Color-agnostic framework (~1700 lines):
 - CSS cascade layers: `@layer reset, tokens, base, components, utilities, animations`
