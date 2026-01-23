@@ -1,115 +1,193 @@
-/* SPE Theme - Color tokens and branding
- * base.css is color-agnostic; this file defines ALL colors
- * To create a new theme: copy this file, modify colors, load instead
+/* SPE Theme - OKLCH Color System
+ * Perceptually uniform colors with consistent lightness across schemes
+ * L: lightness (0-100%), C: chroma (0-0.4), H: hue (0-360)
  * Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
  */
 
-/* === Light Theme (Default) === */
+/* === Light Theme (Stone - Default) === */
 :root {
-    --bg-primary: #fafaf9;
-    --bg-secondary: #f5f5f4;
-    --bg-tertiary: #e7e5e3;
-    --fg-primary: #1c1917;
-    --fg-secondary: #57534e;
-    --fg-muted: #78716c;
-    --accent: #57534e;
-    --accent-hover: #44403c;
-    --accent-subtle: #e7e5e3;
-    --border: #d6d3d1;
-    --border-muted: #e7e5e3;
-    --success: #15803d;
-    --danger: #dc2626;
-    --warning: #ca8a04;
-    --glass: rgb(250 250 249 / 0.8);
-    --glass-border: rgb(214 211 209 / 0.5);
-    --php: #777BB4;
+    /* Hue: 60 (warm neutral) | Chroma: 0.02 (subtle) */
+    --bg-primary:   oklch(98% 0.005 60);
+    --bg-secondary: oklch(96% 0.008 60);
+    --bg-tertiary:  oklch(92% 0.012 60);
+    --fg-primary:   oklch(25% 0.02 60);
+    --fg-secondary: oklch(45% 0.02 60);
+    --fg-muted:     oklch(55% 0.015 60);
+    --accent:       oklch(45% 0.05 60);
+    --accent-hover: oklch(35% 0.06 60);
+    --accent-fg:    oklch(98% 0.005 60);
+    --accent-subtle:oklch(92% 0.015 60);
+    --border:       oklch(85% 0.01 60);
+    --border-muted: oklch(90% 0.008 60);
+    /* Semantic (fixed hues) */
+    --success:      oklch(45% 0.15 145);
+    --danger:       oklch(55% 0.2 25);
+    --warning:      oklch(70% 0.15 85);
+    /* Effects */
+    --glass:        oklch(98% 0.005 60 / 0.8);
+    --glass-border: oklch(85% 0.01 60 / 0.5);
+    /* Brand */
+    --php:          oklch(55% 0.1 285);
 }
 
 /* === Dark Theme (System Preference) === */
 @media (prefers-color-scheme: dark) {
     :root:not(.light) {
-        --bg-primary: #0c0a09;
-        --bg-secondary: #1c1917;
-        --bg-tertiary: #292524;
-        --fg-primary: #fafaf9;
-        --fg-secondary: #a8a29e;
-        --fg-muted: #78716c;
-        --accent: #d6d3d1;
-        --accent-hover: #e7e5e3;
-        --accent-subtle: #44403c;
-        --border: #44403c;
-        --border-muted: #292524;
-        --success: #4ade80;
-        --danger: #f87171;
-        --warning: #facc15;
+        --bg-primary:   oklch(12% 0.01 60);
+        --bg-secondary: oklch(16% 0.012 60);
+        --bg-tertiary:  oklch(22% 0.015 60);
+        --fg-primary:   oklch(95% 0.01 60);
+        --fg-secondary: oklch(75% 0.015 60);
+        --fg-muted:     oklch(55% 0.015 60);
+        --accent:       oklch(80% 0.03 60);
+        --accent-hover: oklch(90% 0.02 60);
+        --accent-fg:    oklch(20% 0.02 60);
+        --accent-subtle:oklch(25% 0.02 60);
+        --border:       oklch(30% 0.015 60);
+        --border-muted: oklch(22% 0.012 60);
+        --success:      oklch(70% 0.15 145);
+        --danger:       oklch(70% 0.18 25);
+        --warning:      oklch(80% 0.15 85);
+        --glass:        oklch(16% 0.012 60 / 0.85);
+        --glass-border: oklch(30% 0.015 60 / 0.5);
+        /* Shadows need higher opacity on dark backgrounds */
         --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
         --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
-        --glass: rgb(28 25 23 / 0.8);
-        --glass-border: rgb(68 64 60 / 0.5);
     }
 }
 
 /* === Dark Theme (Toggle Override) === */
 html.dark {
-    --bg-primary: #0c0a09;
-    --bg-secondary: #1c1917;
-    --bg-tertiary: #292524;
-    --fg-primary: #fafaf9;
-    --fg-secondary: #a8a29e;
-    --fg-muted: #78716c;
-    --accent: #d6d3d1;
-    --accent-hover: #e7e5e3;
-    --accent-subtle: #44403c;
-    --border: #44403c;
-    --border-muted: #292524;
-    --success: #4ade80;
-    --danger: #f87171;
-    --warning: #facc15;
+    --bg-primary:   oklch(12% 0.01 60);
+    --bg-secondary: oklch(16% 0.012 60);
+    --bg-tertiary:  oklch(22% 0.015 60);
+    --fg-primary:   oklch(95% 0.01 60);
+    --fg-secondary: oklch(75% 0.015 60);
+    --fg-muted:     oklch(55% 0.015 60);
+    --accent:       oklch(80% 0.03 60);
+    --accent-hover: oklch(90% 0.02 60);
+    --accent-fg:    oklch(20% 0.02 60);
+    --accent-subtle:oklch(25% 0.02 60);
+    --border:       oklch(30% 0.015 60);
+    --border-muted: oklch(22% 0.012 60);
+    --success:      oklch(70% 0.15 145);
+    --danger:       oklch(70% 0.18 25);
+    --warning:      oklch(80% 0.15 85);
+    --glass:        oklch(16% 0.012 60 / 0.85);
+    --glass-border: oklch(30% 0.015 60 / 0.5);
+    /* Shadows need higher opacity on dark backgrounds */
     --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
-    --glass: rgb(28 25 23 / 0.8);
-    --glass-border: rgb(68 64 60 / 0.5);
 }
 
-/* === Color Schemes === */
+/* === Color Schemes ===
+ * Same lightness structure, only hue changes:
+ * Stone: H=60 | Ocean: H=220 | Forest: H=150 | Sunset: H=45
+ */
 
-/* Ocean */
+/* Ocean (H=220 cyan-blue, higher chroma for vibrancy) */
 .scheme-ocean:not(.dark) {
-    --bg-primary: #f8fcfd; --bg-secondary: #f0f7f9; --bg-tertiary: #e4f1f4;
-    --accent: #0891b2; --accent-hover: #06b6d4; --accent-subtle: #cffafe;
-    --border: #b8d4db; --border-muted: #cde3e8;
+    --bg-primary:   oklch(98% 0.008 220);
+    --bg-secondary: oklch(96% 0.012 220);
+    --bg-tertiary:  oklch(92% 0.018 220);
+    --fg-primary:   oklch(25% 0.06 220);
+    --fg-secondary: oklch(40% 0.08 220);
+    --fg-muted:     oklch(50% 0.06 220);
+    --accent:       oklch(55% 0.12 220);
+    --accent-hover: oklch(60% 0.14 220);
+    --accent-fg:    oklch(98% 0.01 220);
+    --accent-subtle:oklch(92% 0.025 220);
+    --border:       oklch(85% 0.02 220);
+    --border-muted: oklch(90% 0.015 220);
+    --glass:        oklch(98% 0.008 220 / 0.8);
+    --glass-border: oklch(85% 0.02 220 / 0.5);
 }
 .scheme-ocean.dark {
-    --bg-primary: #0c1214; --bg-secondary: #111a1d; --bg-tertiary: #172226;
-    --accent: #22d3ee; --accent-hover: #67e8f9; --accent-subtle: #22d3ee26;
-    --border: #1e3a40; --border-muted: #152a2f;
+    --bg-primary:   oklch(12% 0.015 220);
+    --bg-secondary: oklch(16% 0.02 220);
+    --bg-tertiary:  oklch(22% 0.025 220);
+    --fg-primary:   oklch(95% 0.02 220);
+    --fg-secondary: oklch(75% 0.05 220);
+    --fg-muted:     oklch(55% 0.04 220);
+    --accent:       oklch(75% 0.12 220);
+    --accent-hover: oklch(85% 0.1 220);
+    --accent-fg:    oklch(15% 0.04 220);
+    --accent-subtle:oklch(25% 0.04 220);
+    --border:       oklch(30% 0.03 220);
+    --border-muted: oklch(22% 0.02 220);
+    --glass:        oklch(16% 0.02 220 / 0.85);
+    --glass-border: oklch(30% 0.03 220 / 0.5);
 }
 
-/* Forest */
+/* Forest (H=150 green) */
 .scheme-forest:not(.dark) {
-    --bg-primary: #f8fdf9; --bg-secondary: #f0f9f2; --bg-tertiary: #e4f4e8;
-    --accent: #16a34a; --accent-hover: #22c55e; --accent-subtle: #dcfce7;
-    --border: #b8dbc2; --border-muted: #cde8d4;
+    --bg-primary:   oklch(98% 0.008 150);
+    --bg-secondary: oklch(96% 0.012 150);
+    --bg-tertiary:  oklch(92% 0.018 150);
+    --fg-primary:   oklch(25% 0.06 150);
+    --fg-secondary: oklch(40% 0.08 150);
+    --fg-muted:     oklch(50% 0.06 150);
+    --accent:       oklch(50% 0.12 150);
+    --accent-hover: oklch(55% 0.14 150);
+    --accent-fg:    oklch(98% 0.01 150);
+    --accent-subtle:oklch(92% 0.025 150);
+    --border:       oklch(85% 0.02 150);
+    --border-muted: oklch(90% 0.015 150);
+    --glass:        oklch(98% 0.008 150 / 0.8);
+    --glass-border: oklch(85% 0.02 150 / 0.5);
 }
 .scheme-forest.dark {
-    --bg-primary: #0c120e; --bg-secondary: #111a14; --bg-tertiary: #17261a;
-    --accent: #4ade80; --accent-hover: #86efac; --accent-subtle: #4ade8026;
-    --border: #1e402a; --border-muted: #152a1c;
+    --bg-primary:   oklch(12% 0.015 150);
+    --bg-secondary: oklch(16% 0.02 150);
+    --bg-tertiary:  oklch(22% 0.025 150);
+    --fg-primary:   oklch(95% 0.02 150);
+    --fg-secondary: oklch(75% 0.05 150);
+    --fg-muted:     oklch(55% 0.04 150);
+    --accent:       oklch(70% 0.12 150);
+    --accent-hover: oklch(80% 0.1 150);
+    --accent-fg:    oklch(15% 0.04 150);
+    --accent-subtle:oklch(25% 0.04 150);
+    --border:       oklch(30% 0.03 150);
+    --border-muted: oklch(22% 0.02 150);
+    --glass:        oklch(16% 0.02 150 / 0.85);
+    --glass-border: oklch(30% 0.03 150 / 0.5);
 }
 
-/* Sunset */
+/* Sunset (H=45 orange-amber) */
 .scheme-sunset:not(.dark) {
-    --bg-primary: #fdfaf8; --bg-secondary: #faf5f0; --bg-tertiary: #f5ede4;
-    --accent: #ea580c; --accent-hover: #f97316; --accent-subtle: #ffedd5;
-    --border: #dbd0b8; --border-muted: #e8dfcd;
+    --bg-primary:   oklch(98% 0.01 45);
+    --bg-secondary: oklch(96% 0.015 45);
+    --bg-tertiary:  oklch(92% 0.02 45);
+    --fg-primary:   oklch(30% 0.08 45);
+    --fg-secondary: oklch(42% 0.1 45);
+    --fg-muted:     oklch(52% 0.08 45);
+    --accent:       oklch(60% 0.16 45);
+    --accent-hover: oklch(65% 0.18 45);
+    --accent-fg:    oklch(98% 0.01 45);
+    --accent-subtle:oklch(92% 0.03 45);
+    --border:       oklch(85% 0.025 45);
+    --border-muted: oklch(90% 0.02 45);
+    --glass:        oklch(98% 0.01 45 / 0.8);
+    --glass-border: oklch(85% 0.025 45 / 0.5);
 }
 .scheme-sunset.dark {
-    --bg-primary: #14110c; --bg-secondary: #1a1611; --bg-tertiary: #262017;
-    --accent: #fb923c; --accent-hover: #fdba74; --accent-subtle: #fb923c26;
-    --border: #40351e; --border-muted: #2a2415;
+    --bg-primary:   oklch(12% 0.02 45);
+    --bg-secondary: oklch(16% 0.025 45);
+    --bg-tertiary:  oklch(22% 0.03 45);
+    --fg-primary:   oklch(95% 0.025 45);
+    --fg-secondary: oklch(75% 0.06 45);
+    --fg-muted:     oklch(55% 0.05 45);
+    --accent:       oklch(72% 0.14 45);
+    --accent-hover: oklch(82% 0.12 45);
+    --accent-fg:    oklch(15% 0.05 45);
+    --accent-subtle:oklch(25% 0.05 45);
+    --border:       oklch(30% 0.035 45);
+    --border-muted: oklch(22% 0.025 45);
+    --glass:        oklch(16% 0.025 45 / 0.85);
+    --glass-border: oklch(30% 0.035 45 / 0.5);
 }
 
 /* === Brand === */
-.btn-php { background: var(--php); }
+.btn-php { background: var(--php); color: oklch(98% 0 0); }

@@ -75,9 +75,11 @@ const Base = {
             document.body.classList.add('sidebar-open');
             this.state({ [side + 'Open']: true });
         } else {
-            sb.classList.remove('open');
+            // Also unpin if pinned
+            sb.classList.remove('open', 'pinned');
+            document.body.classList.remove(side + '-pinned');
             if (!document.querySelector('.sidebar.open')) document.body.classList.remove('sidebar-open');
-            this.state({ [side + 'Open']: false });
+            this.state({ [side + 'Open']: false, [side + 'Pinned']: false });
         }
     },
 
@@ -200,8 +202,25 @@ const Base = {
             }
         });
 
+        // Responsive: hide pinned sidebars when viewport shrinks to mobile
+        matchMedia('(min-width: 1280px)').addEventListener('change', e => {
+            if (!e.matches) {
+                // Viewport went below desktop - close all sidebars
+                document.querySelectorAll('.sidebar.open').forEach(sb => {
+                    sb.classList.remove('open', 'pinned');
+                });
+                document.body.classList.remove('left-pinned', 'right-pinned', 'sidebar-open');
+            } else {
+                // Viewport went to desktop - restore pinned state
+                this.restore();
+            }
+        });
+
         // Lucide icons
         if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        // Remove preload class to enable transitions (after state restored)
+        requestAnimationFrame(() => document.documentElement.classList.remove('preload'));
     }
 };
 

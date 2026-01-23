@@ -8,7 +8,7 @@ readonly class Ctx {
     public function __construct(
         public string $email = 'mc@netserva.org',
         array $in = ['o' => 'Home', 'm' => 'list', 'x' => ''],
-        public array $out = ['doc' => 'SPE::04', 'head' => '', 'main' => '', 'foot' => ''],
+        public array $out = ['doc' => 'SPE::04', 'page' => '← 04 Themes', 'head' => '', 'main' => '', 'foot' => ''],
         public array $nav = [
             ['home',     'Home',    'Home'],
             ['book-open','About',   'About'],
@@ -56,12 +56,12 @@ abstract class Plugin {
 
 final class HomeModel extends Plugin {
     #[\Override] public function list(): array {
-        return ['head' => 'App Shell', 'main' => 'Dual sidebar interface with <b>LHS navigation</b> and <b>RHS settings</b>.'];
+        return ['head' => 'Theme System', 'main' => 'A modern CSS architecture using <b>OKLCH color space</b> and <b>mobile-first</b> responsive design.'];
     }
 }
 final class AboutModel extends Plugin {
     #[\Override] public function list(): array {
-        return ['head' => 'About', 'main' => 'This chapter introduces the <b>App Shell</b> pattern with pinnable sidebars.'];
+        return ['head' => 'App Shell', 'main' => 'Dual sidebar interface with <b>LHS</b> and <b>RHS</b> navigation panels.'];
     }
 }
 final class ContactModel extends Plugin {
@@ -83,10 +83,46 @@ final class HomeView extends View {
 <div class="card">
     <h2>{$this->ary['head']}</h2>
     <p>{$this->ary['main']}</p>
+    <h3>CSS Architecture</h3>
+    <ul style="list-style:disc;padding-left:1.5rem;margin-top:0.5rem">
+        <li><b>base.css</b> - Color-agnostic framework (layout, components, utilities)</li>
+        <li><b>site.css</b> - All color definitions using OKLCH color space</li>
+    </ul>
+    <h3>OKLCH Color Space</h3>
+    <ul style="list-style:disc;padding-left:1.5rem;margin-top:0.5rem">
+        <li><b>Perceptually uniform</b> - Equal changes look equal visually</li>
+        <li><b>L</b> (Lightness) - Consistent across all hues (0-100%)</li>
+        <li><b>C</b> (Chroma) - Color intensity (0 = gray, 0.4 = vivid)</li>
+        <li><b>H</b> (Hue) - Color angle (0-360°)</li>
+    </ul>
+    <h3>Color Schemes</h3>
+    <ul style="list-style:disc;padding-left:1.5rem;margin-top:0.5rem">
+        <li><b>Stone</b> (H=60) - Warm neutral, default theme</li>
+        <li><b>Ocean</b> (H=220) - Cool cyan-blue tones</li>
+        <li><b>Forest</b> (H=150) - Natural green palette</li>
+        <li><b>Sunset</b> (H=45) - Warm orange-amber</li>
+    </ul>
+    <h3>Mobile-First Breakpoints</h3>
+    <ul style="list-style:disc;padding-left:1.5rem;margin-top:0.5rem">
+        <li><b>Mobile</b> (0-767px) - Base styles, full width</li>
+        <li><b>Tablet</b> (768px+) - Cards gain borders/shadows</li>
+        <li><b>Desktop</b> (1280px+) - Sidebar pinning enabled</li>
+    </ul>
+</div>
+HTML;
+    }
+}
+
+final class AboutView extends View {
+    #[\Override] public function list(): string {
+        return <<<HTML
+<div class="card">
+    <h2>{$this->ary['head']}</h2>
+    <p>{$this->ary['main']}</p>
     <h3>Features</h3>
     <ul style="list-style:disc;padding-left:1.5rem;margin-top:0.5rem">
-        <li><b>LHS Sidebar</b> - Navigation (pages, posts)</li>
-        <li><b>RHS Sidebar</b> - Settings (theme, colors)</li>
+        <li><b>LHS Panel</b> - Primary navigation (pages, posts)</li>
+        <li><b>RHS Panel</b> - Secondary navigation, suited to settings</li>
         <li><b>Flyover</b> - Sidebars overlay content by default</li>
         <li><b>Pin</b> - Lock sidebars open on desktop (1280px+)</li>
     </ul>
@@ -100,8 +136,6 @@ final class HomeView extends View {
 HTML;
     }
 }
-
-final class AboutView extends View {}
 
 final class ContactView extends View {
     #[\Override] public function list(): string {
@@ -153,7 +187,7 @@ final class Theme {
         return <<<HTML
 <nav class="topnav">
     <button class="menu-toggle" data-sidebar="left"><i data-lucide="menu"></i></button>
-    <h1><a class="brand" href="/"><span>{$this->out['doc']}</span></a></h1>
+    <h1><a class="brand" href="/"><span>{$this->out['page']}</span></a></h1>
     <button class="menu-toggle" data-sidebar="right"><i data-lucide="menu"></i></button>
 </nav>
 HTML;
@@ -162,8 +196,9 @@ HTML;
     private function sidebar(string $side): string {
         $nav = $side === 'left'
             ? $this->links($this->ctx->nav, 'o', $this->ctx->in['o'])
-            : '<a href="#" onclick="Base.toggleTheme();return false" data-icon="moon"><i data-lucide="moon"></i> Toggle Theme</a>'
-              . $this->colorLinks();
+            : $this->colorLinks()
+              . '<div class="sidebar-divider"></div>'
+              . '<a href="#" onclick="Base.toggleTheme();return false" data-icon="moon"><i data-lucide="moon"></i> Toggle Theme</a>';
         $title = $side === 'left' ? 'Navigation' : 'Settings';
         $icon = $side === 'left' ? 'compass' : 'sliders-horizontal';
         return <<<HTML
@@ -193,7 +228,7 @@ HTML;
     <link rel="stylesheet" href="/base.css">
     <link rel="stylesheet" href="/site.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <script>(function(){var t=localStorage.getItem('theme'),c=localStorage.getItem('scheme'),h=document.documentElement;h.className=(t||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))+(c&&c!=='default'?' scheme-'+c:'');})()</script>
+    <script>(function(){var s=JSON.parse(localStorage.getItem('base-state')||'{}'),t=s.theme,c=s.scheme,h=document.documentElement;h.className='preload '+(t||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))+(c&&c!=='default'?' scheme-'+c:'');})()</script>
 </head>
 <body>
 {$body}
