@@ -52,18 +52,18 @@ final class PagesView extends Theme
 
         $html = <<<HTML
         <div class="card">
-            <div class="flex" style="justify-content:space-between;align-items:center;margin-bottom:1rem">
+            <div class="list-header">
                 <h2>📄 Pages</h2>
                 <a href="?o=Pages&m=create$t" class="btn">+ New Page</a>
             </div>
-            <table style="width:100%;border-collapse:collapse">
+            <table class="admin-table">
                 <thead>
-                    <tr style="border-bottom:2px solid var(--border)">
-                        <th style="text-align:center;padding:0.5rem;width:3rem">Icon</th>
-                        <th style="text-align:left;padding:0.5rem">Title</th>
-                        <th style="text-align:left;padding:0.5rem">Slug</th>
-                        <th style="text-align:left;padding:0.5rem">Updated</th>
-                        <th style="text-align:right;padding:0.5rem">Actions</th>
+                    <tr>
+                        <th class="text-center col-icon">Icon</th>
+                        <th>Title</th>
+                        <th>Slug</th>
+                        <th>Updated</th>
+                        <th class="text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -79,12 +79,12 @@ final class PagesView extends Theme
                 : "<a href=\"?o=Pages&m=delete&id={$item['id']}$t\" title=\"Delete\" class=\"icon\" onclick=\"return confirm('Delete this page?')\">🗑️</a>";
 
             $html .= <<<HTML
-                <tr style="border-bottom:1px solid var(--border)">
-                    <td style="padding:0.5rem;text-align:center">$icon</td>
-                    <td style="padding:0.5rem"><a href="?p=$slug$t">$title</a></td>
-                    <td style="padding:0.5rem"><code>$slug</code></td>
-                    <td style="padding:0.5rem"><small>{$item['updated']}</small></td>
-                    <td style="padding:0.5rem;text-align:right">
+                <tr>
+                    <td class="text-center">$icon</td>
+                    <td><a href="?p=$slug$t">$title</a></td>
+                    <td><code>$slug</code></td>
+                    <td><small>{$item['updated']}</small></td>
+                    <td class="text-right">
                         <a href="?o=Pages&m=update&id={$item['id']}$t" title="Edit" class="icon">✏️</a>
                         $deleteBtn
                     </td>

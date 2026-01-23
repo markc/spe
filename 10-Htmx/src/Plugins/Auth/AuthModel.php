@@ -43,6 +43,12 @@ final class AuthModel
         $this->db = new Db('users');
     }
 
+    // Get base path for redirects (root router compatibility)
+    private function base(): string
+    {
+        return preg_match('#^/(\d{2}-[^/]+)/#', $_SERVER['SCRIPT_NAME'] ?? '', $m) ? "/{$m[1]}/" : '/';
+    }
+
     // === Login ===
 
     public function login(): array
@@ -51,7 +57,7 @@ final class AuthModel
 
         // Already logged in
         if (Util::is_usr()) {
-            header('Location: /');
+            header('Location: ' . $this->base());
             exit();
         }
 
@@ -102,7 +108,7 @@ final class AuthModel
         }
 
         Util::log(($usr['fname'] ?: $usr['login']) . ' logged in', 'success');
-        header('Location: /');
+        header('Location: ' . $this->base());
         exit();
     }
 
@@ -130,7 +136,7 @@ final class AuthModel
             Util::log("$login logged out", 'success');
         }
 
-        header('Location: /');
+        header('Location: ' . $this->base());
         exit();
     }
 
@@ -141,7 +147,7 @@ final class AuthModel
         Util::elog(__METHOD__);
 
         if (Util::is_usr()) {
-            header('Location: /');
+            header('Location: ' . $this->base());
             exit();
         }
 

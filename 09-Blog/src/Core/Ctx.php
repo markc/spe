@@ -4,7 +4,6 @@
 
 namespace SPE\Blog\Core;
 
-use SPE\App\Acl;
 use SPE\App\Db;
 use SPE\App\QueryType;
 use SPE\App\Util;
@@ -45,7 +44,7 @@ final class Ctx
 
         // Input parameters
         $this->in = [
-            'o' => $this->ses('o', 'Blog'),
+            'o' => $_REQUEST['o'] ?? 'Blog',
             'm' => $_REQUEST['m'] ?? 'list',
             't' => $this->ses('t', 'Simple'),
             'x' => $_REQUEST['x'] ?? '',
@@ -74,15 +73,6 @@ final class Ctx
             $this->db->read('posts', 'id,title,slug,icon', "type='page' ORDER BY id", [], QueryType::All),
         );
         $pages[] = ['📝 Blog', "$base/blog"];
-
-        // Role-based additions
-        $acl = Acl::current();
-
-        if ($acl->can(Acl::Admin)) {
-            $pages[] = ['👥 Users', '?o=Users'];
-            $pages[] = ['📝 Posts', '?o=Blog&edit'];
-            $pages[] = ['🏷️ Categories', '?o=Categories'];
-        }
 
         return $pages;
     }

@@ -19,7 +19,7 @@ final class HomeModel extends Plugin
                 <p>The Method Template Pattern in PHP provides a framework for defining a rendering system while allowing specific steps to be deferred to subclasses. At its core, it establishes a base template method that controls the overall structure and flow of content generation, while individual methods handle specific rendering tasks.</p>
                 <p>What makes this pattern particularly powerful is its return-based nature, where each method returns content rather than directly outputting it. This allows rendered content to be collected, transformed, and manipulated before final output.</p>
             </div>
-            <div class="flex mt-2" style="gap:1rem;justify-content:center">
+            <div class="btn-group-center mt-4">
                 <button class="btn" onclick="showToast('Everything is working great!', 'success');">Success Message</button>
                 <button class="btn btn-danger" onclick="showToast('Something went wrong!', 'danger');">Danger Message</button>
             </div>

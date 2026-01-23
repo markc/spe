@@ -163,6 +163,14 @@ const Base = {
             // Overlay click
             if (t.closest('.overlay')) { this.closeSidebars(); return; }
 
+            // Sidebar group toggle (collapsible)
+            const groupTitle = t.closest('.sidebar-group-title');
+            if (groupTitle) {
+                const group = groupTitle.closest('.sidebar-group');
+                group?.classList.toggle('collapsed');
+                return;
+            }
+
             // Dropdown toggle
             const dropToggle = t.closest('.dropdown-toggle');
             if (dropToggle) {

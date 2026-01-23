@@ -26,7 +26,7 @@ final class ProfileView extends Theme
         };
 
         return <<<HTML
-        <div class="card" style="max-width:700px;margin:2rem auto">
+        <div class="card card-lg">
             <h2>👤 My Profile</h2>
             <form method="post" action="?o=Profile$t">
                 <div class="grid-2col">
@@ -56,7 +56,7 @@ final class ProfileView extends Theme
                         <input type="text" value="$created" disabled>
                     </div>
                 </div>
-                <div class="flex" style="justify-content:space-between;align-items:center;margin-top:1.5rem">
+                <div class="list-header mt-4">
                     <a href="?o=Auth&m=update$t">🔑 Change Password</a>
                     <button type="submit" class="btn">Save Profile</button>
                 </div>

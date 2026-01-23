@@ -95,6 +95,49 @@ abstract class Theme
         return '<a href="?o=Auth&m=login"><i data-lucide="lock"></i> Login</a>';
     }
 
+    protected function userDropdown(): string
+    {
+        if (!Util::is_usr()) {
+            return '<a href="?o=Auth&m=login"><i data-lucide="lock"></i> Login</a>';
+        }
+
+        $usr = $_SESSION['usr'];
+        $name = htmlspecialchars($usr['fname'] ?: $usr['login']);
+        $t = $this->ctx->in['t'];
+
+        // Profile link
+        $links = '<a href="?o=Auth&m=profile"><i data-lucide="user"></i> Profile</a>';
+        $links .= '<a href="?o=Auth&m=changepw"><i data-lucide="key"></i> Password</a>';
+
+        // Admin links
+        if (Util::is_adm()) {
+            $links .= '<div class="dropdown-divider"></div>';
+            $links .= '<a href="?o=Users"><i data-lucide="users"></i> Users</a>';
+            $links .= '<a href="?o=Posts"><i data-lucide="file-text"></i> Posts</a>';
+            $links .= '<a href="?o=Categories"><i data-lucide="tags"></i> Categories</a>';
+        }
+
+        // Layout options
+        $links .= '<div class="dropdown-divider"></div>';
+        foreach ($this->ctx->themes as $p) {
+            $active = $t === $p[2] ? ' class="active"' : '';
+            $links .= "<a href=\"?t={$p[2]}\"$active><i data-lucide=\"{$p[0]}\"></i> {$p[1]}</a>";
+        }
+
+        // Color options
+        $links .= '<div class="dropdown-divider"></div>';
+        $links .= '<a href="#" data-scheme="default"><i data-lucide="circle"></i> Stone</a>';
+        $links .= '<a href="#" data-scheme="ocean"><i data-lucide="waves"></i> Ocean</a>';
+        $links .= '<a href="#" data-scheme="forest"><i data-lucide="trees"></i> Forest</a>';
+        $links .= '<a href="#" data-scheme="sunset"><i data-lucide="sunset"></i> Sunset</a>';
+
+        // Logout
+        $links .= '<div class="dropdown-divider"></div>';
+        $links .= '<a href="?o=Auth&m=logout"><i data-lucide="log-out"></i> Logout</a>';
+
+        return "<div class=\"dropdown dropdown-end\"><span class=\"dropdown-toggle\"><i data-lucide=\"circle-user\"></i> $name</span><div class=\"dropdown-menu\">$links</div></div>";
+    }
+
     protected function html(string $theme, string $body): string
     {
         $flash = $this->flash();

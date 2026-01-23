@@ -25,7 +25,7 @@ final class AuthView
         $action = '?o=Auth&m=login';
         $forgotUrl = '?o=Auth&m=forgotpw';
         return <<<HTML
-        <div class="card" style="max-width:400px;margin:2rem auto">
+        <div class="card card-sm">
             <h2>🔒 Sign In</h2>
             <form method="post" action="$action" hx-post="$action" hx-target="#main">
                 $csrf
@@ -61,7 +61,7 @@ final class AuthView
         $action = '?o=Auth&m=forgotpw';
         $backUrl = '?o=Auth&m=login';
         return <<<HTML
-        <div class="card" style="max-width:400px;margin:2rem auto">
+        <div class="card card-sm">
             <h2>🔑 Forgot Password</h2>
             <p class="text-muted">Enter your email and we'll send you a reset link.</p>
             <form method="post" action="$action" hx-post="$action" hx-target="#main">
@@ -85,7 +85,7 @@ final class AuthView
         $csrf = Util::csrfField();
         $action = '?o=Auth&m=resetpw';
         return <<<HTML
-        <div class="card" style="max-width:400px;margin:2rem auto">
+        <div class="card card-sm">
             <h2>🔐 Reset Password</h2>
             <p class="text-center"><strong>$login</strong></p>
             <form method="post" action="$action" hx-post="$action" hx-target="#main">
@@ -114,7 +114,7 @@ final class AuthView
         $action = '?o=Auth&m=changepw';
         $cancelUrl = '?o=Auth&m=profile';
         return <<<HTML
-        <div class="card" style="max-width:400px;margin:2rem auto">
+        <div class="card card-sm">
             <h2>🔒 Change Password</h2>
             <p class="text-center"><strong>$login</strong></p>
             <form method="post" action="$action" hx-post="$action" hx-target="#main" hx-push-url="$cancelUrl">
@@ -156,7 +156,7 @@ final class AuthView
         $changePwUrl = '?o=Auth&m=changepw';
 
         return <<<HTML
-        <div class="card" style="max-width:500px;margin:2rem auto">
+        <div class="card card-md">
             <h2>👤 My Profile</h2>
             <form method="post" action="$action" hx-post="$action" hx-target="#main">
                 $csrf
@@ -164,12 +164,12 @@ final class AuthView
                     <label>Email (login)</label>
                     <input type="email" value="$login" disabled>
                 </div>
-                <div class="flex">
-                    <div class="form-group flex-1">
+                <div class="form-row">
+                    <div class="form-group">
                         <label for="fname">First Name</label>
                         <input type="text" id="fname" name="fname" value="$fname">
                     </div>
-                    <div class="form-group flex-1">
+                    <div class="form-group">
                         <label for="lname">Last Name</label>
                         <input type="text" id="lname" name="lname" value="$lname">
                     </div>

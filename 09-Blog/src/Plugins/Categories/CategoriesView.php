@@ -5,10 +5,15 @@
 namespace SPE\Blog\Plugins\Categories;
 
 use SPE\App\Util;
-use SPE\Blog\Core\Theme;
+use SPE\Blog\Core\Ctx;
 
-final class CategoriesView extends Theme
+final class CategoriesView
 {
+    public function __construct(
+        private Ctx $ctx,
+        private array $a,
+    ) {}
+
     private function t(): string
     {
         return '&t=' . $this->ctx->in['t'];
@@ -23,7 +28,7 @@ final class CategoriesView extends Theme
 
     public function read(): string
     {
-        $a = $this->ctx->ary;
+        $a = $this->a;
         if (empty($a))
             return '<div class="card"><p>Category not found.</p></div>';
         $t = $this->t();
@@ -50,7 +55,7 @@ final class CategoriesView extends Theme
             <p class="text-muted">$desc</p>
             <p><strong>$postCount</strong> posts in this category</p>
             $postList
-            <div class="flex mt-3" style="gap:0.5rem">
+            <div class="btn-group mt-3">
                 <a href="?o=Categories$t" class="btn">« Back</a>
                 <a href="?o=Categories&m=update&id={$a['id']}$t" class="btn">Edit</a>
             </div>
@@ -62,7 +67,7 @@ final class CategoriesView extends Theme
     {
         if (Util::is_post())
             return '';
-        return $this->form($this->ctx->ary);
+        return $this->form($this->a);
     }
 
     public function delete(): string
@@ -72,22 +77,22 @@ final class CategoriesView extends Theme
 
     public function list(): string
     {
-        $a = $this->ctx->ary;
+        $a = $this->a;
         $t = $this->t();
 
         $html = <<<HTML
         <div class="card">
-            <div class="flex" style="justify-content:space-between;align-items:center;margin-bottom:1rem">
+            <div class="list-header">
                 <h2>🏷️ Categories</h2>
                 <a href="?o=Categories&m=create$t" class="btn">+ New Category</a>
             </div>
-            <table style="width:100%;border-collapse:collapse">
+            <table class="admin-table">
                 <thead>
-                    <tr style="border-bottom:2px solid var(--border)">
-                        <th style="text-align:left;padding:0.5rem">Name</th>
-                        <th style="text-align:left;padding:0.5rem">Slug</th>
-                        <th style="text-align:center;padding:0.5rem">Posts</th>
-                        <th style="text-align:right;padding:0.5rem">Actions</th>
+                    <tr>
+                        <th>Name</th>
+                        <th>Slug</th>
+                        <th class="text-center">Posts</th>
+                        <th class="text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -103,11 +108,11 @@ final class CategoriesView extends Theme
                 : "<a href=\"?o=Categories&m=delete&id={$item['id']}$t\" title=\"Delete\" class=\"icon\" onclick=\"return confirm('Delete this category?')\">🗑️</a>";
 
             $html .= <<<HTML
-                <tr style="border-bottom:1px solid var(--border)">
-                    <td style="padding:0.5rem"><a href="?o=Categories&m=read&id={$item['id']}$t">$name</a></td>
-                    <td style="padding:0.5rem"><code>$slug</code></td>
-                    <td style="padding:0.5rem;text-align:center">{$item['post_count']}</td>
-                    <td style="padding:0.5rem;text-align:right">
+                <tr>
+                    <td><a href="?o=Categories&m=read&id={$item['id']}$t">$name</a></td>
+                    <td><code>$slug</code></td>
+                    <td class="text-center">{$item['post_count']}</td>
+                    <td class="text-right">
                         <a href="?o=Categories&m=update&id={$item['id']}$t" title="Edit" class="icon">✏️</a>
                         $deleteBtn
                     </td>
@@ -130,7 +135,7 @@ final class CategoriesView extends Theme
         $btnText = $id ? 'Update' : 'Create';
 
         return <<<HTML
-        <div class="card" style="max-width:500px;margin:2rem auto">
+        <div class="card card-md">
             <h2>$heading</h2>
             <form method="post" action="$action">
                 <input type="hidden" name="id" value="$id">

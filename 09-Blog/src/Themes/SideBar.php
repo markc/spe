@@ -4,6 +4,7 @@
 
 namespace SPE\Blog\Themes;
 
+use SPE\App\Util;
 use SPE\Blog\Core\Theme;
 
 final class SideBar extends Theme
@@ -12,50 +13,40 @@ final class SideBar extends Theme
     public function render(): string
     {
         $path = '/' . trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
-        $t = $this->ctx->in['t'];
 
         // Navigation links (supports both clean URLs and query strings)
-        $n1 = $this->ctx->nav
-            |> (fn($n) => array_map(fn($p) => sprintf(
-                '<a href="%s"%s title="%s">%s</a>',
-                $p[1], $this->isActiveNav($p[1], $path) ? ' class="active"' : '', $p[0], $p[0],
-            ), $n))
+        $nav = $this->ctx->nav
+            |> (fn($n) => array_map(function($p) use ($path) {
+                // Extract emoji (grapheme cluster) from start of title for data-icon attribute
+                preg_match('/^(\X)\s*/u', $p[0], $m);
+                $icon = (isset($m[1]) && preg_match('/^\p{So}|\p{S}/u', $m[1])) ? $m[1] : '📄';
+                return sprintf(
+                    '<a href="%s"%s title="%s" data-icon="%s">%s</a>',
+                    $p[1],
+                    $this->isActiveNav($p[1], $path) ? ' class="active"' : '',
+                    $p[0],
+                    $icon,
+                    $p[0],
+                );
+            }, $n))
             |> (static fn($a) => implode('', $a));
 
-        // Layout links
-        $n2 = $this->ctx->themes
-            |> (static fn($n) => array_map(static fn($p) => sprintf(
-                '<a href="?t=%s"%s title="%s" data-icon="%s"><i data-lucide="%s"></i> %s</a>',
-                $p[2], $t === $p[2] ? ' class="active"' : '', $p[1], $p[0], $p[0], $p[1],
-            ), $n))
-            |> (static fn($a) => implode('', $a));
-
-        $auth = $this->authNav();
+        $userMenu = $this->userDropdown();
+        $mobileMenu = $this->mobileMenuItems();
         $body = <<<HTML
         <nav class="topnav">
             <button class="menu-toggle"><i data-lucide="menu"></i></button>
             <h1><a class="brand" href="/"><i data-lucide="chevron-left"></i> <span>Blog PHP Example</span></a></h1>
-            <span class="topnav-links">$auth</span>
-            <button class="theme-toggle" id="theme-icon"><i data-lucide="moon"></i></button>
+            <div class="topnav-user desktop-only">$userMenu</div>
+            <button class="theme-toggle desktop-only" id="theme-icon"><i data-lucide="moon"></i></button>
         </nav>
         <div class="sidebar-layout">
             <aside class="sidebar">
-                <div class="sidebar-group">
-                    <div class="sidebar-group-title" data-icon="file-text"><i data-lucide="file-text"></i> Pages</div>
-                    <nav>$n1</nav>
-                </div>
-                <div class="sidebar-group">
-                    <div class="sidebar-group-title" data-icon="layout-grid"><i data-lucide="layout-grid"></i> Layout</div>
-                    <nav>$n2</nav>
-                </div>
-                <div class="sidebar-group">
-                    <div class="sidebar-group-title" data-icon="swatch-book"><i data-lucide="swatch-book"></i> Colors</div>
-                    <nav>
-                        <a href="#" data-scheme="default" title="Stone" data-icon="circle"><i data-lucide="circle"></i> Stone</a>
-                        <a href="#" data-scheme="ocean" title="Ocean" data-icon="waves"><i data-lucide="waves"></i> Ocean</a>
-                        <a href="#" data-scheme="forest" title="Forest" data-icon="trees"><i data-lucide="trees"></i> Forest</a>
-                        <a href="#" data-scheme="sunset" title="Sunset" data-icon="sunset"><i data-lucide="sunset"></i> Sunset</a>
-                    </nav>
+                <div class="sidebar-content">
+                    <nav>$nav</nav>
+                    <div class="mobile-only sidebar-mobile-menu">
+                        $mobileMenu
+                    </div>
                 </div>
                 <button class="sidebar-toggle" aria-label="Toggle sidebar"></button>
             </aside>
@@ -66,6 +57,37 @@ final class SideBar extends Theme
         </div>
         HTML;
         return $this->html('SideBar', $body);
+    }
+
+    private function mobileMenuItems(): string
+    {
+        $items = '<div class="sidebar-divider"></div>';
+
+        // Theme toggle
+        $items .= '<a href="#" onclick="Base.toggleTheme(); return false;" data-icon="🌙"><i data-lucide="moon"></i> Toggle Theme</a>';
+
+        if (!Util::is_usr()) {
+            $items .= '<a href="?o=Auth&m=login" data-icon="🔒"><i data-lucide="lock"></i> Login</a>';
+            return $items;
+        }
+
+        // User menu items
+        $items .= '<a href="?o=Profile" data-icon="👤"><i data-lucide="user"></i> Profile</a>';
+        $items .= '<a href="?o=Profile&m=changepw" data-icon="🔑"><i data-lucide="key"></i> Password</a>';
+
+        // Admin links
+        if (Util::is_adm()) {
+            $items .= '<div class="sidebar-divider"></div>';
+            $items .= '<a href="?o=Users" data-icon="👥"><i data-lucide="users"></i> Users</a>';
+            $items .= '<a href="?o=Posts" data-icon="📝"><i data-lucide="file-text"></i> Posts</a>';
+            $items .= '<a href="?o=Categories" data-icon="🏷️"><i data-lucide="tags"></i> Categories</a>';
+        }
+
+        // Logout
+        $items .= '<div class="sidebar-divider"></div>';
+        $items .= '<a href="?o=Auth&m=logout" data-icon="🚪"><i data-lucide="log-out"></i> Logout</a>';
+
+        return $items;
     }
 
     private function isActiveNav(string $href, string $path): bool

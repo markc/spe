@@ -35,9 +35,9 @@ namespace SPE\Router {
         public function __construct(
             public array $out = ['doc' => 'SPE', 'page' => '🐘 Simple PHP Engine'],
             public array $nav = [
+                ['book-open', 'Docs', 'docs/'],
                 ['github', 'GitHub', 'https://github.com/markc/spe'],
                 ['video', 'Tutorials', 'https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B'],
-                ['book-open', 'Docs', 'docs/'],
             ],
             public array $colors = [
                 ['circle', 'Stone', 'default'],

@@ -12,15 +12,13 @@ final class Simple extends Theme
     public function render(): string
     {
         $nav = $this->nav();
-        $dd = $this->dropdown();
-        $colors = $this->colors();
-        $auth = $this->authNav();
+        $userMenu = $this->userDropdown();
         $body = <<<HTML
         <div class="container">
             <header class="mt-4"><h1><a class="brand" href="/"><i data-lucide="chevron-left"></i> <span>Blog PHP Example</span></a></h1></header>
             <nav class="card flex">
-                $nav $dd $colors
-                <span class="ml-auto">$auth <button class="theme-toggle" id="theme-icon"><i data-lucide="moon"></i></button></span>
+                $nav
+                <span class="ml-auto">$userMenu <button class="theme-toggle" id="theme-icon"><i data-lucide="moon"></i></button></span>
             </nav>
             <main class="mt-4 mb-4">{$this->out['main']}</main>
             <footer class="text-center"><small>© 2015-2026 Mark Constable (MIT License)</small></footer>

@@ -387,7 +387,7 @@
     .pin-toggle:hover { background: var(--bg-primary); color: var(--accent); }
     .sidebar.pinned .pin-toggle { color: var(--accent); }
 
-    .sidebar nav { padding: var(--space-2) 0; display: flex; flex-direction: column; align-items: stretch; border: none; }
+    .sidebar > nav { padding: var(--space-2) 0; display: flex; flex-direction: column; align-items: stretch; border: none; }
     .sidebar nav a {
         display: flex; align-items: center; gap: var(--space-3);
         padding: var(--space-2) var(--space-3); padding-inline-start: calc(var(--space-3) - 3px);
@@ -400,6 +400,27 @@
 
     .sidebar-divider { height: 1px; background: var(--border); margin-block: var(--space-2); }
 
+    /* Sidebar Groups (collapsible) */
+    .sidebar-group { margin-block: var(--space-1); }
+    .sidebar-group-title {
+        display: flex; align-items: center; gap: var(--space-3);
+        padding: var(--space-2) var(--space-3); padding-inline-start: calc(var(--space-3) - 3px);
+        border-inline-start: 3px solid transparent;
+        color: var(--fg-muted); font-weight: 500; cursor: pointer;
+        transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+    }
+    .sidebar-group-title:hover { background: var(--bg-primary); border-color: var(--fg-muted); }
+    .sidebar-group-title::after {
+        content: ''; margin-inline-start: auto;
+        border: 4px solid transparent; border-block-start-color: currentColor;
+        transition: transform var(--transition-fast);
+    }
+    .sidebar-group.collapsed .sidebar-group-title::after { transform: rotate(-90deg); }
+    .sidebar-group nav { display: grid; grid-template-rows: 1fr; transition: grid-template-rows 0.4s ease-in-out; }
+    .sidebar-group.collapsed nav { grid-template-rows: 0fr; }
+    .sidebar-group nav > div { overflow: hidden; min-height: 0; }
+    .sidebar-group nav a { padding-inline-start: calc(var(--space-6) - 3px); font-size: 0.9em; }
+
     /* Overlay */
     .overlay {
         position: fixed; inset: 0;
@@ -411,7 +432,7 @@
     body.sidebar-open .overlay { opacity: 1; visibility: visible; }
 
     /* Main */
-    main { margin-block-start: var(--topnav-height); padding: 0; transition: margin var(--transition-slow); }
+    main { margin-block-start: var(--topnav-height); padding: var(--space-4); transition: margin var(--transition-slow); }
 
     /* === Prose (Markdown/Article) === */
     .prose { line-height: var(--leading-relaxed); }

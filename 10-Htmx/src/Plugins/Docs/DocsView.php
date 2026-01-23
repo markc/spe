@@ -106,7 +106,7 @@ final class DocsView extends Theme
 
         $html = <<<HTML
         <div class="card">
-            <div class="flex" style="justify-content:space-between;align-items:center;margin-bottom:1rem">
+            <div class="list-header">
                 <h2>📚 Documentation</h2>
                 <a href="?o=Docs&m=create$t" class="btn">+ New Doc</a>
             </div>
@@ -130,7 +130,7 @@ final class DocsView extends Theme
                     // File existence warning
                     $warning = '';
                     if (!$doc['file_exists']) {
-                        $warning = '<span class="tag" style="background:var(--danger);color:#fff" title="File not found">⚠️ Missing</span>';
+                        $warning = '<span class="tag tag-danger" title="File not found">⚠️ Missing</span>';
                     }
 
                     // Actions
@@ -149,7 +149,7 @@ final class DocsView extends Theme
                             $actions
                         </div>
                         <div class="docs-item-meta">
-                            <code class="text-muted" style="font-size:0.8em">$path</code>
+                            <code class="text-muted text-xs">$path</code>
                         </div>
                         <div class="docs-item-excerpt text-muted">$excerpt</div>
                     </div>

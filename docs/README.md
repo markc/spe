@@ -4,7 +4,6 @@
 [![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![CI](https://github.com/markc/spe/actions/workflows/ci.yml/badge.svg)](https://github.com/markc/spe/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/markc/spe)](https://github.com/markc/spe/releases/latest)
 [![Website](https://img.shields.io/badge/Website-markc.github.io-blue?logo=github)](https://markc.github.io/spe/)
 [![Tutorial](https://img.shields.io/badge/Tutorial-10_Chapters-blue)](https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B)
 [![Built with Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-orange?logo=anthropic)](https://claude.ai/code)

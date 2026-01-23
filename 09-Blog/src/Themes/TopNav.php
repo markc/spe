@@ -12,13 +12,12 @@ final class TopNav extends Theme
     public function render(): string
     {
         $nav = $this->nav();
-        $dd = $this->dropdown();
-        $colors = $this->colors();
-        $auth = $this->authNav();
+        $userMenu = $this->userDropdown();
         $body = <<<HTML
         <nav class="topnav">
             <h1><a class="brand" href="/"><i data-lucide="chevron-left"></i> <span>Blog PHP Example</span></a></h1>
-            <div class="topnav-links">$nav $dd $colors | $auth</div>
+            <div class="topnav-links">$nav</div>
+            <div class="topnav-user">$userMenu</div>
             <button class="theme-toggle" id="theme-icon"><i data-lucide="moon"></i></button>
             <button class="menu-toggle"><i data-lucide="menu"></i></button>
         </nav>

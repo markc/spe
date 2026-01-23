@@ -89,7 +89,7 @@ final class BlogView
         $author = htmlspecialchars($a['author']);
         $date = date('F j, Y', strtotime($a['created']));
         $image = $a['featured_image']
-            ? "<img src=\"{$a['featured_image']}\" alt=\"$title\" class=\"blog-featured-image\" style=\"float:right;width:33%;margin:0 0 1rem 1.5rem;border-radius:var(--radius-md);\">"
+            ? "<img src=\"{$a['featured_image']}\" alt=\"$title\" class=\"blog-featured-image\">"
             : '';
 
         // Build category tags

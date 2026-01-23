@@ -3,98 +3,105 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="light dark">
     <title>SPE Docs</title>
     <link rel="icon" href="favicon.ico">
     <link rel="stylesheet" href="base.css">
     <link rel="stylesheet" href="site.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <script>(function(){const t=localStorage.getItem("base-theme"),s=localStorage.getItem("base-scheme"),c=t||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");document.documentElement.className=c+(s&&s!=="default"?" scheme-"+s:"")})();</script>
+    <script>(function(){var s=JSON.parse(localStorage.getItem('base-state')||'{}'),t=s.theme,c=s.scheme,h=document.documentElement;h.className='preload '+(t||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))+(c&&c!=='default'?' scheme-'+c:'');})()</script>
+    <style>
+        .sidebar-left > nav { padding: 0; }
+        .sidebar-group { margin-block: 0; }
+        .sidebar-group-title { font-weight: normal; color: var(--fg-primary); }
+        .sidebar-group nav a { font-size: inherit; padding-inline-start: calc(var(--space-3) - 3px); color: var(--fg-muted); }
+    </style>
 </head>
 <body>
 <nav class="topnav">
-    <button class="menu-toggle"><i data-lucide="menu"></i></button>
-    <h1><a class="brand" href="/">📚 <span>SPE Documentation</span></a></h1>
-    <button class="theme-toggle" id="theme-icon"><i data-lucide="moon"></i></button>
+    <button class="menu-toggle" data-sidebar="left"><i data-lucide="menu"></i></button>
+    <h1><a class="brand" href="/"><span>📚 SPE Documentation</span></a></h1>
+    <button class="menu-toggle" data-sidebar="right"><i data-lucide="menu"></i></button>
 </nav>
-<div class="sidebar-layout">
-    <aside class="sidebar" id="sidebar">
-        <nav class="mt-2"><a href="#README.md" data-path="README.md" data-icon="home"><i data-lucide="home"></i> SPE Overview</a></nav>
-        <div class="sidebar-group collapsed">
-            <div class="sidebar-group-title" data-icon="video"><i data-lucide="video"></i> 00 Tutorial</div>
-            <nav><a href="#00-Tutorial/README.md" data-path="00-Tutorial/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></nav>
-        </div>
-        <div class="sidebar-group collapsed">
-            <div class="sidebar-group-title" data-icon="file-code"><i data-lucide="file-code"></i> 01 Simple</div>
-            <nav><a href="#01-Simple/README.md" data-path="01-Simple/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></nav>
-        </div>
-        <div class="sidebar-group collapsed">
-            <div class="sidebar-group-title" data-icon="palette"><i data-lucide="palette"></i> 02 Styled</div>
-            <nav><a href="#02-Styled/README.md" data-path="02-Styled/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></nav>
-        </div>
-        <div class="sidebar-group collapsed">
-            <div class="sidebar-group-title" data-icon="puzzle"><i data-lucide="puzzle"></i> 03 Plugins</div>
-            <nav><a href="#03-Plugins/README.md" data-path="03-Plugins/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></nav>
-        </div>
-        <div class="sidebar-group collapsed">
-            <div class="sidebar-group-title" data-icon="layout-template"><i data-lucide="layout-template"></i> 04 Themes</div>
-            <nav><a href="#04-Themes/README.md" data-path="04-Themes/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></nav>
-        </div>
-        <div class="sidebar-group collapsed">
-            <div class="sidebar-group-title" data-icon="package"><i data-lucide="package"></i> 05 Autoload</div>
-            <nav><a href="#05-Autoload/README.md" data-path="05-Autoload/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></nav>
-        </div>
-        <div class="sidebar-group collapsed">
-            <div class="sidebar-group-title" data-icon="cookie"><i data-lucide="cookie"></i> 06 Session</div>
-            <nav><a href="#06-Session/README.md" data-path="06-Session/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></nav>
-        </div>
-        <div class="sidebar-group collapsed">
-            <div class="sidebar-group-title" data-icon="database"><i data-lucide="database"></i> 07 PDO</div>
-            <nav><a href="#07-PDO/README.md" data-path="07-PDO/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></nav>
-        </div>
-        <div class="sidebar-group collapsed">
-            <div class="sidebar-group-title" data-icon="users"><i data-lucide="users"></i> 08 Users</div>
-            <nav><a href="#08-Users/README.md" data-path="08-Users/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></nav>
-        </div>
-        <div class="sidebar-group collapsed">
-            <div class="sidebar-group-title" data-icon="newspaper"><i data-lucide="newspaper"></i> 09 Blog</div>
-            <nav>
-                <a href="#09-Blog/README.md" data-path="09-Blog/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a>
-                <a href="#09-Blog/authentication.md" data-path="09-Blog/authentication.md" data-icon="lock"><i data-lucide="lock"></i> Authentication</a>
-                <a href="#09-Blog/database.md" data-path="09-Blog/database.md" data-icon="hard-drive"><i data-lucide="hard-drive"></i> Database</a>
-                <a href="#09-Blog/markdown.md" data-path="09-Blog/markdown.md" data-icon="file-text"><i data-lucide="file-text"></i> Markdown</a>
-                <a href="#09-Blog/php85-features.md" data-path="09-Blog/php85-features.md" data-icon="code"><i data-lucide="code"></i> PHP 8.5</a>
-            </nav>
-        </div>
-        <div class="sidebar-group collapsed">
-            <div class="sidebar-group-title" data-icon="youtube"><i data-lucide="youtube"></i> 10 YouTube</div>
-            <nav><a href="#10-YouTube/README.md" data-path="10-YouTube/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></nav>
-        </div>
-        <div class="sidebar-group collapsed">
-            <div class="sidebar-group-title" data-icon="server"><i data-lucide="server"></i> 11 HCP</div>
-            <nav><a href="#11-HCP/README.md" data-path="11-HCP/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></nav>
-        </div>
-        <div class="sidebar-group">
-            <div class="sidebar-group-title" data-icon="swatch-book"><i data-lucide="swatch-book"></i> Colors</div>
-            <nav>
-                <a href="#" data-scheme="default" title="Stone" data-icon="circle"><i data-lucide="circle"></i> Stone</a>
-                <a href="#" data-scheme="ocean" title="Ocean" data-icon="waves"><i data-lucide="waves"></i> Ocean</a>
-                <a href="#" data-scheme="forest" title="Forest" data-icon="trees"><i data-lucide="trees"></i> Forest</a>
-                <a href="#" data-scheme="sunset" title="Sunset" data-icon="sunset"><i data-lucide="sunset"></i> Sunset</a>
-            </nav>
-        </div>
-        <button class="sidebar-toggle" aria-label="Toggle sidebar"></button>
-    </aside>
-    <div class="sidebar-main">
-        <main id="content" class="prose mt-4">
-            <h1>SPE Documentation</h1>
-            <p>Select a document from the sidebar to view its contents.</p>
-        </main>
-        <footer class="text-center mt-3">
-            <small>© 2015-2026 Mark Constable (MIT License)</small>
-        </footer>
+<aside class="sidebar sidebar-left">
+    <div class="sidebar-header">
+        <span><i data-lucide="book-open"></i> Chapters</span>
+        <button class="pin-toggle" data-sidebar="left" title="Pin sidebar"><i data-lucide="pin"></i></button>
     </div>
-</div>
+    <nav><a href="#README.md" data-path="README.md" data-icon="home"><i data-lucide="home"></i> SPE Overview</a></nav>
+    <div class="sidebar-group collapsed">
+        <div class="sidebar-group-title" data-icon="video"><i data-lucide="video"></i> 00 Tutorial</div>
+        <nav><div><a href="#00-Tutorial/README.md" data-path="00-Tutorial/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></div></nav>
+    </div>
+    <div class="sidebar-group collapsed">
+        <div class="sidebar-group-title" data-icon="file-code"><i data-lucide="file-code"></i> 01 Simple</div>
+        <nav><div><a href="#01-Simple/README.md" data-path="01-Simple/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></div></nav>
+    </div>
+    <div class="sidebar-group collapsed">
+        <div class="sidebar-group-title" data-icon="palette"><i data-lucide="palette"></i> 02 Styled</div>
+        <nav><div><a href="#02-Styled/README.md" data-path="02-Styled/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></div></nav>
+    </div>
+    <div class="sidebar-group collapsed">
+        <div class="sidebar-group-title" data-icon="puzzle"><i data-lucide="puzzle"></i> 03 Plugins</div>
+        <nav><div><a href="#03-Plugins/README.md" data-path="03-Plugins/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></div></nav>
+    </div>
+    <div class="sidebar-group collapsed">
+        <div class="sidebar-group-title" data-icon="layout-template"><i data-lucide="layout-template"></i> 04 Themes</div>
+        <nav><div><a href="#04-Themes/README.md" data-path="04-Themes/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></div></nav>
+    </div>
+    <div class="sidebar-group collapsed">
+        <div class="sidebar-group-title" data-icon="package"><i data-lucide="package"></i> 05 Autoload</div>
+        <nav><div><a href="#05-Autoload/README.md" data-path="05-Autoload/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></div></nav>
+    </div>
+    <div class="sidebar-group collapsed">
+        <div class="sidebar-group-title" data-icon="cookie"><i data-lucide="cookie"></i> 06 Session</div>
+        <nav><div><a href="#06-Session/README.md" data-path="06-Session/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></div></nav>
+    </div>
+    <div class="sidebar-group collapsed">
+        <div class="sidebar-group-title" data-icon="database"><i data-lucide="database"></i> 07 PDO</div>
+        <nav><div><a href="#07-PDO/README.md" data-path="07-PDO/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></div></nav>
+    </div>
+    <div class="sidebar-group collapsed">
+        <div class="sidebar-group-title" data-icon="users"><i data-lucide="users"></i> 08 Users</div>
+        <nav><div><a href="#08-Users/README.md" data-path="08-Users/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></div></nav>
+    </div>
+    <div class="sidebar-group collapsed">
+        <div class="sidebar-group-title" data-icon="newspaper"><i data-lucide="newspaper"></i> 09 Blog</div>
+        <nav><div>
+            <a href="#09-Blog/README.md" data-path="09-Blog/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a>
+            <a href="#09-Blog/authentication.md" data-path="09-Blog/authentication.md" data-icon="lock"><i data-lucide="lock"></i> Authentication</a>
+            <a href="#09-Blog/database.md" data-path="09-Blog/database.md" data-icon="hard-drive"><i data-lucide="hard-drive"></i> Database</a>
+            <a href="#09-Blog/markdown.md" data-path="09-Blog/markdown.md" data-icon="file-text"><i data-lucide="file-text"></i> Markdown</a>
+            <a href="#09-Blog/php85-features.md" data-path="09-Blog/php85-features.md" data-icon="code"><i data-lucide="code"></i> PHP 8.5</a>
+        </div></nav>
+    </div>
+    <div class="sidebar-group collapsed">
+        <div class="sidebar-group-title" data-icon="radio"><i data-lucide="radio"></i> 10 Htmx</div>
+        <nav><div><a href="#10-Htmx/README.md" data-path="10-Htmx/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></div></nav>
+    </div>
+    <div class="sidebar-group collapsed">
+        <div class="sidebar-group-title" data-icon="server"><i data-lucide="server"></i> 11 HCP</div>
+        <nav><div><a href="#11-HCP/README.md" data-path="11-HCP/README.md" data-icon="book-open"><i data-lucide="book-open"></i> README</a></div></nav>
+    </div>
+</aside>
+<aside class="sidebar sidebar-right">
+    <div class="sidebar-header">
+        <span><i data-lucide="sliders-horizontal"></i> Settings</span>
+        <button class="pin-toggle" data-sidebar="right" title="Pin sidebar"><i data-lucide="pin"></i></button>
+    </div>
+    <nav>
+        <a href="#" data-scheme="default" data-icon="circle"><i data-lucide="circle"></i> Stone</a>
+        <a href="#" data-scheme="ocean" data-icon="waves"><i data-lucide="waves"></i> Ocean</a>
+        <a href="#" data-scheme="forest" data-icon="trees"><i data-lucide="trees"></i> Forest</a>
+        <a href="#" data-scheme="sunset" data-icon="sunset"><i data-lucide="sunset"></i> Sunset</a>
+        <div class="sidebar-divider"></div>
+        <a href="#" onclick="Base.toggleTheme();return false" data-icon="moon"><i data-lucide="moon"></i> Toggle Theme</a>
+    </nav>
+</aside>
+<main id="content" class="prose">
+    <h1>SPE Documentation</h1>
+    <p>Select a document from the sidebar to view its contents.</p>
+</main>
+<div class="overlay"></div>
 <script src="base.js"></script>
 <script src="md.js"></script>
 </body>

@@ -29,7 +29,7 @@ final class ContactModel extends Plugin
                 </div>
             </form>
             <script>function handleContact(f){location.href='mailto:{$this->ctx->email}?subject='+encodeURIComponent(f.subject.value)+'&body='+encodeURIComponent(f.message.value);showToast('Opening email client...','success');return false;}</script>
-            <div class="flex mt-2" style="gap:1rem;justify-content:center">
+            <div class="btn-group-center mt-2">
                 <a href="https://github.com/markc/spe" class="btn">SPE Project Page</a>
                 <a href="https://github.com/markc/spe/issues" class="btn">SPE Issue Tracker</a>
             </div>

@@ -5,10 +5,15 @@
 namespace SPE\Htmx\Plugins\Users;
 
 use SPE\App\Util;
-use SPE\Htmx\Core\Theme;
+use SPE\Htmx\Core\Ctx;
 
-final class UsersView extends Theme
+final class UsersView
 {
+    public function __construct(
+        private Ctx $ctx,
+        private array $a,
+    ) {}
+
     private function t(): string
     {
         return '&t=' . $this->ctx->in['t'];
@@ -23,7 +28,7 @@ final class UsersView extends Theme
 
     public function read(): string
     {
-        $a = $this->ctx->ary;
+        $a = $this->a;
         $t = $this->t();
         $backUrl = "?o=Users$t";
         if (empty($a))
@@ -47,7 +52,7 @@ final class UsersView extends Theme
                 <p><strong>Updated:</strong> {$a['updated']}</p>
                 <p><strong>Admin Note:</strong> $anote</p>
             </div>
-            <div class="flex mt-3" style="gap:0.5rem">
+            <div class="btn-group mt-3">
                 <a href="$backUrl" hx-get="$backUrl" hx-target="#main" hx-push-url="true" class="btn">« Back</a>
                 <a href="$editUrl" hx-get="$editUrl" hx-target="#main" hx-push-url="true" class="btn">Edit</a>
                 <a href="$deleteUrl" hx-get="$deleteUrl" hx-target="#main" hx-push-url="$backUrl" hx-confirm="Delete user '$login'?" class="btn btn-danger">Delete</a>
@@ -60,7 +65,7 @@ final class UsersView extends Theme
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST')
             return '';
-        return $this->form($this->ctx->ary);
+        return $this->form($this->a);
     }
 
     public function delete(): string
@@ -70,7 +75,7 @@ final class UsersView extends Theme
 
     public function list(): string
     {
-        $a = $this->ctx->ary;
+        $a = $this->a;
         $t = $this->t();
         $tv = $this->ctx->in['t'];
         $q = htmlspecialchars($_GET['q'] ?? '');
@@ -80,9 +85,9 @@ final class UsersView extends Theme
 
         $html = <<<HTML
         <div class="card">
-            <div class="flex" style="justify-content:space-between;align-items:center;margin-bottom:1rem">
-                <div class="flex" style="gap:0.5rem">
-                    <input type="search" name="q" placeholder="Search users..." value="$q" style="width:200px"
+            <div class="list-header">
+                <div class="search-form">
+                    <input type="search" name="q" placeholder="Search users..." value="$q" class="search-input"
                         hx-get="?o=Users&t=$tv"
                         hx-trigger="keyup changed delay:300ms, search"
                         hx-target="#main"
@@ -91,14 +96,14 @@ final class UsersView extends Theme
                 </div>
                 <a href="$createUrl" hx-get="$createUrl" hx-target="#main" hx-push-url="true" class="btn">+ Add User</a>
             </div>
-            <table style="width:100%;border-collapse:collapse">
+            <table class="admin-table">
                 <thead>
-                    <tr style="border-bottom:2px solid var(--border)">
-                        <th style="text-align:left;padding:0.5rem">Login</th>
-                        <th style="text-align:left;padding:0.5rem">Name</th>
-                        <th style="text-align:left;padding:0.5rem">Created</th>
-                        <th style="text-align:left;padding:0.5rem">Updated</th>
-                        <th style="text-align:right;padding:0.5rem">Actions</th>
+                    <tr>
+                        <th>Login</th>
+                        <th>Name</th>
+                        <th>Created</th>
+                        <th>Updated</th>
+                        <th class="text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -111,12 +116,12 @@ final class UsersView extends Theme
             $editUrl = "?o=Users&m=update&id={$item['id']}$t";
             $deleteUrl = "?o=Users&m=delete&id={$item['id']}$t";
             $html .= <<<HTML
-                <tr style="border-bottom:1px solid var(--border)" id="user-row-{$item['id']}">
-                    <td style="padding:0.5rem"><a href="$readUrl" hx-get="$readUrl" hx-target="#main" hx-push-url="true">$login</a></td>
-                    <td style="padding:0.5rem">$name</td>
-                    <td style="padding:0.5rem"><small>{$item['created']}</small></td>
-                    <td style="padding:0.5rem"><small>{$item['updated']}</small></td>
-                    <td style="padding:0.5rem;text-align:right">
+                <tr id="user-row-{$item['id']}">
+                    <td><a href="$readUrl" hx-get="$readUrl" hx-target="#main" hx-push-url="true">$login</a></td>
+                    <td>$name</td>
+                    <td><small>{$item['created']}</small></td>
+                    <td><small>{$item['updated']}</small></td>
+                    <td class="text-right">
                         <a href="$editUrl" hx-get="$editUrl" hx-target="#main" hx-push-url="true" title="Edit" class="icon">✏️</a>
                         <a href="$deleteUrl" hx-get="$deleteUrl" hx-target="#user-row-{$item['id']}" hx-swap="outerHTML swap:0.3s" hx-confirm="Delete user '$login'?" title="Delete" class="icon">🗑️</a>
                     </td>
@@ -130,12 +135,12 @@ final class UsersView extends Theme
         $p = $a['pagination'];
         if ($p['pages'] > 1) {
             $sq = $q ? "&q=$q" : '';
-            $html .= '<div class="flex mt-2" style="justify-content:center;gap:0.5rem">';
+            $html .= '<div class="btn-group-center mt-4">';
             if ($p['page'] > 1) {
                 $prevUrl = "?o=Users&page=" . ($p['page'] - 1) . "$sq$t";
                 $html .= "<a href=\"$prevUrl\" hx-get=\"$prevUrl\" hx-target=\"#main\" hx-push-url=\"true\" class=\"btn\">« Prev</a>";
             }
-            $html .= "<span style=\"padding:0.5rem\">Page {$p['page']} of {$p['pages']}</span>";
+            $html .= "<span class=\"p-2\">Page {$p['page']} of {$p['pages']}</span>";
             if ($p['page'] < $p['pages']) {
                 $nextUrl = "?o=Users&page=" . ($p['page'] + 1) . "$sq$t";
                 $html .= "<a href=\"$nextUrl\" hx-get=\"$nextUrl\" hx-target=\"#main\" hx-push-url=\"true\" class=\"btn\">Next »</a>";
@@ -171,12 +176,12 @@ final class UsersView extends Theme
                     <label for="login">Login (Email)</label>
                     <input type="email" id="login" name="login" value="$login" required>
                 </div>
-                <div class="flex" style="gap:1rem">
-                    <div class="form-group" style="flex:1">
+                <div class="form-row">
+                    <div class="form-group">
                         <label for="fname">First Name</label>
                         <input type="text" id="fname" name="fname" value="$fname">
                     </div>
-                    <div class="form-group" style="flex:1">
+                    <div class="form-group">
                         <label for="lname">Last Name</label>
                         <input type="text" id="lname" name="lname" value="$lname">
                     </div>
@@ -185,12 +190,12 @@ final class UsersView extends Theme
                     <label for="altemail">Alternate Email</label>
                     <input type="email" id="altemail" name="altemail" value="$altemail">
                 </div>
-                <div class="flex" style="gap:1rem">
-                    <div class="form-group" style="flex:1">
+                <div class="form-row">
+                    <div class="form-group">
                         <label for="grp">Group</label>
                         <input type="number" id="grp" name="grp" value="$grp">
                     </div>
-                    <div class="form-group" style="flex:1">
+                    <div class="form-group">
                         <label for="acl">ACL</label>
                         <input type="number" id="acl" name="acl" value="$acl">
                     </div>

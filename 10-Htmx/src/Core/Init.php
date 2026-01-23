@@ -116,6 +116,20 @@ final readonly class Init
             return new $view($ctx, $ary)->$m();
         }
 
+        // Posts plugin - admin only (CRUD for posts)
+        if ($o === 'Posts') {
+            if (!Acl::check(Acl::Admin)) {
+                Util::log('Admin access required');
+                header('Location: ?o=Auth&m=login');
+                exit();
+            }
+
+            $model = self::NS . 'Plugins\\Posts\\PostsModel';
+            $ary = new $model($ctx)->$m();
+            $view = self::NS . 'Plugins\\Posts\\PostsView';
+            return new $view($ctx, $ary)->$m();
+        }
+
         // Categories plugin - admin only
         if ($o === 'Categories') {
             if (!Acl::check(Acl::Admin)) {
