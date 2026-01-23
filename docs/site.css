@@ -1,254 +1,115 @@
 /* SPE Theme - Color tokens and branding
- * This file defines ALL colors - base.css is color-agnostic
+ * base.css is color-agnostic; this file defines ALL colors
  * To create a new theme: copy this file, modify colors, load instead
  * Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
  */
 
-/* === Light Theme (Default) - Stone warm grays === */
+/* === Light Theme (Default) === */
 :root {
-    /* Backgrounds - Stone palette */
     --bg-primary: #fafaf9;
     --bg-secondary: #f5f5f4;
     --bg-tertiary: #e7e5e3;
-
-    /* Foregrounds - Stone palette */
     --fg-primary: #1c1917;
     --fg-secondary: #57534e;
     --fg-muted: #78716c;
-
-    /* Accent - Warm gray (Stone 600/500) */
     --accent: #57534e;
     --accent-hover: #44403c;
     --accent-subtle: #e7e5e3;
-
-    /* Borders - Stone palette */
     --border: #d6d3d1;
     --border-muted: #e7e5e3;
-
-    /* Semantic colors */
     --success: #15803d;
-    --success-subtle: #dcfce7;
     --danger: #dc2626;
-    --danger-subtle: #fee2e2;
     --warning: #ca8a04;
-    --warning-subtle: #fef9c3;
-
-    /* SPE brand */
-    --php: #777BB4;
-
-    /* Glass morphism */
     --glass: rgb(250 250 249 / 0.8);
     --glass-border: rgb(214 211 209 / 0.5);
-    --accent-glow: rgb(87 83 78 / 0.3);
-    --accent-on-dark: #a8a29e;
+    --php: #777BB4;
 }
 
-/* === Dark Theme (System Preference) - Stone warm grays === */
+/* === Dark Theme (System Preference) === */
 @media (prefers-color-scheme: dark) {
     :root:not(.light) {
-        /* Backgrounds - Stone palette */
         --bg-primary: #0c0a09;
         --bg-secondary: #1c1917;
         --bg-tertiary: #292524;
-
-        /* Foregrounds - Stone palette */
         --fg-primary: #fafaf9;
         --fg-secondary: #a8a29e;
         --fg-muted: #78716c;
-
-        /* Accent - Warm gray (Stone 300/400) */
         --accent: #d6d3d1;
         --accent-hover: #e7e5e3;
         --accent-subtle: #44403c;
-
-        /* Borders - Stone palette */
         --border: #44403c;
         --border-muted: #292524;
-
-        /* Semantic colors */
         --success: #4ade80;
-        --success-subtle: #4ade8026;
         --danger: #f87171;
-        --danger-subtle: #f8717126;
         --warning: #facc15;
-        --warning-subtle: #facc1526;
-
-        /* Shadows (higher opacity for dark backgrounds) */
-        --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.3);
         --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
         --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
-        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4);
-
-        /* Glass morphism (dark) */
         --glass: rgb(28 25 23 / 0.8);
         --glass-border: rgb(68 64 60 / 0.5);
-        --accent-glow: rgb(214 211 209 / 0.2);
-        --accent-on-dark: #e7e5e3;
     }
 }
 
-/* === Explicit Light Theme (Toggle Override) - Stone warm grays === */
-html.light {
-    /* Backgrounds - Stone palette */
-    --bg-primary: #fafaf9;
-    --bg-secondary: #f5f5f4;
-    --bg-tertiary: #e7e5e3;
-
-    /* Foregrounds - Stone palette */
-    --fg-primary: #1c1917;
-    --fg-secondary: #57534e;
-    --fg-muted: #78716c;
-
-    /* Accent - Warm gray (Stone 600/500) */
-    --accent: #57534e;
-    --accent-hover: #44403c;
-    --accent-subtle: #e7e5e3;
-
-    /* Borders - Stone palette */
-    --border: #d6d3d1;
-    --border-muted: #e7e5e3;
-
-    /* Semantic colors */
-    --success: #15803d;
-    --success-subtle: #dcfce7;
-    --danger: #dc2626;
-    --danger-subtle: #fee2e2;
-    --warning: #ca8a04;
-    --warning-subtle: #fef9c3;
-
-    /* Glass morphism (light) */
-    --glass: rgb(250 250 249 / 0.8);
-    --glass-border: rgb(214 211 209 / 0.5);
-    --accent-glow: rgb(87 83 78 / 0.3);
-    --accent-on-dark: #a8a29e;
-}
-
-/* === Explicit Dark Theme (Toggle Override) - Stone warm grays === */
+/* === Dark Theme (Toggle Override) === */
 html.dark {
-    /* Backgrounds - Stone palette */
     --bg-primary: #0c0a09;
     --bg-secondary: #1c1917;
     --bg-tertiary: #292524;
-
-    /* Foregrounds - Stone palette */
     --fg-primary: #fafaf9;
     --fg-secondary: #a8a29e;
     --fg-muted: #78716c;
-
-    /* Accent - Warm gray (Stone 300/400) */
     --accent: #d6d3d1;
     --accent-hover: #e7e5e3;
     --accent-subtle: #44403c;
-
-    /* Borders - Stone palette */
     --border: #44403c;
     --border-muted: #292524;
-
-    /* Semantic colors */
     --success: #4ade80;
-    --success-subtle: #4ade8026;
     --danger: #f87171;
-    --danger-subtle: #f8717126;
     --warning: #facc15;
-    --warning-subtle: #facc1526;
-
-    /* Shadows (higher opacity for dark backgrounds) */
-    --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.3);
     --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4);
-
-    /* Glass morphism (dark) */
     --glass: rgb(28 25 23 / 0.8);
     --glass-border: rgb(68 64 60 / 0.5);
-    --accent-glow: rgb(214 211 209 / 0.2);
-    --accent-on-dark: #e7e5e3;
 }
 
-/* === Color Schemes (accent color variants) === */
+/* === Color Schemes === */
 
-/* Ocean scheme - Light */
-html.light.scheme-ocean,
-html.scheme-ocean:not(.dark) {
-    --bg-primary: #f8fcfd;
-    --bg-secondary: #f0f7f9;
-    --bg-tertiary: #e4f1f4;
-    --accent: #0891b2;
-    --accent-hover: #06b6d4;
-    --accent-subtle: #cffafe;
-    --accent-glow: rgb(8 145 178 / 0.3);
-    --border: #b8d4db;
-    --border-muted: #cde3e8;
+/* Ocean */
+.scheme-ocean:not(.dark) {
+    --bg-primary: #f8fcfd; --bg-secondary: #f0f7f9; --bg-tertiary: #e4f1f4;
+    --accent: #0891b2; --accent-hover: #06b6d4; --accent-subtle: #cffafe;
+    --border: #b8d4db; --border-muted: #cde3e8;
+}
+.scheme-ocean.dark {
+    --bg-primary: #0c1214; --bg-secondary: #111a1d; --bg-tertiary: #172226;
+    --accent: #22d3ee; --accent-hover: #67e8f9; --accent-subtle: #22d3ee26;
+    --border: #1e3a40; --border-muted: #152a2f;
 }
 
-/* Ocean scheme - Dark */
-html.dark.scheme-ocean {
-    --bg-primary: #0c1214;
-    --bg-secondary: #111a1d;
-    --bg-tertiary: #172226;
-    --accent: #22d3ee;
-    --accent-hover: #67e8f9;
-    --accent-subtle: #22d3ee26;
-    --accent-glow: rgb(34 211 238 / 0.3);
-    --border: #1e3a40;
-    --border-muted: #152a2f;
+/* Forest */
+.scheme-forest:not(.dark) {
+    --bg-primary: #f8fdf9; --bg-secondary: #f0f9f2; --bg-tertiary: #e4f4e8;
+    --accent: #16a34a; --accent-hover: #22c55e; --accent-subtle: #dcfce7;
+    --border: #b8dbc2; --border-muted: #cde8d4;
+}
+.scheme-forest.dark {
+    --bg-primary: #0c120e; --bg-secondary: #111a14; --bg-tertiary: #17261a;
+    --accent: #4ade80; --accent-hover: #86efac; --accent-subtle: #4ade8026;
+    --border: #1e402a; --border-muted: #152a1c;
 }
 
-/* Forest scheme - Light */
-html.light.scheme-forest,
-html.scheme-forest:not(.dark) {
-    --bg-primary: #f8fdf9;
-    --bg-secondary: #f0f9f2;
-    --bg-tertiary: #e4f4e8;
-    --accent: #16a34a;
-    --accent-hover: #22c55e;
-    --accent-subtle: #dcfce7;
-    --accent-glow: rgb(22 163 74 / 0.3);
-    --border: #b8dbc2;
-    --border-muted: #cde8d4;
+/* Sunset */
+.scheme-sunset:not(.dark) {
+    --bg-primary: #fdfaf8; --bg-secondary: #faf5f0; --bg-tertiary: #f5ede4;
+    --accent: #ea580c; --accent-hover: #f97316; --accent-subtle: #ffedd5;
+    --border: #dbd0b8; --border-muted: #e8dfcd;
+}
+.scheme-sunset.dark {
+    --bg-primary: #14110c; --bg-secondary: #1a1611; --bg-tertiary: #262017;
+    --accent: #fb923c; --accent-hover: #fdba74; --accent-subtle: #fb923c26;
+    --border: #40351e; --border-muted: #2a2415;
 }
 
-/* Forest scheme - Dark */
-html.dark.scheme-forest {
-    --bg-primary: #0c120e;
-    --bg-secondary: #111a14;
-    --bg-tertiary: #17261a;
-    --accent: #4ade80;
-    --accent-hover: #86efac;
-    --accent-subtle: #4ade8026;
-    --accent-glow: rgb(74 222 128 / 0.3);
-    --border: #1e402a;
-    --border-muted: #152a1c;
-}
-
-/* Sunset scheme - Light */
-html.light.scheme-sunset,
-html.scheme-sunset:not(.dark) {
-    --bg-primary: #fdfaf8;
-    --bg-secondary: #faf5f0;
-    --bg-tertiary: #f5ede4;
-    --accent: #ea580c;
-    --accent-hover: #f97316;
-    --accent-subtle: #ffedd5;
-    --accent-glow: rgb(234 88 12 / 0.3);
-    --border: #dbd0b8;
-    --border-muted: #e8dfcd;
-}
-
-/* Sunset scheme - Dark */
-html.dark.scheme-sunset {
-    --bg-primary: #14110c;
-    --bg-secondary: #1a1611;
-    --bg-tertiary: #262017;
-    --accent: #fb923c;
-    --accent-hover: #fdba74;
-    --accent-subtle: #fb923c26;
-    --accent-glow: rgb(251 146 60 / 0.3);
-    --border: #40351e;
-    --border-muted: #2a2415;
-}
-
-/* === SPE Brand === */
+/* === Brand === */
 .btn-php { background: var(--php); }
