@@ -154,7 +154,7 @@ final class Theme {
 <nav class="topnav">
     <button class="menu-toggle" data-sidebar="left"><i data-lucide="menu"></i></button>
     <h1><a class="brand" href="/"><span>{$this->out['doc']}</span></a></h1>
-    <button class="menu-toggle" data-sidebar="right"><i data-lucide="settings"></i></button>
+    <button class="menu-toggle" data-sidebar="right"><i data-lucide="menu"></i></button>
 </nav>
 HTML;
     }
@@ -163,7 +163,7 @@ HTML;
         $nav = $side === 'left'
             ? $this->links($this->ctx->nav, 'o', $this->ctx->in['o'])
             : '<a href="#" onclick="Base.toggleTheme();return false" data-icon="moon"><i data-lucide="moon"></i> Toggle Theme</a>'
-              . '<div class="sidebar-divider"></div>' . $this->colorLinks();
+              . $this->colorLinks();
         $title = $side === 'left' ? 'Navigation' : 'Settings';
         $icon = $side === 'left' ? 'compass' : 'sliders-horizontal';
         return <<<HTML
