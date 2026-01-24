@@ -10,28 +10,28 @@ abstract class Plugin
         protected Ctx $ctx,
     ) {}
 
-    public function create(): array|string
+    public function create(): array
     {
-        return ['head' => 'Create', 'main' => 'Plugin::create() not implemented yet!'];
+        return ['head' => 'Create', 'main' => 'Plugin::create() not implemented yet!', 'foot' => __METHOD__];
     }
 
-    public function read(): array|string
+    public function read(): array
     {
-        return ['head' => 'Read', 'main' => 'Plugin::read() not implemented yet!'];
+        return ['head' => 'Read', 'main' => 'Plugin::read() not implemented yet!', 'foot' => __METHOD__];
     }
 
-    public function update(): array|string
+    public function update(): array
     {
-        return ['head' => 'Update', 'main' => 'Plugin::update() not implemented yet!'];
+        return ['head' => 'Update', 'main' => 'Plugin::update() not implemented yet!', 'foot' => __METHOD__];
     }
 
-    public function delete(): array|string
+    public function delete(): array
     {
-        return ['head' => 'Delete', 'main' => 'Plugin::delete() not implemented yet!'];
+        return ['head' => 'Delete', 'main' => 'Plugin::delete() not implemented yet!', 'foot' => __METHOD__];
     }
 
-    public function list(): array|string
+    public function list(): array
     {
-        return ['head' => 'List', 'main' => 'Plugin::list() not implemented yet!'];
+        return ['head' => 'List', 'main' => 'Plugin::list() not implemented yet!', 'foot' => __METHOD__];
     }
 }

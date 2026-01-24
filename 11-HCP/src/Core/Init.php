@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 // Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Core;
@@ -13,13 +12,9 @@ final readonly class Init
 
     private array $out;
 
-    public function __construct(
-        private Ctx $ctx,
-    ) {
+    public function __construct(private Ctx $ctx)
+    {
         Util::elog(__METHOD__);
-
-        // TODO: Implement remember cookie with HcpDb
-        // Util::remember() expects SPE\App\Db, skip for now
 
         [$o, $m] = [$ctx->in['o'], $ctx->in['m']];
 
@@ -44,23 +39,14 @@ final readonly class Init
         $ctx = $this->ctx;
 
         // Map plugin names to classes
-        $plugins = [
-            'Auth' => 'Auth',
-            'System' => 'System',
-            'Vhosts' => 'Vhosts',
-            'Vmails' => 'Vmails',
-            'Vdns' => 'Vdns',
-            'Ssl' => 'Ssl',
-            'Stats' => 'Stats',
-        ];
+        $plugins = ['Auth', 'System', 'Vhosts', 'Vmails', 'Valias', 'Vdns', 'Ssl', 'Stats'];
 
-        if (!isset($plugins[$o])) {
+        if (!in_array($o, $plugins)) {
             return '<div class="card"><p>Plugin not found: ' . htmlspecialchars($o) . '</p></div>';
         }
 
-        $plugin = $plugins[$o];
-        $modelClass = self::NS . "Plugins\\{$plugin}\\{$plugin}Model";
-        $viewClass = self::NS . "Plugins\\{$plugin}\\{$plugin}View";
+        $modelClass = self::NS . "Plugins\\{$o}\\{$o}Model";
+        $viewClass = self::NS . "Plugins\\{$o}\\{$o}View";
 
         if (!class_exists($modelClass)) {
             return '<div class="card"><p>Plugin not implemented: ' . htmlspecialchars($o) . '</p></div>';
@@ -69,7 +55,6 @@ final readonly class Init
         // Execute model method
         $model = new $modelClass($ctx);
         if (!method_exists($model, $m)) {
-            // Auth defaults to login, others to list
             $m = $o === 'Auth' ? 'login' : 'list';
         }
         if (!method_exists($model, $m)) {
@@ -98,24 +83,29 @@ final readonly class Init
 
         $x = $this->ctx->in['x'];
 
-        // JSON output mode
+        if ($x === 'text') {
+            return preg_replace('/^\h*\v+/m', '', strip_tags($this->out['main']));
+        }
         if ($x === 'json') {
             header('Content-Type: application/json');
             return json_encode($this->out);
         }
 
-        // Default: render HTML via theme
-        $t = $this->ctx->in['t'];
-        $theme = self::NS . "Themes\\{$t}";
-
-        if (!class_exists($theme)) {
-            $theme = self::NS . "Themes\\TopNav";
+        // HTMX partial request - return main content only
+        if (isset($_SERVER['HTTP_HX_REQUEST'])) {
+            $flash = Util::log();
+            $html = $this->out['main'];
+            if ($flash) {
+                foreach ($flash as $type => $msg) {
+                    $msg = htmlspecialchars($msg);
+                    $html .= "<script>showToast('{$msg}', '{$type}');</script>";
+                }
+            }
+            return $html;
         }
 
-        $html = new $theme($this->ctx, $this->out)->render();
-
+        $html = new Theme($this->ctx, $this->out)->render();
         Util::perfLog(__FILE__);
-
         return $html;
     }
 }

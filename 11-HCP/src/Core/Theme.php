@@ -1,124 +1,142 @@
 <?php declare(strict_types=1);
-
 // Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Core;
 
 use SPE\App\Util;
 
-abstract class Theme
+final class Theme
 {
-    public function __construct(
-        protected Ctx $ctx,
-        protected array $out,
-    ) {}
+    public function __construct(private Ctx $ctx, private array $out) {}
 
-    abstract public function render(): string;
-
-    protected function nav(): string
+    public function render(): string
     {
-        $current = $this->ctx->in['o'];
-        return $this->ctx->nav
-            |> (fn($n) => array_map(fn($p) => sprintf(
-                '<a href="%s"%s>%s</a>',
-                $p[1],
-                $this->isActive($p[1], $current) ? ' class="active"' : '',
-                $p[0],
-            ), $n))
-            |> (static fn($a) => implode(' ', $a));
+        return $this->html($this->topnav() . $this->sidebar('left') . $this->sidebar('right') . "<main id=\"main\">{$this->out['main']}</main>");
     }
 
-    private function isActive(string $href, string $current): bool
+    private function navLinks(): string
     {
-        if (preg_match('/\?o=(\w+)/', $href, $m)) {
-            return $m[1] === $current;
+        $path = '/' . trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+        return implode('', array_map(fn($p) => sprintf(
+            '<a href="%s" hx-get="%s" hx-target="#main" hx-push-url="true"%s data-icon="%s"><i data-lucide="%s"></i> %s</a>',
+            $p[2], $p[2], $this->isActive($p[2], $path) ? ' class="active"' : '', $p[0], $p[0], $p[1]
+        ), $this->ctx->nav));
+    }
+
+    private function isActive(string $href, string $path): bool
+    {
+        if (str_starts_with($href, '/')) {
+            return $href === $path || ($href === '/' && $path === '/');
+        }
+        if (str_starts_with($href, '?o=')) {
+            return str_starts_with($this->ctx->in['o'], substr($href, 3));
         }
         return false;
     }
 
-    protected function dropdown(): string
+    private function colorLinks(): string
     {
-        $t = $this->ctx->in['t'];
-        $links = $this->ctx->themes
-            |> (static fn($n) => array_map(static fn($p) => sprintf(
-                '<a href="?t=%s"%s><i data-lucide="%s"></i> %s</a>',
-                $p[2],
-                $t === $p[2] ? ' class="active"' : '',
-                $p[0],
-                $p[1],
-            ), $n))
-            |> (static fn($a) => implode('', $a));
-        return "<div class=\"dropdown\"><span class=\"dropdown-toggle\"><i data-lucide=\"layout-grid\"></i> Layout</span><div class=\"dropdown-menu\">$links</div></div>";
+        return implode('', array_map(fn($p) => sprintf(
+            '<a href="#" data-scheme="%s" data-icon="%s"><i data-lucide="%s"></i> %s</a>', $p[2], $p[0], $p[0], $p[1]
+        ), $this->ctx->colors));
     }
 
-    protected function colors(): string
-    {
-        return <<<HTML
-        <div class="dropdown"><span class="dropdown-toggle"><i data-lucide="swatch-book"></i> Colors</span><div class="dropdown-menu">
-        <a href="#" data-scheme="default"><i data-lucide="circle"></i> Stone</a>
-        <a href="#" data-scheme="ocean"><i data-lucide="waves"></i> Ocean</a>
-        <a href="#" data-scheme="forest"><i data-lucide="trees"></i> Forest</a>
-        <a href="#" data-scheme="sunset"><i data-lucide="sunset"></i> Sunset</a>
-        </div></div>
-        HTML;
-    }
-
-    protected function flash(): string
-    {
-        $log = Util::log();
-        if (!$log)
-            return '';
-
-        $html = '';
-        foreach ($log as $type => $msg) {
-            $msg = htmlspecialchars($msg);
-            $html .= "<script>showToast('$msg', '$type');</script>";
-        }
-        return $html;
-    }
-
-    protected function authNav(): string
+    private function authNav(): string
     {
         if (Util::is_usr()) {
             $usr = $_SESSION['usr'];
             $name = htmlspecialchars($usr['fname'] ?: $usr['login']);
-            $role = Util::is_adm() ? ' (admin)' : '';
-            return "<a href=\"?o=Auth&m=profile\"><i data-lucide=\"user\"></i> $name$role</a> <a href=\"?o=Auth&m=logout\">Logout</a>";
+            $role = Util::is_adm() ? ' <small>(admin)</small>' : '';
+            return "<div class=\"sidebar-divider\"></div><a href=\"?o=Auth&m=profile\" hx-get=\"?o=Auth&m=profile\" hx-target=\"#main\" hx-push-url=\"true\" data-icon=\"user\"><i data-lucide=\"user\"></i> {$name}{$role}</a><a href=\"?o=Auth&m=changepw\" hx-get=\"?o=Auth&m=changepw\" hx-target=\"#main\" hx-push-url=\"true\" data-icon=\"key\"><i data-lucide=\"key\"></i> Password</a><a href=\"?o=Auth&m=logout\" data-icon=\"log-out\"><i data-lucide=\"log-out\"></i> Logout</a>";
         }
-        return '<a href="?o=Auth&m=login"><i data-lucide="lock"></i> Login</a>';
+        return "<div class=\"sidebar-divider\"></div><a href=\"?o=Auth&m=login\" hx-get=\"?o=Auth&m=login\" hx-target=\"#main\" hx-push-url=\"true\" data-icon=\"lock\"><i data-lucide=\"lock\"></i> Login</a>";
     }
 
-    protected function html(string $theme, string $body): string
+    private function topnav(): string
+    {
+        return <<<HTML
+<nav class="topnav">
+    <button class="menu-toggle" data-sidebar="left"><i data-lucide="menu"></i></button>
+    <h1><a class="brand" href="/"><span>{$this->out['page']}</span></a></h1>
+    <button class="menu-toggle" data-sidebar="right"><i data-lucide="menu"></i></button>
+</nav>
+HTML;
+    }
+
+    private function sidebar(string $side): string
+    {
+        [$nav, $title, $icon] = $side === 'left'
+            ? [$this->navLinks() . $this->authNav(), 'Navigation', 'compass']
+            : [$this->colorLinks() . '<div class="sidebar-divider"></div><a href="#" onclick="Base.toggleTheme();return false" data-icon="moon"><i data-lucide="moon"></i> Toggle Theme</a>', 'Settings', 'sliders-horizontal'];
+        return <<<HTML
+<aside class="sidebar sidebar-{$side}">
+    <div class="sidebar-header"><span><i data-lucide="{$icon}"></i> {$title}</span><button class="pin-toggle" data-sidebar="{$side}" title="Pin sidebar"><i data-lucide="pin"></i></button></div>
+    <nav>{$nav}</nav>
+</aside>
+HTML;
+    }
+
+    private function flash(): string
+    {
+        $log = Util::log();
+        if (!$log) return '';
+        $html = '';
+        foreach ($log as $type => $msg) {
+            $msg = htmlspecialchars($msg);
+            $html .= "<script>showToast('{$msg}', '{$type}');</script>";
+        }
+        return $html;
+    }
+
+    private function html(string $body): string
     {
         $flash = $this->flash();
         $css = $this->out['css'] ?? '';
         $js = $this->out['js'] ?? '';
         $end = $this->out['end'] ?? '';
-        $hostname = gethostname() ?: 'HCP';
-
         return <<<HTML
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>{$this->out['doc']} - {$hostname} [$theme]</title>
-            <link rel="stylesheet" href="/base.css">
-            <link rel="stylesheet" href="/site.css">
-            <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-            <script>(function(){const t=localStorage.getItem("base-theme"),s=localStorage.getItem("base-scheme"),c=t||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");document.documentElement.className=c+(s&&s!=="default"?" scheme-"+s:"")})();</script>
-            <link rel="stylesheet" href="/hcp.css">
-        {$css}
-        </head>
-        <body>
-        {$body}
-        <script src="/base.js"></script>
-        <script src="/tables.js"></script>
-        {$js}
-        {$flash}
-        {$end}
-        </body>
-        </html>
-        HTML;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{$this->out['doc']}</title>
+    <link rel="stylesheet" href="/base.css">
+    <link rel="stylesheet" href="/site.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script>(function(){var s=JSON.parse(localStorage.getItem('base-state')||'{}'),t=s.theme,c=s.scheme,h=document.documentElement;h.className='preload '+(t||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))+(c&&c!=='default'?' scheme-'+c:'');})()</script>
+    <style>
+        .htmx-request #main { opacity: 0.5; transition: opacity 200ms; }
+        .htmx-request .htmx-indicator { display: inline-block; }
+        .htmx-indicator { display: none; }
+        #main { transition: opacity 200ms ease-in-out; }
+        .htmx-swapping { opacity: 0; }
+        .htmx-settling { opacity: 1; }
+    </style>
+{$css}
+</head>
+<body hx-boost="true">
+{$body}
+<div class="overlay"></div>
+<script src="/base.js"></script>
+<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+<script>
+document.body.addEventListener('showToast', function(e) {
+    if (e.detail && e.detail.message) showToast(e.detail.message, e.detail.type || 'success');
+});
+document.body.addEventListener('htmx:afterSettle', function(e) {
+    document.querySelectorAll('nav a, .sidebar a').forEach(a => {
+        a.classList.remove('active');
+        if (a.getAttribute('href') === window.location.pathname || a.getAttribute('href') === window.location.search) a.classList.add('active');
+    });
+    lucide.createIcons();
+});
+</script>
+{$js}
+{$flash}
+{$end}
+</body>
+</html>
+HTML;
     }
 }

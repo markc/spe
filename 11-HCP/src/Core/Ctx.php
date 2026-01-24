@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 // Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\HCP\Core;
@@ -10,17 +9,13 @@ use SPE\App\Util;
 final class Ctx
 {
     public array $in;
-    public array $out;
     public array $nav;
     public HcpDb $db;
 
     public function __construct(
         public string $email = 'noreply@localhost',
-        array $out = ['doc' => 'HCP', 'head' => '', 'main' => '', 'foot' => '', 'css' => '', 'js' => '', 'end' => ''],
-        public array $themes = [
-            ['navigation',      'TopNav',  'TopNav'],
-            ['panel-left',      'SideBar', 'SideBar'],
-        ],
+        public array $out = ['doc' => 'HCP', 'page' => 'Hosting Control Panel', 'head' => '', 'main' => '', 'foot' => '', 'css' => '', 'js' => '', 'end' => ''],
+        public array $colors = [['circle', 'Stone', 'default'], ['waves', 'Ocean', 'ocean'], ['trees', 'Forest', 'forest'], ['sunset', 'Sunset', 'sunset']],
     ) {
         session_status() === PHP_SESSION_NONE && session_start();
 
@@ -32,14 +27,12 @@ final class Ctx
         // Input parameters - HCP defaults to System dashboard
         $this->in = [
             'o' => $this->ses('o', 'System'),
-            'm' => $_REQUEST['m'] ?? 'list',
-            't' => $this->ses('t', 'TopNav'),
-            'x' => $_REQUEST['x'] ?? '',
+            'm' => ($_REQUEST['m'] ?? 'list') |> trim(...) |> htmlspecialchars(...),
+            'x' => ($_REQUEST['x'] ?? '') |> trim(...) |> htmlspecialchars(...),
             'i' => (int) ($_REQUEST['i'] ?? 0),
         ];
-        $this->out = $out;
 
-        // Initialize HCP database for auth
+        // Initialize HCP database
         $this->db = new HcpDb();
         $this->nav = $this->buildNav();
 
@@ -51,21 +44,19 @@ final class Ctx
     private function buildNav(): array
     {
         // HCP navigation - all require admin access
-        $nav = [];
-
-        $acl = Acl::current();
-        if ($acl->can(Acl::Admin)) {
-            $nav = [
-                ['📊 Dashboard', '?o=System'],
-                ['🌐 Vhosts',    '?o=Vhosts'],
-                ['📧 Mail',      '?o=Vmails'],
-                ['🔗 DNS',       '?o=Vdns'],
-                ['🔒 SSL',       '?o=Ssl'],
-                ['📈 Stats',     '?o=Stats'],
-            ];
+        if (!Acl::check(Acl::Admin)) {
+            return [];
         }
 
-        return $nav;
+        return [
+            ['layout-dashboard', 'Dashboard', '?o=System'],
+            ['globe', 'Vhosts', '?o=Vhosts'],
+            ['mail', 'Mail', '?o=Vmails'],
+            ['at-sign', 'Aliases', '?o=Valias'],
+            ['network', 'DNS', '?o=Vdns'],
+            ['shield-check', 'SSL', '?o=Ssl'],
+            ['bar-chart-3', 'Stats', '?o=Stats'],
+        ];
     }
 
     public function ses(string $k, mixed $v = ''): mixed

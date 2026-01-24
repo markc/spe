@@ -188,8 +188,8 @@ final class ValiasView extends Plugin
                 <td>{$status}</td>
                 <td class="actions">
                     <a href="?o=Valias&m=read&source={$a['source']}" title="View">👁</a>
-                    <a href="?o=Valias&m=update&source={$a['source']}" title="Edit">✏️</a>
-                    <a href="?o=Valias&m=delete&source={$a['source']}" title="Delete">🗑</a>
+                    <a href="?o=Valias&m=update&source={$a['source']}" title="Edit"><i data-lucide="edit" class="inline-icon"></i></a>
+                    <a href="?o=Valias&m=delete&source={$a['source']}" title="Delete"><i data-lucide="trash-2" class="inline-icon"></i></a>
                 </td>
             </tr>
             HTML;

@@ -138,7 +138,7 @@ final class VhostsView extends Plugin
                 <td>{$status}</td>
                 <td class="actions">
                     <a href="?o=Vhosts&m=read&domain={$v['domain']}" title="View">👁</a>
-                    <a href="?o=Vhosts&m=delete&domain={$v['domain']}" title="Delete">🗑</a>
+                    <a href="?o=Vhosts&m=delete&domain={$v['domain']}" title="Delete"><i data-lucide="trash-2" class="inline-icon"></i></a>
                 </td>
             </tr>
             HTML;

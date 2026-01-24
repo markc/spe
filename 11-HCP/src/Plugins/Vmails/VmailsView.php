@@ -208,8 +208,8 @@ final class VmailsView extends Plugin
                 <td>{$m['created_at']}</td>
                 <td class="actions">
                     <a href="?o=Vmails&m=read&email={$m['email']}" title="View">👁</a>
-                    <a href="?o=Vmails&m=update&email={$m['email']}" title="Password">🔑</a>
-                    <a href="?o=Vmails&m=delete&email={$m['email']}" title="Delete">🗑</a>
+                    <a href="?o=Vmails&m=update&email={$m['email']}" title="Password"><i data-lucide="key" class="inline-icon"></i></a>
+                    <a href="?o=Vmails&m=delete&email={$m['email']}" title="Delete"><i data-lucide="trash-2" class="inline-icon"></i></a>
                 </td>
             </tr>
             HTML;
