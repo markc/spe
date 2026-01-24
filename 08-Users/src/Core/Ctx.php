@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 // Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Users\Core;
@@ -12,83 +11,62 @@ use SPE\App\Util;
 final class Ctx
 {
     public array $in;
-    public array $out;
     public array $nav;
     public Db $db;
-
-    // Centralized config (from HCP pattern)
     public int $perp = 10; // Items per page
 
     public function __construct(
         public string $email = 'mc@netserva.org',
-        array $out = [
-            'doc' => 'SPE::08',
-            'head' => '',
-            'main' => '',
-            'foot' => '',
-            'css' => '',
-            'js' => '',
-            'end' => '',
-        ],
-        public array $themes = [
-            ['layout-template', 'Simple',  'Simple'],
-            ['navigation',      'TopNav',  'TopNav'],
-            ['panel-left',      'SideBar', 'SideBar'],
-        ],
+        array $in = ['o' => 'Blog', 'm' => 'list', 'x' => '', 'i' => 0, 'g' => 0],
+        public array $out = ['doc' => 'SPE::08', 'page' => '← 08 Users', 'head' => '', 'main' => '', 'foot' => '', 'css' => '', 'js' => '', 'end' => ''],
+        public array $colors = [['circle', 'Stone', 'default'], ['waves', 'Ocean', 'ocean'], ['trees', 'Forest', 'forest'], ['sunset', 'Sunset', 'sunset']],
     ) {
         session_status() === PHP_SESSION_NONE && session_start();
 
-        // Process flash message from URL (l parameter, from HCP pattern)
+        // Process flash message from URL (l parameter)
         if (isset($_GET['l']) && $_GET['l']) {
             Util::log(htmlspecialchars($_GET['l']), $_GET['lt'] ?? 'success');
         }
 
-        // Input parameters (extended from HCP pattern)
+        // Only 'o' is sticky; 'm' resets each request
         $this->in = [
-            'o' => $this->ses('o', 'Blog'), // Object/plugin
-            'm' => $_REQUEST['m'] ?? 'list', // Method/action
-            't' => $this->ses('t', 'Simple'), // Theme
-            'x' => $_REQUEST['x'] ?? '', // Output format (json, text, {key})
-            'i' => (int) ($_REQUEST['i'] ?? 0), // Item ID
-            'g' => (int) ($_REQUEST['g'] ?? 0), // Group/category filter
+            'o' => $this->ses('o', $in['o']),
+            'm' => ($_REQUEST['m'] ?? $in['m']) |> trim(...) |> htmlspecialchars(...),
+            'x' => ($_REQUEST['x'] ?? $in['x']) |> trim(...) |> htmlspecialchars(...),
+            'i' => (int) ($_REQUEST['i'] ?? $in['i']),
+            'g' => (int) ($_REQUEST['g'] ?? $in['g']),
         ];
-        $this->out = $out;
 
         // Initialize database and build role-based navigation
         $this->db = new Db('blog');
         $this->nav = $this->buildNav();
     }
 
-    // Build navigation based on user role (from HCP pattern)
     private function buildNav(): array
     {
         // Detect base path for root router compatibility
         $base = preg_match('#^/(\d{2}-[^/]+)/#', $_SERVER['SCRIPT_NAME'] ?? '', $m) ? "/{$m[1]}" : '';
 
+        // Map emoji icons to Lucide icon names
+        $iconMap = ['🏠' => 'home', '📋' => 'book-open', '✉️' => 'mail', '📰' => 'newspaper', '📝' => 'edit', '📄' => 'file-text', '📚' => 'library'];
+
         // Base navigation from pages table (clean URLs)
         $pages = array_map(
-            static fn($r) => [trim(($r['icon'] ?? '') . ' ' . $r['title']), "$base/" . $r['slug']],
-            $this->db->read('posts', 'id,title,slug,icon', "type='page' ORDER BY id", [], QueryType::All),
+            fn($r) => [$iconMap[$r['icon']] ?? 'file-text', $r['title'], "$base/" . $r['slug']],
+            $this->db->read('posts', 'title,slug,icon', "type='page' ORDER BY id", [], QueryType::All),
         );
-        $pages[] = ['📝 Blog', "$base/blog"];
+        $pages[] = ['newspaper', 'Blog', "$base/blog"];
 
         // Role-based additions
         $acl = Acl::current();
-
-        if ($acl->can(Acl::User)) {
-            // Authenticated users get profile link
-        }
-
         if ($acl->can(Acl::Admin)) {
-            // Admins get management links
-            $pages[] = ['👥 Users', '?o=Users'];
-            $pages[] = ['📝 Posts', '?o=Blog&edit'];
+            $pages[] = ['users', 'Users', '?o=Users'];
+            $pages[] = ['file-edit', 'Posts', '?o=Blog&edit'];
         }
 
         return $pages;
     }
 
-    // Get/set session value: URL param overrides, else use session, else use default
     public function ses(string $k, mixed $v = ''): mixed
     {
         return $_SESSION[$k] = isset($_REQUEST[$k])
