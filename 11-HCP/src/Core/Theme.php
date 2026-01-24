@@ -119,6 +119,7 @@ HTML;
 {$body}
 <div class="overlay"></div>
 <script src="/base.js"></script>
+<script src="site.js"></script>
 <script src="https://unpkg.com/htmx.org@2.0.4"></script>
 <script>
 document.body.addEventListener('showToast', function(e) {

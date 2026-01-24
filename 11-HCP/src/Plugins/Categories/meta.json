@@ -1,0 +1,15 @@
+{
+    "name": "Categories",
+    "description": "Category management",
+    "version": "1.0.0",
+    "icon": "bi bi-tags",
+    "emoji": "🏷️",
+    "href": "?o=Categories",
+    "method": "list",
+    "ajax": false,
+    "order": 13,
+    "group": "admin",
+    "auth": true,
+    "admin": true,
+    "enabled": true
+}

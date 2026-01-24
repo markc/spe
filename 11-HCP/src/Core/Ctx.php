@@ -4,13 +4,17 @@
 namespace SPE\HCP\Core;
 
 use SPE\App\Acl;
+use SPE\App\Db;
+use SPE\App\QueryType;
 use SPE\App\Util;
 
 final class Ctx
 {
     public array $in;
     public array $nav;
-    public HcpDb $db;
+    public Db $db;        // Blog database (posts/pages/categories)
+    public HcpDb $hcpDb;  // HCP database (vhosts/vmails/etc)
+    public int $perp = 9; // Items per page
 
     public function __construct(
         public string $email = 'noreply@localhost',
@@ -24,16 +28,19 @@ final class Ctx
             Util::log(htmlspecialchars($_GET['l']), $_GET['lt'] ?? 'success');
         }
 
-        // Input parameters - HCP defaults to System dashboard
+        // Input parameters
         $this->in = [
-            'o' => $this->ses('o', 'System'),
+            'o' => $this->ses('o', 'Home'),
             'm' => ($_REQUEST['m'] ?? 'list') |> trim(...) |> htmlspecialchars(...),
             'x' => ($_REQUEST['x'] ?? '') |> trim(...) |> htmlspecialchars(...),
             'i' => (int) ($_REQUEST['i'] ?? 0),
         ];
 
-        // Initialize HCP database
-        $this->db = new HcpDb();
+        // Initialize databases
+        $this->db = new Db('blog');     // Posts, pages, categories
+        $this->hcpDb = new HcpDb();     // Vhosts, vmails, etc
+
+        // Build navigation
         $this->nav = $this->buildNav();
 
         // Set email from hostname
@@ -43,20 +50,42 @@ final class Ctx
 
     private function buildNav(): array
     {
-        // HCP navigation - all require admin access
-        if (!Acl::check(Acl::Admin)) {
-            return [];
+        $base = preg_match('#^/(\d{2}-[^/]+)/#', $_SERVER['SCRIPT_NAME'] ?? '', $m) ? "/{$m[1]}" : '';
+
+        // Map stored icons to Lucide names (for legacy emoji support)
+        $iconMap = ['🏠' => 'home', '📋' => 'book-open', '✉️' => 'mail', '📰' => 'newspaper', '📝' => 'file-text', '📄' => 'file-text', '📚' => 'library'];
+
+        // Base navigation from pages (visible to all)
+        $pages = array_map(
+            fn($r) => [$iconMap[$r['icon']] ?? ($r['icon'] ?: 'file-text'), $r['title'], "$base/" . $r['slug']],
+            $this->db->read('posts', 'title,slug,icon', "type='page' ORDER BY id", [], QueryType::All),
+        );
+
+        // Blog link (visible to all)
+        $pages[] = ['newspaper', 'Blog', "$base/blog"];
+
+        // Docs link (visible to all)
+        $pages[] = ['library', 'Docs', '?o=Docs'];
+
+        // Blog admin links (Admin+)
+        if (Acl::check(Acl::Admin)) {
+            $pages[] = ['file-text', 'Posts', '?o=Posts'];
+            $pages[] = ['tags', 'Categories', '?o=Categories'];
         }
 
-        return [
-            ['layout-dashboard', 'Dashboard', '?o=System'],
-            ['globe', 'Vhosts', '?o=Vhosts'],
-            ['mail', 'Mail', '?o=Vmails'],
-            ['at-sign', 'Aliases', '?o=Valias'],
-            ['network', 'DNS', '?o=Vdns'],
-            ['shield-check', 'SSL', '?o=Ssl'],
-            ['bar-chart-3', 'Stats', '?o=Stats'],
-        ];
+        // HCP admin links (SuperAdmin only)
+        if (Acl::check(Acl::SuperAdmin)) {
+            $pages[] = ['users', 'Users', '?o=Users'];
+            $pages[] = ['layout-dashboard', 'System', '?o=System'];
+            $pages[] = ['globe', 'Vhosts', '?o=Vhosts'];
+            $pages[] = ['mail', 'Mail', '?o=Vmails'];
+            $pages[] = ['at-sign', 'Aliases', '?o=Valias'];
+            $pages[] = ['network', 'DNS', '?o=Vdns'];
+            $pages[] = ['shield-check', 'SSL', '?o=Ssl'];
+            $pages[] = ['bar-chart-3', 'Stats', '?o=Stats'];
+        }
+
+        return $pages;
     }
 
     public function ses(string $k, mixed $v = ''): mixed
