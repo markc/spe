@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 // Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Session\Core;
@@ -7,29 +6,21 @@ namespace SPE\Session\Core;
 final class Ctx
 {
     public array $in;
-    public array $out;
 
     public function __construct(
         public string $email = 'mc@netserva.org',
-        array $in = ['o' => 'Home', 'm' => 'list', 't' => 'Simple', 'x' => ''],
-        array $out = ['doc' => 'SPE::06', 'head' => '', 'main' => '', 'foot' => ''],
-        public array $nav = [
-            ['home',      'Home',    'Home'],
-            ['book-open', 'About',   'About'],
-            ['mail',      'Contact', 'Contact'],
-        ],
-        public array $themes = [
-            ['layout-template', 'Simple',  'Simple'],
-            ['navigation',      'TopNav',  'TopNav'],
-            ['panel-left',      'SideBar', 'SideBar'],
-        ],
+        array $in = ['o' => 'Home', 'm' => 'list', 'x' => ''],
+        public array $out = ['doc' => 'SPE::06', 'page' => '← 06 Session', 'head' => '', 'main' => '', 'foot' => ''],
+        public array $nav = [['home', 'Home', 'Home'], ['book-open', 'About', 'About'], ['mail', 'Contact', 'Contact']],
+        public array $colors = [['circle', 'Stone', 'default'], ['waves', 'Ocean', 'ocean'], ['trees', 'Forest', 'forest'], ['sunset', 'Sunset', 'sunset']],
     ) {
         session_status() === PHP_SESSION_NONE && session_start();
-
-        // Sticky parameters: URL overrides session, session persists across requests
-        $this->in = array_map($this->ses(...), array_keys($in), $in)
-            |> (static fn($v) => array_combine(array_keys($in), $v));
-        $this->out = $out;
+        // Only 'o' (plugin) is sticky; 'm' (method) defaults to 'list' each request
+        $this->in = [
+            'o' => $this->ses('o', $in['o']),
+            'm' => ($_REQUEST['m'] ?? $in['m']) |> trim(...) |> htmlspecialchars(...),
+            'x' => ($_REQUEST['x'] ?? $in['x']) |> trim(...) |> htmlspecialchars(...),
+        ];
     }
 
     // Get/set session value: URL param overrides, else use session, else use default
