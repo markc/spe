@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
-
 // Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Core;
 
+use SPE\App\Acl;
 use SPE\App\Db;
 use SPE\App\QueryType;
 use SPE\App\Util;
@@ -11,29 +11,15 @@ use SPE\App\Util;
 final class Ctx
 {
     public array $in;
-    public array $out;
     public array $nav;
     public Db $db;
-
-    // Centralized config
     public int $perp = 6; // Items per page
 
     public function __construct(
         public string $email = 'noreply@localhost',
-        array $out = [
-            'doc' => 'SPE::09',
-            'head' => '',
-            'main' => '',
-            'foot' => '',
-            'css' => '',
-            'js' => '',
-            'end' => '',
-        ],
-        public array $themes = [
-            ['layout-template', 'Simple',  'Simple'],
-            ['navigation',      'TopNav',  'TopNav'],
-            ['panel-left',      'SideBar', 'SideBar'],
-        ],
+        array $in = ['o' => 'Blog', 'm' => 'list', 'x' => '', 'i' => 0, 'g' => 0],
+        public array $out = ['doc' => 'SPE::09', 'page' => '← 09 Blog', 'head' => '', 'main' => '', 'foot' => '', 'css' => '', 'js' => '', 'end' => ''],
+        public array $colors = [['circle', 'Stone', 'default'], ['waves', 'Ocean', 'ocean'], ['trees', 'Forest', 'forest'], ['sunset', 'Sunset', 'sunset']],
     ) {
         session_status() === PHP_SESSION_NONE && session_start();
 
@@ -42,16 +28,14 @@ final class Ctx
             Util::log(htmlspecialchars($_GET['l']), $_GET['lt'] ?? 'success');
         }
 
-        // Input parameters
+        // Only 'o' is sticky; 'm' resets each request
         $this->in = [
-            'o' => $_REQUEST['o'] ?? 'Blog',
-            'm' => $_REQUEST['m'] ?? 'list',
-            't' => $this->ses('t', 'Simple'),
-            'x' => $_REQUEST['x'] ?? '',
-            'i' => (int) ($_REQUEST['i'] ?? 0),
-            'g' => (int) ($_REQUEST['g'] ?? 0), // Category filter
+            'o' => $this->ses('o', $in['o']),
+            'm' => ($_REQUEST['m'] ?? $in['m']) |> trim(...) |> htmlspecialchars(...),
+            'x' => ($_REQUEST['x'] ?? $in['x']) |> trim(...) |> htmlspecialchars(...),
+            'i' => (int) ($_REQUEST['i'] ?? $in['i']),
+            'g' => (int) ($_REQUEST['g'] ?? $in['g']),
         ];
-        $this->out = $out;
 
         // Initialize database and build navigation
         $this->db = new Db('blog');
@@ -64,15 +48,24 @@ final class Ctx
 
     private function buildNav(): array
     {
-        // Detect base path for root router compatibility
         $base = preg_match('#^/(\d{2}-[^/]+)/#', $_SERVER['SCRIPT_NAME'] ?? '', $m) ? "/{$m[1]}" : '';
+
+        // Map emoji icons to Lucide icon names
+        $iconMap = ['🏠' => 'home', '📋' => 'book-open', '✉️' => 'mail', '📰' => 'newspaper', '📝' => 'edit', '📄' => 'file-text', '📚' => 'library'];
 
         // Base navigation from pages table
         $pages = array_map(
-            static fn($r) => [trim(($r['icon'] ?? '') . ' ' . $r['title']), "$base/" . $r['slug']],
-            $this->db->read('posts', 'id,title,slug,icon', "type='page' ORDER BY id", [], QueryType::All),
+            fn($r) => [$iconMap[$r['icon']] ?? 'file-text', $r['title'], "$base/" . $r['slug']],
+            $this->db->read('posts', 'title,slug,icon', "type='page' ORDER BY id", [], QueryType::All),
         );
-        $pages[] = ['📝 Blog', "$base/blog"];
+        $pages[] = ['newspaper', 'Blog', "$base/blog"];
+
+        // Admin links (role-based)
+        if (Acl::check(Acl::Admin)) {
+            $pages[] = ['users', 'Users', '?o=Users'];
+            $pages[] = ['file-text', 'Posts', '?o=Posts'];
+            $pages[] = ['tags', 'Categories', '?o=Categories'];
+        }
 
         return $pages;
     }
