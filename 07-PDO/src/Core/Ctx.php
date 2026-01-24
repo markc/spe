@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 // Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\PDO\Core;
@@ -10,34 +9,35 @@ use SPE\App\QueryType;
 final class Ctx
 {
     public array $in;
-    public array $out;
     public array $nav;
     public Db $db;
 
     public function __construct(
         public string $email = 'mc@netserva.org',
-        array $in = ['o' => 'Home', 'm' => 'list', 't' => 'Simple', 'x' => '', 'id' => 0],
-        array $out = ['doc' => 'SPE::07', 'head' => '', 'main' => '', 'foot' => ''],
-        public array $themes = [
-            ['layout-template', 'Simple',  'Simple'],
-            ['navigation',      'TopNav',  'TopNav'],
-            ['panel-left',      'SideBar', 'SideBar'],
-        ],
+        array $in = ['o' => 'Home', 'm' => 'list', 'x' => '', 'id' => 0],
+        public array $out = ['doc' => 'SPE::07', 'page' => '← 07 PDO', 'head' => '', 'main' => '', 'foot' => ''],
+        public array $colors = [['circle', 'Stone', 'default'], ['waves', 'Ocean', 'ocean'], ['trees', 'Forest', 'forest'], ['sunset', 'Sunset', 'sunset']],
     ) {
         session_status() === PHP_SESSION_NONE && session_start();
 
-        // Sticky parameters: URL overrides session, session persists across requests
-        $this->in = array_map($this->ses(...), array_keys($in), $in)
-            |> (static fn($v) => array_combine(array_keys($in), $v));
-        $this->out = $out;
+        // Only 'o' (plugin) is sticky; 'm' defaults to 'list' each request
+        $this->in = [
+            'o' => $this->ses('o', $in['o']),
+            'm' => ($_REQUEST['m'] ?? $in['m']) |> trim(...) |> htmlspecialchars(...),
+            'x' => ($_REQUEST['x'] ?? $in['x']) |> trim(...) |> htmlspecialchars(...),
+            'id' => (int) ($_REQUEST['id'] ?? $in['id']),
+        ];
 
         // Initialize database and build navigation from pages
         $this->db = new Db('blog');
+        $pages = $this->db->read('posts', 'title,slug,icon', "type='page' ORDER BY id", [], QueryType::All);
+        // Map emoji icons to Lucide icon names
+        $iconMap = ['🏠' => 'home', '📋' => 'book-open', '✉️' => 'mail', '📰' => 'newspaper', '📝' => 'edit', '📄' => 'file-text', '📚' => 'library'];
         $this->nav = array_map(
-            static fn($r) => [trim(($r['icon'] ?? '') . ' ' . $r['title']), ucfirst($r['slug'])],
-            $this->db->read('posts', 'id,title,slug,icon', "type='page' ORDER BY id", [], QueryType::All),
+            static fn($r) => [$iconMap[$r['icon']] ?? 'file-text', $r['title'], ucfirst($r['slug'])],
+            $pages,
         );
-        $this->nav[] = ['📝 Blog', 'Blog'];
+        $this->nav[] = ['newspaper', 'Blog', 'Blog'];
     }
 
     // Get/set session value: URL param overrides, else use session, else use default
