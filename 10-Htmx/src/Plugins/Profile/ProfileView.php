@@ -57,7 +57,7 @@ final class ProfileView extends Theme
                     </div>
                 </div>
                 <div class="list-header mt-4">
-                    <a href="?o=Auth&m=update$t">🔑 Change Password</a>
+                    <a href="?o=Auth&m=update$t"><i data-lucide="key"></i> Change Password</a>
                     <button type="submit" class="btn">Save Profile</button>
                 </div>
             </form>

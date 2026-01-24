@@ -34,7 +34,7 @@ final class DocsView extends Theme
             $path = htmlspecialchars($a['content']);
             return <<<HTML
             <div class="card">
-                <p><a href="?o=Docs$t">← Back to Docs</a></p>
+                <p><a href="?o=Docs$t"><i data-lucide="arrow-left" class="inline-icon"></i> Back to Docs</a></p>
                 <h2>File Not Found</h2>
                 <p>The markdown file could not be read:</p>
                 <code>$path</code>
@@ -44,7 +44,7 @@ final class DocsView extends Theme
         }
 
         $title = htmlspecialchars($a['title']);
-        $icon = htmlspecialchars($a['icon'] ?: '📚');
+        $icon = htmlspecialchars($a['icon'] ?: '<i data-lucide="library" class="inline-icon"></i>');
         $content = Util::md($a['file_content']);
         $author = htmlspecialchars($a['author']);
         $date = date('M j, Y', strtotime($a['created']));
@@ -73,7 +73,7 @@ final class DocsView extends Theme
         return <<<HTML
         <article class="blog-single">
             <header class="blog-single-header">
-                <h1><a href="?o=Docs$t" class="back-arrow">«</a> $icon $title</h1>
+                <h1><a href="?o=Docs$t" class="back-arrow"><i data-lucide="arrow-left" class="inline-icon"></i></a> $icon $title</h1>
                 <div class="blog-single-meta">
                     <span>By $author</span> · <span>$date</span>
                     <span class="text-muted">(updated $updated)</span>
@@ -107,7 +107,7 @@ final class DocsView extends Theme
         $html = <<<HTML
         <div class="card">
             <div class="list-header">
-                <h2>📚 Documentation</h2>
+                <h2><i data-lucide="library" class="inline-icon"></i> Documentation</h2>
                 <a href="?o=Docs&m=create$t" class="btn">+ New Doc</a>
             </div>
         HTML;
@@ -121,7 +121,7 @@ final class DocsView extends Theme
                 $html .= '<div class="docs-list">';
 
                 foreach ($docs as $doc) {
-                    $icon = htmlspecialchars($doc['icon'] ?: '📄');
+                    $icon = htmlspecialchars($doc['icon'] ?: '<i data-lucide="file-text" class="inline-icon"></i>');
                     $title = htmlspecialchars($doc['title']);
                     $slug = htmlspecialchars($doc['slug']);
                     $excerpt = htmlspecialchars($doc['excerpt'] ?: '');
@@ -130,14 +130,14 @@ final class DocsView extends Theme
                     // File existence warning
                     $warning = '';
                     if (!$doc['file_exists']) {
-                        $warning = '<span class="tag tag-danger" title="File not found">⚠️ Missing</span>';
+                        $warning = '<span class="tag tag-danger" title="File not found"><i data-lucide="alert-triangle" class="inline-icon"></i> Missing</span>';
                     }
 
                     // Actions
                     $actions = <<<ACT
                     <span class="docs-actions">
-                        <a href="?o=Docs&m=update&id={$doc['id']}$t" title="Edit">✏️</a>
-                        <a href="?o=Docs&m=delete&id={$doc['id']}$t" title="Delete" onclick="return confirm('Delete this doc?')">🗑️</a>
+                        <a href="?o=Docs&m=update&id={$doc['id']}$t" title="Edit"><i data-lucide="edit" class="inline-icon"></i></a>
+                        <a href="?o=Docs&m=delete&id={$doc['id']}$t" title="Delete" onclick="return confirm('Delete this doc?')"><i data-lucide="trash-2" class="inline-icon"></i></a>
                     </span>
                     ACT;
 
@@ -221,7 +221,7 @@ final class DocsView extends Theme
                     </div>
                     <div class="form-group">
                         <label for="icon">Icon (emoji)</label>
-                        <input type="text" id="icon" name="icon" value="$icon" placeholder="📚">
+                        <input type="text" id="icon" name="icon" value="$icon" placeholder="<i data-lucide="library" class="inline-icon"></i>">
                     </div>
                     <div class="form-group">
                         <label for="featured_image">Featured Image URL</label>
@@ -246,10 +246,10 @@ final class DocsView extends Theme
     {
         $t = $this->t();
         $prevHtml = $prev
-            ? "<a href=\"?o=Docs&m=read&slug={$prev['slug']}$t\" class=\"blog-nav-prev\"><span>← Previous</span><strong>{$prev['title']}</strong></a>"
+            ? "<a href=\"?o=Docs&m=read&slug={$prev['slug']}$t\" class=\"blog-nav-prev\"><span><i data-lucide="chevron-left" class="inline-icon"></i> Previous</span><strong>{$prev['title']}</strong></a>"
             : '<span></span>';
         $nextHtml = $next
-            ? "<a href=\"?o=Docs&m=read&slug={$next['slug']}$t\" class=\"blog-nav-next\"><span>Next →</span><strong>{$next['title']}</strong></a>"
+            ? "<a href=\"?o=Docs&m=read&slug={$next['slug']}$t\" class=\"blog-nav-next\"><span>Next <i data-lucide="chevron-right" class="inline-icon"></i></span><strong>{$next['title']}</strong></a>"
             : '<span></span>';
 
         return <<<HTML

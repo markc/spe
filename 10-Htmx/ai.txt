@@ -1,86 +1,71 @@
 ---
-updated: 2026-01-18
-scope: /10-Htmx
+updated: 2026-01-16
+scope: /09-Blog
 parent: ../ai.txt
 ---
 
-# Chapter 10: htmx - SPA-like Blog
+# Chapter 09: Blog - Complete CMS
 
-Blog CMS enhanced with htmx for SPA-like navigation without page reloads.
+Full content management system with authentication, blog, pages, categories, and documentation.
 
 ## Learning Objectives
 
-- Integrate htmx for partial page updates
-- Implement SPA-like navigation with URL history
-- Add live search with debouncing
-- Create inline CRUD operations
-- Handle server-triggered events (toasts)
-
-## Key htmx Features Demonstrated
-
-Navigation: All links use hx-get/hx-target for partial updates
-Forms: hx-post for AJAX form submission
-Live Search: hx-trigger="keyup changed delay:300ms"
-Delete: hx-confirm for confirmation dialogs
-Loading States: htmx-indicator class for spinners
-URL History: hx-push-url preserves browser history
+- Build complete authentication system (login, logout, register)
+- Implement blog with posts, categories, and tags
+- Create static pages with markdown support
+- Design category management with post associations
+- Generate documentation from filesystem markdown
 
 ## Directory Structure
 
 ```
-10-Htmx/
+09-Blog/
 ├── public/
-│   └── index.php
+│   ├── index.php
+│   └── data/           # SQLite databases
 └── src/
-    ├── Core/           # Init (htmx detection), Ctx, Theme (htmx script)
-    ├── Plugins/        # Views with hx-* attributes
-    └── Themes/         # TopNav, SideBar, Simple with id="main"
+    ├── Core/           # Init, Ctx, Db, Plugin, Theme, Util
+    ├── Plugins/        # Auth/, Blog/, Posts/, Pages/, Categories/, Users/, Docs/
+    └── Themes/
 ```
 
-## htmx Integration Points
+## Plugins
 
-Init.php: Detects HX-Request header, returns partial HTML
-Theme.php: Loads htmx script, adds hx-boost to body
-nav(): Links with hx-get, hx-target="#main", hx-push-url
-Views: All links/forms enhanced with htmx attributes
+Auth: Login, logout, registration, password reset
+Blog: Public blog view with excerpts and pagination
+Posts: Admin CRUD for blog posts
+Pages: Static page management
+Categories: Category CRUD with post associations
+Users: User management (from Chapter 08)
+Docs: Filesystem-based documentation viewer
 
-## How It Works
+## Features
 
-1. Initial page load: Full HTML response
-2. Subsequent navigation: htmx sends HX-Request header
-3. Server detects header: Returns only main content
-4. htmx swaps: Replaces #main element, updates URL
-5. Flash messages: Sent via HX-Trigger header
+Markdown Support: Posts and pages support markdown content
+Featured Images: Posts can have featured images
+Excerpts: Auto-generated or custom excerpts
+Category Tags: Posts associated with multiple categories
+Post Types: post, page, doc (polymorphic posts table)
 
-## Code Patterns
+## Database Schema
 
-```php
-// Detect htmx request (Init.php)
-if (isset($_SERVER['HTTP_HX_REQUEST'])) {
-    return $this->out['main'];  // Partial HTML
-}
-
-// Navigation with htmx (Theme.php)
-<a href="/blog" hx-get="/blog" hx-target="#main" hx-push-url="true">Blog</a>
-
-// Live search (UsersView.php)
-<input hx-get="?o=Users" hx-trigger="keyup changed delay:300ms" hx-target="#main">
-
-// Inline delete (UsersView.php)
-<a hx-get="?o=Users&m=delete&id=1" hx-confirm="Delete?" hx-swap="outerHTML">Delete</a>
-```
+posts: id, user_id, title, slug, content, excerpt, type, status, featured_image, created_at
+categories: id, name, slug, description
+post_categories: post_id, category_id (junction table)
+users: id, email, password, name, role, created_at
 
 ## Running
 
 ```
-cd 10-Htmx/public
+cd 09-Blog/public
 php -S localhost:8080
 ```
 
 ## AI Guidelines
 
-- Clone of 09-Blog with htmx enhancements
-- Demonstrates hypermedia-driven application (HDA) pattern
-- No JavaScript framework required
-- Graceful degradation: Works without JS (full page loads)
-- Namespace: SPE\Htmx\
+- This is the "production-ready" chapter
+- Complete auth flow with session management
+- Posts table uses 'type' field for polymorphism (post/page/doc)
+- Markdown rendered via Util::md() method
+- Most complex chapter; includes all previous patterns
+- Namespace: SPE\Blog\

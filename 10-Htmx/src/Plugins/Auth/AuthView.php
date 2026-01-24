@@ -9,7 +9,6 @@ use SPE\Htmx\Core\Ctx;
 
 /**
  * Auth views - login, forgot password, reset password, change password, profile
- * Enhanced with htmx for SPA-like form submissions
  */
 final class AuthView
 {
@@ -22,12 +21,10 @@ final class AuthView
     {
         $login = htmlspecialchars($this->a['login'] ?? '');
         $csrf = Util::csrfField();
-        $action = '?o=Auth&m=login';
-        $forgotUrl = '?o=Auth&m=forgotpw';
         return <<<HTML
         <div class="card card-sm">
-            <h2>🔒 Sign In</h2>
-            <form method="post" action="$action" hx-post="$action" hx-target="#main">
+            <h2><i data-lucide="lock"></i> Sign In</h2>
+            <form method="post" action="?o=Auth&m=login">
                 $csrf
                 <div class="form-group">
                     <label for="login">Email</label>
@@ -42,7 +39,7 @@ final class AuthView
                     <button type="submit" class="btn">Sign In</button>
                 </div>
                 <div class="text-center mt-2">
-                    <a href="$forgotUrl" hx-get="$forgotUrl" hx-target="#main" hx-push-url="true">Forgot password?</a>
+                    <a href="?o=Auth&m=forgotpw">Forgot password?</a>
                 </div>
             </form>
         </div>
@@ -58,20 +55,18 @@ final class AuthView
     {
         $login = htmlspecialchars($this->a['login'] ?? '');
         $csrf = Util::csrfField();
-        $action = '?o=Auth&m=forgotpw';
-        $backUrl = '?o=Auth&m=login';
         return <<<HTML
         <div class="card card-sm">
-            <h2>🔑 Forgot Password</h2>
+            <h2><i data-lucide="key"></i> Forgot Password</h2>
             <p class="text-muted">Enter your email and we'll send you a reset link.</p>
-            <form method="post" action="$action" hx-post="$action" hx-target="#main">
+            <form method="post" action="?o=Auth&m=forgotpw">
                 $csrf
                 <div class="form-group">
                     <label for="login">Email</label>
                     <input type="email" id="login" name="login" value="$login" required autofocus>
                 </div>
                 <div class="flex justify-between">
-                    <a href="$backUrl" hx-get="$backUrl" hx-target="#main" hx-push-url="true" class="btn btn-muted">Back</a>
+                    <a href="?o=Auth&m=login" class="btn btn-muted">Back</a>
                     <button type="submit" class="btn">Send Reset Link</button>
                 </div>
             </form>
@@ -83,12 +78,11 @@ final class AuthView
     {
         $login = htmlspecialchars($this->a['login'] ?? '');
         $csrf = Util::csrfField();
-        $action = '?o=Auth&m=resetpw';
         return <<<HTML
         <div class="card card-sm">
-            <h2>🔐 Reset Password</h2>
+            <h2><i data-lucide="key-round"></i> Reset Password</h2>
             <p class="text-center"><strong>$login</strong></p>
-            <form method="post" action="$action" hx-post="$action" hx-target="#main">
+            <form method="post" action="?o=Auth&m=resetpw">
                 $csrf
                 <div class="form-group">
                     <label for="passwd1">New Password</label>
@@ -111,13 +105,11 @@ final class AuthView
     {
         $login = htmlspecialchars($this->a['login'] ?? '');
         $csrf = Util::csrfField();
-        $action = '?o=Auth&m=changepw';
-        $cancelUrl = '?o=Auth&m=profile';
         return <<<HTML
         <div class="card card-sm">
-            <h2>🔒 Change Password</h2>
+            <h2><i data-lucide="lock"></i> Change Password</h2>
             <p class="text-center"><strong>$login</strong></p>
-            <form method="post" action="$action" hx-post="$action" hx-target="#main" hx-push-url="$cancelUrl">
+            <form method="post" action="?o=Auth&m=changepw">
                 $csrf
                 <div class="form-group">
                     <label for="webpw">Current Password</label>
@@ -133,7 +125,7 @@ final class AuthView
                 </div>
                 <p class="text-muted text-sm">At least 12 characters with uppercase, lowercase, and number.</p>
                 <div class="flex justify-between">
-                    <a href="$cancelUrl" hx-get="$cancelUrl" hx-target="#main" hx-push-url="true" class="btn btn-muted">Cancel</a>
+                    <a href="?o=Auth&m=profile" class="btn btn-muted">Cancel</a>
                     <button type="submit" class="btn">Change Password</button>
                 </div>
             </form>
@@ -152,13 +144,11 @@ final class AuthView
         $login = htmlspecialchars($a['login'] ?? '');
         $altemail = htmlspecialchars($a['altemail'] ?? '');
         $csrf = Util::csrfField();
-        $action = '?o=Auth&m=profile';
-        $changePwUrl = '?o=Auth&m=changepw';
 
         return <<<HTML
         <div class="card card-md">
-            <h2>👤 My Profile</h2>
-            <form method="post" action="$action" hx-post="$action" hx-target="#main">
+            <h2><i data-lucide="user"></i> My Profile</h2>
+            <form method="post" action="?o=Auth&m=profile">
                 $csrf
                 <div class="form-group">
                     <label>Email (login)</label>
@@ -179,7 +169,7 @@ final class AuthView
                     <input type="email" id="altemail" name="altemail" value="$altemail">
                 </div>
                 <div class="flex justify-between">
-                    <a href="$changePwUrl" hx-get="$changePwUrl" hx-target="#main" hx-push-url="true" class="btn btn-muted">🔒 Change Password</a>
+                    <a href="?o=Auth&m=changepw" class="btn btn-muted"><i data-lucide="lock"></i> Change Password</a>
                     <button type="submit" class="btn">Update Profile</button>
                 </div>
             </form>

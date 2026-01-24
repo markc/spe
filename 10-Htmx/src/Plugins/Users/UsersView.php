@@ -29,16 +29,14 @@ final class UsersView
     public function read(): string
     {
         $a = $this->a;
-        $t = $this->t();
-        $backUrl = "?o=Users$t";
         if (empty($a))
             return (
-                '<div class="card"><p>User not found.</p><a href="' . $backUrl . '" hx-get="' . $backUrl . '" hx-target="#main" hx-push-url="true" class="btn">« Back</a></div>'
+                '<div class="card"><p>User not found.</p><a href="?o=Users'
+                . $this->t()
+                . '" class="btn"><i data-lucide="chevron-left" class="inline-icon"></i> Back</a></div>'
             );
+        $t = $this->t();
         $anote = Util::nlbr($a['anote'] ?? '');
-        $editUrl = "?o=Users&m=update&id={$a['id']}$t";
-        $deleteUrl = "?o=Users&m=delete&id={$a['id']}$t";
-        $login = htmlspecialchars($a['login']);
         return <<<HTML
         <div class="card">
             <h2>👤 {$a['login']}</h2>
@@ -53,9 +51,9 @@ final class UsersView
                 <p><strong>Admin Note:</strong> $anote</p>
             </div>
             <div class="btn-group mt-3">
-                <a href="$backUrl" hx-get="$backUrl" hx-target="#main" hx-push-url="true" class="btn">« Back</a>
-                <a href="$editUrl" hx-get="$editUrl" hx-target="#main" hx-push-url="true" class="btn">Edit</a>
-                <a href="$deleteUrl" hx-get="$deleteUrl" hx-target="#main" hx-push-url="$backUrl" hx-confirm="Delete user '$login'?" class="btn btn-danger">Delete</a>
+                <a href="?o=Users$t" class="btn"><i data-lucide="chevron-left" class="inline-icon"></i> Back</a>
+                <a href="?o=Users&m=update&id={$a['id']}$t" class="btn">Edit</a>
+                <a href="?o=Users&m=delete&id={$a['id']}$t" class="btn btn-danger" onclick="return confirm('Delete this user?')">Delete</a>
             </div>
         </div>
         HTML;
@@ -77,24 +75,20 @@ final class UsersView
     {
         $a = $this->a;
         $t = $this->t();
-        $tv = $this->ctx->in['t'];
         $q = htmlspecialchars($_GET['q'] ?? '');
-        $clearUrl = "?o=Users$t";
-        $clear = $q ? "<a href=\"$clearUrl\" hx-get=\"$clearUrl\" hx-target=\"#main\" hx-push-url=\"true\" class=\"btn\">Clear</a>" : '';
-        $createUrl = "?o=Users&m=create$t";
+        $clear = $q ? "<a href=\"?o=Users$t\" class=\"btn\">Clear</a>" : '';
 
         $html = <<<HTML
         <div class="card">
             <div class="list-header">
-                <div class="search-form">
-                    <input type="search" name="q" placeholder="Search users..." value="$q" class="search-input"
-                        hx-get="?o=Users&t=$tv"
-                        hx-trigger="keyup changed delay:300ms, search"
-                        hx-target="#main"
-                        hx-push-url="true">
+                <form class="search-form">
+                    <input type="hidden" name="o" value="Users">
+                    <input type="hidden" name="t" value="{$this->ctx->in['t']}">
+                    <input type="search" name="q" placeholder="Search..." value="$q" class="search-input">
+                    <button type="submit" class="btn">Search</button>
                     $clear
-                </div>
-                <a href="$createUrl" hx-get="$createUrl" hx-target="#main" hx-push-url="true" class="btn">+ Add User</a>
+                </form>
+                <a href="?o=Users&m=create$t" class="btn">+ Add User</a>
             </div>
             <table class="admin-table">
                 <thead>
@@ -112,18 +106,15 @@ final class UsersView
         foreach ($a['items'] as $item) {
             $login = htmlspecialchars($item['login']);
             $name = htmlspecialchars($item['fname'] . ' ' . $item['lname']);
-            $readUrl = "?o=Users&m=read&id={$item['id']}$t";
-            $editUrl = "?o=Users&m=update&id={$item['id']}$t";
-            $deleteUrl = "?o=Users&m=delete&id={$item['id']}$t";
             $html .= <<<HTML
-                <tr id="user-row-{$item['id']}">
-                    <td><a href="$readUrl" hx-get="$readUrl" hx-target="#main" hx-push-url="true">$login</a></td>
+                <tr>
+                    <td><a href="?o=Users&m=read&id={$item['id']}$t">$login</a></td>
                     <td>$name</td>
                     <td><small>{$item['created']}</small></td>
                     <td><small>{$item['updated']}</small></td>
                     <td class="text-right">
-                        <a href="$editUrl" hx-get="$editUrl" hx-target="#main" hx-push-url="true" title="Edit" class="icon">✏️</a>
-                        <a href="$deleteUrl" hx-get="$deleteUrl" hx-target="#user-row-{$item['id']}" hx-swap="outerHTML swap:0.3s" hx-confirm="Delete user '$login'?" title="Delete" class="icon">🗑️</a>
+                        <a href="?o=Users&m=update&id={$item['id']}$t" title="Edit" class="icon"><i data-lucide="edit" class="inline-icon"></i></a>
+                        <a href="?o=Users&m=delete&id={$item['id']}$t" title="Delete" class="icon" onclick="return confirm('Delete this user?')"><i data-lucide="trash-2" class="inline-icon"></i></a>
                     </td>
                 </tr>
             HTML;
@@ -131,20 +122,16 @@ final class UsersView
 
         $html .= '</tbody></table>';
 
-        // Pagination with htmx
+        // Pagination
         $p = $a['pagination'];
         if ($p['pages'] > 1) {
             $sq = $q ? "&q=$q" : '';
             $html .= '<div class="btn-group-center mt-4">';
-            if ($p['page'] > 1) {
-                $prevUrl = "?o=Users&page=" . ($p['page'] - 1) . "$sq$t";
-                $html .= "<a href=\"$prevUrl\" hx-get=\"$prevUrl\" hx-target=\"#main\" hx-push-url=\"true\" class=\"btn\">« Prev</a>";
-            }
+            if ($p['page'] > 1)
+                $html .= "<a href=\"?o=Users&page=" . ($p['page'] - 1) . "$sq$t\" class=\"btn\"><i data-lucide="chevron-left" class="inline-icon"></i> Prev</a>";
             $html .= "<span class=\"p-2\">Page {$p['page']} of {$p['pages']}</span>";
-            if ($p['page'] < $p['pages']) {
-                $nextUrl = "?o=Users&page=" . ($p['page'] + 1) . "$sq$t";
-                $html .= "<a href=\"$nextUrl\" hx-get=\"$nextUrl\" hx-target=\"#main\" hx-push-url=\"true\" class=\"btn\">Next »</a>";
-            }
+            if ($p['page'] < $p['pages'])
+                $html .= "<a href=\"?o=Users&page=" . ($p['page'] + 1) . "$sq$t\" class=\"btn\">Next <i data-lucide="chevron-right" class="inline-icon"></i></a>";
             $html .= '</div>';
         }
 
@@ -165,12 +152,11 @@ final class UsersView
         $action = $id ? "?o=Users&m=update&id=$id$t" : "?o=Users&m=create$t";
         $heading = $id ? 'Edit User' : 'Create User';
         $btnText = $id ? 'Update' : 'Create';
-        $cancelUrl = "?o=Users$t";
 
         return <<<HTML
         <div class="card">
             <h2>$heading</h2>
-            <form method="post" action="$action" hx-post="$action" hx-target="#main" hx-push-url="$cancelUrl">
+            <form method="post" action="$action">
                 <input type="hidden" name="id" value="$id">
                 <div class="form-group">
                     <label for="login">Login (Email)</label>
@@ -209,7 +195,7 @@ final class UsersView
                     <textarea id="anote" name="anote" rows="3">$anote</textarea>
                 </div>
                 <div class="text-right">
-                    <a href="$cancelUrl" hx-get="$cancelUrl" hx-target="#main" hx-push-url="true" class="btn btn-muted">Cancel</a>
+                    <a href="?o=Users$t" class="btn btn-muted">Cancel</a>
                     <button type="submit" class="btn">$btnText</button>
                 </div>
             </form>

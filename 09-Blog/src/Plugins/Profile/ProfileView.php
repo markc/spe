@@ -27,7 +27,7 @@ final class ProfileView extends Theme
 
         return <<<HTML
         <div class="card card-lg">
-            <h2>👤 My Profile</h2>
+            <h2><i data-lucide="user" class="inline-icon"></i> My Profile</h2>
             <form method="post" action="?o=Profile$t">
                 <div class="grid-2col">
                     <div class="form-group">
@@ -57,7 +57,7 @@ final class ProfileView extends Theme
                     </div>
                 </div>
                 <div class="list-header mt-4">
-                    <a href="?o=Auth&m=update$t">🔑 Change Password</a>
+                    <a href="?o=Auth&m=update$t"><i data-lucide="key" class="inline-icon"></i> Change Password</a>
                     <button type="submit" class="btn">Save Profile</button>
                 </div>
             </form>

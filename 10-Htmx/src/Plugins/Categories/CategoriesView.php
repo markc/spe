@@ -42,7 +42,7 @@ final class CategoriesView
             $postList = '<h3 class="mt-2">Posts in this category</h3><ul>';
             foreach ($a['posts'] as $post) {
                 $title = htmlspecialchars($post['title']);
-                $type = $post['type'] === 'page' ? '📄' : '📝';
+                $type = $post['type'] === 'page' ? '<i data-lucide="file-text" class="inline-icon"></i>' : '<i data-lucide="file-text" class="inline-icon"></i>';
                 $link = $post['type'] === 'page' ? "?p={$post['slug']}" : "?o=Blog&m=read&id={$post['id']}";
                 $postList .= "<li>$type <a href=\"$link$t\">$title</a></li>";
             }
@@ -51,12 +51,12 @@ final class CategoriesView
 
         return <<<HTML
         <div class="card">
-            <h2>🏷️ $name</h2>
+            <h2><i data-lucide="tag" class="inline-icon"></i> $name</h2>
             <p class="text-muted">$desc</p>
             <p><strong>$postCount</strong> posts in this category</p>
             $postList
             <div class="btn-group mt-3">
-                <a href="?o=Categories$t" class="btn">« Back</a>
+                <a href="?o=Categories$t" class="btn"><i data-lucide="chevron-left" class="inline-icon"></i> Back</a>
                 <a href="?o=Categories&m=update&id={$a['id']}$t" class="btn">Edit</a>
             </div>
         </div>
@@ -83,7 +83,7 @@ final class CategoriesView
         $html = <<<HTML
         <div class="card">
             <div class="list-header">
-                <h2>🏷️ Categories</h2>
+                <h2><i data-lucide="tag" class="inline-icon"></i> Categories</h2>
                 <a href="?o=Categories&m=create$t" class="btn">+ New Category</a>
             </div>
             <table class="admin-table">
@@ -104,8 +104,8 @@ final class CategoriesView
             $slug = htmlspecialchars($item['slug']);
             $isProtected = in_array($slug, $protected);
             $deleteBtn = $isProtected
-                ? '<span class="text-muted" title="Protected">🔒</span>'
-                : "<a href=\"?o=Categories&m=delete&id={$item['id']}$t\" title=\"Delete\" class=\"icon\" onclick=\"return confirm('Delete this category?')\">🗑️</a>";
+                ? '<span class="text-muted" title="Protected"><i data-lucide="lock" class="inline-icon"></i></span>'
+                : "<a href=\"?o=Categories&m=delete&id={$item['id']}$t\" title=\"Delete\" class=\"icon\" onclick=\"return confirm('Delete this category?')\"><i data-lucide="trash-2" class="inline-icon"></i></a>";
 
             $html .= <<<HTML
                 <tr>
@@ -113,7 +113,7 @@ final class CategoriesView
                     <td><code>$slug</code></td>
                     <td class="text-center">{$item['post_count']}</td>
                     <td class="text-right">
-                        <a href="?o=Categories&m=update&id={$item['id']}$t" title="Edit" class="icon">✏️</a>
+                        <a href="?o=Categories&m=update&id={$item['id']}$t" title="Edit" class="icon"><i data-lucide="edit" class="inline-icon"></i></a>
                         $deleteBtn
                     </td>
                 </tr>

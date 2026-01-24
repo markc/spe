@@ -23,7 +23,7 @@ final class AuthView
         $csrf = Util::csrfField();
         return <<<HTML
         <div class="card card-sm">
-            <h2>🔒 Sign In</h2>
+            <h2><i data-lucide="lock" class="inline-icon"></i> Sign In</h2>
             <form method="post" action="?o=Auth&m=login">
                 $csrf
                 <div class="form-group">
@@ -57,7 +57,7 @@ final class AuthView
         $csrf = Util::csrfField();
         return <<<HTML
         <div class="card card-sm">
-            <h2>🔑 Forgot Password</h2>
+            <h2><i data-lucide="key" class="inline-icon"></i> Forgot Password</h2>
             <p class="text-muted">Enter your email and we'll send you a reset link.</p>
             <form method="post" action="?o=Auth&m=forgotpw">
                 $csrf
@@ -80,7 +80,7 @@ final class AuthView
         $csrf = Util::csrfField();
         return <<<HTML
         <div class="card card-sm">
-            <h2>🔐 Reset Password</h2>
+            <h2><i data-lucide="key-round" class="inline-icon"></i> Reset Password</h2>
             <p class="text-center"><strong>$login</strong></p>
             <form method="post" action="?o=Auth&m=resetpw">
                 $csrf
@@ -107,7 +107,7 @@ final class AuthView
         $csrf = Util::csrfField();
         return <<<HTML
         <div class="card card-sm">
-            <h2>🔒 Change Password</h2>
+            <h2><i data-lucide="lock" class="inline-icon"></i> Change Password</h2>
             <p class="text-center"><strong>$login</strong></p>
             <form method="post" action="?o=Auth&m=changepw">
                 $csrf
@@ -147,7 +147,7 @@ final class AuthView
 
         return <<<HTML
         <div class="card card-md">
-            <h2>👤 My Profile</h2>
+            <h2><i data-lucide="user" class="inline-icon"></i> My Profile</h2>
             <form method="post" action="?o=Auth&m=profile">
                 $csrf
                 <div class="form-group">
@@ -169,7 +169,7 @@ final class AuthView
                     <input type="email" id="altemail" name="altemail" value="$altemail">
                 </div>
                 <div class="flex justify-between">
-                    <a href="?o=Auth&m=changepw" class="btn btn-muted">🔒 Change Password</a>
+                    <a href="?o=Auth&m=changepw" class="btn btn-muted"><i data-lucide="lock" class="inline-icon"></i> Change Password</a>
                     <button type="submit" class="btn">Update Profile</button>
                 </div>
             </form>

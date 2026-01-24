@@ -53,7 +53,7 @@ final class PagesView extends Theme
         $html = <<<HTML
         <div class="card">
             <div class="list-header">
-                <h2>📄 Pages</h2>
+                <h2><i data-lucide="file-text" class="inline-icon"></i> Pages</h2>
                 <a href="?o=Pages&m=create$t" class="btn">+ New Page</a>
             </div>
             <table class="admin-table">
@@ -72,11 +72,11 @@ final class PagesView extends Theme
         foreach ($a['items'] as $item) {
             $title = htmlspecialchars($item['title']);
             $slug = htmlspecialchars($item['slug']);
-            $icon = htmlspecialchars($item['icon'] ?? '📄');
+            $icon = htmlspecialchars($item['icon'] ?? '<i data-lucide="file-text" class="inline-icon"></i>');
             $isCore = in_array($slug, ['home', 'about', 'contact']);
             $deleteBtn = $isCore
-                ? '<span class="text-muted" title="Core page">🔒</span>'
-                : "<a href=\"?o=Pages&m=delete&id={$item['id']}$t\" title=\"Delete\" class=\"icon\" onclick=\"return confirm('Delete this page?')\">🗑️</a>";
+                ? '<span class="text-muted" title="Core page"><i data-lucide="lock" class="inline-icon"></i></span>'
+                : "<a href=\"?o=Pages&m=delete&id={$item['id']}$t\" title=\"Delete\" class=\"icon\" onclick=\"return confirm('Delete this page?')\"><i data-lucide="trash-2" class="inline-icon"></i></a>";
 
             $html .= <<<HTML
                 <tr>
@@ -85,7 +85,7 @@ final class PagesView extends Theme
                     <td><code>$slug</code></td>
                     <td><small>{$item['updated']}</small></td>
                     <td class="text-right">
-                        <a href="?o=Pages&m=update&id={$item['id']}$t" title="Edit" class="icon">✏️</a>
+                        <a href="?o=Pages&m=update&id={$item['id']}$t" title="Edit" class="icon"><i data-lucide="edit" class="inline-icon"></i></a>
                         $deleteBtn
                     </td>
                 </tr>
@@ -144,7 +144,7 @@ final class PagesView extends Theme
                     </div>
                     <div class="form-group">
                         <label for="icon">Icon (emoji or heroicon class)</label>
-                        <input type="text" id="icon" name="icon" value="$icon" placeholder="🏠 or hero-home">
+                        <input type="text" id="icon" name="icon" value="$icon" placeholder="<i data-lucide="home" class="inline-icon"></i> or hero-home">
                     </div>
                 </div>
                 <div class="form-group">

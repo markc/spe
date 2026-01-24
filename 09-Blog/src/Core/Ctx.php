@@ -18,7 +18,7 @@ final class Ctx
     public function __construct(
         public string $email = 'noreply@localhost',
         array $in = ['o' => 'Blog', 'm' => 'list', 'x' => '', 'i' => 0, 'g' => 0],
-        public array $out = ['doc' => 'SPE::09', 'page' => '← 09 Blog', 'head' => '', 'main' => '', 'foot' => '', 'css' => '', 'js' => '', 'end' => ''],
+        public array $out = ['doc' => 'SPE::09', 'page' => '09 Blog', 'head' => '', 'main' => '', 'foot' => '', 'css' => '', 'js' => '', 'end' => ''],
         public array $colors = [['circle', 'Stone', 'default'], ['waves', 'Ocean', 'ocean'], ['trees', 'Forest', 'forest'], ['sunset', 'Sunset', 'sunset']],
     ) {
         session_status() === PHP_SESSION_NONE && session_start();

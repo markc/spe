@@ -56,6 +56,7 @@ final readonly class Init
     {
         $ctx = $this->ctx;
 
+        // Auth plugin - public and user methods
         if ($o === 'Auth') {
             $userMethods = ['profile', 'changepw'];
             if (in_array($m, $userMethods) && !Util::is_usr()) {
@@ -69,6 +70,7 @@ final readonly class Init
             return new $view($ctx, $ary)->$m();
         }
 
+        // Users plugin - admin only
         if ($o === 'Users') {
             if (!Acl::check(Acl::Admin)) {
                 Util::log('Admin access required');
@@ -81,6 +83,7 @@ final readonly class Init
             return new $view($ctx, $ary)->$m();
         }
 
+        // Blog plugin - read is public, write requires admin
         if ($o === 'Blog') {
             $writeMethods = ['create', 'update', 'delete'];
             if (in_array($m, $writeMethods) && !Acl::check(Acl::Admin)) {
@@ -94,6 +97,7 @@ final readonly class Init
             return new $view($ctx, $ary)->$m();
         }
 
+        // Posts plugin - admin only
         if ($o === 'Posts') {
             if (!Acl::check(Acl::Admin)) {
                 Util::log('Admin access required');
@@ -106,6 +110,7 @@ final readonly class Init
             return new $view($ctx, $ary)->$m();
         }
 
+        // Categories plugin - admin only
         if ($o === 'Categories') {
             if (!Acl::check(Acl::Admin)) {
                 Util::log('Admin access required');
@@ -139,18 +144,17 @@ final readonly class Init
             return json_encode($this->out[$x], JSON_PRETTY_PRINT);
         }
 
-        // htmx: return partial HTML fragment
+        // HTMX partial request - return main content only
         if (isset($_SERVER['HTTP_HX_REQUEST'])) {
-            header('Content-Type: text/html; charset=utf-8');
-            $log = Util::log();
-            if ($log) {
-                $events = [];
-                foreach ($log as $type => $msg) {
-                    $events['showToast'] = ['message' => $msg, 'type' => $type];
+            $flash = Util::log();
+            $html = $this->out['main'];
+            if ($flash) {
+                foreach ($flash as $type => $msg) {
+                    $msg = htmlspecialchars($msg);
+                    $html .= "<script>showToast('{$msg}', '{$type}');</script>";
                 }
-                header('HX-Trigger: ' . json_encode($events));
             }
-            return $this->out['main'];
+            return $html;
         }
 
         $html = new Theme($this->ctx, $this->out)->render();

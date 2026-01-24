@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 // Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Htmx\Plugins\Posts;
@@ -9,20 +8,11 @@ use SPE\Htmx\Core\Ctx;
 
 final class PostsView
 {
-    public function __construct(
-        private Ctx $ctx,
-        private array $a,
-    ) {}
-
-    private function t(): string
-    {
-        return '&t=' . $this->ctx->in['t'];
-    }
+    public function __construct(private Ctx $ctx, private array $a) {}
 
     public function create(): string
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST')
-            return '';
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') return '';
         return $this->form();
     }
 
@@ -30,18 +20,14 @@ final class PostsView
     {
         $a = $this->a;
         if (empty($a))
-            return (
-                '<div class="card"><p>Post not found.</p><a href="?o=Posts'
-                . $this->t()
-                . '" class="btn">« Back</a></div>'
-            );
-        $t = $this->t();
+            return '<div class="card"><p>Post not found.</p><a href="?o=Posts" class="btn"><i data-lucide="arrow-left"></i> Back</a></div>';
+
         $content = Util::md($a['content'] ?? '');
         $canEdit = $a['can_edit'] ?? false;
         $editBtns = $canEdit ? <<<HTML
-                    <a href="?o=Posts&m=update&id={$a['id']}$t" class="btn">Edit</a>
-                    <a href="?o=Posts&m=delete&id={$a['id']}$t" class="btn btn-danger" onclick="return confirm('Delete this post?')">Delete</a>
-            HTML : '';
+            <a href="?o=Posts&m=update&id={$a['id']}" class="btn"><i data-lucide="edit"></i> Edit</a>
+            <a href="?o=Posts&m=delete&id={$a['id']}" class="btn btn-danger" onclick="return confirm('Delete this post?')"><i data-lucide="trash-2"></i> Delete</a>
+        HTML : '';
 
         // Build category tags
         $categories = $a['categories'] ?? [];
@@ -50,7 +36,7 @@ final class PostsView
             $catTags = '<p class="mt-1">';
             foreach ($categories as $cat) {
                 $name = htmlspecialchars($cat['name']);
-                $catTags .= "<span class=\"tag\">🏷️ $name</span> ";
+                $catTags .= "<span class=\"tag\"><i data-lucide=\"tag\" class=\"inline-icon\"></i> $name</span> ";
             }
             $catTags .= '</p>';
         }
@@ -58,11 +44,11 @@ final class PostsView
         return <<<HTML
         <div class="card">
             <h2>{$a['title']}</h2>
-            <p class="text-muted"><small>By {$a['author']} | Published: {$a['created']} | Updated: {$a['updated']}</small></p>
+            <p class="text-muted"><small><i data-lucide="user" class="inline-icon"></i> {$a['author']} | <i data-lucide="calendar" class="inline-icon"></i> {$a['created']} | {$a['updated']}</small></p>
             $catTags
             <div class="prose mt-2">$content</div>
             <div class="btn-group-end mt-3">
-                <a href="?o=Posts$t" class="btn">« Back</a>
+                <a href="?o=Posts" class="btn"><i data-lucide="arrow-left"></i> Back</a>
                 $editBtns
             </div>
         </div>
@@ -71,34 +57,28 @@ final class PostsView
 
     public function update(): string
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST')
-            return '';
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') return '';
         return $this->form($this->a);
     }
 
-    public function delete(): string
-    {
-        return '';
-    }
+    public function delete(): string { return ''; }
 
     public function list(): string
     {
         $a = $this->a;
-        $t = $this->t();
         $q = htmlspecialchars($_GET['q'] ?? '');
-        $clear = $q ? "<a href=\"?o=Posts$t\" class=\"btn\">Clear</a>" : '';
+        $clear = $q ? "<a href=\"?o=Posts\" class=\"btn\"><i data-lucide=\"x\"></i></a>" : '';
         $canCreate = $a['can_create'] ?? false;
-        $createBtn = $canCreate ? "<a href=\"?o=Posts&m=create$t\" class=\"btn\">+ New Post</a>" : '';
+        $createBtn = $canCreate ? "<a href=\"?o=Posts&m=create\" class=\"btn\"><i data-lucide=\"plus\"></i> New Post</a>" : '';
 
         $html = <<<HTML
         <div class="card">
             <div class="list-header">
-                <h2>📝 Posts</h2>
+                <h2><i data-lucide="file-text"></i> Posts</h2>
                 <form class="search-form">
                     <input type="hidden" name="o" value="Posts">
-                    <input type="hidden" name="t" value="{$this->ctx->in['t']}">
                     <input type="search" name="q" placeholder="Search..." value="$q" class="search-input">
-                    <button type="submit" class="btn">Search</button>
+                    <button type="submit" class="btn"><i data-lucide="search"></i></button>
                     $clear
                 </form>
                 $createBtn
@@ -123,11 +103,11 @@ final class PostsView
             $author = htmlspecialchars($item['author']);
             $canEdit = $isAdmin || (int) $item['author_id'] === (int) $userId;
             $actions = $canEdit
-                ? "<a href=\"?o=Posts&m=update&id={$item['id']}$t\" title=\"Edit\" class=\"icon\">✏️</a> <a href=\"?o=Posts&m=delete&id={$item['id']}$t\" title=\"Delete\" class=\"icon\" onclick=\"return confirm('Delete this post?')\">🗑️</a>"
+                ? "<a href=\"?o=Posts&m=update&id={$item['id']}\" title=\"Edit\"><i data-lucide=\"edit\"></i></a> <a href=\"?o=Posts&m=delete&id={$item['id']}\" title=\"Delete\" onclick=\"return confirm('Delete this post?')\"><i data-lucide=\"trash-2\"></i></a>"
                 : '';
             $html .= <<<HTML
                 <tr>
-                    <td><a href="?o=Posts&m=read&id={$item['id']}$t">$title</a></td>
+                    <td><a href="?o=Posts&m=read&id={$item['id']}">$title</a></td>
                     <td><small>$author</small></td>
                     <td><small>{$item['updated']}</small></td>
                     <td class="text-right">$actions</td>
@@ -143,10 +123,10 @@ final class PostsView
             $sq = $q ? "&q=$q" : '';
             $html .= '<div class="btn-group-center mt-4">';
             if ($p['page'] > 1)
-                $html .= "<a href=\"?o=Posts&page=" . ($p['page'] - 1) . "$sq$t\" class=\"btn\">« Prev</a>";
+                $html .= "<a href=\"?o=Posts&page=" . ($p['page'] - 1) . "$sq\" class=\"btn\"><i data-lucide=\"chevron-left\"></i> Prev</a>";
             $html .= "<span class=\"p-2\">Page {$p['page']} of {$p['pages']}</span>";
             if ($p['page'] < $p['pages'])
-                $html .= "<a href=\"?o=Posts&page=" . ($p['page'] + 1) . "$sq$t\" class=\"btn\">Next »</a>";
+                $html .= "<a href=\"?o=Posts&page=" . ($p['page'] + 1) . "$sq\" class=\"btn\">Next <i data-lucide=\"chevron-right\"></i></a>";
             $html .= '</div>';
         }
 
@@ -156,13 +136,12 @@ final class PostsView
     private function form(array $data = []): string
     {
         $id = $data['id'] ?? 0;
-        $t = $this->t();
         $title = htmlspecialchars($data['title'] ?? '');
         $content = htmlspecialchars($data['content'] ?? '');
         $excerpt = htmlspecialchars($data['excerpt'] ?? '');
         $featuredImage = htmlspecialchars($data['featured_image'] ?? '');
-        $action = $id ? "?o=Posts&m=update&id=$id$t" : "?o=Posts&m=create$t";
-        $heading = $id ? 'Edit Post' : 'New Post';
+        $action = $id ? "?o=Posts&m=update&id=$id" : "?o=Posts&m=create";
+        $heading = $id ? '<i data-lucide="edit"></i> Edit Post' : '<i data-lucide="plus"></i> New Post';
         $btnText = $id ? 'Update' : 'Create';
 
         // Build category checkboxes
@@ -209,7 +188,7 @@ final class PostsView
                 </div>
                 $catCheckboxes
                 <div class="text-right">
-                    <a href="?o=Posts$t" class="btn btn-muted">Cancel</a>
+                    <a href="?o=Posts" class="btn btn-muted">Cancel</a>
                     <button type="submit" class="btn">$btnText</button>
                 </div>
             </form>

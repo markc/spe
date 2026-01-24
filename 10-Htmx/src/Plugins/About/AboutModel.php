@@ -18,7 +18,7 @@ final class AboutModel extends Plugin
             <div class="card mt-2">
                 <p class="text-center"><em>The code is available on <a href="https://github.com/markc/spe">GitHub</a>, and contributions are most welcome. Feel free to contact me at <a href="mailto:{$this->ctx->email}">{$this->ctx->email}</a> or via the Issue Tracker with any questions or suggestions.</em></p>
             </div>
-            <div class="btn-group-center mt-2">
+            <div class="btn-group-center mt-4">
                 <a href="https://github.com/markc/spe" class="btn">SPE Project Page</a>
                 <a href="https://github.com/markc/spe/issues" class="btn">SPE Issue Tracker</a>
             </div>

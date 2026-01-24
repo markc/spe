@@ -4,7 +4,7 @@
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 use SPE\App\Env;
-use SPE\Htmx\Core\{Init, Ctx};
+use SPE\Blog\Core\{Init, Ctx};
 
 Env::load(__DIR__ . '/..');
 echo new Init(new Ctx);

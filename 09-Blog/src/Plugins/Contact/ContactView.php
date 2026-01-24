@@ -13,7 +13,7 @@ final class ContactView extends Theme
         extract($this->ctx->ary);
         return <<<HTML
         <div class="card">
-            <h2>✉️ $head</h2>
+            <h2><i data-lucide="mail" class="inline-icon"></i> $head</h2>
             <div>$main</div>
             <footer class="text-muted mt-2"><small>$foot</small></footer>
         </div>

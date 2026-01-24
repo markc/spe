@@ -33,13 +33,13 @@ final class UsersView
             return (
                 '<div class="card"><p>User not found.</p><a href="?o=Users'
                 . $this->t()
-                . '" class="btn">« Back</a></div>'
+                . '" class="btn"><i data-lucide="chevron-left" class="inline-icon"></i> Back</a></div>'
             );
         $t = $this->t();
         $anote = Util::nlbr($a['anote'] ?? '');
         return <<<HTML
         <div class="card">
-            <h2>👤 {$a['login']}</h2>
+            <h2><i data-lucide="user" class="inline-icon"></i> {$a['login']}</h2>
             <div class="mt-2">
                 <p><strong>First Name:</strong> {$a['fname']}</p>
                 <p><strong>Last Name:</strong> {$a['lname']}</p>
@@ -51,7 +51,7 @@ final class UsersView
                 <p><strong>Admin Note:</strong> $anote</p>
             </div>
             <div class="btn-group mt-3">
-                <a href="?o=Users$t" class="btn">« Back</a>
+                <a href="?o=Users$t" class="btn"><i data-lucide="chevron-left" class="inline-icon"></i> Back</a>
                 <a href="?o=Users&m=update&id={$a['id']}$t" class="btn">Edit</a>
                 <a href="?o=Users&m=delete&id={$a['id']}$t" class="btn btn-danger" onclick="return confirm('Delete this user?')">Delete</a>
             </div>
@@ -113,8 +113,8 @@ final class UsersView
                     <td><small>{$item['created']}</small></td>
                     <td><small>{$item['updated']}</small></td>
                     <td class="text-right">
-                        <a href="?o=Users&m=update&id={$item['id']}$t" title="Edit" class="icon">✏️</a>
-                        <a href="?o=Users&m=delete&id={$item['id']}$t" title="Delete" class="icon" onclick="return confirm('Delete this user?')">🗑️</a>
+                        <a href="?o=Users&m=update&id={$item['id']}$t" title="Edit" class="icon"><i data-lucide="edit" class="inline-icon"></i></a>
+                        <a href="?o=Users&m=delete&id={$item['id']}$t" title="Delete" class="icon" onclick="return confirm('Delete this user?')"><i data-lucide="trash-2" class="inline-icon"></i></a>
                     </td>
                 </tr>
             HTML;
@@ -128,10 +128,10 @@ final class UsersView
             $sq = $q ? "&q=$q" : '';
             $html .= '<div class="btn-group-center mt-4">';
             if ($p['page'] > 1)
-                $html .= "<a href=\"?o=Users&page=" . ($p['page'] - 1) . "$sq$t\" class=\"btn\">« Prev</a>";
+                $html .= "<a href=\"?o=Users&page=" . ($p['page'] - 1) . "$sq$t\" class=\"btn\"><i data-lucide="chevron-left" class="inline-icon"></i> Prev</a>";
             $html .= "<span class=\"p-2\">Page {$p['page']} of {$p['pages']}</span>";
             if ($p['page'] < $p['pages'])
-                $html .= "<a href=\"?o=Users&page=" . ($p['page'] + 1) . "$sq$t\" class=\"btn\">Next »</a>";
+                $html .= "<a href=\"?o=Users&page=" . ($p['page'] + 1) . "$sq$t\" class=\"btn\">Next <i data-lucide="chevron-right" class="inline-icon"></i></a>";
             $html .= '</div>';
         }
 
