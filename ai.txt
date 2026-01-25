@@ -1,1 +1,77 @@
-docs/ai.txt
+---
+updated: 2026-01-25
+scope: /
+parent: https://raw.githubusercontent.com/markc/Dev/main/ai.txt
+---
+
+# Simple PHP Engine (SPE)
+
+A progressive PHP 8.5 micro-framework tutorial in 11 chapters. Each chapter builds on the previous, demonstrating modern PHP features and design patterns.
+
+## About
+
+SPE is an educational project showcasing modern PHP 8.1-8.5 capabilities through a progressive tutorial series. Starting from a simple single-file framework, it advances to a full-featured CMS with database, authentication, and plugin architecture.
+
+Perfect for developers wanting to learn current PHP best practices without heavyweight frameworks like Laravel or Symfony.
+
+- Website: https://markc.github.io/spe/
+- GitHub: https://github.com/markc/spe
+- License: MIT
+
+## Quick Start
+
+```bash
+git clone https://github.com/markc/spe
+cd spe
+composer install
+php -S localhost:8000
+```
+
+Open http://localhost:8000 to see the chapter index.
+
+## Requirements
+
+- PHP 8.5+ (for pipe operator `|>`)
+- Composer (for chapters 05-10)
+- SQLite (for chapters 07-10)
+
+## Chapters
+
+- 00-Tutorial: Video generation pipeline (Playwright + Piper TTS)
+- 01-Simple: Single-file anonymous class with pipe operator basics
+- 02-Styled: Custom CSS, dark mode, toast notifications
+- 03-Plugins: Plugin architecture, CRUDL pattern
+- 04-Themes: Model/View separation, multiple layouts
+- 05-Autoload: PSR-4 autoloading via Composer
+- 06-Session: PHP session management
+- 07-PDO: SQLite database with type-safe PDO queries
+- 08-Users: User management with full CRUDL operations
+- 09-Blog: Complete CMS (Auth, Blog, Pages, Categories, Docs)
+- 10-Htmx: HTMX integration for dynamic UI
+- 11-HCP: Hosting Control Panel (includes `hcp-legacy/` reference code)
+
+## Modern PHP Features
+
+- **Pipe Operator (8.5)**: Elegant data transformation chains using `|>`
+- **Asymmetric Visibility (8.4)**: `public private(set)` property declarations
+- **Typed Constants (8.3)**: `const string DEFAULT = 'value'`
+- **Override Attribute (8.3)**: `#[\Override]` for class inheritance clarity
+- **Readonly Classes (8.2)**: Immutable class definitions
+- **Enums (8.1)**: Type-safe enum patterns (QueryType: All, One, Column)
+- **First-Class Callables (8.1)**: `fn(...)` syntax for function references
+
+## Architecture
+
+- **URL Pattern**: `?o=PluginName&m=action&t=Theme&id=1`
+- **Request Flow**: `index.php → Init(Ctx) → {Plugin}Model→method() → {Plugin}View→method() → HTML`
+- **Core Framework**: Init (bootstrap), Ctx (request context), Db (SQLite PDO), Plugin (base class), Theme (view rendering)
+- **Themes**: Simple (minimal), TopNav (horizontal nav), SideBar (left sidebar)
+
+## CSS Architecture
+
+Custom framework (~270 lines) without Bootstrap:
+- No color definitions in base.css (enables theme swapping)
+- CSS custom properties for light/dark theming
+- Auto dark mode via `@media (prefers-color-scheme: dark)`
+- Manual theme toggle via localStorage
+- Responsive mobile-first design
