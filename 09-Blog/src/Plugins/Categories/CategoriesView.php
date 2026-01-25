@@ -105,7 +105,7 @@ final class CategoriesView
             $isProtected = in_array($slug, $protected);
             $deleteBtn = $isProtected
                 ? '<span class="text-muted" title="Protected"><i data-lucide="lock" class="inline-icon"></i></span>'
-                : "<a href=\"?o=Categories&m=delete&id={$item['id']}$t\" title=\"Delete\" class=\"icon\" onclick=\"return confirm('Delete this category?')\"><i data-lucide="trash-2" class="inline-icon"></i></a>";
+                : "<a href=\"?o=Categories&m=delete&id={$item['id']}$t\" title=\"Delete\" class=\"icon\" onclick=\"return confirm('Delete this category?')\"><i data-lucide=\"trash-2\" class=\"inline-icon\"></i></a>";
 
             $html .= <<<HTML
                 <tr>

@@ -76,7 +76,7 @@ final class PagesView extends Theme
             $isCore = in_array($slug, ['home', 'about', 'contact']);
             $deleteBtn = $isCore
                 ? '<span class="text-muted" title="Core page"><i data-lucide="lock" class="inline-icon"></i></span>'
-                : "<a href=\"?o=Pages&m=delete&id={$item['id']}$t\" title=\"Delete\" class=\"icon\" onclick=\"return confirm('Delete this page?')\"><i data-lucide="trash-2" class="inline-icon"></i></a>";
+                : "<a href=\"?o=Pages&m=delete&id={$item['id']}$t\" title=\"Delete\" class=\"icon\" onclick=\"return confirm('Delete this page?')\"><i data-lucide=\"trash-2\" class=\"inline-icon\"></i></a>";
 
             $html .= <<<HTML
                 <tr>

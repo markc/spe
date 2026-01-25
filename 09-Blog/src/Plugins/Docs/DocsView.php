@@ -246,10 +246,10 @@ final class DocsView extends Theme
     {
         $t = $this->t();
         $prevHtml = $prev
-            ? "<a href=\"?o=Docs&m=read&slug={$prev['slug']}$t\" class=\"blog-nav-prev\"><span><i data-lucide="chevron-left" class="inline-icon"></i> Previous</span><strong>{$prev['title']}</strong></a>"
+            ? "<a href=\"?o=Docs&m=read&slug={$prev['slug']}$t\" class=\"blog-nav-prev\"><span><i data-lucide=\"chevron-left\" class=\"inline-icon\"></i> Previous</span><strong>{$prev['title']}</strong></a>"
             : '<span></span>';
         $nextHtml = $next
-            ? "<a href=\"?o=Docs&m=read&slug={$next['slug']}$t\" class=\"blog-nav-next\"><span>Next <i data-lucide="chevron-right" class="inline-icon"></i></span><strong>{$next['title']}</strong></a>"
+            ? "<a href=\"?o=Docs&m=read&slug={$next['slug']}$t\" class=\"blog-nav-next\"><span>Next <i data-lucide=\"chevron-right\" class=\"inline-icon\"></i></span><strong>{$next['title']}</strong></a>"
             : '<span></span>';
 
         return <<<HTML

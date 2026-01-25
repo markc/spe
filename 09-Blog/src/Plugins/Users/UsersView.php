@@ -128,10 +128,10 @@ final class UsersView
             $sq = $q ? "&q=$q" : '';
             $html .= '<div class="btn-group-center mt-4">';
             if ($p['page'] > 1)
-                $html .= "<a href=\"?o=Users&page=" . ($p['page'] - 1) . "$sq$t\" class=\"btn\"><i data-lucide="chevron-left" class="inline-icon"></i> Prev</a>";
+                $html .= "<a href=\"?o=Users&page=" . ($p['page'] - 1) . "$sq$t\" class=\"btn\"><i data-lucide=\"chevron-left\" class=\"inline-icon\"></i> Prev</a>";
             $html .= "<span class=\"p-2\">Page {$p['page']} of {$p['pages']}</span>";
             if ($p['page'] < $p['pages'])
-                $html .= "<a href=\"?o=Users&page=" . ($p['page'] + 1) . "$sq$t\" class=\"btn\">Next <i data-lucide="chevron-right" class="inline-icon"></i></a>";
+                $html .= "<a href=\"?o=Users&page=" . ($p['page'] + 1) . "$sq$t\" class=\"btn\">Next <i data-lucide=\"chevron-right\" class=\"inline-icon\"></i></a>";
             $html .= '</div>';
         }
 
