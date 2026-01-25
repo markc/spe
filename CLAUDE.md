@@ -185,6 +185,14 @@ Unicode emoji instead of icon libraries:
 - Home: `🏠` About: `📋` Contact: `✉️` Blog: `📰` Posts: `📝`
 - Pages: `📄` Categories: `🏷️` Users: `👥` Docs: `📚` Auth: `🔒`
 
+## Note: ai.txt Duplication
+
+Two copies exist (GitHub raw URLs don't follow symlinks):
+- `ai.txt` - For GitHub/remote discovery
+- `docs/ai.txt` - For local/docs site
+
+Keep both in sync when updating.
+
 ## License
 
 MIT License - Copyright (C) 2015-2026 Mark Constable <mc@netserva.org>
