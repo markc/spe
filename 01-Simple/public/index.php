@@ -31,22 +31,22 @@ echo
                 |> (static fn($a) => implode(' | ', $a));
 
             return <<<HTML
-             <!DOCTYPE html>
-             <html lang="en">
-                <head>
-                    <meta charset="utf-8">
-                    <meta name="viewport" content="width=device-width,initial-scale=1">
-                    <meta name="color-scheme" content="light dark">
-                    <title>SPE::01</title>
-                    <style>body{margin:auto;width:25rem;text-align:center}a{text-decoration:none}hr{margin:0}</style>
-                </head>
-                <body>
-                    <header><h1><a href="/">« Simple PHP Example</a></h1><hr><nav>{$nav}</nav><hr></header>
-                    <main>{$this->main}</main>
-                    <footer><small><em>Copyright © 2015-2026 Mark Constable (MIT License)</em></small></footer>
-                </body>
-            </html>
-            HTML;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>SPE::01</title>
+    <style>body{margin:auto;width:25rem;text-align:center}a{text-decoration:none}hr{margin:0}</style>
+</head>
+<body>
+    <header><h1><a href="/">« Simple PHP Example</a></h1><hr><nav>{$nav}</nav><hr></header>
+    <main>{$this->main}</main>
+    <footer><small><em>Copyright © 2015-2026 Mark Constable (MIT License)</em></small></footer>
+</body>
+</html>
+HTML;
         }
     }
 ;

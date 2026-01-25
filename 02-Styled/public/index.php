@@ -72,40 +72,40 @@ HTML;
 
     private function homeContent(): string {
         return <<<'HTML'
-        <p>Welcome to the <b>Styled</b> chapter. While this page looks similar to <a href="/01-Simple/">01-Simple</a>, several key improvements have been made.</p>
+<p>Welcome to the <b>Styled</b> chapter. While this page looks similar to <a href="/01-Simple/">01-Simple</a>, several key improvements have been made.</p>
 
-        <h3 class="mt-4">What's New?</h3>
-        <ul class="mt-2" style="list-style:disc;padding-left:1.5rem">
-            <li><b>External CSS</b> — Styles moved from inline <code>&lt;style&gt;</code> to <code>base.css</code> and <code>site.css</code> files</li>
-            <li><b>External JavaScript</b> — Script moved from inline to <code>base.js</code> for theme toggle and toast notifications</li>
-            <li><b>Dark Mode Toggle</b> — Click the 🌙 button to switch between light and dark themes (persists via localStorage)</li>
-            <li><b>Toast Notifications</b> — Try the Success/Danger buttons below to see toast messages</li>
-            <li><b>Card Hover Effects</b> — Cards lift on hover with smooth shadow transitions</li>
-        </ul>
+<h3 class="mt-4">What's New?</h3>
+<ul class="mt-2" style="list-style:disc;padding-left:1.5rem">
+    <li><b>External CSS</b> — Styles moved from inline <code>&lt;style&gt;</code> to <code>base.css</code> and <code>site.css</code> files</li>
+    <li><b>External JavaScript</b> — Script moved from inline to <code>base.js</code> for theme toggle and toast notifications</li>
+    <li><b>Dark Mode Toggle</b> — Click the 🌙 button to switch between light and dark themes (persists via localStorage)</li>
+    <li><b>Toast Notifications</b> — Try the Success/Danger buttons below to see toast messages</li>
+    <li><b>Card Hover Effects</b> — Cards lift on hover with smooth shadow transitions</li>
+</ul>
 
-        <h3 class="mt-4">CSS Architecture</h3>
-        <p><code>base.css</code> provides the color-agnostic framework (layouts, components, utilities). <code>site.css</code> defines all colors and themes. This separation allows themes to be swapped by just changing <code>site.css</code>.</p>
+<h3 class="mt-4">CSS Architecture</h3>
+<p><code>base.css</code> provides the color-agnostic framework (layouts, components, utilities). <code>site.css</code> defines all colors and themes. This separation allows themes to be swapped by just changing <code>site.css</code>.</p>
 
-        <h3 class="mt-4">Same PHP Structure</h3>
-        <p>The PHP code remains a single-file anonymous class like 01-Simple. The key difference is the move to external assets, preparing for the component-based approach in later chapters.</p>
-        HTML;
+<h3 class="mt-4">Same PHP Structure</h3>
+<p>The PHP code remains a single-file anonymous class like 01-Simple. The key difference is the move to external assets, preparing for the component-based approach in later chapters.</p>
+HTML;
     }
 
     private function contactForm(): string {
         return <<<HTML
-        <p>{$this->content}</p>
-        <form class="mt-2" onsubmit="return handleContact(this)">
-            <div class="form-group"><label for="subject">Subject</label><input type="text" id="subject" name="subject" required></div>
-            <div class="form-group"><label for="message">Message</label><textarea id="message" name="message" rows="4" required></textarea></div>
-            <div class="text-right"><button type="submit" class="btn">Send Message</button></div>
-        </form>
-        <script>
-        function handleContact(form) {
-            location.href = 'mailto:mc@netserva.org?subject=' + encodeURIComponent(form.subject.value) + '&body=' + encodeURIComponent(form.message.value);
-            showToast('Opening email client...', 'success');
-            return false;
-        }
-        </script>
-        HTML;
+<p>{$this->content}</p>
+<form class="mt-2" onsubmit="return handleContact(this)">
+    <div class="form-group"><label for="subject">Subject</label><input type="text" id="subject" name="subject" required></div>
+    <div class="form-group"><label for="message">Message</label><textarea id="message" name="message" rows="4" required></textarea></div>
+    <div class="text-right"><button type="submit" class="btn">Send Message</button></div>
+</form>
+<script>
+function handleContact(form) {
+    location.href = 'mailto:mc@netserva.org?subject=' + encodeURIComponent(form.subject.value) + '&body=' + encodeURIComponent(form.message.value);
+    showToast('Opening email client...', 'success');
+    return false;
+}
+</script>
+HTML;
     }
 };
