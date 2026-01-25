@@ -32,7 +32,7 @@ final class Theme
         return <<<HTML
 <nav class="topnav">
     <button class="menu-toggle" data-sidebar="left"><i data-lucide="menu"></i></button>
-    <h1><a class="brand" href="/"><span>{$this->out['page']}</span></a></h1>
+    <h1><a class="brand" href="../"><span>{$this->out['page']}</span></a></h1>
     <button class="menu-toggle" data-sidebar="right"><i data-lucide="menu"></i></button>
 </nav>
 HTML;
@@ -68,15 +68,15 @@ HTML;
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{$this->out['doc']}</title>
-    <link rel="stylesheet" href="/base.css">
-    <link rel="stylesheet" href="/site.css">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../site.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script>(function(){var s=JSON.parse(localStorage.getItem('base-state')||'{}'),t=s.theme,c=s.scheme,h=document.documentElement;h.className='preload '+(t||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))+(c&&c!=='default'?' scheme-'+c:'');})()</script>
 </head>
 <body>
 {$body}
 <div class="overlay"></div>
-<script src="/base.js"></script>
+<script src="../base.js"></script>
 <script>if(location.search)history.replaceState(null,'',location.pathname);</script>
 {$flash}
 </body>

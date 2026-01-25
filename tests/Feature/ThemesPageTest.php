@@ -29,13 +29,13 @@ describe('Full Page Rendering', function () {
 
         expect($html)->toContain('<!DOCTYPE html>');
         expect($html)->toContain('<title>SPE::04 [Simple]</title>');
-        expect($html)->toContain('href="/site.css"');
+        expect($html)->toContain('href="../site.css"');
         expect($html)->toContain('<div class="container">');
         expect($html)->toContain('<header>');
         expect($html)->toContain('<nav class="card flex">');
         expect($html)->toContain('<main class="mt-4 mb-4">');
         expect($html)->toContain('<footer');
-        expect($html)->toContain('src="/base.js"');
+        expect($html)->toContain('src="../base.js"');
     });
 
     test('renders complete page with TopNav theme', function () {
@@ -103,7 +103,7 @@ describe('Theme-Specific Layouts', function () {
         foreach (['Simple', 'TopNav', 'SideBar'] as $theme) {
             $html = renderPage(themesIndexPath(), ['t' => $theme]);
 
-            expect($html)->toContain('<a class="brand" href="/">');
+            expect($html)->toContain('<a class="brand" href="../">');
             expect($html)->toContain('🐘 Themes PHP Example');
         }
     });

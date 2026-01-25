@@ -154,13 +154,13 @@ describe('External Assets', function () {
     test('includes external CSS stylesheet', function () {
         $html = renderPage(styledIndexPath(), []);
 
-        expect($html)->toContain('<link rel="stylesheet" href="/site.css">');
+        expect($html)->toContain('<link rel="stylesheet" href="../site.css">');
     });
 
     test('includes external JavaScript file', function () {
         $html = renderPage(styledIndexPath(), []);
 
-        expect($html)->toContain('<script src="/base.js"></script>');
+        expect($html)->toContain('<script src="../base.js"></script>');
     });
 
     test('no inline styles in head', function () {

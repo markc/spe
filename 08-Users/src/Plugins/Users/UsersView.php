@@ -86,7 +86,7 @@ final class UsersView
                     <input type="password" id="webpw" name="webpw" autocomplete="new-password">
                 </div>
                 <div class="flex justify-between">
-                    <a href="/" class="btn btn-muted">Cancel</a>
+                    <a href="../" class="btn btn-muted">Cancel</a>
                     <button type="submit" class="btn">Update Profile</button>
                 </div>
             </form>

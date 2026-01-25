@@ -111,7 +111,7 @@ describe('User Journey Scenarios', function () {
     test('header link returns to root', function () {
         $html = renderPage(simpleIndexPath(), ['m' => 'about']);
 
-        expect($html)->toContain('<a href="/">');
+        expect($html)->toContain('<a href="../">');
     });
 
 });

@@ -44,13 +44,13 @@ echo new class {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light dark">
     <title>SPE::02 {$this->title}</title>
-    <link rel="stylesheet" href="/base.css">
-    <link rel="stylesheet" href="/site.css">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../site.css">
     <script>(function(){const t=localStorage.getItem("base-theme");document.documentElement.className=t||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")})();</script>
 </head>
 <body>
 <div class="container">
-    <header class="mt-4"><h1><a class="brand" href="/">‹ <span>Styled PHP Example</span></a></h1></header>
+    <header class="mt-4"><h1><a class="brand" href="../">‹ <span>Styled PHP Example</span></a></h1></header>
     <nav class="card flex">{$nav}<span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span></nav>
     <main class="mt-4 mb-4">
         <div class="card-hover">
@@ -64,7 +64,7 @@ echo new class {
     </main>
     <footer class="text-center"><small>© 2015-2026 Mark Constable (MIT License)</small></footer>
 </div>
-<script src="/base.js"></script>
+<script src="../base.js"></script>
 </body>
 </html>
 HTML;
@@ -72,7 +72,7 @@ HTML;
 
     private function homeContent(): string {
         return <<<'HTML'
-<p>Welcome to the <b>Styled</b> chapter. While this page looks similar to <a href="/01-Simple/">01-Simple</a>, several key improvements have been made.</p>
+<p>Welcome to the <b>Styled</b> chapter. While this page looks similar to <a href="../01-Simple/">01-Simple</a>, several key improvements have been made.</p>
 
 <h3 class="mt-4">What's New?</h3>
 <ul class="mt-2" style="list-style:disc;padding-left:1.5rem">

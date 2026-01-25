@@ -24,7 +24,7 @@ describe('Full Page Rendering', function () {
 
         // Head with assets
         expect($html)->toContain('<title>SPE::03 Home</title>');
-        expect($html)->toContain('href="/site.css"');
+        expect($html)->toContain('href="../site.css"');
 
         // Body with container
         expect($html)->toContain('<div class="container">');
@@ -35,7 +35,7 @@ describe('Full Page Rendering', function () {
 
         // Plugin content
         expect($html)->toContain('Plugin Architecture');
-        expect($html)->toContain('src="/base.js"');
+        expect($html)->toContain('src="../base.js"');
     });
 
     test('renders complete About page', function () {
@@ -190,7 +190,7 @@ describe('User Journey Scenarios', function () {
     test('brand link returns to root', function () {
         $html = renderPage(pluginsIndexPath(), ['o' => 'About']);
 
-        expect($html)->toContain('<a class="brand" href="/">');
+        expect($html)->toContain('<a class="brand" href="../">');
         expect($html)->toContain('Plugins PHP Example');
     });
 

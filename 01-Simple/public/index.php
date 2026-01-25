@@ -41,7 +41,7 @@ echo
     <style>body{margin:auto;width:25rem;text-align:center}a{text-decoration:none}hr{margin:0}</style>
 </head>
 <body>
-    <header><h1><a href="/">« Simple PHP Example</a></h1><hr><nav>{$nav}</nav><hr></header>
+    <header><h1><a href="../">« Simple PHP Example</a></h1><hr><nav>{$nav}</nav><hr></header>
     <main>{$this->main}</main>
     <footer><small><em>Copyright © 2015-2026 Mark Constable (MIT License)</em></small></footer>
 </body>

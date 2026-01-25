@@ -55,18 +55,18 @@ if (!class_exists('Ctx')) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light dark">
     <title>SPE::03 {$this->in['o']}</title>
-    <link rel="stylesheet" href="/base.css">
-    <link rel="stylesheet" href="/site.css">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../site.css">
     <script>(function(){const t=localStorage.getItem("base-theme");document.documentElement.className=t||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")})();</script>
 </head>
 <body>
 <div class="container">
-    <header class="mt-4"><h1><a class="brand" href="/">‹ <span>Plugins PHP Example</span></a></h1></header>
+    <header class="mt-4"><h1><a class="brand" href="../">‹ <span>Plugins PHP Example</span></a></h1></header>
     <nav class="card flex">{$nav}<span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span></nav>
     <main class="mt-4 mb-4">{$this->out['main']}</main>
     <footer class="text-center"><small>© 2015-2026 Mark Constable (MIT License)</small></footer>
 </div>
-<script src="/base.js"></script>
+<script src="../base.js"></script>
 </body>
 </html>
 HTML;
@@ -87,7 +87,7 @@ HTML;
             return <<<'HTML'
             <div class="card">
                 <h2>Plugin Architecture</h2>
-                <p>While this page looks similar to <a href="/02-Styled/">02-Styled</a>, the underlying PHP structure has been completely reorganized to use a <b>plugin-based architecture</b>.</p>
+                <p>While this page looks similar to <a href="../02-Styled/">02-Styled</a>, the underlying PHP structure has been completely reorganized to use a <b>plugin-based architecture</b>.</p>
 
                 <h3 class="mt-4">What Changed?</h3>
                 <p>In 02-Styled, page content was stored in a simple array within an anonymous class. Here, each page is now a separate <b>Plugin class</b> that extends an abstract base class with standardized methods.</p>
