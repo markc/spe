@@ -113,8 +113,20 @@ final class Md
                     : (
                         preg_match('/^<(?:h[1-6]|ul|ol|blockquote|hr|pre|table)/', $p)
                             ? $p
+                            // Soft newlines (source line-wrapping) collapse to a
+                            // space, like CommonMark — only a deliberate hard break
+                            // (line ending in "\" or two+ trailing spaces) becomes
+                            // a <br>. Keeps the JS md.js twin's rendering identical.
                             : '<p>'
-                            . preg_replace('/\n/', '<br>', $p)
+                            . str_replace(
+                                "\x06",
+                                '<br>',
+                                preg_replace(
+                                    '/\n/',
+                                    ' ',
+                                    preg_replace('/(?: {2,}|\\\\)\n/', "\x06", $p),
+                                ),
+                            )
                             . '</p>'
                     )
             ),
