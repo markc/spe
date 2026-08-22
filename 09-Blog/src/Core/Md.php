@@ -19,7 +19,8 @@ final class Md
     public static function render(string $markdown): string
     {
         $code = [];
-        $escaped = htmlspecialchars(str_replace("\r\n", "\n", $markdown));
+        // \x1A is our placeholder marker; strip any from the input so it cannot collide.
+        $escaped = htmlspecialchars(str_replace(["\r\n", "\x1A"], ["\n", ''], $markdown));
         $stashed = self::stash($escaped, $code);   // pull code out into placeholders
         return strtr(self::blocks($stashed), $code); // parse, then restore the code
     }

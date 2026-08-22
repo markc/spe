@@ -10,7 +10,9 @@
         }
     ],
     "require": {
-        "php": "^8.5"
+        "php": "^8.5",
+        "ext-mbstring": "*",
+        "ext-pdo_sqlite": "*"
     },
     "autoload": {
         "psr-4": {

@@ -16,8 +16,11 @@ final class PostsModel extends Plugin
     #[\Override]
     public function read(): array
     {
-        $post = $this->find($this->ctx->in['i']);
-        return $post ?: ['title' => 'Not found', 'body' => 'There is no such post.'];
+        if ($post = $this->find($this->ctx->in['i'])) {
+            return $post;
+        }
+        http_response_code(404);
+        return ['title' => 'Not found', 'body' => 'There is no such post.'];
     }
 
     #[\Override]

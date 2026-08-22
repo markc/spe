@@ -16,17 +16,23 @@ final class Chapter
     private $proc;
     private array $cookies = [];
 
+    public readonly string $db;
+
     private function __construct(public readonly string $dir, public readonly int $port)
     {
         $root = dirname(__DIR__, 2);
-        // Start every chapter from a clean database so tests are repeatable.
-        if (is_file($db = "$root/$dir/data/spe.db")) {
-            unlink($db);
+        // Use a throwaway database (via the SPE_DB env var the chapter reads), so the
+        // suite is repeatable and never touches a reader's real chapter database.
+        $this->db = sys_get_temp_dir() . "/spe-test-$dir.db";
+        if (is_file($this->db)) {
+            unlink($this->db);
         }
         $this->proc = proc_open(
             ['php', '-S', "127.0.0.1:$port", '-t', "$root/$dir/public"],
             [1 => ['file', '/dev/null', 'w'], 2 => ['file', '/dev/null', 'w']],
             $pipes,
+            null,
+            [...getenv(), 'SPE_DB' => $this->db],
         );
         set_error_handler(static fn(): bool => true);
         try {
@@ -52,6 +58,9 @@ final class Chapter
     {
         foreach (self::$running as $c) {
             proc_terminate($c->proc);
+            if (is_file($c->db)) {
+                unlink($c->db);
+            }
         }
         self::$running = [];
     }

@@ -23,7 +23,11 @@ final class UsersModel extends Plugin
     #[\Override]
     public function read(): array
     {
-        return $this->find($this->ctx->in['i']) ?: ['title' => 'Not found', 'body' => 'There is no such user.'];
+        if ($user = $this->find($this->ctx->in['i'])) {
+            return $user;
+        }
+        http_response_code(404);
+        return ['title' => 'Not found', 'body' => 'There is no such user.'];
     }
 
     #[\Override]
@@ -48,6 +52,7 @@ final class UsersModel extends Plugin
     {
         $user = $this->find($this->ctx->in['i']);
         if (!$user) {
+            http_response_code(404);
             return ['title' => 'Not found', 'body' => 'There is no such user.'];
         }
         if ($p = $this->ctx->post()) {
@@ -55,7 +60,7 @@ final class UsersModel extends Plugin
             if (($p['password'] ?? '') !== '') {
                 $fields['password'] = password_hash((string) $p['password'], PASSWORD_DEFAULT);
             }
-            $this->ctx->db->update('users', $fields, 'id = :id', ['id' => $user['id']]);
+            (void) $this->ctx->db->update('users', $fields, 'id = :id', ['id' => $user['id']]);
             $this->ctx->flash(Flash::Success, 'User updated.');
             $this->redirect("?o=Users&m=read&i={$user['id']}");
         }
