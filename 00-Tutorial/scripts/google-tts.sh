@@ -17,14 +17,10 @@ CONFIG_DIR="$HOME/.config/google"
 SERVICE_ACCOUNT="$CONFIG_DIR/tts-service-account.json"
 TTS_API="https://texttospeech.googleapis.com/v1/text:synthesize"
 
-# Default voice (Neural2 - high quality, natural sounding)
-DEFAULT_VOICE="en-US-Neural2-J"  # Male, natural
-# Other good options:
-#   en-US-Neural2-A (Male)
-#   en-US-Neural2-C (Female)
-#   en-US-Neural2-D (Male)
-#   en-US-Neural2-F (Female)
-#   en-US-Neural2-J (Male, recommended for tutorials)
+# Default voice (Chirp 3 HD - most natural; chosen for the SPE series)
+DEFAULT_VOICE="en-US-Chirp3-HD-Charon"  # Male, warm/natural
+# Other Chirp 3 HD options: en-US-Chirp3-HD-{Puck,Fenrir,Aoede,Kore,Leda,Orus,Zephyr}
+# Neural2 fallback (better acronym/lexicon control): en-US-Neural2-J
 
 # Colors
 RED='\033[0;31m'
