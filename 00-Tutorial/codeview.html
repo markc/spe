@@ -10,18 +10,20 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <style>
+  /* Normal code-editor sizes for a ~1280-wide page; the browser's own 120%
+     zoom (Zen profile) is the ONLY zoom applied on top. */
   :root { color-scheme: dark; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { background: #0d1117; }
-  body { font: 40px/1.5 "JetBrains Mono", "DejaVu Sans Mono", monospace; padding: 64px 96px; }
-  .bar { color: #8b949e; font-size: 34px; margin-bottom: 32px; display: flex; gap: 20px; align-items: center; }
-  .dot { width: 20px; height: 20px; border-radius: 50%; background: #ff5f56; box-shadow: 36px 0 #ffbd2e, 72px 0 #27c93f; margin-right: 72px; }
+  body { font: 16px/1.6 "JetBrains Mono", "DejaVu Sans Mono", monospace; padding: 28px 44px; }
+  .bar { color: #8b949e; font-size: 14px; margin-bottom: 18px; display: flex; gap: 10px; align-items: center; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; background: #ff5f56; box-shadow: 18px 0 #ffbd2e, 36px 0 #27c93f; margin-right: 40px; }
   .code { display: table; border-collapse: collapse; width: 100%; }
   .line { display: table-row; }
-  .ln { display: table-cell; text-align: right; color: #6e7681; user-select: none; padding-right: 40px; white-space: nowrap; }
+  .ln { display: table-cell; text-align: right; color: #6e7681; user-select: none; padding-right: 22px; white-space: nowrap; }
   .src { display: table-cell; white-space: pre; color: #c9d1d9; }
   .line.hl { background: #1f2937; }
-  .line.hl .src { box-shadow: inset 6px 0 #ffbd2e; }
+  .line.hl .src { box-shadow: inset 4px 0 #ffbd2e; }
   .line.hl .ln { color: #ffbd2e; }
 </style>
 </head>

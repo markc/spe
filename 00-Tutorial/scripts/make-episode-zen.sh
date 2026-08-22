@@ -25,6 +25,18 @@ And this is the one security habit worth carrying with you from the very first c
 That is the entire engine in just fifty-seven lines, and every chapter from here builds on it by adding exactly one new idea, beginning with the next one, where we give the very same page a proper look with shared styling, dark mode and an application shell.
 EOF
 
+# Speak-as rules: keep narration readable but fix how Chirp says dev terms
+# (PHP -> the peso currency; 404 -> "four hundred and four"). Applied only to
+# the text sent to TTS, never to the stored script.
+speakable() {
+  echo "$1" | sed -E '
+    s/PHP 8\.5/P H P eight point five/g;
+    s/PHP 8\.4/P H P eight point four/g;
+    s/\bPHP\b/P H P/g;
+    s/\b404\b/four oh four/g;
+    s/\b200\b/two hundred/g'
+}
+
 if [ -f "$DIR/durations.json" ] && [ "${RESYNTH:-0}" != 1 ]; then
   echo "reusing cached narration (RESYNTH=1 to redo)"
 else
@@ -32,7 +44,7 @@ else
   DURS="["
   for i in "${!NARR[@]}"; do
     wav="$DIR/aud/$(printf '%02d' "$i").wav"
-    bash "$TTS" "${NARR[$i]}" "$wav" >/dev/null
+    bash "$TTS" "$(speakable "${NARR[$i]}")" "$wav" >/dev/null
     d=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$wav")
     DURS="$DURS$d,"
     echo "  scene $i ${d}s"
