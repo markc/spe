@@ -110,3 +110,6 @@ Thumbs.db
 # ===================
 all.php
 public/php_errors.log
+
+# npm lockfile for the capture tooling (project uses bun.lock)
+00-Tutorial/package-lock.json
