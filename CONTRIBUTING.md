@@ -94,20 +94,19 @@ Each chapter builds on the previous:
 | 08-Auth | User CRUDL |
 | 09-Blog | Full CMS |
 
-### Directory Layout (05-10)
+### Directory Layout (05-09)
 
 ```
 XX-Chapter/
-├── public/index.php
-└── src/
-    ├── Core/           # Framework classes
-    ├── Plugins/        # Feature plugins
-    │   └── Name/
-    │       ├── NameModel.php
-    │       ├── NameView.php
-    │       └── meta.json
-    └── Themes/         # Layout themes
+├── public/index.php    # require ../../vendor/autoload.php; echo new Init(new Ctx);
+├── src/
+│   ├── Core/           # Ctx, Init, Plugin, View, Theme (+ Db, enums as introduced)
+│   └── Plugins/Name/   # NameModel.php (data), NameView.php (HTML)
+├── schema.sql          # created + seeded on first run (07+)
+└── data/               # SQLite file, gitignored
 ```
+
+Chapters 01–04 are a single `public/index.php` each. See [docs/CONVENTIONS.md](docs/CONVENTIONS.md) for the full rules.
 
 ## Making Changes
 

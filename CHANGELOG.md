@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Rebuilt as a coherent nine-chapter tutorial (01–09).** Each chapter is now a strict diff of the previous one following `docs/CONVENTIONS.md`, with one new idea per chapter and stable class names throughout. Chapters 04 and 08 renamed to `04-Views` and `08-Auth`.
+- Every chapter README rewritten from the actual code (opening · what changed · walkthrough · PHP features · security · try it · next); top-level `README.md`, `CONTEXT.md` and `ai.txt` brought in line.
+- CI now runs on PHP 8.5 and actually runs Mago and Pest; added `chapters.json` manifest + `bin/check-chapters.php`, run by `composer check` and CI.
+- Tests rebuilt as a per-chapter HTTP suite (each chapter on its own built-in server), replacing the old suite that skipped all chapter-04 tests on class-name collisions.
+
+### Added
+- `docs/CONVENTIONS.md` — the contract every chapter follows.
+- 09-Blog: one `posts` table with a `Type` enum, a safe Markdown renderer, `Post` property hooks, many-to-many tags, pagination, and `bin/seed-docs.php` to serve this tutorial as docs.
+- Security baseline taught as syllabus: validate-input/escape-output, CSRF-checked POST-only writes, prepared statements, hashed passwords, `session_regenerate_id`, rotating hashed remember-me.
+
+### Removed
+- `10-Htmx` (was dead code — its entry point loaded chapter 09 and four views had parse errors) and `11-HCP` (a hosting-ops product, not a tutorial chapter).
+- The shared root `app/` library — every chapter is now self-contained; the legacy `SPE\App` code (including the flagged SQL-sort and host-header issues) is gone.
+- Root-router path traversal; duplicate `QueryType` enum.
+
+
 ## [1.0.2] - 2024-12-15
 
 ### Added

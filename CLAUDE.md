@@ -4,195 +4,109 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Project Overview
 
-**SPE (Simple PHP Engine)** is a progressive PHP 8.5 micro-framework tutorial in 10 chapters (00-10). Each chapter builds on the previous, demonstrating modern PHP features and design patterns.
+**SPE (Simple PHP Engine)** is a progressive PHP 8.5 tutorial in nine chapters (01–09). It builds one small web application nine times, each chapter adding exactly one idea, to teach plain modern PHP as a framework-free alternative to Laravel/Symfony for small-to-moderate projects — readable by humans and AI agents alike.
 
-**For tutorial video generation**, see [00-Tutorial/CLAUDE.md](00-Tutorial/CLAUDE.md).
+**The authoritative rules are in [docs/CONVENTIONS.md](docs/CONVENTIONS.md).** The machine-readable chapter list is `chapters.json`, verified against the tree by `bin/check-chapters.php`. `00-Tutorial/` is video-generation tooling, not a chapter.
 
 ## Requirements
 
-- PHP 8.5+ (for pipe operator `|>`)
-- Composer (for chapters 05-10)
+- PHP 8.5+ (pipe operator `|>`, property hooks, `#[\NoDiscard]`, URI extension)
+- Composer (chapters 05–09)
+- `pdo_sqlite` (chapters 07–09)
 
-## Quick Reference
+## Quick reference
 
 ```bash
-# Run from root (serves all chapters)
-php -S localhost:8000
-
-# Run specific chapter (05-10)
-cd 09-Blog/public && php -S localhost:8080
-
-# Install dependencies
 composer install
+
+# Serve everything through the root router:
+php -S localhost:8000 index.php          # http://localhost:8000/
+
+# Or one chapter standalone:
+php -S localhost:8009 -t 09-Blog/public
+
+composer check      # bin/check-chapters.php + mago lint + pest
+composer test       # pest
+composer lint       # mago
+composer format     # mago format
 ```
 
-## PHP Features by Version
+Later chapters seed a login: `admin@example.com` / `admin`, `user@example.com` / `user`.
 
-| Version | Features Used |
-|---------|---------------|
-| PHP 8.5 | Pipe operator `\|>` with first-class callables |
-| PHP 8.4 | Asymmetric visibility `public private(set)`, `new` without parentheses |
-| PHP 8.3 | Typed constants, `#[\Override]` attribute |
-| PHP 8.2 | Readonly classes |
-| PHP 8.1 | Enums, first-class callables `fn(...)` |
+## The request contract (chapters 03+)
+
+```
+?o=Blog&m=read&i=1&x=json
+o = plugin      validated /^[A-Z][A-Za-z]*$/ and must be a Plugin subclass
+m = method      create | read | update | delete | list
+i = id          integer
+x = export      '' (HTML) | json
+```
+
+Chapter 09 also validates `page` (int) and `tag` (slug). Everything is validated once in `Ctx`.
+
+### Request flow
+
+```
+public/index.php → new Init(new Ctx)
+Ctx   validates the request; opens the DB and restores the user in later chapters
+Init  resolves {o}Model, calls ->{m}(), passes the data to {o}View->{m}()
+Theme wraps the view output in the HTML document   (Init emits JSON when x=json)
+```
 
 ## Architecture
 
-### URL Parameters
-```
-?o=Home     - Plugin/Object name
-?m=list     - Method (create, read, update, delete, list)
-?t=TopNav   - Theme (Simple, TopNav, SideBar)
-?id=1       - Record ID for CRUD operations
-```
+### Directory structure (05–09)
 
-### Request Flow
-```
-index.php → Init(Ctx) → {Plugin}Model→method() → {Plugin}View→method() → HTML
-```
-
-### Directory Structure
 ```
 XX-Chapter/
-├── public/index.php       # Entry point (all chapters)
-└── src/                   # (chapters 05-10 only)
-    ├── Core/              # Init, Ctx, Db, Plugin, Theme, Util
-    ├── Plugins/{Name}/    # {Name}Model.php, {Name}View.php, meta.json
-    └── Themes/            # Simple.php, TopNav.php, SideBar.php
+├── public/index.php     # require ../../vendor/autoload.php; echo new Init(new Ctx);
+├── src/Core/            # Ctx, Init, Plugin, View, Theme (+ Db, enums, value objects as introduced)
+├── src/Plugins/{Name}/  # {Name}Model.php (returns data), {Name}View.php (returns HTML)
+├── schema.sql           # created + seeded on first run (07+)
+└── data/                # SQLite file, gitignored
 ```
 
-### Namespacing (chapters 05-10)
+Chapters 01–04 are a single `public/index.php` each. PSR-4 namespace per chapter: `SPE\{Chapter}\` (e.g. `SPE\Blog\Core\Init`). Each chapter is **self-contained** — there is no shared root PHP library; duplication between chapters is intentional, because they are snapshots.
 
-PSR-4 namespace: `SPE\{Chapter}\` (e.g., `SPE\Blog\Core\Init`)
+### Core classes (introduced once, kept thereafter)
 
-## Key Code Patterns
+`Ctx` (validated request; gains session/DB/user), `Init` (front controller), `Plugin` (model base, CRUDL), `View` (HTML base, owns `e()`), `Theme` (document), `Db` (PDO wrapper), `QueryType`/`Role`/`Type` (enums), `User`/`Post` (readonly / property-hook value objects), `Md` (safe Markdown), `Flash` (toast enum).
 
-```php
-<?php declare(strict_types=1);
-// Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
+## Chapter progression
 
-// PHP 8.5 Pipe operator
-$value = $input |> trim(...) |> strtolower(...);
+| # | Name | Idea | PHP features |
+|---|------|------|--------------|
+| 01 | Simple | request → page (anonymous class) | pipe `\|>`, typed const, `private(set)`, first-class callables |
+| 02 | Styled | presentation: app shell, dark mode, toasts | `match`, heredoc/nowdoc |
+| 03 | Plugins | request contract + CRUDL plugins | readonly classes, `new X()->m()`, `#[\Override]` |
+| 04 | Views | model/view/theme; escape at output | `View::e()`, base-view fallback |
+| 05 | Autoload | PSR-4 files via Composer | namespaces, `strict_types` |
+| 06 | Session | sessions, flash, CSRF, POST-only writes | enums with methods, secure cookies, PRG |
+| 07 | PDO | SQLite, prepared statements, Posts CRUDL | backed enums, `#[\NoDiscard]` |
+| 08 | Auth | users, roles, login/logout, remember-me | enum ACL, readonly value objects, `?->` |
+| 09 | Blog | Markdown content engine: posts + docs, tags, pagination | property hooks, `array_first/last`, URI ext |
 
-// PHP 8.4 Asymmetric visibility
-public private(set) string $page;
+## Key rules (from CONVENTIONS.md)
 
-// PHP 8.3 Typed constants
-private const string DEFAULT = 'home';
+- **One idea per chapter; each chapter is a strict diff of the previous.** `diff -r 05-Autoload 06-Session` shows only the session idea. Change the earliest chapter an idea belongs to, then carry the identical change forward.
+- **Validate input, escape output.** `Ctx` constrains each parameter to an allow-list; models carry raw data; views escape every dynamic value with `View::e()` (`htmlspecialchars` + `ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5`). The only unescaped output is app-produced HTML, named `$html` (chapter 09 markdown).
+- **Writes only on a CSRF-checked POST** via `Ctx::post()`; delete and logout are POST. SQL is always prepared; identifiers are never from input. Passwords hashed; session id regenerated on login/logout.
+- **Tight code, comprehensive docs.** Source carries almost no comments; the explanation lives in each chapter's README. Prefer shortening the code and lengthening the README.
+- **Stable names, HTML in heredocs (never concatenated), Lucide icons (pinned), no CSS framework.**
 
-// PHP 8.3 Override attribute
-#[\Override] public function list(): array { ... }
+## Documentation
 
-// PHP 8.2 Readonly class
-final readonly class PluginMeta { ... }
+`docs/` is the GitHub Pages source and the single source of truth. The root `README.md` and each `XX-Chapter/README.md` are symlinks into `docs/`. Each chapter README follows a fixed section order (opening · what changed · walkthrough · PHP features · security · try it · next); see `.claude/runbooks/documentation-style-guide.md`. After changing a chapter, update its README and `chapters.json`, then run `composer check`.
 
-// PHP 8.1 Enum
-enum QueryType { case All; case One; case Column; }
-```
+## Styling
 
-## Chapter Progression
+`base.css` (colour-agnostic structure) + `site.css` (all colours, OKLCH, light/dark + four schemes) + `base.js` (theme, sidebars, toasts). Shared by every chapter so the look stays fixed while the code evolves. Referenced by relative path (`../base.css`).
 
-| # | Name | Key Addition |
-|---|------|--------------|
-| 00 | Tutorial | Video generation pipeline (Playwright + Piper TTS) |
-| 01 | Simple | Single-file anonymous class, pipe operator |
-| 02 | Styled | Custom CSS, dark mode, toast notifications |
-| 03 | Plugins | Plugin architecture, CRUDL pattern |
-| 04 | Themes | Model/View separation, multiple layouts |
-| 05 | Autoload | PSR-4 autoloading via Composer |
-| 06 | Session | PHP session management |
-| 07 | PDO | SQLite database, QueryType enum |
-| 08 | Users | User management CRUDL |
-| 09 | Blog | Full CMS: Auth, Blog, Pages, Categories, Docs |
-| 10 | YouTube | YouTube Manager: OAuth, API integration |
+## ai.txt
 
-## Databases (07-10)
-
-- `blog.db` - Posts (type: post/page/doc), Categories, junction table
-- `users.db` - Authentication and user profiles
-
-## Shared Assets & Documentation
-
-**Symlink strategy** for single source of truth:
-
-```
-docs/                      # Real files (GitHub Pages source)
-├── README.md              # Project README
-├── base.css               # Generic CSS framework (layouts, components)
-├── site.css               # SPE-specific branding (colors, fonts)
-├── base.js                # Generic JS (theme toggle, toast, animations)
-├── md.js                  # Markdown rendering
-└── */README.md            # Chapter docs
-
-/README.md                 → symlink → docs/README.md
-/base.css                  → symlink → docs/base.css
-/site.css                  → symlink → docs/site.css
-/base.js                   → symlink → docs/base.js
-/01-Simple/README.md       → symlink → ../docs/01-Simple/README.md
-```
-
-- **Edit docs/** - changes appear in repo view AND GitHub Pages
-- **GitHub follows symlinks** for README display
-- **Local symlinks work** on Linux/macOS
-
-All chapters 02-10 reference shared assets via absolute paths (`/base.css`, `/site.css`, `/base.js`)
-
-### CSS Architecture (base.css + site.css)
-
-**Design Principle:** base.css is color-agnostic (never defines colors). site.css defines ALL colors. This separation allows base.min.css to be cached indefinitely while themes are swapped by changing site.css.
-
-**Mobile-First Responsive:** Base styles are mobile, with progressive enhancement via `min-width` breakpoints:
-- **Mobile** (0-767px): Single column, stacked flex, sidebar off-canvas, cards without border/shadow
-- **Tablet** (768px+): Flex row, sidebar visible, `.desktop-only` shown, 2-col grids, cards gain border/shadow
-- **Desktop** (1280px+): 3-col and 4-col grids
-
-**base.css** - Color-agnostic framework (~1700 lines):
-- CSS cascade layers: `@layer reset, tokens, base, components, utilities, animations`
-- Structural tokens only: typography, spacing, radius, shadows, transitions, z-index
-- Layouts: `.container`, `.topnav`, `.sidebar-layout`, `.sidebar`
-- Components: `.card`, `.btn`, `.tag`, `.dropdown`, `.toast`, `.prose`, `.glass`
-- Content: `.article-*`, `.data-table`, `.list-item-*`, `.pagination`
-- Utilities: `.flex`, `.flex-row`, `.flex-col`, grid, spacing, text
-- Bootstrap aliases: `d-flex`, `d-none`, `align-items-center`, `justify-content-between`, etc.
-- Animations: fade, scale, reveal, hover effects
-- Accessibility: `prefers-reduced-motion`, `prefers-contrast`, `:focus-visible`
-
-**site.css** - Complete theme definition (~168 lines):
-- Light theme colors in `:root` (--bg-*, --fg-*, --accent*, --border*, --success*, --danger*, --warning*)
-- Glass morphism tokens: `--glass`, `--glass-border`, `--accent-glow`
-- Dark theme via `@media (prefers-color-scheme: dark)`
-- Explicit `html.light` and `html.dark` for toggle overrides
-- Shadow overrides for dark mode (higher opacity)
-- Brand class: `.btn-php`
-
-**Creating new themes:**
-```bash
-cp docs/site.css docs/themes/ocean.css  # Copy and modify colors
-```
-```html
-<link rel="stylesheet" href="/base.min.css">
-<link rel="stylesheet" href="/themes/ocean.css">
-```
-
-**Inline theme script** (in `<head>` to prevent FOUC):
-```html
-<script>(function(){const t=localStorage.getItem("base-theme");document.documentElement.className=t||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")})();</script>
-```
-
-## Icons
-
-Unicode emoji instead of icon libraries:
-- Home: `🏠` About: `📋` Contact: `✉️` Blog: `📰` Posts: `📝`
-- Pages: `📄` Categories: `🏷️` Users: `👥` Docs: `📚` Auth: `🔒`
-
-## Note: ai.txt Duplication
-
-Two copies exist (GitHub raw URLs don't follow symlinks):
-- `ai.txt` - For GitHub/remote discovery
-- `docs/ai.txt` - For local/docs site
-
-Keep both in sync when updating.
+Two copies (`ai.txt` and `docs/ai.txt`) because GitHub raw URLs don't follow symlinks — keep them in sync.
 
 ## License
 
-MIT License - Copyright (C) 2015-2026 Mark Constable <mc@netserva.org>
+MIT — Copyright (C) 2015-2026 Mark Constable <mc@netserva.org>
