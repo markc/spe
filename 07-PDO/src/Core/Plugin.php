@@ -7,9 +7,21 @@ abstract class Plugin
 {
     public function __construct(protected Ctx $ctx) {}
 
-    public function create(): array { return ['head' => 'Create', 'main' => 'Not implemented']; }
-    public function read(): array { return ['head' => 'Read', 'main' => 'Not implemented']; }
-    public function update(): array { return ['head' => 'Update', 'main' => 'Not implemented']; }
-    public function delete(): array { return ['head' => 'Delete', 'main' => 'Not implemented']; }
-    public function list(): array { return ['head' => 'List', 'main' => 'Not implemented']; }
+    /** @return array{title: string, body: string} */
+    public function create(): array { return $this->todo('create'); }
+    public function read(): array { return $this->todo('read'); }
+    public function update(): array { return $this->todo('update'); }
+    public function delete(): array { return $this->todo('delete'); }
+    public function list(): array { return $this->todo('list'); }
+
+    protected function redirect(string $query): never
+    {
+        header("Location: $query");
+        exit;
+    }
+
+    private function todo(string $m): array
+    {
+        return ['title' => ucfirst($m), 'body' => static::class . "::$m() is not implemented."];
+    }
 }

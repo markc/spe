@@ -127,12 +127,18 @@
             "dir": "07-PDO",
             "idea": "Persistence: SQLite via PDO, a schema, prepared statements, a real CRUDL plugin",
             "entry": "07-PDO/public/index.php",
-            "adds": [],
+            "adds": [
+                "src/Core/Db.php",
+                "src/Core/QueryType.php",
+                "schema.sql",
+                "src/Plugins/Posts/PostsModel.php",
+                "src/Plugins/Posts/PostsView.php"
+            ],
             "php": [
-                "backed enums",
+                "backed and pure enums",
                 "#[\\NoDiscard]",
                 "match on enum cases",
-                "PDO typed binding"
+                "PDO prepared statements with typed binding"
             ],
             "visible_change": true,
             "run": "php -S localhost:8007 -t 07-PDO/public",

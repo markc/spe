@@ -5,15 +5,28 @@ namespace SPE\PDO\Core;
 
 class View
 {
-    public function __construct(protected Ctx $ctx, protected array $ary) {}
+    public function __construct(protected Ctx $ctx, protected array $data) {}
 
-    public function list(): string
+    public function create(): string { return $this->card(); }
+    public function read(): string { return $this->card(); }
+    public function update(): string { return $this->card(); }
+    public function delete(): string { return $this->card(); }
+    public function list(): string { return $this->card(); }
+
+    protected function card(): string
     {
         return <<<HTML
-<div class="card">
-    <h2>{$this->ary['head']}</h2>
-    <p>{$this->ary['main']}</p>
-</div>
+<div class="card"><h2>{$this->e($this->data['title'])}</h2><p>{$this->e($this->data['body'])}</p></div>
 HTML;
+    }
+
+    protected function csrf(): string
+    {
+        return '<input type="hidden" name="csrf" value="' . $this->e($this->ctx->token) . '">';
+    }
+
+    protected function e(string|int|float|null $v): string
+    {
+        return htmlspecialchars((string) $v, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5, 'UTF-8');
     }
 }

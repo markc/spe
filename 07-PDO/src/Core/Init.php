@@ -3,44 +3,32 @@
 
 namespace SPE\PDO\Core;
 
-use SPE\App\QueryType;
-
 final readonly class Init
 {
-    private const string NS = 'SPE\\PDO\\';
+    private const string PLUGINS = 'SPE\\PDO\\Plugins\\';
+
     private array $out;
 
     public function __construct(private Ctx $ctx)
     {
         [$o, $m] = [$ctx->in['o'], $ctx->in['m']];
-
-        // &edit flag without explicit method implies list
-        if (isset($_GET['edit']) && !isset($_REQUEST['m'])) {
-            $m = 'list';
-        }
-
-        // Blog plugin or page from database
-        if ($o === 'Blog') {
-            $model = self::NS . "Plugins\\Blog\\BlogModel";
-            $ary = class_exists($model) ? new $model($ctx)->$m() : [];
-            $view = self::NS . "Plugins\\Blog\\BlogView";
-            $main = class_exists($view) ? new $view($ctx, $ary)->$m() : '';
+        [$model, $view] = [self::PLUGINS . "$o\\{$o}Model", self::PLUGINS . "$o\\{$o}View"];
+        if (is_subclass_of($model, Plugin::class)) {
+            $data = new $model($ctx)->$m();
         } else {
-            // Load page from database
-            $ary = $ctx->db->read('posts', '*', "slug=:s AND type='page'", ['s' => strtolower($o)], QueryType::One)
-                ?: [];
-            $view = self::NS . "Plugins\\Blog\\BlogView";
-            $main = $ary ? new $view($ctx, $ary)->page() : '<div class="card"><p>Page not found.</p></div>';
+            http_response_code(404);
+            $data = ['title' => 'Not found', 'body' => 'There is no such plugin.'];
         }
-
-        $this->out = [...$ctx->out, ...$ary, 'main' => $main];
+        $view = is_a($view, View::class, true) ? $view : View::class;
+        $this->out = [...$ctx->out, ...$data, 'main' => new $view($ctx, $data)->$m()];
     }
 
     public function __toString(): string
     {
-        return match ($this->ctx->in['x']) {
-            'json' => (header('Content-Type: application/json') ?: '') . json_encode($this->out),
-            default => new Theme($this->ctx, $this->out)->render(),
-        };
+        if ($this->ctx->in['x'] === 'json') {
+            header('Content-Type: application/json');
+            return json_encode($this->out, JSON_THROW_ON_ERROR);
+        }
+        return new Theme($this->ctx, $this->out)->render();
     }
 }
