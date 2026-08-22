@@ -14,9 +14,9 @@ mkdirSync(OUT, { recursive: true });
 
 const pause = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// Lay the page out at a VWxVH css viewport and paint it at deviceScaleFactor DSF,
-// so the video is captured at (VW*DSF)x(VH*DSF) device pixels — razor sharp.
-// Default = 4K: a 1280-wide browser at 3x -> 3840x2160. Override via env.
+// Lay out at a VWxVH css viewport, painted at deviceScaleFactor DSF, so the
+// video is (VW*DSF)x(VH*DSF) device pixels. Default = 1280x720 at 3x = true 4K,
+// which fills the frame for the full-app-shell chapters (02+).
 const VW = Number(process.env.VW || 1280);
 const VH = Number(process.env.VH || 720);
 const DSF = Number(process.env.DSF || 3);
