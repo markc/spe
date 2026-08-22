@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.2] - 2024-12-15
 
 ### Added
-- Chapter 00 introductory video tutorial ([YouTube](https://youtu.be/Pch633WeTHU))
+- Chapter 00 introductory video tutorial ([YouTube](https://www.youtube.com/@NetServa))
 - `00-Tutorial/tutorial.txt` narration script (23 segments, ~4:36 duration)
 - `00-Tutorial/scripts/youtube-upload.sh` for automated YouTube uploads with OAuth
 - `00-Tutorial/youtube-metadata.json` template for video metadata
