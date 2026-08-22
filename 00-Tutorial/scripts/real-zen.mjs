@@ -35,8 +35,11 @@ const scenes = [
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// The real binary, not the /usr/bin/zen-browser wrapper script (geckodriver
+// requires an actual Firefox-family executable next to application.ini).
+const ZEN_BIN = process.env.ZEN_BIN || '/opt/zen-browser-bin/zen-bin';
 const opts = new firefox.Options();
-opts.setBinary('/usr/bin/zen-browser');
+opts.setBinary(ZEN_BIN);
 opts.addArguments('-profile', PROFILE);   // the user's real profile (its own zoom + chrome)
 opts.setPreference('browser.aboutConfig.showWarning', false);
 
