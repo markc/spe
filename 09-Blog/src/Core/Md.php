@@ -7,8 +7,10 @@ use Uri\Rfc3986\Uri;
 
 /**
  * A small, safe Markdown renderer built as a pipe of pure steps. The input is
- * escaped first, so anything not turned into a tag here is shown as literal text,
- * and link/image targets are checked against an allowed set of URL schemes.
+ * escaped first, so anything not turned into a tag here is shown as literal text.
+ * Code — fenced blocks and inline spans — is pulled out into placeholders before
+ * anything else runs, so it is never re-parsed as Markdown, then restored at the
+ * end. Link and image targets are checked against an allowed set of URL schemes.
  */
 final class Md
 {
@@ -16,17 +18,25 @@ final class Md
 
     public static function render(string $markdown): string
     {
-        return $markdown
-            |> (static fn(string $s) => str_replace("\r\n", "\n", $s))
-            |> htmlspecialchars(...)
-            |> self::codeBlocks(...)
-            |> self::blocks(...);
+        $code = [];
+        $escaped = htmlspecialchars(str_replace("\r\n", "\n", $markdown));
+        $stashed = self::stash($escaped, $code);   // pull code out into placeholders
+        return strtr(self::blocks($stashed), $code); // parse, then restore the code
     }
 
-    /** Fenced ```code``` first, so nothing inside is treated as Markdown. */
-    private static function codeBlocks(string $s): string
+    /** Replace fenced blocks and inline code with opaque tokens, banking their HTML. */
+    private static function stash(string $s, array &$code): string
     {
-        return preg_replace_callback('/^```\n(.*?)\n```$/ms', static fn(array $m) => '<pre><code>' . $m[1] . '</code></pre>', $s);
+        $s = preg_replace_callback('/```\n(.*?)\n```/s', static function (array $m) use (&$code) {
+            $token = "\x1A" . count($code) . "\x1A";
+            $code[$token] = '<pre><code>' . $m[1] . '</code></pre>';
+            return "\n\n$token\n\n";
+        }, $s);
+        return preg_replace_callback('/`([^`]+)`/', static function (array $m) use (&$code) {
+            $token = "\x1A" . count($code) . "\x1A";
+            $code[$token] = '<code>' . $m[1] . '</code>';
+            return $token;
+        }, $s);
     }
 
     private static function blocks(string $s): string
@@ -34,8 +44,8 @@ final class Md
         $html = [];
         foreach (preg_split('/\n{2,}/', trim($s)) as $block) {
             $block = trim($block);
-            if ($block === '' || str_starts_with($block, '<pre>')) {
-                $html[] = $block;
+            if ($block === '' || preg_match('/^\x1A\d+\x1A$/', $block)) {
+                $html[] = $block;                       // blank, or a banked code block
             } elseif (preg_match('/^#{1,3} /', $block)) {
                 $level = strlen($block) - strlen(ltrim($block, '#'));
                 $html[] = "<h$level>" . self::inline(ltrim(substr($block, $level))) . "</h$level>";
@@ -61,7 +71,6 @@ final class Md
 
     private static function inline(string $s): string
     {
-        $s = preg_replace('/`([^`]+)`/', '<code>$1</code>', $s);
         $s = preg_replace('/\*\*([^*]+)\*\*/', '<strong>$1</strong>', $s);
         $s = preg_replace('/\*([^*]+)\*/', '<em>$1</em>', $s);
         $s = preg_replace_callback('/!\[([^\]]*)\]\(([^)]+)\)/', static fn(array $m) => self::image($m[1], $m[2]), $s);

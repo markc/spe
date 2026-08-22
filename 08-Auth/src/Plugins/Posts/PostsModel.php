@@ -42,10 +42,11 @@ final class PostsModel extends Plugin
     {
         $post = $this->find($this->ctx->in['i']);
         if (!$post) {
+            http_response_code(404);
             return ['title' => 'Not found', 'body' => 'There is no such post.'];
         }
         if ($p = $this->ctx->post()) {
-            $this->ctx->db->update('posts', $this->fields($p), 'id = :id', ['id' => $post['id']]);
+            (void) $this->ctx->db->update('posts', $this->fields($p), 'id = :id', ['id' => $post['id']]);
             $this->ctx->flash(Flash::Success, 'Post updated.');
             $this->redirect("?o=Posts&m=read&i={$post['id']}");
         }

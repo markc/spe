@@ -51,10 +51,10 @@ test('an admin can open Users and see the seeded accounts', function () {
     expect($r->status)->toBe(200)->and($r->body)->toContain('admin@example.com', 'user@example.com');
 });
 
-test('a normal user is still refused Users', function () {
+test('a normal user is refused Users with a 403, not a login redirect', function () {
     login($this->c, 'user@example.com', 'user');
     $r = $this->c->get('?o=Users');
-    expect($r->status)->toBe(302)->and($r->header('Location'))->toBe('?o=Auth&m=create');
+    expect($r->status)->toBe(403)->and($r->body)->toContain('Forbidden');
     expect($this->c->get()->body)->not->toContain('data-lucide="users"');
 });
 

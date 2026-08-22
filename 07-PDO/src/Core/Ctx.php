@@ -20,6 +20,7 @@ final readonly class Ctx
                 'cookie_httponly' => true,
                 'cookie_samesite' => 'Lax',
                 'use_strict_mode' => true,
+                'cookie_secure' => !empty($_SERVER['HTTPS']),
             ]);
         }
         $this->token = $_SESSION['token'] ??= bin2hex(random_bytes(16));

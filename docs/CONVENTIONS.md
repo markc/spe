@@ -24,7 +24,7 @@ SPE teaches plain, modern PHP 8.5 by building one small application nine times, 
 
 **One idea per chapter.** If a change is not part of the chapter's idea, it belongs in another chapter. Presentation changes belong in 02; there are no visual changes in 03, 04 or 05 — those chapters are deliberately invisible in the browser so the reader can concentrate on structure.
 
-**Each chapter is a strict diff of the previous one.** `diff -r 05-Autoload 06-Session` must show only the Session idea. Files keep their names and positions across chapters; a class that exists in chapter N exists, with the same name and the same job, in every later chapter. Renaming is drift and drift is a bug.
+**Each chapter is a strict diff of the previous one.** `diff -r 05-Autoload 06-Session` must show only the Session idea. Files keep their names and positions across chapters. A **core** class (`Ctx`, `Init`, `Plugin`, `View`, `Theme`, `Db`, the enums, the value objects) that exists in chapter N exists, with the same name and the same job, in every later chapter — renaming or dropping one is drift, and drift is a bug. **Plugins are the application**, not the framework, so a plugin may be *superseded* when a later chapter's idea replaces it — the static `Contact` page gives way to the database-backed `Posts` in 07, and `Posts` becomes the `Blog`/`Docs` content engine in 09 — and when that happens the chapter README's "what changed" section says so explicitly.
 
 **Each chapter is self-contained.** Everything a chapter runs lives under its own directory (`XX-Name/public`, `XX-Name/src`). There is no shared PHP library at the repository root, because shared code that changes later silently rewrites earlier chapters. Duplication between chapters is intentional: they are snapshots.
 
@@ -109,7 +109,7 @@ Navigation, colour schemes and other configuration live in `Ctx` as plain arrays
 
 ## Assets
 
-`docs/base.css`, `docs/site.css` and `docs/base.js` are the only shared files and they are not PHP. `base.css` is colour-agnostic structure; `site.css` is every colour. Chapters link them by relative path (`../base.css`) so each chapter also works when served on its own with `php -S localhost:8000 -t XX-Name/public`. They are shared because they are an asset, not code, and because the whole point of chapters 03–05 is that the page does not change.
+`docs/base.css`, `docs/site.css` and `docs/base.js` are the only shared files and they are not PHP. `base.css` is colour-agnostic structure; `site.css` is every colour. Chapters link them by relative path (`../base.css`). The canonical way to run the project is the root router — `php -S localhost:8000 index.php`, then visit `/XX-Name/` — which serves those assets (they live symlinked at the repo root). A chapter also runs standalone with `php -S localhost:8000 -t XX-Name/public` for reading the PHP, though the shared CSS/JS only resolve through the root router. They are shared because they are an asset, not code, and because the whole point of chapters 03–05 is that the page does not change.
 
 ## Documentation contract
 

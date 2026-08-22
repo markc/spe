@@ -16,13 +16,19 @@ namespace {
 
     // Chapter pattern: /XX-Name/... -> /XX-Name/public/...
     if (preg_match('#^/(\d{2}-[^/]+)(/.*)?$#', $uri, $m) && is_dir($pub = __DIR__ . "/{$m[1]}/public")) {
-        if (is_file($f = $pub . ($m[2] ?? '/')) && str_starts_with(realpath($f), realpath($pub) . '/')) {
-            // Serve static file with correct content type
-            $ext = pathinfo($f, PATHINFO_EXTENSION);
-            $types = ['css' => 'text/css', 'js' => 'text/javascript', 'webp' => 'image/webp',
-                      'png' => 'image/png', 'jpg' => 'image/jpeg', 'gif' => 'image/gif', 'svg' => 'image/svg+xml'];
-            header('Content-Type: ' . ($types[$ext] ?? mime_content_type($f)));
-            return readfile($f);
+        $rest = $m[2] ?? '/';
+        if ($rest !== '/' && $rest !== '/index.php') {
+            // A specific file was requested under the chapter: serve it if it exists
+            // and is inside public/, otherwise it is a genuine 404 — not a page.
+            if (is_file($f = $pub . $rest) && str_starts_with((string) realpath($f), realpath($pub) . '/')) {
+                $ext = pathinfo($f, PATHINFO_EXTENSION);
+                $types = ['css' => 'text/css', 'js' => 'text/javascript', 'webp' => 'image/webp',
+                          'png' => 'image/png', 'jpg' => 'image/jpeg', 'gif' => 'image/gif', 'svg' => 'image/svg+xml'];
+                header('Content-Type: ' . ($types[$ext] ?? mime_content_type($f)));
+                return readfile($f);
+            }
+            http_response_code(404);
+            return true;
         }
         $_SERVER['SCRIPT_NAME'] = "/{$m[1]}/public/index.php";
         return require "$pub/index.php";
@@ -32,6 +38,14 @@ namespace {
     if (str_starts_with($uri, '/docs')) {
         if (is_file($f = __DIR__ . $uri)) return false;
         if (is_dir($f) && is_file("$f/index.html")) return require "$f/index.html";
+        http_response_code(404);
+        return true;
+    }
+
+    // The chapter index is only the site root; anything else is not a page.
+    if ($uri !== '/') {
+        http_response_code(404);
+        return true;
     }
 }
 

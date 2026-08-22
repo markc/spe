@@ -19,6 +19,10 @@ final class Chapter
     private function __construct(public readonly string $dir, public readonly int $port)
     {
         $root = dirname(__DIR__, 2);
+        // Start every chapter from a clean database so tests are repeatable.
+        if (is_file($db = "$root/$dir/data/spe.db")) {
+            unlink($db);
+        }
         $this->proc = proc_open(
             ['php', '-S', "127.0.0.1:$port", '-t', "$root/$dir/public"],
             [1 => ['file', '/dev/null', 'w'], 2 => ['file', '/dev/null', 'w']],

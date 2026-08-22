@@ -16,8 +16,8 @@ test('each page renders with its title', function (string $page, string $label) 
     expect($r->status)->toBe(200)->and($r->body)->toContain("<title>SPE::02 $label</title>", "<h2>$label</h2>");
 })->with([['home', 'Home'], ['about', 'About'], ['contact', 'Contact']]);
 
-test('contact page has the mailto form', function () {
-    expect($this->c->get('?o=contact')->body)->toContain('<form', 'mailto:', 'name="subject"', 'name="message"');
+test('contact page has a mailto link', function () {
+    expect($this->c->get('?o=contact')->body)->toContain('href="mailto:mc@netserva.org"');
 });
 
 test('unknown page is a 404 inside the shell', function () {

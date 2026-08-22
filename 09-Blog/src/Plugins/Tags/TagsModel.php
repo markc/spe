@@ -29,11 +29,12 @@ final class TagsModel extends Plugin
     {
         $tag = $this->ctx->db->read('tags', '*', 'id = :id', ['id' => $this->ctx->in['i']], QueryType::One);
         if (!$tag) {
+            http_response_code(404);
             return ['title' => 'Not found', 'body' => 'There is no such tag.'];
         }
         if ($p = $this->ctx->post()) {
             $name = trim((string) ($p['name'] ?? '')) ?: $tag['name'];
-            $this->ctx->db->update('tags', ['name' => $name, 'slug' => $this->slug($name)], 'id = :id', ['id' => $tag['id']]);
+            (void) $this->ctx->db->update('tags', ['name' => $name, 'slug' => $this->slug($name)], 'id = :id', ['id' => $tag['id']]);
             $this->ctx->flash(Flash::Success, 'Tag renamed.');
             $this->redirect('?o=Tags');
         }

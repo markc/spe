@@ -21,6 +21,7 @@ final readonly class Ctx
                 'cookie_httponly' => true,
                 'cookie_samesite' => 'Lax',
                 'use_strict_mode' => true,
+                'cookie_secure' => !empty($_SERVER['HTTPS']),
             ]);
         }
         $this->token = $_SESSION['token'] ??= bin2hex(random_bytes(16));
@@ -102,7 +103,7 @@ final readonly class Ctx
     private function issueRemember(int $uid): void
     {
         [$selector, $validator] = [bin2hex(random_bytes(9)), bin2hex(random_bytes(32))];
-        $this->db->create('user_tokens', [
+        (void) $this->db->create('user_tokens', [
             'selector' => $selector,
             'validator_hash' => hash('sha256', $validator),
             'user_id' => $uid,
@@ -125,7 +126,9 @@ final readonly class Ctx
         if (!$row || $row['expires'] < date('Y-m-d H:i:s') || !hash_equals($row['validator_hash'], hash('sha256', $m[2]))) {
             return null;
         }
-        $this->db->delete('user_tokens', 'selector = :s', ['s' => $m[1]]);
+        (void) $this->db->delete('user_tokens', 'selector = :s', ['s' => $m[1]]);
+        // Same as a fresh login: rotate the token and the session id, then sign in.
+        session_regenerate_id(true);
         $this->issueRemember((int) $row['user_id']);
         return $_SESSION['uid'] = (int) $row['user_id'];
     }
@@ -133,7 +136,7 @@ final readonly class Ctx
     private function clearRemember(): void
     {
         if (preg_match('/^([0-9a-f]{18}):/', $_COOKIE['remember'] ?? '', $m)) {
-            $this->db->delete('user_tokens', 'selector = :s', ['s' => $m[1]]);
+            (void) $this->db->delete('user_tokens', 'selector = :s', ['s' => $m[1]]);
         }
         setcookie('remember', '', ['expires' => time() - 3600, 'httponly' => true, 'samesite' => 'Lax']);
     }

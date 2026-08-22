@@ -14,9 +14,13 @@ final class Post
     }
 
     public string $excerpt {
-        get => strlen($plain = trim(preg_replace('/\s+/', ' ', strip_tags(Md::render($this->body))))) > 160
-            ? rtrim(substr($plain, 0, 160)) . '…'
-            : $plain;
+        get {
+            $plain = Md::render($this->body)
+                |> strip_tags(...)
+                |> (static fn(string $s) => html_entity_decode($s, ENT_QUOTES | ENT_HTML5, 'UTF-8'))
+                |> (static fn(string $s) => trim((string) preg_replace('/\s+/', ' ', $s)));
+            return mb_strlen($plain) > 160 ? rtrim(mb_substr($plain, 0, 160)) . '…' : $plain;
+        }
     }
 
     /** @param list<array{id:int,name:string,slug:string}> $tags */

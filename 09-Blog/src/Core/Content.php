@@ -58,6 +58,7 @@ abstract class Content extends Plugin
     {
         $post = $this->find($this->ctx->in['i']);
         if (!$post) {
+            http_response_code(404);
             return ['title' => 'Not found', 'body' => 'There is no such entry.'];
         }
         $ids = array_map(intval(...), $this->ctx->db->read('posts', 'id', 'type = :t', ['t' => $this->type()->value], QueryType::All, 'ORDER BY id')
@@ -92,10 +93,11 @@ abstract class Content extends Plugin
     {
         $post = $this->find($this->ctx->in['i']);
         if (!$post) {
+            http_response_code(404);
             return ['title' => 'Not found', 'body' => 'There is no such entry.'];
         }
         if ($p = $this->ctx->post()) {
-            $this->ctx->db->update('posts', $this->fields($p), 'id = :id', ['id' => $post->id]);
+            (void) $this->ctx->db->update('posts', $this->fields($p), 'id = :id', ['id' => $post->id]);
             $this->syncTags($post->id, (string) ($p['tags'] ?? ''));
             $this->ctx->flash(Flash::Success, 'Saved.');
             $this->redirect("?o={$this->ctx->in['o']}&m=read&i={$post->id}");
@@ -139,13 +141,16 @@ abstract class Content extends Plugin
 
     private function syncTags(int $postId, string $csv): void
     {
-        $this->ctx->db->delete('post_tags', 'post_id = :id', ['id' => $postId]);
-        $names = array_filter(array_map(trim(...), explode(',', $csv)));
-        foreach (array_unique($names) as $name) {
-            $slug = self::slugify($name, false);
+        (void) $this->ctx->db->delete('post_tags', 'post_id = :id', ['id' => $postId]);
+        // Deduplicate by slug, so "PHP, php" is one tag and one junction row.
+        $bySlug = [];
+        foreach (array_filter(array_map(trim(...), explode(',', $csv))) as $name) {
+            $bySlug[self::slugify($name, false)] ??= $name;
+        }
+        foreach ($bySlug as $slug => $name) {
             $id = (int) $this->ctx->db->read('tags', 'id', 'slug = :s', ['s' => $slug], QueryType::Col)
                 ?: $this->ctx->db->create('tags', ['name' => $name, 'slug' => $slug]);
-            $this->ctx->db->create('post_tags', ['post_id' => $postId, 'tag_id' => $id]);
+            (void) $this->ctx->db->create('post_tags', ['post_id' => $postId, 'tag_id' => $id]);
         }
     }
 
