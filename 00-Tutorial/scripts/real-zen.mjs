@@ -8,13 +8,17 @@
 
 import { Builder, By } from 'selenium-webdriver';
 import firefox from 'selenium-webdriver/firefox.js';
-import { readFileSync, mkdtempSync } from 'fs';
-import { tmpdir } from 'os';
+import { readFileSync } from 'fs';
+import { homedir } from 'os';
 
 const BASE = process.env.BASE || 'http://127.0.0.1:8000';
 const APP = `${BASE}/01-Simple`;
 const CODE = (hl) => `${BASE}/00-Tutorial/codeview.html?f=01-Simple/public/index.php&hl=${hl}`;
-const ZOOM = process.env.ZOOM || '1.2';
+// Use the user's real Zen profile (its own 120% zoom + hidden chrome). ZOOM=1
+// means "don't add any extra zoom, trust the profile"; set >1 only for a fresh profile.
+const PROFILE = process.env.PROFILE || `${homedir()}/.zen/212lt933.Default Profile`;
+const ZOOM = process.env.ZOOM || '1';
+const FULLSCREEN = process.env.FULLSCREEN === '1';
 const durs = JSON.parse(readFileSync('/tmp/ep01/durations.json', 'utf8')); // seconds[]
 
 const scenes = [
@@ -30,22 +34,22 @@ const scenes = [
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const profile = mkdtempSync(`${tmpdir()}/zen-spe-`);
 
 const opts = new firefox.Options();
 opts.setBinary('/usr/bin/zen-browser');
-opts.addArguments('-profile', profile);
+opts.addArguments('-profile', PROFILE);   // the user's real profile (its own zoom + chrome)
 opts.setPreference('browser.aboutConfig.showWarning', false);
-opts.setPreference('devtools.console.stdout.content', true);
 
 const driver = await new Builder().forBrowser('firefox').setFirefoxOptions(opts).build();
 
-async function zoom() { await driver.executeScript('document.documentElement.style.zoom = arguments[0]', ZOOM); }
+// Only add zoom for a fresh profile; ZOOM=1 trusts the profile's own default.
+async function zoom() { if (ZOOM !== '1') await driver.executeScript('document.documentElement.style.zoom = arguments[0]', ZOOM); }
 async function go(url) { await driver.get(url); await zoom(); }
 async function clickLink(name) { await driver.findElement(By.linkText(name)).click(); await zoom(); }
 
 try {
-  await driver.manage().window().fullscreen();
+  if (FULLSCREEN) await driver.manage().window().fullscreen();
+  else await driver.manage().window().maximize();
   await sleep(500);
 
   // pre-roll on a blank page while the recorder settles; the jump to scene 1

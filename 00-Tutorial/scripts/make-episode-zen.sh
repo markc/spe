@@ -7,7 +7,7 @@
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/../.." && pwd)"
-ZOOM="${ZOOM:-1.2}"
+ZOOM="${ZOOM:-1}"   # 1 = trust the Zen profile's own 120% default
 DIR=/tmp/ep01
 mkdir -p "$DIR/aud"
 TTS="$HERE/google-tts.sh"
