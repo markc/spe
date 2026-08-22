@@ -69,7 +69,7 @@ try {
     } else if (s.act === 'tour') {
       await go(`${APP}/`);
       await sleep(1500);
-      for (const n of ['About', 'Contact', 'Home']) { await clickLink(n); await sleep(1200); }
+      for (const o of ['about', 'contact', 'home']) { await go(`${APP}/?o=${o}`); await sleep(1200); }
     } else if (s.act === 'notfound') {
       await go(`${APP}/?o=nope`);
     } else if (s.act === 'xss') {
