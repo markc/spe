@@ -15,11 +15,11 @@
             <directory suffix=".php">01-Simple/public</directory>
             <directory suffix=".php">02-Styled/public</directory>
             <directory suffix=".php">03-Plugins/public</directory>
-            <directory suffix=".php">04-Themes/public</directory>
+            <directory suffix=".php">04-Views/public</directory>
             <directory>05-Autoload/src</directory>
             <directory>06-Session/src</directory>
             <directory>07-PDO/src</directory>
-            <directory>08-Users/src</directory>
+            <directory>08-Auth/src</directory>
             <directory>09-Blog/src</directory>
         </include>
     </source>

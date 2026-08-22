@@ -18,11 +18,11 @@
             "SPE\\Simple\\": "01-Simple/src",
             "SPE\\Styled\\": "02-Styled/src",
             "SPE\\Plugins\\": "03-Plugins/src",
-            "SPE\\Themes\\": "04-Themes/src",
+            "SPE\\Themes\\": "04-Views/src",
             "SPE\\Autoload\\": "05-Autoload/src",
             "SPE\\Session\\": "06-Session/src",
             "SPE\\PDO\\": "07-PDO/src",
-            "SPE\\Users\\": "08-Users/src",
+            "SPE\\Users\\": "08-Auth/src",
             "SPE\\Blog\\": "09-Blog/src"
         }
     },
@@ -48,6 +48,7 @@
         "format": "mago format",
         "test": "pest",
         "check": [
+            "php bin/check-chapters.php",
             "@lint",
             "@test"
         ],

@@ -138,10 +138,10 @@ For chapters with interactive elements (forms, CRUD, auth):
 
 ```bash
 # Generate interaction code
-bunx playwright codegen http://localhost:8080/08-Users
+bunx playwright codegen http://localhost:8080/08-Auth
 
 # Run demo with video recording
-bun run demo 08-Users --video
+bun run demo 08-Auth --video
 ```
 
 Edit `scripts/demo.ts` to add chapter-specific interaction sequences.

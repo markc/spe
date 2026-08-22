@@ -1,4 +1,4 @@
-# SPE::08 Users
+# SPE::08 Auth
 
 _Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)_
 

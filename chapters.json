@@ -1,0 +1,173 @@
+{
+    "$comment": "Machine-readable chapter manifest. bin/check-chapters.php verifies it against the tree. See docs/CONVENTIONS.md.",
+    "php": "8.5",
+    "request": {
+        "o": "object (plugin)",
+        "m": "method (create|read|update|delete|list)",
+        "i": "id (int)",
+        "x": "export format ('' | json)"
+    },
+    "chapters": [
+        {
+            "id": "01",
+            "name": "Simple",
+            "dir": "01-Simple",
+            "idea": "A request becomes a page: one self-rendering anonymous class",
+            "entry": "01-Simple/public/index.php",
+            "adds": [
+                "public/index.php"
+            ],
+            "php": [
+                "pipe operator |>",
+                "typed class constants",
+                "asymmetric visibility public private(set)",
+                "first-class callable syntax f(...)"
+            ],
+            "visible_change": true,
+            "run": "php -S localhost:8001 -t 01-Simple/public",
+            "test": "vendor/bin/pest tests/01-Simple"
+        },
+        {
+            "id": "02",
+            "name": "Styled",
+            "dir": "02-Styled",
+            "idea": "Presentation: shared CSS/JS, the app shell, dark mode, colour schemes, toasts",
+            "entry": "02-Styled/public/index.php",
+            "adds": [],
+            "php": [
+                "heredoc and nowdoc discipline",
+                "match expression"
+            ],
+            "visible_change": true,
+            "run": "php -S localhost:8002 -t 02-Styled/public",
+            "test": "vendor/bin/pest tests/02-Styled"
+        },
+        {
+            "id": "03",
+            "name": "Plugins",
+            "dir": "03-Plugins",
+            "idea": "The request contract (o, m, x) and the CRUDL plugin interface",
+            "entry": "03-Plugins/public/index.php",
+            "adds": [],
+            "php": [
+                "readonly classes",
+                "new X()->method() without parentheses",
+                "abstract classes and inheritance",
+                "match(true) dispatch"
+            ],
+            "visible_change": false,
+            "run": "php -S localhost:8003 -t 03-Plugins/public",
+            "test": "vendor/bin/pest tests/03-Plugins"
+        },
+        {
+            "id": "04",
+            "name": "Views",
+            "dir": "04-Views",
+            "idea": "Model returns data, View returns HTML, Theme wraps it; escape at output",
+            "entry": "04-Views/public/index.php",
+            "adds": [],
+            "php": [
+                "#[\\Override]",
+                "static return types",
+                "htmlspecialchars flags"
+            ],
+            "visible_change": false,
+            "run": "php -S localhost:8004 -t 04-Views/public",
+            "test": "vendor/bin/pest tests/04-Views"
+        },
+        {
+            "id": "05",
+            "name": "Autoload",
+            "dir": "05-Autoload",
+            "idea": "The same code as files: PSR-4, namespaces, Composer",
+            "entry": "05-Autoload/public/index.php",
+            "adds": [
+                "src/Core/Ctx.php",
+                "src/Core/Init.php",
+                "src/Core/Plugin.php",
+                "src/Core/View.php",
+                "src/Core/Theme.php",
+                "src/Plugins/Home/HomeModel.php",
+                "src/Plugins/Home/HomeView.php",
+                "src/Plugins/About/AboutModel.php",
+                "src/Plugins/Contact/ContactModel.php",
+                "src/Plugins/Contact/ContactView.php"
+            ],
+            "php": [
+                "namespaces and use",
+                "PSR-4 autoloading",
+                "declare(strict_types=1)"
+            ],
+            "visible_change": false,
+            "run": "php -S localhost:8005 -t 05-Autoload/public",
+            "test": "vendor/bin/pest tests/05-Autoload"
+        },
+        {
+            "id": "06",
+            "name": "Session",
+            "dir": "06-Session",
+            "idea": "State between requests: sessions, flash messages, CSRF, POST-only mutations",
+            "entry": "06-Session/public/index.php",
+            "adds": [],
+            "php": [
+                "enums with methods",
+                "clone() with on an immutable object",
+                "session configuration"
+            ],
+            "visible_change": true,
+            "run": "php -S localhost:8006 -t 06-Session/public",
+            "test": "vendor/bin/pest tests/06-Session"
+        },
+        {
+            "id": "07",
+            "name": "PDO",
+            "dir": "07-PDO",
+            "idea": "Persistence: SQLite via PDO, a schema, prepared statements, a real CRUDL plugin",
+            "entry": "07-PDO/public/index.php",
+            "adds": [],
+            "php": [
+                "backed enums",
+                "#[\\NoDiscard]",
+                "match on enum cases",
+                "PDO typed binding"
+            ],
+            "visible_change": true,
+            "run": "php -S localhost:8007 -t 07-PDO/public",
+            "test": "vendor/bin/pest tests/07-PDO"
+        },
+        {
+            "id": "08",
+            "name": "Auth",
+            "dir": "08-Auth",
+            "idea": "Identity: users, password hashing, login/logout, roles, access control",
+            "entry": "08-Auth/public/index.php",
+            "adds": [],
+            "php": [
+                "enum methods as an ACL",
+                "readonly value objects",
+                "nullable types and ?-> ",
+                "password_hash / password_verify"
+            ],
+            "visible_change": true,
+            "run": "php -S localhost:8008 -t 08-Auth/public",
+            "test": "vendor/bin/pest tests/08-Auth"
+        },
+        {
+            "id": "09",
+            "name": "Blog",
+            "dir": "09-Blog",
+            "idea": "The application: content types, markdown, tags, pagination, self-hosted docs",
+            "entry": "09-Blog/public/index.php",
+            "adds": [],
+            "php": [
+                "property hooks",
+                "array_first() / array_last()",
+                "URI extension",
+                "pipe operator as a render pipeline"
+            ],
+            "visible_change": true,
+            "run": "php -S localhost:8009 -t 09-Blog/public",
+            "test": "vendor/bin/pest tests/09-Blog"
+        }
+    ]
+}

@@ -50,6 +50,9 @@ jobs:
           done
           [ "$missing" -eq 0 ]
 
+      - name: Check chapter manifest
+        run: php bin/check-chapters.php
+
       - name: Mago lint
         run: composer lint
 

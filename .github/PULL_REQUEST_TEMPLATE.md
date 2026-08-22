@@ -17,11 +17,11 @@ Brief description of changes.
 - [ ] 01-Simple
 - [ ] 02-Styled
 - [ ] 03-Plugins
-- [ ] 04-Themes
+- [ ] 04-Views
 - [ ] 05-Autoload
 - [ ] 06-Session
 - [ ] 07-PDO
-- [ ] 08-Users
+- [ ] 08-Auth
 - [ ] 09-Blog
 - [ ] Root (shared assets, docs)
 

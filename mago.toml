@@ -6,10 +6,10 @@ paths = [
     "01-Simple/public",
     "02-Styled/public",
     "03-Plugins/public",
-    "04-Themes/public",
+    "04-Views/public",
     "05-Autoload/src",
     "06-Session/src",
     "07-PDO/src",
-    "08-Users/src",
+    "08-Auth/src",
     "09-Blog/src",
 ]

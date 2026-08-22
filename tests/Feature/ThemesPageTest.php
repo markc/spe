@@ -2,7 +2,7 @@
 // Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 /**
- * Feature Tests for 04-Themes/public/index.php
+ * Feature Tests for 04-Views/public/index.php
  *
  * Tests complete user scenarios and integration:
  * - Full page rendering with different themes
@@ -11,14 +11,14 @@
  * - Comparison between themes
  * - Edge cases and security
  *
- * NOTE: 03-Plugins and 04-Themes share class names (Ctx, Init, Plugin).
+ * NOTE: 03-Plugins and 04-Views share class names (Ctx, Init, Plugin).
  * Tests may be skipped if conflicting classes are already loaded.
  */
 
 // Skip all tests if 03-Plugins classes are loaded (they conflict)
 beforeEach(function () {
     if (class_exists('Ctx') && !isChapterLoaded(4)) {
-        $this->markTestSkipped('04-Themes classes conflict with already-loaded 03-Plugins classes');
+        $this->markTestSkipped('04-Views classes conflict with already-loaded 03-Plugins classes');
     }
 });
 
@@ -239,7 +239,7 @@ describe('Security', function () {
 describe('Comparison with Previous Chapters', function () {
 
     test('has Model/View separation unlike 03-Plugins', function () {
-        // 04-Themes uses separate Model and View classes
+        // 04-Views uses separate Model and View classes
         $html = renderPage(themesIndexPath(), ['o' => 'Home']);
 
         // The content comes from HomeModel, rendered by HomeView

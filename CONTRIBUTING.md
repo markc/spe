@@ -87,11 +87,11 @@ Each chapter builds on the previous:
 | 01-Simple | Single-file, pipe operator |
 | 02-Styled | Custom CSS, dark mode |
 | 03-Plugins | Plugin architecture |
-| 04-Themes | Model/View separation |
+| 04-Views | Model/View separation |
 | 05-Autoload | PSR-4, Composer |
 | 06-Session | Session management |
 | 07-PDO | SQLite database |
-| 08-Users | User CRUDL |
+| 08-Auth | User CRUDL |
 | 09-Blog | Full CMS |
 
 ### Directory Layout (05-10)
@@ -131,7 +131,7 @@ git checkout -b fix/bug-description
 Write clear commit messages:
 
 ```
-Add user avatar support to 08-Users
+Add user avatar support to 08-Auth
 
 - Add avatar upload field to user form
 - Store avatars in uploads/ directory

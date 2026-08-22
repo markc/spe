@@ -149,7 +149,7 @@ Use transitional phrases to show relationships:
 - CRUDL method pattern
 - Separation of routing from content
 
-### 04-Themes
+### 04-Views
 - Model/View separation
 - Theme inheritance and overrides
 - Multiple layout strategies
@@ -169,7 +169,7 @@ Use transitional phrases to show relationships:
 - QueryType enum pattern
 - Prepared statements
 
-### 08-Users
+### 08-Auth
 - Authentication flow
 - Password hashing
 - User management CRUDL

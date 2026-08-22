@@ -37,11 +37,11 @@ index.php → Init(Ctx) → {Plugin}Model::method() → {Plugin}View::method() �
 | 01 | 01-Simple | Foundation | Single anonymous class, pipe operator |
 | 02 | 02-Styled | Presentation | Custom CSS, dark mode toggle, toasts |
 | 03 | 03-Plugins | Architecture | Plugin system with meta.json |
-| 04 | 04-Themes | Separation | Model/View split, multiple layouts |
+| 04 | 04-Views | Separation | Model/View split, multiple layouts |
 | 05 | 05-Autoload | Standards | PSR-4, Composer, namespaces |
 | 06 | 06-Session | State | Session handling, flash messages |
 | 07 | 07-PDO | Data | SQLite database, QueryType enum |
-| 08 | 08-Users | CRUDL | Full user management |
+| 08 | 08-Auth | CRUDL | Full user management |
 | 09 | 09-Blog | CMS | Auth, blog posts, categories, pages |
 | 10 | 10-YouTube | Integration | OAuth, YouTube API, shared services |
 

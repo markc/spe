@@ -2,7 +2,7 @@
 // Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 /**
- * Unit Tests for 04-Themes/public/index.php
+ * Unit Tests for 04-Views/public/index.php
  *
  * Tests individual components and logic in isolation:
  * - Plugin routing with Model/View separation
@@ -11,14 +11,14 @@
  * - Input sanitization
  * - JSON API output
  *
- * NOTE: 03-Plugins and 04-Themes share class names (Ctx, Init, Plugin).
+ * NOTE: 03-Plugins and 04-Views share class names (Ctx, Init, Plugin).
  * Tests may be skipped if conflicting classes are already loaded.
  */
 
 // Skip all tests if 03-Plugins classes are loaded (they conflict)
 beforeEach(function () {
     if (class_exists('Ctx') && !isChapterLoaded(4)) {
-        $this->markTestSkipped('04-Themes classes conflict with already-loaded 03-Plugins classes');
+        $this->markTestSkipped('04-Views classes conflict with already-loaded 03-Plugins classes');
     }
 });
 

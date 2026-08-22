@@ -80,11 +80,11 @@ Open http://localhost:8000 to see the chapter index.
 | 01 | [Simple](01-Simple/README.md) | Single-file anonymous class | Pipe operator basics |
 | 02 | [Styled](02-Styled/README.md) | Custom CSS, dark mode | Toast notifications |
 | 03 | [Plugins](03-Plugins/README.md) | Plugin architecture | CRUDL pattern |
-| 04 | [Themes](04-Themes/README.md) | Model/View separation | Multiple layouts |
+| 04 | [Views](04-Views/README.md) | Model/View/Theme separation | Escape at output |
 | 05 | [Autoload](05-Autoload/README.md) | PSR-4 autoloading | Composer integration |
 | 06 | [Session](06-Session/README.md) | Session management | State persistence |
 | 07 | [PDO](07-PDO/README.md) | Database access | SQLite + QueryType enum |
-| 08 | [Users](08-Users/README.md) | User management | Full CRUDL operations |
+| 08 | [Auth](08-Auth/README.md) | Users, login, roles | Access control |
 | 09 | [Blog](09-Blog/README.md) | Complete CMS | Auth, Blog, Docs, Categories |
 
 ## Architecture

@@ -8,11 +8,11 @@
 /01-Simple/ @markc
 /02-Styled/ @markc
 /03-Plugins/ @markc
-/04-Themes/ @markc
+/04-Views/ @markc
 /05-Autoload/ @markc
 /06-Session/ @markc
 /07-PDO/ @markc
-/08-Users/ @markc
+/08-Auth/ @markc
 /09-Blog/ @markc
 
 # Tutorial generation

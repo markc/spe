@@ -41,11 +41,11 @@ Open http://localhost:8000 to see the chapter index.
 - 01-Simple: Single-file anonymous class with pipe operator basics
 - 02-Styled: Custom CSS, dark mode, toast notifications
 - 03-Plugins: Plugin architecture, CRUDL pattern
-- 04-Themes: Model/View separation, multiple layouts
+- 04-Views: Model returns data, View returns HTML, Theme wraps it
 - 05-Autoload: PSR-4 autoloading via Composer
 - 06-Session: PHP session management
 - 07-PDO: SQLite database with type-safe PDO queries
-- 08-Users: User management with full CRUDL operations
+- 08-Auth: Users, password hashing, login/logout, roles
 - 09-Blog: Complete CMS (Auth, Blog, Pages, Categories, Docs)
 
 ## Modern PHP Features

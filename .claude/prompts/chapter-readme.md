@@ -43,11 +43,11 @@ Replace `XX-Chapter` with the actual chapter name and adjust the focus:
 | 01-Simple | `public/index.php` - anonymous class, pipe operator |
 | 02-Styled | `public/index.php` + `spe.css` + `spe.js` |
 | 03-Plugins | `public/index.php` - plugin architecture |
-| 04-Themes | `public/index.php` - theme inheritance |
+| 04-Views | `public/index.php` - theme inheritance |
 | 05-Autoload | `composer.json` + `src/` structure |
 | 06-Session | Session handling in `src/Core/` |
 | 07-PDO | `src/Core/Db.php` - database abstraction |
-| 08-Users | `src/Plugins/Users/` - auth flow |
+| 08-Auth | `src/Plugins/Users/` - auth flow |
 | 09-Blog | Full CMS patterns across all files |
 
 ## Expected Output

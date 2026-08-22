@@ -55,11 +55,11 @@ namespace SPE\Router {
                 ['01', 'Simple', 'Single-file anonymous class demonstrating PHP 8.5 pipe operator with first-class callables'],
                 ['02', 'Styled', 'Custom CSS framework with CSS variables, automatic dark mode detection, and toast notifications'],
                 ['03', 'Plugins', 'Plugin architecture introducing the CRUDL pattern for Create, Read, Update, Delete, List operations'],
-                ['04', 'Themes', 'Model/View separation with three switchable layout themes: Simple, TopNav, and SideBar'],
+                ['04', 'Views', 'Model returns data, View returns HTML, Theme wraps it; escape at output'],
                 ['05', 'Autoload', 'PSR-4 autoloading via Composer with proper namespacing and directory structure'],
                 ['06', 'Session', 'PHP session management with sticky URL parameters and flash messages for user feedback'],
                 ['07', 'PDO', 'SQLite database integration using PDO wrapper class and QueryType enum for fetch modes'],
-                ['08', 'Users', 'User management system with full CRUDL operations and profile handling'],
+                ['08', 'Auth', 'Identity: users, password hashing, login/logout, roles, access control'],
                 ['09', 'Blog', 'Complete CMS featuring authentication, blog posts, static pages, and documentation'],
             ],
         ) {}
@@ -136,7 +136,7 @@ HTML;
 <main>
     <div class="card">
         <h2>Chapters</h2>
-        <p>A progressive PHP 8.5 micro-framework tutorial in 12 chapters</p>
+        <p>A progressive PHP 8.5 micro-framework tutorial in 9 chapters</p>
         $list
     </div>
 </main>
