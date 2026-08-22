@@ -3,8 +3,6 @@
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-use SPE\App\Env;
-use SPE\Users\Core\{Init, Ctx};
+use SPE\Auth\Core\{Ctx, Init};
 
-Env::load(__DIR__ . '/..');
 echo new Init(new Ctx);

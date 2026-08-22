@@ -23,6 +23,12 @@ final readonly class Response
         return null;
     }
 
+    /** Every Set-Cookie line joined, since a response may set several. */
+    public function cookies(): string
+    {
+        return implode("\n", array_filter($this->headers, static fn(string $h) => stripos($h, 'Set-Cookie:') === 0));
+    }
+
     public function json(): array
     {
         return json_decode($this->body, true, flags: JSON_THROW_ON_ERROR);

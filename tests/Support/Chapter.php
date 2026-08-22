@@ -67,6 +67,12 @@ final class Chapter
         $this->cookies = [];
     }
 
+    /** Drop the session cookie but keep the rest (e.g. remember-me). */
+    public function dropSession(): void
+    {
+        unset($this->cookies['PHPSESSID']);
+    }
+
     private function request(string $method, string $query, array $data = []): Response
     {
         $headers = $this->cookies ? ['Cookie: ' . implode('; ', $this->cookies)] : [];

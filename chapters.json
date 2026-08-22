@@ -150,12 +150,20 @@
             "dir": "08-Auth",
             "idea": "Identity: users, password hashing, login/logout, roles, access control",
             "entry": "08-Auth/public/index.php",
-            "adds": [],
+            "adds": [
+                "src/Core/Role.php",
+                "src/Core/User.php",
+                "src/Plugins/Auth/AuthModel.php",
+                "src/Plugins/Auth/AuthView.php",
+                "src/Plugins/Users/UsersModel.php",
+                "src/Plugins/Users/UsersView.php"
+            ],
             "php": [
                 "enum methods as an ACL",
                 "readonly value objects",
-                "nullable types and ?-> ",
-                "password_hash / password_verify"
+                "nullable types and ?->",
+                "password_hash / password_verify",
+                "session_regenerate_id"
             ],
             "visible_change": true,
             "run": "php -S localhost:8008 -t 08-Auth/public",
