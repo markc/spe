@@ -1,0 +1,9 @@
+{
+  "title": "SPE Chapter 08 - Auth: Users, Roles, Login & Remember-Me",
+  "description": "Chapter 08 of Simple PHP Engine - adding identity and authorization to the plain PHP 8.5 app.\n\nThis tutorial covers:\n• Role as an ordered enum whose can() IS the access-control system\n• A readonly User value object built from a database row\n• Login/logout modelled as creating and destroying a session\n• password_hash / password_verify and session_regenerate_id\n• Per-plugin guard() checked in the front controller before the plugin runs\n• Admin-only Users CRUDL (hashed passwords, no self-delete)\n• Remember-me: a random selector plus a rotating, hashed validator\n\n🔗 Links:\nGitHub: https://github.com/markc/spe/tree/main/08-Auth\nDocumentation: https://markc.github.io/spe/08-Auth/\n\n#PHP #PHP85 #Authentication #Security #Enums #Tutorial #WebDevelopment",
+  "tags": ["php", "php 8.5", "authentication", "authorization", "roles", "enum", "password hashing", "sessions", "remember me", "security", "tutorial", "web development"],
+  "categoryId": "28",
+  "privacyStatus": "public",
+  "playlistId": "PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B",
+  "playlistPosition": 8
+}
