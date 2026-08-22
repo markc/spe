@@ -5,24 +5,30 @@ namespace SPE\Session\Core;
 
 final readonly class Init
 {
-    private const string NS = 'SPE\\Session\\';
+    private const string PLUGINS = 'SPE\\Session\\Plugins\\';
+
     private array $out;
 
     public function __construct(private Ctx $ctx)
     {
         [$o, $m] = [$ctx->in['o'], $ctx->in['m']];
-        $model = self::NS . "Plugins\\{$o}\\{$o}Model";
-        $ary = class_exists($model) ? new $model($ctx)->$m() : [];
-        $view = self::NS . "Plugins\\{$o}\\{$o}View";
-        $main = class_exists($view) ? new $view($ctx, $ary)->$m() : new View($ctx, $ary)->$m();
-        $this->out = [...$ctx->out, ...$ary, 'main' => $main];
+        [$model, $view] = [self::PLUGINS . "$o\\{$o}Model", self::PLUGINS . "$o\\{$o}View"];
+        if (is_subclass_of($model, Plugin::class)) {
+            $data = new $model($ctx)->$m();
+        } else {
+            http_response_code(404);
+            $data = ['title' => 'Not found', 'body' => 'There is no such plugin.'];
+        }
+        $view = is_a($view, View::class, true) ? $view : View::class;
+        $this->out = [...$ctx->out, ...$data, 'main' => new $view($ctx, $data)->$m()];
     }
 
     public function __toString(): string
     {
-        return match ($this->ctx->in['x']) {
-            'json' => (header('Content-Type: application/json') ?: '') . json_encode($this->out),
-            default => new Theme($this->ctx, $this->out)->render(),
-        };
+        if ($this->ctx->in['x'] === 'json') {
+            header('Content-Type: application/json');
+            return json_encode($this->out, JSON_THROW_ON_ERROR);
+        }
+        return new Theme($this->ctx, $this->out)->render();
     }
 }

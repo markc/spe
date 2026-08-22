@@ -3,43 +3,65 @@
 
 namespace SPE\Session\Core;
 
-final class Ctx
+final readonly class Ctx
 {
     public array $in;
+    public string $token;
 
     public function __construct(
-        public string $email = 'mc@netserva.org',
-        array $in = ['o' => 'Home', 'm' => 'list', 'x' => ''],
-        public array $out = ['doc' => 'SPE::06', 'page' => '← 06 Session', 'head' => '', 'main' => '', 'foot' => ''],
+        public array $out = ['doc' => 'SPE::06', 'page' => '06 Session', 'main' => ''],
         public array $nav = [['home', 'Home', 'Home'], ['book-open', 'About', 'About'], ['mail', 'Contact', 'Contact']],
-        public array $colors = [['circle', 'Stone', 'default'], ['waves', 'Ocean', 'ocean'], ['trees', 'Forest', 'forest'], ['sunset', 'Sunset', 'sunset']],
+        public array $schemes = [['circle', 'Stone', 'default'], ['waves', 'Ocean', 'ocean'], ['trees', 'Forest', 'forest'], ['sunset', 'Sunset', 'sunset']],
+        public string $email = 'mc@netserva.org',
     ) {
-        session_status() === PHP_SESSION_NONE && session_start();
-        // Only 'o' (plugin) is sticky; 'm' (method) defaults to 'list' each request
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start([
+                'cookie_httponly' => true,
+                'cookie_samesite' => 'Lax',
+                'use_strict_mode' => true,
+            ]);
+        }
+        $this->token = $_SESSION['token'] ??= bin2hex(random_bytes(16));
         $this->in = [
-            'o' => $this->ses('o', $in['o']),
-            'm' => ($_REQUEST['m'] ?? $in['m']) |> trim(...) |> htmlspecialchars(...),
-            'x' => ($_REQUEST['x'] ?? $in['x']) |> trim(...) |> htmlspecialchars(...),
+            'o' => self::get('o', 'Home', '/^[A-Z][A-Za-z]{0,31}$/'),
+            'm' => self::get('m', 'list', '/^(create|read|update|delete|list)$/'),
+            'x' => self::get('x', '', '/^json$/'),
         ];
     }
 
-    // Get/set session value: URL param overrides, else use session, else use default
-    public function ses(string $k, mixed $v = ''): mixed
+    private static function get(string $key, string $default, string $pattern): string
     {
-        return $_SESSION[$k] = isset($_REQUEST[$k])
-            ? (is_array($_REQUEST[$k]) ? $_REQUEST[$k] : (trim($_REQUEST[$k]) |> htmlspecialchars(...)))
-            : $_SESSION[$k] ?? $v;
+        $v = $_GET[$key] ?? '';
+        return is_string($v) && preg_match($pattern, $v) ? $v : $default;
     }
 
-    // Flash message: set message, retrieve once, then clear
-    public function flash(string $k, ?string $msg = null): ?string
+    /**
+     * The submitted form, but only for a genuine POST carrying this session's
+     * CSRF token. Any other request — including a POST with a wrong or missing
+     * token — returns null, so a model can guard every write with one line.
+     */
+    public function post(): ?array
     {
-        if ($msg !== null) {
-            $_SESSION["_flash_{$k}"] = $msg;
-            return $msg;
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return null;
         }
-        $val = $_SESSION["_flash_{$k}"] ?? null;
-        unset($_SESSION["_flash_{$k}"]);
-        return $val;
+        if (!hash_equals($this->token, (string) ($_POST['csrf'] ?? ''))) {
+            $this->flash(Flash::Danger, 'That form has expired. Please try again.');
+            return null;
+        }
+        return $_POST;
+    }
+
+    public function flash(Flash $level, string $message): void
+    {
+        $_SESSION['flash'][] = [$level->value, $message];
+    }
+
+    /** Returns the queued flash messages and clears them. */
+    public function takeFlash(): array
+    {
+        $flash = $_SESSION['flash'] ?? [];
+        unset($_SESSION['flash']);
+        return $flash;
     }
 }

@@ -3,40 +3,28 @@
 
 namespace SPE\Session\Plugins\Contact;
 
-use SPE\Session\Core\Plugin;
+use SPE\Session\Core\{Flash, Plugin};
 
 final class ContactModel extends Plugin
 {
     #[\Override]
     public function list(): array
     {
-        $_SESSION['visit_count'] = ($_SESSION['visit_count'] ?? 0) + 1;
-        $_SESSION['last_page'] = 'Contact';
-
-        return [
-            'head' => 'Contact Page',
-            'main' => 'Get in touch using the <b>email form</b> below.',
-            'draft_subject' => $_SESSION['draft_subject'] ?? '',
-            'draft_message' => $_SESSION['draft_message'] ?? '',
-        ];
+        return ['title' => 'Contact', 'body' => 'Send a message. The form posts to the server, which checks the CSRF token before accepting it.'];
     }
 
-    public function save(): array
+    #[\Override]
+    public function create(): array
     {
-        $_SESSION['draft_subject'] = $_POST['subject'] ?? '';
-        $_SESSION['draft_message'] = $_POST['message'] ?? '';
-        $this->ctx->flash('msg', 'Draft saved to session!');
-        $this->ctx->flash('type', 'success');
-
-        return $this->list();
-    }
-
-    public function clear(): array
-    {
-        unset($_SESSION['draft_subject'], $_SESSION['draft_message']);
-        $this->ctx->flash('msg', 'Draft cleared from session!');
-        $this->ctx->flash('type', 'warning');
-
-        return $this->list();
+        if ($p = $this->ctx->post()) {
+            $subject = trim((string) ($p['subject'] ?? ''));
+            if ($subject === '') {
+                $this->ctx->flash(Flash::Warning, 'Please enter a subject.');
+            } else {
+                // A real app would send mail here; this chapter is about the request cycle.
+                $this->ctx->flash(Flash::Success, "Thanks — your message about \"$subject\" was received.");
+            }
+        }
+        $this->redirect('?o=Contact');
     }
 }

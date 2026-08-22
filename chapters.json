@@ -108,11 +108,14 @@
             "dir": "06-Session",
             "idea": "State between requests: sessions, flash messages, CSRF, POST-only mutations",
             "entry": "06-Session/public/index.php",
-            "adds": [],
+            "adds": [
+                "src/Core/Flash.php"
+            ],
             "php": [
                 "enums with methods",
-                "clone() with on an immutable object",
-                "session configuration"
+                "session configuration",
+                "CSRF tokens",
+                "POST-only mutations with Post/Redirect/Get"
             ],
             "visible_change": true,
             "run": "php -S localhost:8006 -t 06-Session/public",

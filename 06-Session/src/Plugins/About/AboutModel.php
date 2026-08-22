@@ -10,12 +10,6 @@ final class AboutModel extends Plugin
     #[\Override]
     public function list(): array
     {
-        $_SESSION['visit_count'] = ($_SESSION['visit_count'] ?? 0) + 1;
-        $_SESSION['last_page'] = 'About';
-
-        return [
-            'head' => 'About Page',
-            'main' => 'This chapter adds <b>PHP session management</b> for persistent state across requests.',
-        ];
+        return ['title' => 'About', 'body' => 'Ctx now starts the session, keeps a CSRF token, and offers post() and flash(). post() returns the form data only for a POST whose token matches, so every write is one guarded line. Flash messages survive the redirect in the session and Theme turns them into toasts.'];
     }
 }
