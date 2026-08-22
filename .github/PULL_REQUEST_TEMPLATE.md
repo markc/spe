@@ -23,7 +23,6 @@ Brief description of changes.
 - [ ] 07-PDO
 - [ ] 08-Users
 - [ ] 09-Blog
-- [ ] 10-YouTube
 - [ ] Root (shared assets, docs)
 
 ## Test Plan

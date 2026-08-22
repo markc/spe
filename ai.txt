@@ -6,7 +6,7 @@ parent: https://raw.githubusercontent.com/markc/Dev/main/ai.txt
 
 # Simple PHP Engine (SPE)
 
-A progressive PHP 8.5 micro-framework tutorial in 11 chapters. Each chapter builds on the previous, demonstrating modern PHP features and design patterns.
+A progressive PHP 8.5 micro-framework tutorial in 9 chapters. Each chapter builds on the previous, demonstrating modern PHP features and design patterns.
 
 ## About
 
@@ -32,8 +32,8 @@ Open http://localhost:8000 to see the chapter index.
 ## Requirements
 
 - PHP 8.5+ (for pipe operator `|>`)
-- Composer (for chapters 05-10)
-- SQLite (for chapters 07-10)
+- Composer (for chapters 05-09)
+- SQLite (for chapters 07-09)
 
 ## Chapters
 
@@ -47,8 +47,6 @@ Open http://localhost:8000 to see the chapter index.
 - 07-PDO: SQLite database with type-safe PDO queries
 - 08-Users: User management with full CRUDL operations
 - 09-Blog: Complete CMS (Auth, Blog, Pages, Categories, Docs)
-- 10-Htmx: HTMX integration for dynamic UI
-- 11-HCP: Hosting Control Panel (includes `hcp-legacy/` reference code)
 
 ## Modern PHP Features
 
@@ -57,7 +55,7 @@ Open http://localhost:8000 to see the chapter index.
 - **Typed Constants (8.3)**: `const string DEFAULT = 'value'`
 - **Override Attribute (8.3)**: `#[\Override]` for class inheritance clarity
 - **Readonly Classes (8.2)**: Immutable class definitions
-- **Enums (8.1)**: Type-safe enum patterns (QueryType: All, One, Column)
+- **Enums (8.1)**: Type-safe enum patterns (QueryType: All, One, Col)
 - **First-Class Callables (8.1)**: `fn(...)` syntax for function references
 
 ## Architecture

@@ -129,7 +129,7 @@ final class Util
         return $pw;
     }
 
-    // === OTP (One Time Password) for password reset (from HCP pattern) ===
+    // === OTP (One Time Password) for password reset ===
 
     private const int OTP_LENGTH = 10;
     private const int OTP_TTL = 3600; // 1 hour

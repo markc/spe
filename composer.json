@@ -23,10 +23,7 @@
             "SPE\\Session\\": "06-Session/src",
             "SPE\\PDO\\": "07-PDO/src",
             "SPE\\Users\\": "08-Users/src",
-            "SPE\\Blog\\": "09-Blog/src",
-            "SPE\\Htmx\\": "10-Htmx/src",
-            "SPE\\HCP\\": "11-HCP/src",
-            "SPE\\HCP\\Lib\\": "11-HCP/lib"
+            "SPE\\Blog\\": "09-Blog/src"
         }
     },
     "minimum-stability": "stable",

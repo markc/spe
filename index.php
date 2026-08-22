@@ -5,12 +5,18 @@
 namespace {
     $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
+    // Reject any path segment that could escape the directory being served
+    if (str_contains($uri, '..')) {
+        http_response_code(404);
+        return true;
+    }
+
     // Static files at root (base.css, site.css, base.js)
     if ($uri !== '/' && is_file(__DIR__ . $uri)) return false;
 
     // Chapter pattern: /XX-Name/... -> /XX-Name/public/...
     if (preg_match('#^/(\d{2}-[^/]+)(/.*)?$#', $uri, $m) && is_dir($pub = __DIR__ . "/{$m[1]}/public")) {
-        if (is_file($f = $pub . ($m[2] ?? '/'))) {
+        if (is_file($f = $pub . ($m[2] ?? '/')) && str_starts_with(realpath($f), realpath($pub) . '/')) {
             // Serve static file with correct content type
             $ext = pathinfo($f, PATHINFO_EXTENSION);
             $types = ['css' => 'text/css', 'js' => 'text/javascript', 'webp' => 'image/webp',
@@ -46,7 +52,6 @@ namespace SPE\Router {
                 ['sunset', 'Sunset', 'sunset'],
             ],
             public array $chapters = [
-                ['00', 'Tutorial', 'Automated video generation pipeline using Playwright browser capture and Piper text-to-speech'],
                 ['01', 'Simple', 'Single-file anonymous class demonstrating PHP 8.5 pipe operator with first-class callables'],
                 ['02', 'Styled', 'Custom CSS framework with CSS variables, automatic dark mode detection, and toast notifications'],
                 ['03', 'Plugins', 'Plugin architecture introducing the CRUDL pattern for Create, Read, Update, Delete, List operations'],
@@ -56,8 +61,6 @@ namespace SPE\Router {
                 ['07', 'PDO', 'SQLite database integration using PDO wrapper class and QueryType enum for fetch modes'],
                 ['08', 'Users', 'User management system with full CRUDL operations and profile handling'],
                 ['09', 'Blog', 'Complete CMS featuring authentication, blog posts, static pages, and documentation'],
-                ['10', 'Htmx', 'SPA-like blog with htmx for partial page updates, live search, and inline CRUD'],
-                ['11', 'HCP', 'Lightweight hosting control panel for managing Nginx vhosts, DNS zones, and SSL certificates'],
             ],
         ) {}
     }

@@ -93,7 +93,6 @@ Each chapter builds on the previous:
 | 07-PDO | SQLite database |
 | 08-Users | User CRUDL |
 | 09-Blog | Full CMS |
-| 10-YouTube | OAuth, API |
 
 ### Directory Layout (05-10)
 

@@ -5,7 +5,7 @@
 namespace SPE\App;
 
 /**
- * Access Control Levels (from HCP pattern)
+ * Access Control Levels
  *
  * Usage:
  *   Acl::SuperAdmin->value  // 0

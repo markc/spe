@@ -5,12 +5,12 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![CI](https://github.com/markc/spe/actions/workflows/ci.yml/badge.svg)](https://github.com/markc/spe/actions/workflows/ci.yml)
 [![Website](https://img.shields.io/badge/Website-markc.github.io-blue?logo=github)](https://markc.github.io/spe/)
-[![Tutorial](https://img.shields.io/badge/Tutorial-10_Chapters-blue)](https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B)
+[![Tutorial](https://img.shields.io/badge/Tutorial-9_Chapters-blue)](https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B)
 [![Built with Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-orange?logo=anthropic)](https://claude.ai/code)
 
 _Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)_
 
-A progressive **PHP 8.5 micro-framework tutorial** in 10 chapters. Each chapter builds on the previous, demonstrating modern PHP features and design patterns.
+A progressive **PHP 8.5 micro-framework tutorial** in 9 chapters. Each chapter builds on the previous, demonstrating modern PHP features and design patterns.
 
 ## Features
 
@@ -50,7 +50,7 @@ enum QueryType { case All; case One; case Column; }
 
 ## Video Tutorials
 
-**[Watch the complete tutorial series on YouTube](https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B)** - 10 chapters with AI narration covering all framework features.
+**[Watch the complete tutorial series on YouTube](https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B)** - 9 chapters with AI narration covering all framework features.
 
 Want to create your own tutorial videos? See [00-Tutorial](00-Tutorial/README.md) for the video generation pipeline.
 
@@ -77,7 +77,6 @@ Open http://localhost:8000 to see the chapter index.
 
 | # | Name | Description | Key Feature |
 |---|------|-------------|-------------|
-| 00 | [Tutorial](00-Tutorial/README.md) | Video generation pipeline | Playwright + Piper TTS |
 | 01 | [Simple](01-Simple/README.md) | Single-file anonymous class | Pipe operator basics |
 | 02 | [Styled](02-Styled/README.md) | Custom CSS, dark mode | Toast notifications |
 | 03 | [Plugins](03-Plugins/README.md) | Plugin architecture | CRUDL pattern |
@@ -87,8 +86,6 @@ Open http://localhost:8000 to see the chapter index.
 | 07 | [PDO](07-PDO/README.md) | Database access | SQLite + QueryType enum |
 | 08 | [Users](08-Users/README.md) | User management | Full CRUDL operations |
 | 09 | [Blog](09-Blog/README.md) | Complete CMS | Auth, Blog, Docs, Categories |
-| 10 | [Htmx](10-Htmx/README.md) | Htmx Integration | Dynamic UI without JavaScript |
-| 11 | [HCP](11-HCP/README.md) | Hosting Control Panel | Mainly for Proxmox VM/CTs |
 
 ## Architecture
 

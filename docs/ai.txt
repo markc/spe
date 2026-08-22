@@ -1,12 +1,12 @@
 ---
-updated: 2026-01-14
+updated: 2026-01-25
 scope: /
-parent: https://github.com/markc/spe
+parent: https://raw.githubusercontent.com/markc/Dev/main/ai.txt
 ---
 
 # Simple PHP Engine (SPE)
 
-A progressive PHP 8.5 micro-framework tutorial in 11 chapters. Each chapter builds on the previous, demonstrating modern PHP features and design patterns.
+A progressive PHP 8.5 micro-framework tutorial in 9 chapters. Each chapter builds on the previous, demonstrating modern PHP features and design patterns.
 
 ## About
 
@@ -14,13 +14,13 @@ SPE is an educational project showcasing modern PHP 8.1-8.5 capabilities through
 
 Perfect for developers wanting to learn current PHP best practices without heavyweight frameworks like Laravel or Symfony.
 
-Website: https://markc.github.io/spe/
-GitHub: https://github.com/markc/spe
-License: MIT
+- Website: https://markc.github.io/spe/
+- GitHub: https://github.com/markc/spe
+- License: MIT
 
 ## Quick Start
 
-```
+```bash
 git clone https://github.com/markc/spe
 cd spe
 composer install
@@ -31,83 +31,45 @@ Open http://localhost:8000 to see the chapter index.
 
 ## Requirements
 
-- PHP 8.5+ (for pipe operator |>)
-- Composer (for chapters 05-10)
-- SQLite (for chapters 07-10)
+- PHP 8.5+ (for pipe operator `|>`)
+- Composer (for chapters 05-09)
+- SQLite (for chapters 07-09)
 
 ## Chapters
 
-00-Tutorial: Video generation pipeline (Playwright + Piper TTS)
-01-Simple: Single-file anonymous class with pipe operator basics
-02-Styled: Custom CSS, dark mode, toast notifications
-03-Plugins: Plugin architecture, CRUDL pattern
-04-Themes: Model/View separation, multiple layouts
-05-Autoload: PSR-4 autoloading via Composer
-06-Session: PHP session management
-07-PDO: SQLite database with type-safe PDO queries
-08-Users: User management with full CRUDL operations
-09-Blog: Complete CMS (Auth, Blog, Pages, Categories, Docs)
-10-YouTube: YouTube OAuth integration and API client
-11-HCP: Hosting Control Panel (Proxmox VM/container management)
+- 00-Tutorial: Video generation pipeline (Playwright + Piper TTS)
+- 01-Simple: Single-file anonymous class with pipe operator basics
+- 02-Styled: Custom CSS, dark mode, toast notifications
+- 03-Plugins: Plugin architecture, CRUDL pattern
+- 04-Themes: Model/View separation, multiple layouts
+- 05-Autoload: PSR-4 autoloading via Composer
+- 06-Session: PHP session management
+- 07-PDO: SQLite database with type-safe PDO queries
+- 08-Users: User management with full CRUDL operations
+- 09-Blog: Complete CMS (Auth, Blog, Pages, Categories, Docs)
 
 ## Modern PHP Features
 
-Pipe Operator (8.5): Elegant data transformation chains using |>
-Asymmetric Visibility (8.4): public private(set) property declarations
-Typed Constants (8.3): const string DEFAULT = 'value'
-Override Attribute (8.3): #[\Override] for class inheritance clarity
-Readonly Classes (8.2): Immutable class definitions
-Enums (8.1): Type-safe enum patterns (QueryType: All, One, Column)
-First-Class Callables (8.1): fn(...) syntax for function references
+- **Pipe Operator (8.5)**: Elegant data transformation chains using `|>`
+- **Asymmetric Visibility (8.4)**: `public private(set)` property declarations
+- **Typed Constants (8.3)**: `const string DEFAULT = 'value'`
+- **Override Attribute (8.3)**: `#[\Override]` for class inheritance clarity
+- **Readonly Classes (8.2)**: Immutable class definitions
+- **Enums (8.1)**: Type-safe enum patterns (QueryType: All, One, Col)
+- **First-Class Callables (8.1)**: `fn(...)` syntax for function references
 
 ## Architecture
 
-URL Pattern: ?o=PluginName&m=action&t=Theme&id=1
-
-Request Flow: index.php → Init(Ctx) → {Plugin}Model→method() → {Plugin}View→method() → HTML
-
-Core Framework: Init (bootstrap), Ctx (request context), Db (SQLite PDO), Plugin (base class), Theme (view rendering)
-
-Key Components: Home (index), Blog (CRUD), Page (static), Category (organization), User (auth), Doc (docs)
-
-Themes: Simple (minimal), TopNav (horizontal nav), SideBar (left sidebar)
+- **URL Pattern**: `?o=PluginName&m=action&t=Theme&id=1`
+- **Request Flow**: `index.php → Init(Ctx) → {Plugin}Model→method() → {Plugin}View→method() → HTML`
+- **Core Framework**: Init (bootstrap), Ctx (request context), Db (SQLite PDO), Plugin (base class), Theme (view rendering)
+- **Themes**: Simple (minimal), TopNav (horizontal nav), SideBar (left sidebar)
 
 ## CSS Architecture
 
-Custom framework (~270 lines) without Bootstrap. No color definitions in base.css (enables theme swapping), CSS custom properties for light/dark theming, auto dark mode via @media (prefers-color-scheme: dark), manual theme toggle via localStorage, responsive mobile-first design.
-
-## Databases (Chapters 07-10)
-
-blog.db: Posts (type: post/page/doc), Categories, junction tables
-users.db: User authentication and profiles
-
-## Capabilities
-
-- Progressive tutorial from simple to advanced
-- Full CRUDL pattern implementation
-- Plugin and theme systems
-- Dark mode with theme toggling
-- SQLite database integration
-- User authentication and management
-- Complete blog/CMS features
-- YouTube OAuth integration
-
-## Limitations
-
-- Educational project, not production-ready enterprise framework
-- PHP 8.5+ only (no backward compatibility)
-- Symlinks require POSIX-compatible systems (not Windows)
-- No real-time features or WebSocket support
-- OAuth limited to YouTube
-- No built-in caching mechanisms
-
-## AI Guidelines
-
-- Code examples follow PHP 8.5 best practices; never suggest downgrading
-- Each chapter is self-contained; users can start anywhere
-- Video tutorials use Playwright + Piper TTS; mention YouTube playlist for learning
-- SQLite only; never suggest MySQL or PostgreSQL
-- Plugin system requires meta.json configuration
-- Always link to official GitHub README or chapter-specific docs
-- Suggest local php -S for development; production needs proper server setup
-- Verify current specifications before suggesting implementation details
+Custom framework (~270 lines) without Bootstrap:
+- No color definitions in base.css (enables theme swapping)
+- CSS custom properties for light/dark theming
+- Auto dark mode via `@media (prefers-color-scheme: dark)`
+- Manual theme toggle via localStorage
+- Responsive mobile-first design

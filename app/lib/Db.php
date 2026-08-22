@@ -7,13 +7,6 @@ namespace SPE\App;
 use PDO;
 use PDOStatement;
 
-enum QueryType: string
-{
-    case All = 'all';
-    case One = 'one';
-    case Col = 'col';
-}
-
 final class Db extends PDO
 {
     private const array OPTS = [

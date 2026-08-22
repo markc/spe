@@ -65,7 +65,7 @@ spe/
 │   ├── frames/             # Screenshots (generated, gitignored)
 │   └── audio/              # TTS audio (generated, gitignored)
 ├── ...
-└── 10-YouTube/
+└── 09-Blog/
 ```
 
 ## Quick Start

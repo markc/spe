@@ -102,7 +102,7 @@ final class AuthModel
             Util::setRemember($this->db, (int) $usr['id']);
         }
 
-        // Set admin session flag (from HCP pattern)
+        // Set admin session flag
         if ($acl->can(Acl::Admin)) {
             $_SESSION['adm'] = $usr['id'];
         }

@@ -24,7 +24,6 @@ Which chapter would this apply to?
 - [ ] 07-PDO
 - [ ] 08-Users
 - [ ] 09-Blog
-- [ ] 10-YouTube
 - [ ] 00-Tutorial (video generation)
 - [ ] All chapters
 
