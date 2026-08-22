@@ -90,7 +90,8 @@ Every SQL statement is a prepared statement, and request data reaches SQL only a
 ## Try it
 
 ```bash
-php -S localhost:8007 -t 07-PDO/public
+# From the repo root, so the shared base.css/site.css/base.js load:
+php -S localhost:8000 index.php   # then open http://localhost:8000/07-PDO/
 ```
 
 The database is created and seeded automatically. Add a post, edit it, delete it; try `?o=Posts&x=json` for the list as data. Delete `07-PDO/data/spe.db` to start fresh.

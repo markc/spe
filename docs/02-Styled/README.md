@@ -52,7 +52,7 @@ The document `<head>` gains the pieces the shell needs: the two stylesheets, the
 - **`site.css`** defines every colour, in the OKLCH colour space, for light and dark and for each scheme.
 - **`base.js`** is a small controller (`Base`) that toggles theme and scheme, opens and pins the sidebars, and shows toasts; `Base.toast('Saved.', 'success')` is what the buttons call.
 
-They are shared rather than copied because they are an *asset*, not a lesson. Each chapter links them by relative path (`../base.css`), so a chapter also runs on its own with `php -S localhost:8000 -t 02-Styled/public`.
+They are shared rather than copied because they are an *asset*, not a lesson. Each chapter links them by relative path (`../base.css`), which resolves when the project is served through the root router (`php -S localhost:8000 index.php`); that is the way to run any chapter from 02 on.
 
 ## PHP features introduced
 
@@ -66,7 +66,8 @@ The escaping story is unchanged from chapter 01: `?o` is validated and used only
 ## Try it
 
 ```bash
-php -S localhost:8002 -t 02-Styled/public
+# From the repo root, so the shared base.css/site.css/base.js load:
+php -S localhost:8000 index.php   # then open http://localhost:8000/02-Styled/
 ```
 
 Open the sidebars, switch scheme and theme (reload — your choice sticks), and press the toast buttons.

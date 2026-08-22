@@ -97,7 +97,8 @@ Chapter 06 adds the write-path guarantees the rest of the series relies on: the 
 ## Try it
 
 ```bash
-php -S localhost:8006 -t 06-Session/public
+# From the repo root, so the shared base.css/site.css/base.js load:
+php -S localhost:8000 index.php   # then open http://localhost:8000/06-Session/
 ```
 
 Submit the Contact form (toast after redirect), reload (no repeat), and inspect the form to see the hidden `csrf` field.

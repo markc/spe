@@ -101,7 +101,8 @@ Every guarantee from earlier chapters holds, and this chapter adds the identity 
 ## Try it
 
 ```bash
-php -S localhost:8008 -t 08-Auth/public
+# From the repo root, so the shared base.css/site.css/base.js load:
+php -S localhost:8000 index.php   # then open http://localhost:8000/08-Auth/
 ```
 
 Sign in as admin (`admin@example.com` / `admin`) and as a normal user (`user@example.com` / `user`); visit `?o=Users` as each; tick "remember me", then delete the session cookie in your browser and reload to see it restore you.

@@ -87,7 +87,8 @@ This chapter establishes output escaping as a rule the rest of the series never 
 ## Try it
 
 ```bash
-php -S localhost:8004 -t 04-Views/public
+# From the repo root, so the shared base.css/site.css/base.js load:
+php -S localhost:8000 index.php   # then open http://localhost:8000/04-Views/
 ```
 
 Look at the Home page source and find `&lt;b&gt;tags&lt;/b&gt;`. Try `?o=About` (base view), `?o=Contact&m=update` (unimplemented, names the model), and `?o=About&x=json` (model data as JSON).

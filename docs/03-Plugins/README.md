@@ -90,7 +90,8 @@ Two guarantees are established here and kept for the rest of the series. First, 
 ## Try it
 
 ```bash
-php -S localhost:8003 -t 03-Plugins/public
+# From the repo root, so the shared base.css/site.css/base.js load:
+php -S localhost:8000 index.php   # then open http://localhost:8000/03-Plugins/
 ```
 
 Try `?o=Home&m=create` (an unimplemented method), `?o=Nope` and `?o=Ctx` (both 404), and `?o=About&x=json` (the data as JSON).

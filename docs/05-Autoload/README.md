@@ -67,8 +67,8 @@ No behaviour changes, so the guarantees of chapters 03–04 carry over untouched
 ## Try it
 
 ```bash
-composer install          # once, from the repo root
-php -S localhost:8005 -t 05-Autoload/public
+composer install                  # once, from the repo root
+php -S localhost:8000 index.php    # then open http://localhost:8000/05-Autoload/
 ```
 
 Confirm the pages are identical to chapter 04. Then compare the code: `diff` the class bodies of `04-Views/public/index.php` against the files in `05-Autoload/src/` and you will find only the namespace lines, the `use` statements, and the version label differ.

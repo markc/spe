@@ -98,7 +98,8 @@ The chapter's new surface is user-authored Markdown, and it is handled to the se
 ## Try it
 
 ```bash
-php -S localhost:8009 -t 09-Blog/public
+# From the repo root, so the shared base.css/site.css/base.js load:
+php -S localhost:8000 index.php   # then open http://localhost:8000/09-Blog/
 php 09-Blog/bin/seed-docs.php     # optional: serve this tutorial as Docs
 ```
 
