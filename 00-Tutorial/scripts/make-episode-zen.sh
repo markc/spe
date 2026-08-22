@@ -40,21 +40,19 @@ echo "$DURS" > "$DIR/durations.json"
 php -S 127.0.0.1:8000 "$ROOT/index.php" >/tmp/php-ep.log 2>&1 &
 PHP=$!
 
-# Switch the active virtual desktop to the one Zen opens on (KWin rule sends it
-# to Desktop 5), so gpu-screen-recorder captures that desktop, then restore.
+# Zen's KWin rule opens it maximised on Desktop 5 and (per your config) activates
+# that desktop, so gpu-screen-recorder captures it. We just remember the current
+# desktop and restore it afterwards. Set SWITCH_DESKTOP=1 to force the switch via
+# D-Bus if your rule ever fails to activate it.
 DESKTOP="${DESKTOP:-Desktop 5}"
 PREV_DESK=$(qdbus6 org.kde.KWin /VirtualDesktopManager current 2>/dev/null || true)
-TARGET_DESK=$(gdbus call --session --dest org.kde.KWin --object-path /VirtualDesktopManager \
-  --method org.freedesktop.DBus.Properties.Get org.kde.KWin.VirtualDesktopManager desktops 2>/dev/null \
-  | grep -oP "'\K[0-9a-f-]{36}(?=', '$DESKTOP')" || true)
 restore_desk() { [ -n "${PREV_DESK:-}" ] && qdbus6 org.kde.KWin /VirtualDesktopManager current "$PREV_DESK" 2>/dev/null || true; }
 trap 'kill $PHP 2>/dev/null || true; restore_desk' EXIT
-if [ -n "$TARGET_DESK" ]; then
-  echo "switching to $DESKTOP for capture"
-  qdbus6 org.kde.KWin /VirtualDesktopManager current "$TARGET_DESK" 2>/dev/null || true
-  sleep 1
-else
-  echo "WARN: could not find '$DESKTOP' — capturing the current desktop"
+if [ "${SWITCH_DESKTOP:-0}" = 1 ]; then
+  TARGET_DESK=$(gdbus call --session --dest org.kde.KWin --object-path /VirtualDesktopManager \
+    --method org.freedesktop.DBus.Properties.Get org.kde.KWin.VirtualDesktopManager desktops 2>/dev/null \
+    | grep -oP "'\K[0-9a-f-]{36}(?=', '$DESKTOP')" || true)
+  [ -n "$TARGET_DESK" ] && { echo "forcing switch to $DESKTOP"; qdbus6 org.kde.KWin /VirtualDesktopManager current "$TARGET_DESK" 2>/dev/null || true; sleep 1; }
 fi
 
 gpu-screen-recorder -w portal -restore-portal-session yes \
