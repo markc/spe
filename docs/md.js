@@ -70,28 +70,34 @@ function md(s) {
     }).join('\n').trim();
 }
 
-// Document viewer
-async function loadDoc(path) {
-    const content = document.getElementById('content');
-    try {
-        const res = await fetch(path);
-        if (!res.ok) throw new Error(`Failed to load ${path}`);
-        content.innerHTML = md(await res.text());
-        document.querySelectorAll('[data-path]').forEach(a => a.classList.toggle('active', a.dataset.path === path));
-        history.pushState({path}, '', `#${path}`);
-    } catch (e) {
-        content.innerHTML = `<p>Error: ${e.message}</p>`;
+// Rewrite an authored .md link (relative to the docs root) to its clean page URL.
+// e.g. "01-Simple/README.md" -> "<root>01-Simple/", "CONVENTIONS.md" -> "<root>conventions/".
+function cleanDocHref(href, root) {
+    if (/^(#|[a-z]+:|\/\/)/i.test(href)) return href;          // anchors, http:, mailto: … left alone
+    if (/(^|\/)README\.md$/.test(href)) {
+        const dir = href.replace(/README\.md$/, '');
+        return (root + dir) || './';
     }
+    if (/CONVENTIONS\.md$/i.test(href)) return root + 'conventions/';
+    if (/\.md$/i.test(href)) return root + href;
+    return href;
 }
 
-// Auto-init doc viewer if data-path links exist
+// Render the page's own Markdown into #content (one page = one document, real URLs, no hash).
 (function() {
     const init = () => {
-        const links = document.querySelectorAll('[data-path]');
-        if (!links.length) return;
-        links.forEach(a => a.addEventListener('click', e => { e.preventDefault(); loadDoc(a.dataset.path); }));
-        window.addEventListener('hashchange', () => location.hash && loadDoc(location.hash.slice(1)));
-        loadDoc(location.hash ? location.hash.slice(1) : 'README.md');
+        const el = document.getElementById('content');
+        if (!el || !el.dataset.md) return;
+        const root = el.dataset.root || '';
+        fetch(el.dataset.md)
+            .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+            .then(src => {
+                el.innerHTML = md(src);
+                el.querySelectorAll('a[href]').forEach(a =>
+                    a.setAttribute('href', cleanDocHref(a.getAttribute('href'), root)));
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            })
+            .catch(() => { el.innerHTML = '<p>Sorry, this document could not be loaded.</p>'; });
     };
     document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', init) : init();
 })();

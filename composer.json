@@ -43,6 +43,7 @@
         "lint": "mago lint --semantics",
         "lint:all": "mago lint",
         "format": "mago format",
+        "build-docs": "php bin/build-docs.php",
         "test": "pest",
         "check": [
             "php bin/check-chapters.php",

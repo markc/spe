@@ -16,6 +16,7 @@ foreach ($manifest['chapters'] as $c) {
     is_dir("$root/$dir") || $fail("$id: directory $dir missing");
     is_file("$root/{$c['entry']}") || $fail("$id: entry {$c['entry']} missing");
     is_file("$root/docs/$dir/README.md") || $fail("$id: docs/$dir/README.md missing");
+    is_file("$root/docs/$dir/index.html") || $fail("$id: docs/$dir/index.html missing — run composer build-docs");
     is_link("$root/$dir/README.md") && readlink("$root/$dir/README.md") === "../docs/$dir/README.md"
         || $fail("$id: $dir/README.md must be a symlink to ../docs/$dir/README.md");
     foreach ($c['adds'] as $f) {

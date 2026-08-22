@@ -3,34 +3,34 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>SPE Documentation</title>
-    <link rel="icon" href="favicon.ico">
-    <link rel="stylesheet" href="base.css">
-    <link rel="stylesheet" href="site.css">
+    <title>SPE::01 Simple</title>
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../base.css">
+    <link rel="stylesheet" href="../site.css">
     <script src="https://unpkg.com/lucide@1.33.0/dist/umd/lucide.min.js"></script>
     <script>(function(){var s=JSON.parse(localStorage.getItem('base-state')||'{}'),t=s.theme,c=s.scheme,h=document.documentElement;h.className='preload '+(t||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))+(c&&c!=='default'?' scheme-'+c:'');})()</script>
 </head>
 <body>
 <nav class="topnav">
     <button class="menu-toggle" data-sidebar="left"><i data-lucide="menu"></i></button>
-    <h1><a class="brand" href="./"><span>📚 SPE Documentation</span></a></h1>
+    <h1><a class="brand" href="../"><span>📚 SPE Documentation</span></a></h1>
     <button class="menu-toggle" data-sidebar="right"><i data-lucide="menu"></i></button>
 </nav>
 <aside class="sidebar sidebar-left">
     <div class="sidebar-header"><span><i data-lucide="book-open"></i> Chapters</span><button class="pin-toggle" data-sidebar="left" title="Pin sidebar"><i data-lucide="pin"></i></button></div>
     <nav>
-        <a href="./" class="active" data-icon="home"><i data-lucide="home"></i> SPE Overview</a>
-        <a href="conventions/" data-icon="ruler"><i data-lucide="ruler"></i> Conventions</a>
-        <a href="00-Tutorial/" data-icon="video"><i data-lucide="video"></i> 00 Tutorial</a>
-        <a href="01-Simple/" data-icon="file-code"><i data-lucide="file-code"></i> 01 Simple</a>
-        <a href="02-Styled/" data-icon="palette"><i data-lucide="palette"></i> 02 Styled</a>
-        <a href="03-Plugins/" data-icon="puzzle"><i data-lucide="puzzle"></i> 03 Plugins</a>
-        <a href="04-Views/" data-icon="layout-template"><i data-lucide="layout-template"></i> 04 Views</a>
-        <a href="05-Autoload/" data-icon="package"><i data-lucide="package"></i> 05 Autoload</a>
-        <a href="06-Session/" data-icon="cookie"><i data-lucide="cookie"></i> 06 Session</a>
-        <a href="07-PDO/" data-icon="database"><i data-lucide="database"></i> 07 PDO</a>
-        <a href="08-Auth/" data-icon="users"><i data-lucide="users"></i> 08 Auth</a>
-        <a href="09-Blog/" data-icon="newspaper"><i data-lucide="newspaper"></i> 09 Blog</a>
+        <a href="../" data-icon="home"><i data-lucide="home"></i> SPE Overview</a>
+        <a href="../conventions/" data-icon="ruler"><i data-lucide="ruler"></i> Conventions</a>
+        <a href="../00-Tutorial/" data-icon="video"><i data-lucide="video"></i> 00 Tutorial</a>
+        <a href="../01-Simple/" class="active" data-icon="file-code"><i data-lucide="file-code"></i> 01 Simple</a>
+        <a href="../02-Styled/" data-icon="palette"><i data-lucide="palette"></i> 02 Styled</a>
+        <a href="../03-Plugins/" data-icon="puzzle"><i data-lucide="puzzle"></i> 03 Plugins</a>
+        <a href="../04-Views/" data-icon="layout-template"><i data-lucide="layout-template"></i> 04 Views</a>
+        <a href="../05-Autoload/" data-icon="package"><i data-lucide="package"></i> 05 Autoload</a>
+        <a href="../06-Session/" data-icon="cookie"><i data-lucide="cookie"></i> 06 Session</a>
+        <a href="../07-PDO/" data-icon="database"><i data-lucide="database"></i> 07 PDO</a>
+        <a href="../08-Auth/" data-icon="users"><i data-lucide="users"></i> 08 Auth</a>
+        <a href="../09-Blog/" data-icon="newspaper"><i data-lucide="newspaper"></i> 09 Blog</a>
     </nav>
 </aside>
 <aside class="sidebar sidebar-right">
@@ -44,9 +44,9 @@
         <a href="#" onclick="Base.toggleTheme();return false" data-icon="moon"><i data-lucide="moon"></i> Toggle Theme</a>
     </nav>
 </aside>
-<main id="content" class="prose" data-md="README.md" data-root="">Loading…</main>
+<main id="content" class="prose" data-md="README.md" data-root="../">Loading…</main>
 <div class="overlay"></div>
-<script src="base.js"></script>
-<script src="md.js"></script>
+<script src="../base.js"></script>
+<script src="../md.js"></script>
 </body>
 </html>

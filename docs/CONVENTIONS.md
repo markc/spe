@@ -125,7 +125,9 @@ Each chapter's README (`docs/XX-Name/README.md`, symlinked from `XX-Name/README.
 
 The prose style is described in `.claude/runbooks/documentation-style-guide.md`: paragraphs over bullets, explain why before what, no "simply" or "obviously".
 
-`chapters.json` at the repository root is the machine-readable manifest: one entry per chapter with its directory, idea, the files it adds, the PHP features it introduces, how to run it and how to test it. `bin/check-chapters.php` verifies that the manifest, the directories, the READMEs and the chapter tables in the root `index.php` and `docs/README.md` all agree, and CI runs it.
+`chapters.json` at the repository root is the machine-readable manifest: one entry per chapter with its directory, idea, the files it adds, the PHP features it introduces, how to run it and how to test it. `bin/check-chapters.php` verifies that the manifest, the directories, the READMEs, the generated docs pages and the chapter tables in the root `index.php` and `docs/README.md` all agree, and CI runs it.
+
+The GitHub Pages site is one static page per section under `docs/<dir>/index.html`, generated from the manifest by `bin/build-docs.php` (`composer build-docs`); each page renders its own co-located `README.md` client-side with `docs/md.js`. The sidebar links straight to clean directory URLs (`/spe/01-Simple/`) — no hash, no extra click. Re-run `composer build-docs` after adding or renaming a chapter; `composer check` fails if a page is missing.
 
 ## Tests
 
