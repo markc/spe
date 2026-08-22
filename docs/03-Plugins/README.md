@@ -2,199 +2,99 @@
 
 _Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)_
 
-Chapter Three presents a paradox: the browser shows exactly the same interface as Chapter Two—the same navigation, the same card layouts, the same dark mode toggle and toast notifications—yet the PHP code behind it has been completely restructured. Where Chapter Two demonstrated a single self-rendering anonymous class, Chapter Three introduces four named classes that separate concerns into distinct responsibilities. This architectural shift produces identical output while establishing the foundation for extensible applications. The visual sameness is intentional; it isolates the structural changes so readers can focus entirely on how the code is organized rather than what it displays.
+Chapter 03 looks identical to chapter 02 in the browser and is completely different underneath. The single anonymous class is gone; in its place are the three classes that shape every remaining chapter: `Ctx`, which reads and validates the request; `Init`, the front controller that turns a request into a page; and `Plugin`, the base class each page extends. This is where SPE stops being a script and becomes a tiny framework — and because the visible output is unchanged, you can give the new structure your whole attention.
 
-## The Same Surface, Different Depths
+## The one idea
 
-Loading Chapter Three in a browser reveals no visible changes from Chapter Two. The navigation links work identically, the theme toggle persists preferences to localStorage, the contact form opens the email client, and the toast buttons display their notifications. This visual continuity masks a fundamental reorganization. Chapter Two's anonymous class handled everything—routing, rendering, content—in a single construct-to-string lifecycle. Chapter Three distributes these responsibilities across a context container, an initialization dispatcher, an abstract plugin base, and concrete plugin implementations. The output remains constant because the architecture serves the same purpose; what changes is how that purpose is achieved and how easily the system can grow.
+**The request contract and the plugin.** From here on every request is described by a few validated query parameters — `o` (which plugin), `m` (which method), `x` (output format) — and every page is a `Plugin`: a class exposing the five CRUDL methods, of which it overrides only the ones it needs.
 
-## The Context Container
+## What's on the screen
 
-The `Ctx` class serves as a readonly value object that holds the application's configuration and state containers. Its constructor uses PHP 8.4's constructor property promotion to declare four public properties with default values:
+The same Home / About / Contact pages in the same shell. What changed is how a URL maps to content: `?o=Home` selects the Home plugin, `?m=list` selects its `list()` method, and `?x=json` returns the data as JSON instead of HTML. Every chapter from here shares this vocabulary.
+
+## Walkthrough
+
+### Ctx — the request
 
 ```php
-readonly class Ctx {
+final readonly class Ctx
+{
+    public array $in;
     public function __construct(
-        public string $email = 'mc@netserva.org',
-        public array $in = ['o' => 'Home', 'm' => 'list', 'x' => ''],
-        public array $out = ['doc' => 'SPE::03', 'nav' => '', 'head' => '', 'main' => '', 'foot' => ''],
-        public array $nav = [['🏠 Home', 'Home'], ['📖 About', 'About'], ['✉️ Contact', 'Contact']]
-    ) {}
-}
-```
-
-The `$email` property provides contact information that plugins can access. The `$in` array defines the expected URL parameters with their defaults: `o` for the plugin/object name, `m` for the method to invoke, and `x` for the output format. The `$out` array provides placeholders for rendered content sections. The `$nav` array defines navigation entries as pairs of display label and plugin name. By making the class readonly, PHP guarantees these defaults cannot be modified after construction—the context is immutable once created.
-
-The significance of `Ctx` lies in what it represents: a single point of truth for application configuration. Rather than scattering defaults across multiple locations or relying on global variables, all configuration lives in one place. When `new Ctx` is instantiated at the application entry point, it carries these defaults forward. The class itself does nothing; it simply exists as a container that other classes can read from.
-
-## The Initialization Dispatcher
-
-The `Init` class performs the actual work of processing requests and generating output. It accepts a `Ctx` instance through constructor injection, processes the incoming request parameters, dispatches to the appropriate plugin, and renders the final HTML or JSON response.
-
-```php
-readonly class Init {
-    private array $in;
-    private array $out;
-
-    public function __construct(private Ctx $ctx) {
-        $this->in = array_map(fn($k, $v) => ($_REQUEST[$k] ?? $v)
-            |> trim(...)
-            |> htmlspecialchars(...), array_keys($ctx->in), $ctx->in)
-            |> (fn($v) => array_combine(array_keys($ctx->in), $v));
-        $this->out = [...$ctx->out, 'main' => $this->dispatch()];
+        public array $out = ['doc' => 'SPE::03', 'page' => '03 Plugins', 'main' => ''],
+        public array $nav = [['home', 'Home', 'Home'], /* … */],
+        /* … */
+    ) {
+        $this->in = [
+            'o' => self::get('o', 'Home', '/^[A-Z][A-Za-z]{0,31}$/'),
+            'm' => self::get('m', 'list', '/^(create|read|update|delete|list)$/'),
+            'x' => self::get('x', '', '/^json$/'),
+        ];
     }
 ```
 
-The constructor's input processing demonstrates a more sophisticated use of the pipe operator than Chapter Two. The `array_map` call iterates over the keys and default values from `$ctx->in`, and for each parameter, retrieves the request value or falls back to the default, then pipes that through `trim(...)` and `htmlspecialchars(...)`. The result flows through another pipe to `array_combine`, which reconstructs an associative array with the original keys. This single expression sanitizes all URL parameters in one pass while preserving any that weren't provided in the request.
-
-The constructor then spreads the context's output array and overwrites the `main` key with the result of `dispatch()`. This pattern—starting with defaults and selectively overwriting—appears throughout SPE as a way to merge configuration with computed values.
-
-## Dynamic Plugin Dispatch
-
-The `dispatch()` method embodies the plugin architecture's core mechanism. It extracts the plugin name and method from the processed input, validates that both exist, and invokes the requested method on a new plugin instance:
+`Ctx` is a **readonly class** (PHP 8.2): once constructed, nothing can change it, so the request is a fixed, trustworthy value for the rest of the cycle. Its most important job is validation. `get()` reads a query parameter and returns it **only if it matches an allow-list pattern**, otherwise the default:
 
 ```php
-private function dispatch(): string {
-    [$o, $m] = [$this->in['o'], $this->in['m']];
-    return match (true) {
-        !class_exists($o) => '<p>Error: plugin not found</p>',
-        !method_exists($o, $m) => '<p>Error: method not found</p>',
-        default => (new $o($this->ctx))->$m()
-    };
+private static function get(string $key, string $default, string $pattern): string
+{
+    $v = $_GET[$key] ?? '';
+    return is_string($v) && preg_match($pattern, $v) ? $v : $default;
 }
 ```
 
-The `match (true)` pattern evaluates each arm's condition in order, returning the first match. If the class doesn't exist, an error message is returned. If the class exists but lacks the requested method, a different error appears. Only when both validations pass does the dispatch actually occur. The expression `(new $o($this->ctx))->$m()` instantiates the plugin class with the context, then immediately calls the method—all in one expression. This is PHP's variable class and method invocation: `$o` contains a string like `'Home'`, and `$m` contains a string like `'list'`, so the expression becomes effectively `(new Home($this->ctx))->list()`.
+So `o` must look like a class name, `m` must be one of the five CRUDL verbs, and `x` is either empty or `json`. Anything else silently becomes the default. This is the chapter's security foundation: the request is constrained to known-good shapes *before* any of it is used to choose a class or a method.
 
-This dispatch mechanism means adding a new plugin requires only creating a new class. No routing tables, no configuration files, no registration code. If a class named `Blog` exists with a `list` method, the URL `?o=Blog&m=list` will invoke it. The simplicity is the point: the architecture scales by convention rather than configuration.
-
-## Output Format Switching
-
-The `__toString()` method determines whether to render HTML or JSON based on the `x` parameter:
+### Init — the front controller
 
 ```php
-public function __toString(): string {
-    return match ($this->in['x']) {
-        'json' => (header('Content-Type: application/json') ?: '') . json_encode($this->out),
-        default => $this->html()
-    };
+[$o, $m] = [$ctx->in['o'], $ctx->in['m']];
+if (is_subclass_of($o, Plugin::class)) {
+    $main = new $o($ctx)->$m();
+} else {
+    http_response_code(404);
+    $main = '<div class="card"><h2>Not found</h2>…</div>';
 }
 ```
 
-When `?x=json` appears in the URL, the response becomes a JSON object containing the output array. The expression `(header('Content-Type: application/json') ?: '')` sends the header and evaluates to an empty string (since `header()` returns null), allowing the JSON output to concatenate cleanly. This gives every plugin an automatic JSON API—the same dispatch mechanism that serves HTML pages also serves structured data. A JavaScript frontend could fetch `?o=Home&m=list&x=json` and receive the plugin's output as JSON without any additional server-side code.
+`Init` resolves the plugin from `o` and calls the method named by `m`. Two PHP niceties appear here: `new $o($ctx)->$m()` uses **`new` without parentheses** (PHP 8.4) to construct and immediately call a method in one expression, and the guard is **`is_subclass_of($o, Plugin::class)`**, not merely `class_exists`. That distinction matters for safety: it means only real plugins are routable. `?o=Ctx`, `?o=Init` or `?o=Plugin` (the abstract base itself) all fail the check and return a 404 instead of letting the router instantiate an arbitrary class. Because `m` was already constrained to the five verbs, `$this->$m()` can never call anything but a CRUDL method.
 
-## The HTML Template
+`__toString()` then renders — either the full HTML page, or, when `?x=json` was requested, the `$out` array as JSON with the right `Content-Type`. Every chapter is therefore also a small JSON API, which is what lets the tests assert on data rather than scraping HTML.
 
-The `html()` method generates the page structure, with navigation built using the same pipe operator pattern from Chapter Two:
-
-```php
-private function html(): string {
-    $nav = $this->ctx->nav
-        |> (fn($n) => array_map(fn($p) => sprintf(
-            '<a href="?o=%s"%s>%s</a>',
-            $p[1], $this->in['o'] === $p[1] ? ' class="active"' : '', $p[0]
-        ), $n))
-        |> (fn($a) => implode(' ', $a));
-```
-
-The navigation array from the context flows through a mapping function that generates anchor tags, then through implode to join them with spaces. The active class detection compares each plugin name against the current `o` parameter. The heredoc template that follows mirrors Chapter Two's structure exactly—container, header, nav, main, footer—because the visual output should be identical. The difference is that `{$this->out['main']}` now contains whatever the dispatched plugin returned, rather than content determined within the same class.
-
-## The Plugin Base Class
-
-The abstract `Plugin` class establishes the CRUDL contract that all plugins inherit:
+### Plugin — the base class
 
 ```php
-abstract class Plugin {
+abstract class Plugin
+{
     public function __construct(protected Ctx $ctx) {}
-    public function create(): string { return '<p>Create: not implemented</p>'; }
-    public function read(): string { return '<p>Read: not implemented</p>'; }
-    public function update(): string { return '<p>Update: not implemented</p>'; }
-    public function delete(): string { return '<p>Delete: not implemented</p>'; }
-    public function list(): string { return '<p>List: not implemented</p>'; }
+    public function create(): string { return $this->todo('create'); }
+    public function read(): string   { return $this->todo('read'); }
+    /* update, delete, list … */
 }
 ```
 
-CRUDL—Create, Read, Update, Delete, List—represents the five fundamental operations for managing data. By providing stub implementations that return "not implemented" messages, the base class allows plugins to override only the methods they need. A simple content plugin might only implement `list()`. A full data management plugin would override all five. The `protected Ctx $ctx` property gives every plugin access to the application context, including the email address, navigation structure, and any other configuration the context carries.
+`Plugin` defines the five CRUDL methods, each returning a "not implemented" card by default. A concrete plugin overrides only what it offers. `Home`, `About` and `Contact` each override `list()` with `#[\Override]` (PHP 8.3) — an attribute that tells PHP (and the reader) "this is deliberately replacing a parent method", so a typo in the method name becomes an error instead of a silently-new method.
 
-The abstract class cannot be instantiated directly—PHP enforces this—so it serves purely as a template for concrete plugins. This is classical object-oriented inheritance: define the interface in the parent, implement the specifics in the children.
+## PHP features introduced
 
-## Concrete Plugin Implementations
+- **Readonly classes (8.2)** — `Ctx` is immutable, so the validated request cannot drift.
+- **`new X()->method()` without parentheses (8.4)** — construct and dispatch in one expression.
+- **Abstract classes and inheritance** — `Plugin` defines the CRUDL contract; pages fill it in.
+- **`#[\Override]` (8.3)** — makes "I am replacing a parent method" explicit and typo-proof.
+- **`match(true)` / guard-based dispatch** — routing decisions made from validated values only.
 
-Each page becomes a final class extending Plugin. The `Home` plugin demonstrates the basic pattern:
+## Security
 
-```php
-final class Home extends Plugin {
-    #[\Override] public function list(): string {
-        return <<<'HTML'
-        <div class="card">
-            <h2>Home Page</h2>
-            <p>Welcome to the <b>Plugins</b> example demonstrating the plugin architecture with CRUDL methods.</p>
-        </div>
-        <div class="flex justify-center mt-2">
-            <button class="btn btn-success" onclick="showToast('Success!', 'success')">Success</button>
-            <button class="btn btn-danger" onclick="showToast('Error!', 'danger')">Danger</button>
-        </div>
-        HTML;
-    }
-}
-```
+Two guarantees are established here and kept for the rest of the series. First, `o`, `m` and `x` are validated against allow-lists in `Ctx` before use, so a request can never name an arbitrary method or format. Second, dispatch uses `is_subclass_of(..., Plugin::class)`, so only classes designed to be pages can be instantiated from a URL — the core classes and any unknown name return a 404, never a fatal error or an unexpected object. Content is still static strings, so there is no escaping to do yet; that arrives with user-supplied data in chapter 04's rules and chapter 06's forms.
 
-The `#[\Override]` attribute, introduced in PHP 8.3, tells the compiler this method intentionally overrides a parent method. If the parent's method signature changes or the method name is misspelled, PHP will raise an error rather than silently creating a new method. The `final` keyword prevents further subclassing—these plugins are leaf nodes in the inheritance tree.
-
-The `Contact` plugin shows how plugins access context data:
-
-```php
-final class Contact extends Plugin {
-    #[\Override] public function list(): string {
-        return <<<HTML
-        <div class="card">
-            <h2>Contact Page</h2>
-            <p>Get in touch using the <b>email form</b> below.</p>
-            <form class="mt-2" onsubmit="return handleContact(this)">
-                ...
-            </form>
-        </div>
-        <script>
-        function handleContact(form) {
-            location.href = 'mailto:{$this->ctx->email}?subject=' + ...
-        }
-        </script>
-        HTML;
-    }
-}
-```
-
-The heredoc uses `HTML` (without quotes) to enable variable interpolation, allowing `{$this->ctx->email}` to insert the email address from the context. This demonstrates why the context object exists: plugins can access shared configuration without hardcoding values or accepting constructor parameters beyond the context itself.
-
-## The Entry Point
-
-The application launches with a single expression that chains the entire request lifecycle:
-
-```php
-echo new Init(new Ctx);
-```
-
-This creates a context with default values, passes it to Init which processes the request and dispatches to a plugin, then echoes the result (triggering `__toString()`). The entire architecture—context, initialization, dispatch, plugin execution, rendering—executes from this one line. Compare this to Chapter Two's `echo new class {...}`: both are single expressions, but Chapter Three's expression orchestrates multiple classes working together.
-
-## URL Parameter Reference
-
-The plugin architecture introduces URL parameters that Chapter Two's static routing didn't need:
-
-- `?o=PluginName` selects which plugin class to instantiate (default: `Home`)
-- `?m=methodName` selects which CRUDL method to call (default: `list`)
-- `?x=json` switches output from HTML to JSON (default: HTML)
-
-These parameters combine freely: `?o=Contact&m=list&x=json` returns the Contact plugin's list output as JSON. The defaults mean that accessing the application with no parameters loads `Home::list()` as HTML, matching Chapter Two's behavior.
-
-## Running the Application
-
-Start the PHP development server from the project root to serve the shared CSS and JavaScript:
+## Try it
 
 ```bash
-cd /path/to/spe
-php -S localhost:8080
+php -S localhost:8003 -t 03-Plugins/public
 ```
 
-Navigate to `http://localhost:8080/03-Plugins/public/` to see the application. Click through the navigation to confirm it works identically to Chapter Two. Then examine the URLs—notice how `?o=About` and `?o=Contact` replace Chapter Two's `?m=about` and `?m=contact`. Add `&x=json` to any URL to see the JSON API output.
+Try `?o=Home&m=create` (an unimplemented method), `?o=Nope` and `?o=Ctx` (both 404), and `?o=About&x=json` (the data as JSON).
 
-The visual experience is deliberately unchanged. What changes is the code's organization and its potential for growth. Chapter Two's anonymous class would require modification to add new pages. Chapter Three's plugin architecture requires only new classes—the dispatch mechanism discovers them automatically. This difference matters little for a three-page site but becomes essential as applications grow. The pattern established here carries forward through the remaining chapters, eventually supporting database-backed plugins, authenticated routes, and full content management.
+## Next
+
+Chapter 04 splits each plugin in two: a **Model** that returns data and a **View** that renders HTML, with a **Theme** wrapping the page. That split is what lets the series introduce the single most important habit it teaches — escape every value at the moment it becomes HTML — which chapter 04 puts into `View::e()`.

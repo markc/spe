@@ -2,270 +2,108 @@
 
 _Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)_
 
-A full-featured blog/CMS system demonstrating the complete SPE framework with authentication, content management, and documentation features.
+Chapter 09 is the destination the whole series has been walking toward: a small but real content engine, built entirely from the pieces the earlier chapters introduced. One table holds several kinds of content, distinguished by a `Type` enum; bodies are written in Markdown and rendered safely; a `Post` object exposes derived values as property hooks; entries carry tags through a junction table; lists paginate and filter; and a Docs section is served by the very engine that documents it. It is the concrete answer to the question the project set out to pose — *for a moderately complex site, do you actually need Laravel?* — and the answer, in a few hundred lines of plain PHP 8.5, is no.
 
-## PHP 8.x Features Demonstrated
+## The one idea
 
-### PHP 8.1
-- First-class callables: `array_keys(...)`, `http_build_query(...)`
-- Enums: `enum QueryType { case All; case One; case Column; }`
-- Readonly properties in value objects
+**The application.** Blog and Docs are the same code with a different `Type`; Markdown, tags, pagination and a documentation site fall out of that one design.
 
-### PHP 8.2
-- Readonly classes: `final readonly class PluginMeta`
-- `true`, `false`, `null` as standalone types
+## What's on the screen
 
-### PHP 8.3
-- Typed class constants: `private const string NS = 'SPE\\Blog\\'`
-- Typed array constants: `private const array OPTIONS = [...]`
-- `#[\Override]` attribute on all overridden methods
+A **Blog** of Markdown posts with tags and pagination; a single-post view with prev/next and oldest/newest links; a **Docs** section (the same engine showing `type = doc`); an admin-only **Tags** manager; and, carried from chapter 08, Auth and Users. Sign in as admin to write. Run `php 09-Blog/bin/seed-docs.php` to import this tutorial's chapter READMEs as docs.
 
-### PHP 8.4
-- Asymmetric visibility: `public private(set) string $prop`
-- `new` without parentheses: `new Ctx`
+## Walkthrough
 
-### PHP 8.5
-- Pipe operator `|>` for data transformation chains throughout
-- First-class callables with pipe: `$_GET |> http_build_query(...)`
+### Type — one table, several kinds
 
-## Quick Start
-
-```bash
-composer install
-cd 09-Blog/public
-php -S localhost:8080
-# Open http://localhost:8080
-```
-
-## Features
-
-### Content Management
-- **Posts**: Blog posts with categories, excerpts, featured images
-- **Pages**: Static pages (Home, About, Contact) with custom icons
-- **Categories**: Organize content with category tagging
-- **Docs**: Documentation system reading markdown files from filesystem
-
-### Authentication
-- User login/logout with session management
-- "Remember me" cookie-based persistence
-- Password reset via email with OTP tokens
-- Role-based access control (admin/user)
-
-### Themes
-- **Simple**: Minimal single-column layout
-- **TopNav**: Fixed top navigation bar
-- **SideBar**: Left sidebar with grouped navigation
-
-### Plugin System
-- Auto-discovery via `meta.json` files
-- Route protection (auth required, admin only)
-- Grouped navigation based on plugin metadata
-
-## Architecture
-
-```
-09-Blog/
-├── public/
-│   └── index.php              # Entry point
-├── src/
-│   ├── Core/
-│   │   ├── Ctx.php            # Context with nav building
-│   │   ├── Db.php             # PDO wrapper with QueryType enum
-│   │   ├── Init.php           # Request dispatch and auth
-│   │   ├── Plugin.php         # Base CRUDL plugin
-│   │   ├── PluginLoader.php   # Auto-discovery from meta.json
-│   │   ├── PluginMeta.php     # Immutable plugin metadata
-│   │   ├── Theme.php          # Base theme with nav helpers
-│   │   └── Util.php           # Helpers + Markdown parser
-│   ├── Plugins/
-│   │   ├── Auth/              # Login, logout, password reset
-│   │   ├── Blog/              # Public blog view
-│   │   ├── Categories/        # Category CRUD
-│   │   ├── Contact/           # Contact form
-│   │   ├── Docs/              # Documentation viewer
-│   │   ├── Home/              # Home page
-│   │   ├── Pages/             # Page CRUD
-│   │   ├── Posts/             # Post CRUD + blog.db
-│   │   ├── Profile/           # User profile editing
-│   │   └── Users/             # User management + users.db
-│   └── Themes/
-│       ├── Simple.php         # Minimal theme
-│       ├── TopNav.php         # Top navigation theme
-│       └── SideBar.php        # Sidebar theme
-└── docs/                      # Documentation markdown files
-```
-
-## URL Parameters
-
-```
-?o=Blog        - Plugin/Object name
-?m=list        - Method (create, read, update, delete, list)
-?t=TopNav      - Theme (Simple, TopNav, SideBar)
-?p=about       - Page slug shortcut (redirects to Pages plugin)
-?id=1          - Record ID for CRUD operations
-```
-
-## Databases
-
-### blog.db (SQLite)
-- `posts` - Blog posts and pages (type: 'post'|'page'|'doc')
-- `categories` - Content categories
-- `post_categories` - Many-to-many relationship
-
-### users.db (SQLite)
-- `users` - User accounts with roles and authentication
-
-## Custom Markdown Parser
-
-`Util::md()` provides a ~70 line GFM-compatible parser supporting:
-- Headings, bold, italic, strikethrough
-- Links, images, code blocks (with syntax highlighting class)
-- Blockquotes, ordered/unordered lists
-- Horizontal rules
-- **GFM Tables** with alignment support
-
-## What's New from 08-Users
-
-1. **Blog Plugin**: Public-facing blog with card grid, pagination, prev/next navigation
-2. **Pages Plugin**: Database-driven pages with custom icons
-3. **Categories Plugin**: Content categorization with many-to-many relationships
-4. **Docs Plugin**: Hybrid database/filesystem documentation system
-5. **Profile Plugin**: User self-service profile editing
-6. **Markdown Parser**: Custom GFM-compatible parser in Util.php
-7. **Dropdown Navigation**: Admin and Theme dropdowns with URL preservation
-8. **Theme-specific Spacing**: CSS handles content spacing per theme
-
-## Production Deployment
-
-09-Blog is the only chapter complete enough for real-world deployment. The other chapters are learning exercises meant for local development.
-
-### Requirements
-
-- PHP 8.5+ with extensions: `pdo_sqlite`, `mbstring`, `session`
-- Web server: Nginx (recommended) or Apache
-- Write access to database directory
-
-### Deployment Steps
-
-#### 1. Transfer Files
-
-```bash
-# From your local machine
-rsync -avz --exclude='.git' --exclude='vendor' \
-    ~/Dev/spe/09-Blog/ user@server:/var/www/spe-blog/
-
-# On server: install dependencies
-cd /var/www/spe-blog && composer install --no-dev --optimize-autoloader
-```
-
-#### 2. Set Permissions
-
-```bash
-# Web server needs write access to databases
-chown -R www-data:www-data /var/www/spe-blog/src/Plugins/Posts/
-chown -R www-data:www-data /var/www/spe-blog/src/Plugins/Users/
-chmod 664 /var/www/spe-blog/src/Plugins/Posts/blog.db
-chmod 664 /var/www/spe-blog/src/Plugins/Users/users.db
-```
-
-#### 3. Nginx Configuration
-
-```nginx
-server {
-    listen 80;
-    server_name example.com;
-    root /var/www/spe-blog/public;
-    index index.php;
-
-    # Route all requests through index.php
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-
-    location ~ \.php$ {
-        fastcgi_pass unix:/run/php/php8.5-fpm.sock;
-        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
-        include fastcgi_params;
-    }
-
-    # Block access to sensitive files
-    location ~ /\.(git|env|sqlite|db) {
-        deny all;
-    }
-
-    # Cache static assets
-    location ~* \.(css|js|ico|png|jpg|gif|svg)$ {
-        expires 30d;
-        add_header Cache-Control "public, immutable";
-    }
+```php
+enum Type: string
+{
+    case Post = 'post';
+    case Doc = 'doc';
+    public function label(): string { … }
+    public function icon(): string { … }
 }
 ```
 
-#### 4. Apache Configuration (.htaccess)
+The `posts` table gains a `type` column. Rather than a separate table and plugin per kind of content, one enum says which kind a row is, and one body of code handles them all.
 
-The `public/` directory needs this `.htaccess`:
+### Content — the shared CRUDL
 
-```apache
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ index.php [QSA,L]
+`Content` is an abstract plugin holding the entire list/read/create/update/delete implementation for content of one type. A concrete plugin says only *which* type:
 
-# Block access to databases
-<FilesMatch "\.(db|sqlite)$">
-    Require all denied
-</FilesMatch>
+```php
+final class BlogModel extends Content { protected function type(): Type { return Type::Post; } }
+final class DocsModel extends Content { protected function type(): Type { return Type::Doc; } }
 ```
 
-#### 5. PHP Configuration
+That is the payoff of the series made literal: Blog and Docs are two lines each because everything else is shared. `Content::guard()` keeps reads public and writes admin-only; every query is scoped to `type()`, so a post id is not reachable through the Docs plugin and vice versa.
 
-Recommended `php.ini` settings for production:
+### Md — Markdown as a safe pipe
 
-```ini
-display_errors = Off
-log_errors = On
-error_log = /var/log/php/error.log
-session.cookie_httponly = On
-session.cookie_secure = On
-session.use_strict_mode = On
+```php
+public static function render(string $markdown): string
+{
+    return $markdown
+        |> (static fn(string $s) => str_replace("\r\n", "\n", $s))
+        |> htmlspecialchars(...)
+        |> self::codeBlocks(...)
+        |> self::blocks(...);
+}
 ```
 
-### Security Considerations
+The renderer is a **pipe of pure steps**, and the very first transform after normalising newlines is `htmlspecialchars` — the input is escaped *before* any Markdown is interpreted, so anything the renderer does not deliberately turn into a tag appears as literal text. Link and image targets are the one place a URL could smuggle in a script, so they are checked with the **URI extension**:
 
-1. **Database location**: SQLite files are in `src/Plugins/*/`. Consider moving them outside the web root:
-   ```php
-   // In Db.php, change path to:
-   private const string DB_PATH = '/var/data/spe/';
-   ```
+```php
+try { $scheme = new Uri($url)->getScheme(); }
+catch (\Throwable) { return null; }
+if ($scheme !== null && !in_array(strtolower($scheme), self::SCHEMES, true)) return null;
+```
 
-2. **Default credentials**: Change the default admin password immediately after deployment.
+Only `http`, `https`, `mailto` and relative URLs survive; `javascript:` and anything malformed are dropped, leaving just the link text. This is why the tests can post `<script>` and a `javascript:` link and find neither in the output.
 
-3. **HTTPS**: Always use HTTPS in production. Update `session.cookie_secure = On`.
+### Post — property hooks
 
-4. **File uploads**: If enabling file uploads, configure upload directory outside web root.
+```php
+final class Post
+{
+    public string $html    { get => Md::render($this->body); }
+    public string $excerpt { get => /* first 160 chars of the stripped body */; }
+    public function __construct(public int $id, public Type $type, public string $title, …) {}
+}
+```
 
-### Database Migration
+`html` and `excerpt` are **property hooks** (PHP 8.4): they read like plain properties but run code on access. The rendered HTML and the list excerpt are therefore always derived from the current body — there is nothing stored to fall out of date. In the view, `{$post->html}` is the one value printed *without* `e()`, and it is safe precisely because `Md` produced it; the name `html` marks that exception deliberately.
 
-To deploy with fresh databases:
+### Tags, pagination, and neighbours
+
+Tags are many-to-many (`tags` + `post_tags`). `Content::list()` paginates (`LIMIT`/`OFFSET` with a page count) and, when a `tag` slug is supplied, joins through the junction to filter. A single post's neighbours use **`array_first()` and `array_last()`** (PHP 8.4) over the ordered list of sibling ids to offer oldest/newest links alongside prev/next. `Ctx` gains two validated inputs for this — `page` (a positive int) and `tag` (a slug pattern) — added to the request contract for this chapter. `TagsModel` is an admin-only CRUDL that also shows each tag's post count.
+
+### Docs that document the engine
+
+`bin/seed-docs.php` reads every `docs/0*-*/README.md`, takes the first heading as the title and the chapter folder as the slug, and stores each as a `type = doc` row (using `(void) $db->create(...)` to acknowledge the ignored id that `#[\NoDiscard]` would otherwise warn about). The finished application then serves this tutorial through the same `Content` code that serves the blog.
+
+## PHP features introduced
+
+- **Property hooks (8.4)** — `Post::$html` and `$excerpt` are computed on read, never stored stale.
+- **`array_first()` / `array_last()` (8.4)** — the oldest/newest neighbours of a post.
+- **The URI extension** — robust scheme extraction to sanitise Markdown links.
+- **The pipe operator as a render pipeline** — `Md::render` reads as the sequence of transforms it performs.
+- **Abstract base sharing** — `Content` and `ContentView` give Blog and Docs one implementation.
+
+## Security
+
+The chapter's new surface is user-authored Markdown, and it is handled to the series' standard: the body is escaped before rendering, so stored `<script>` shows as text; link and image schemes are validated against an allow-list, so `javascript:` URLs are dropped; and slugs are generated by the application, never taken from input. Everything from chapter 08 still holds — writes are admin-only and CSRF-checked, reads are public, queries are prepared and type-scoped. The single unescaped value, `$post->html`, is output the application itself produced.
+
+## Try it
 
 ```bash
-# Copy empty database schemas (if available)
-# Or let the application create them on first run
-
-# To migrate existing data:
-scp local:~/Dev/spe/09-Blog/src/Plugins/Posts/blog.db server:/var/www/spe-blog/src/Plugins/Posts/
-scp local:~/Dev/spe/09-Blog/src/Plugins/Users/users.db server:/var/www/spe-blog/src/Plugins/Users/
+php -S localhost:8009 -t 09-Blog/public
+php 09-Blog/bin/seed-docs.php     # optional: serve this tutorial as Docs
 ```
 
-### Troubleshooting
+Read the Blog, page through it, click a tag to filter, open Docs, and sign in as admin (`admin@example.com` / `admin`) to write a post in Markdown with tags. `?o=Blog&x=json` returns the list as data.
 
-| Issue | Solution |
-|-------|----------|
-| 500 error | Check `error_log`, ensure PHP 8.5+, verify permissions |
-| Database locked | Ensure `www-data` has write access to db files AND parent directory |
-| Sessions not working | Check `session.save_path` is writable |
-| CSS/JS not loading | Verify `/spe.css` and `/spe.js` paths, check Nginx `root` directive |
+## The series, complete
 
-## License
-
-MIT License
+Nine chapters, each one idea: a request becomes a page (01); presentation is shared and frozen (02); the request contract and plugins (03); model/view/theme and escape-at-output (04); PSR-4 and Composer (05); sessions, flash and CSRF (06); PDO and prepared statements (07); users, roles and login (08); and a Markdown content engine with tags, pagination and self-hosted docs (09). No framework, no magic — just modern PHP used deliberately. That is the point.

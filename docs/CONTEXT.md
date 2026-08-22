@@ -1,238 +1,83 @@
 # SPE Project Context
 
-A progressive PHP 8.5 micro-framework tutorial demonstrating modern PHP patterns across 10 chapters. MIT licensed, authored by Mark Constable.
+A progressive PHP 8.5 tutorial in nine chapters. MIT licensed, authored by Mark Constable. This file orients a reader (human or AI agent) quickly; the authoritative rules are in [CONVENTIONS.md](CONVENTIONS.md) and the machine-readable manifest is `chapters.json`.
 
-## What This Is
+## What this is
 
-SPE (Simple PHP Engine) teaches PHP development through incremental complexity. Each chapter builds on the previous, introducing one new concept while maintaining a minimal codebase. The target audience is developers learning modern PHP or those wanting a lightweight alternative to heavy frameworks.
+SPE builds one small web application nine times, each chapter adding exactly one idea, to teach plain modern PHP — a framework-free alternative to Laravel/Symfony for small-to-moderate projects. Each chapter is a strict diff of the previous one and runs on its own.
 
-## Technology Stack
+## Technology
 
-PHP 8.5+ (required for pipe operator `|>`), SQLite via PDO, Composer for PSR-4 autoloading (chapters 05+), custom CSS (~270 lines, no Bootstrap), vanilla JavaScript for dark mode and toasts.
+PHP 8.5+ (pipe operator `|>`), SQLite via PDO (chapters 07+), Composer for PSR-4 autoloading (05+), custom CSS (`base.css` + `site.css`, OKLCH, no Bootstrap), a small vanilla-JS controller (`base.js`) for theme, sidebars and toasts. Dev tools: Pest (tests) and Mago (lint/format).
 
-## URL Routing Convention
-
-All routing uses query parameters:
-```
-?o=PluginName&m=method&t=ThemeName
-
-o = Object/Plugin (Home, Users, Blog, Pages, etc.)
-m = Method (list, create, read, update, delete)
-t = Theme (Simple, TopNav, SideBar)
-```
-
-Default: `?o=Home&m=list&t=TopNav`
-
-## Request Flow
+## The request contract (chapters 03+)
 
 ```
-index.php → Init(Ctx) → {Plugin}Model::method() → {Plugin}View::method() → HTML
+?o=Blog&m=read&i=1&x=json
+o = plugin (validated /^[A-Z][A-Za-z]*$/, must be a Plugin subclass)
+m = method (create | read | update | delete | list)
+i = integer id
+x = '' (HTML) | json
+```
+Chapter 09 also validates `page` (int) and `tag` (slug). Chapters 01–02 use only `o` to pick a page.
+
+## Request flow
+
+```
+public/index.php → new Init(new Ctx)
+Ctx  validates the request (opens DB / restores user in later chapters)
+Init resolves {o}Model, calls ->{m}(), hands the data to {o}View->{m}()
+Theme wraps it in the document; or Init emits JSON when x=json
 ```
 
-## Chapter Progression
+## Chapter progression
 
-| Ch | Folder | Focus | Key Addition |
-|----|--------|-------|--------------|
-| 00 | 00-Tutorial | Video pipeline | Playwright, Piper TTS, MLT/FFmpeg |
-| 01 | 01-Simple | Foundation | Single anonymous class, pipe operator |
-| 02 | 02-Styled | Presentation | Custom CSS, dark mode toggle, toasts |
-| 03 | 03-Plugins | Architecture | Plugin system with meta.json |
-| 04 | 04-Views | Separation | Model/View split, multiple layouts |
-| 05 | 05-Autoload | Standards | PSR-4, Composer, namespaces |
-| 06 | 06-Session | State | Session handling, flash messages |
-| 07 | 07-PDO | Data | SQLite database, QueryType enum |
-| 08 | 08-Auth | CRUDL | Full user management |
-| 09 | 09-Blog | CMS | Auth, blog posts, categories, pages |
-| 10 | 10-YouTube | Integration | OAuth, YouTube API, shared services |
+| # | Folder | Idea | Key additions |
+|---|--------|------|---------------|
+| 01 | 01-Simple | request → page | anonymous class, pipe, `private(set)`, typed const |
+| 02 | 02-Styled | presentation | app shell, dark mode, schemes, toasts, `match` |
+| 03 | 03-Plugins | request contract + plugins | `Ctx`/`Init`/`Plugin`, readonly, `#[\Override]` |
+| 04 | 04-Views | model/view/theme, escape at output | `View::e()`, base-view fallback |
+| 05 | 05-Autoload | PSR-4 files | namespaces, Composer, `strict_types` |
+| 06 | 06-Session | sessions, flash, CSRF, POST-only | `Flash` enum, secure cookies, PRG |
+| 07 | 07-PDO | database | `Db`, `QueryType`, prepared statements, `#[\NoDiscard]`, Posts CRUDL |
+| 08 | 08-Auth | identity | `Role` enum ACL, `User`, login/logout, remember-me, Users CRUDL |
+| 09 | 09-Blog | content engine | `Type`, `Md`, `Post` (property hooks), tags, pagination, self-hosted docs |
 
-## Directory Structure (Chapters 05-09)
+`00-Tutorial` is the video-generation tooling and the per-chapter narration/artefacts; it is not a chapter.
+
+## Directory structure (05–09)
 
 ```
 XX-Chapter/
-├── public/
-│   └── index.php           # Entry point, minimal bootstrap
-├── src/
-│   ├── Core/
-│   │   ├── Init.php        # Application bootstrap
-│   │   ├── Ctx.php         # Request context container
-│   │   ├── Db.php          # PDO wrapper with QueryType enum
-│   │   ├── Plugin.php      # Base plugin class
-│   │   └── Theme.php       # Base theme class
-│   ├── Plugins/
-│   │   └── {Name}/
-│   │       ├── {Name}Model.php
-│   │       ├── {Name}View.php
-│   │       └── meta.json   # Plugin config
-│   └── Themes/
-│       ├── Simple.php      # Minimal layout
-│       ├── TopNav.php      # Horizontal nav
-│       └── SideBar.php     # Sidebar nav
-├── data/
-│   └── spe.db              # SQLite database
-└── composer.json
+├── public/index.php        # require ../../vendor/autoload.php; echo new Init(new Ctx);
+├── src/Core/               # Ctx, Init, Plugin, View, Theme (+ Db, enums, value objects as introduced)
+├── src/Plugins/{Name}/     # {Name}Model.php (data), {Name}View.php (HTML)
+├── schema.sql              # created + seeded on first run (07+)
+└── data/                   # SQLite file, gitignored
 ```
+Chapters 01–04 are a single `public/index.php` each.
 
-## PHP Version Features Used
+## Conventions in brief
 
-### PHP 8.5 (Required)
-```php
-// Pipe operator for data transformation
-$clean = $input |> trim(...) |> strtolower(...) |> htmlspecialchars(...);
-```
+- One idea per chapter; each chapter a strict diff of the previous; each self-contained (no shared root PHP library).
+- Names are stable: the request is always `Ctx`, the front controller always `Init`, plugins always `{Name}Model`/`{Name}View`.
+- **Validate input** (allow-list patterns in `Ctx`), **escape output** (`View::e()` = `htmlspecialchars` with `ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5`); models carry raw data.
+- Writes only on a CSRF-checked POST via `Ctx::post()`; delete and logout are POST; SQL is always prepared; passwords hashed; session id regenerated on login/logout.
+- Tight code, comprehensive docs: source carries almost no comments; the explanation lives in each chapter's README.
+- Icons are Lucide (pinned version); HTML is written in heredocs, never concatenated.
 
-### PHP 8.4
-```php
-// Asymmetric visibility
-public private(set) string $page;
-```
+## Tooling
 
-### PHP 8.3
-```php
-// Typed constants
-private const string DEFAULT = 'home';
-// Override attribute
-#[\Override] public function list(): array { ... }
-```
+- `composer check` → `bin/check-chapters.php` (manifest vs tree) + `mago lint` + `pest`.
+- Tests live in `tests/<Name>/` and drive each chapter over HTTP on its own built-in server.
+- CI (`.github/workflows/ci.yml`) runs on PHP 8.5: syntax-checks every tracked file, checks `strict_types`, the manifest, mago and Pest.
 
-### PHP 8.2
-```php
-// Readonly classes
-final readonly class PluginMeta { ... }
-```
+## Documentation strategy
 
-### PHP 8.1
-```php
-// Enums for query types
-enum QueryType { case All; case One; case Column; }
-```
+`docs/` is the GitHub Pages source and single source of truth; the root `README.md` and each `XX-Chapter/README.md` are symlinks into it. Each chapter README follows a fixed section order (opening · what changed · walkthrough · PHP features · security · try it · next), described in `.claude/runbooks/documentation-style-guide.md`.
 
-## CRUDL Pattern
+## Links
 
-All data plugins follow this method convention:
-
-| Method | Route | Purpose |
-|--------|-------|---------|
-| list | `?o=Users&m=list` | Display all records (paginated) |
-| create | `?o=Users&m=create` | Show form / process new record |
-| read | `?o=Users&m=read&i=1` | Display single record |
-| update | `?o=Users&m=update&i=1` | Edit form / save changes |
-| delete | `?o=Users&m=delete&i=1` | Confirm / remove record |
-
-Parameter `i` = item ID for single-record operations.
-
-## Database Schema (Chapter 09)
-
-```sql
--- Users table
-CREATE TABLE users (
-    id INTEGER PRIMARY KEY,
-    email TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    name TEXT,
-    role TEXT DEFAULT 'user',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
--- Posts table  
-CREATE TABLE posts (
-    id INTEGER PRIMARY KEY,
-    user_id INTEGER,
-    title TEXT NOT NULL,
-    slug TEXT UNIQUE,
-    content TEXT,
-    status TEXT DEFAULT 'draft',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
-
--- Categories and pivot tables follow similar patterns
-```
-
-## CSS Architecture
-
-Custom `spe.css` using CSS custom properties:
-```css
-:root {
-    --bg: #ffffff;
-    --fg: #333333;
-    --accent: #0066cc;
-    /* ... */
-}
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg: #1a1a1a;
-        --fg: #e0e0e0;
-    }
-}
-```
-
-Manual toggle stores preference in `localStorage.theme`.
-
-## Plugin meta.json Format
-
-```json
-{
-    "name": "Users",
-    "description": "User management plugin",
-    "version": "1.0.0",
-    "nav": true,
-    "order": 10,
-    "icon": "👤",
-    "requires": ["Db", "Session"]
-}
-```
-
-## Common Tasks
-
-### Add a new plugin
-1. Create `src/Plugins/{Name}/` folder
-2. Add `{Name}Model.php` extending `Plugin`
-3. Add `{Name}View.php` extending `Plugin`
-4. Add `meta.json` with nav:true to appear in menu
-5. Register in Ctx if needed
-
-### Add a database table
-1. Add CREATE TABLE in `data/schema.sql`
-2. Create Model with CRUDL methods
-3. Use `Db::qry()` with QueryType enum
-
-### Change theme layout
-1. Edit theme class in `src/Themes/`
-2. Or create new theme extending `Theme`
-3. Select via `?t=ThemeName` parameter
-
-### Run locally
-```bash
-cd XX-Chapter
-composer install  # chapters 05+
-php -S localhost:8000 -t public
-```
-
-## Video Generation Pipeline (Chapter 00)
-
-Scripts for creating tutorial videos:
-```
-00-Tutorial/
-├── scripts/
-│   ├── capture.ts      # Playwright browser recording
-│   ├── narrate.sh      # Piper TTS audio generation
-│   └── compose.sh      # MLT/FFmpeg video assembly
-├── content/
-│   └── {chapter}.md    # Narration scripts
-└── output/             # Final MP4 files
-```
-
-## External Links
-
-- Docs: https://markc.github.io/spe/
+- Site: https://markc.github.io/spe/
 - Repo: https://github.com/markc/spe
-- Videos: https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B
-
-## Conventions
-
-- File naming: PascalCase for classes, snake_case for scripts
-- One class per file, PSR-4 compliant namespaces
-- Methods return arrays (Model) or strings (View)
-- Views use heredoc syntax for HTML templates
-- No external CSS/JS frameworks
-- SQLite for portability, no MySQL required

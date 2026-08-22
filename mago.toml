@@ -2,7 +2,6 @@ php-version = "8.5"
 
 [source]
 paths = [
-    "app/lib",
     "01-Simple/public",
     "02-Styled/public",
     "03-Plugins/public",

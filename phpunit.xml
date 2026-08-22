@@ -11,7 +11,6 @@
     </testsuites>
     <source>
         <include>
-            <directory>app/lib</directory>
             <directory suffix=".php">01-Simple/public</directory>
             <directory suffix=".php">02-Styled/public</directory>
             <directory suffix=".php">03-Plugins/public</directory>

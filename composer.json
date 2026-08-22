@@ -14,7 +14,6 @@
     },
     "autoload": {
         "psr-4": {
-            "SPE\\App\\": "app/lib",
             "SPE\\Autoload\\": "05-Autoload/src",
             "SPE\\Session\\": "06-Session/src",
             "SPE\\PDO\\": "07-PDO/src",

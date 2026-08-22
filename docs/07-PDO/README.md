@@ -2,272 +2,99 @@
 
 _Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)_
 
-Chapter Seven adds persistent storage. Where previous chapters kept all content in PHP code—static navigation arrays, hardcoded page text—this chapter introduces database access through PDO and SQLite. Pages become editable. Blog posts can be created, modified, and deleted. Navigation builds dynamically from database records. The application transforms from a static demonstration into a genuine content management foundation. This chapter also marks a pivotal architectural shift: the first use of shared library code in `app/lib/`, demonstrating why common functionality belongs in reusable components rather than duplicated across chapters.
+Chapter 07 is where the application starts remembering things between visits, not just between requests. It adds a database: a small `Db` class over PDO, a `QueryType` enum for describing what a read should return, a `schema.sql` that creates and seeds a SQLite file on first run, and the first genuine CRUDL plugin — **Posts** — that lists, reads, creates, updates and deletes rows. Everything a form writes goes through the CSRF-guarded `post()` from chapter 06, and everything that touches SQL goes through a prepared statement. This is the chapter that makes the "you don't need a framework" case concrete.
 
-## The Shared Library
+## The one idea
 
-Previous chapters were self-contained. Each had its own `Core/Util.php` with whatever helper methods it needed. This worked when utilities were simple—Chapter Six needed only a `timeAgo()` function. But database access requires substantially more code: connection management, query building, result fetching, schema initialization. Duplicating this across chapters would create maintenance nightmares and obscure the actual chapter-specific learning.
+**Persistence through prepared statements.** A thin `Db` wrapper builds every query as a prepared statement with typed bindings, and a real CRUDL plugin uses it — no request value is ever concatenated into SQL.
 
-Chapter Seven introduces the `app/lib/` directory containing shared components:
+## What's on the screen
 
-```
-app/lib/
-├── Db.php       # Database abstraction extending PDO
-├── Env.php      # Environment configuration loader
-├── Schema.php   # Database schema definitions
-└── Util.php     # Shared utilities (md, excerpt, timeAgo, etc.)
-```
+A **Posts** page: a table of seeded posts, each linking to a single view; a "New post" form; edit and delete controls. Create and edit round-trip through the database and redirect to the saved post; delete is a POST-only button.
 
-The namespace `SPE\App` maps to this directory, allowing any chapter to import shared functionality:
+## Walkthrough
+
+### QueryType — naming the shape of a read
 
 ```php
-use SPE\App\{Db, QueryType};
-use SPE\App\Util;
+enum QueryType { case All; case One; case Col; }
 ```
 
-This architectural decision mirrors real-world PHP development where common code lives in vendor packages or shared libraries. The progression from Chapter Six's minimal local `Util.php` (19 lines, one method) to Chapter Seven's use of `SPE\App\Util` (140+ lines, many methods) demonstrates why shared libraries become necessary as applications grow.
+A pure (unbacked) enum with three cases: return every row, one row, or a single scalar. It replaces the bag of PDO fetch-mode constants with three names that say what the caller wants.
 
-## The Database Abstraction
+### Db — a thin, safe layer over PDO
 
-The `Db` class extends PHP's PDO to provide a cleaner CRUD interface:
+`Db extends PDO`, opens the SQLite file (creating and seeding it from `schema.sql` on first run), and sets three options that matter: exceptions on error, associative fetches, and **`ATTR_EMULATE_PREPARES => false`** so prepared statements are real server-side statements, not string-substituted client-side ones.
 
 ```php
-final class Db extends PDO
+public function read(string $table, string $cols, string $where = '', array $params = [],
+                     QueryType $type = QueryType::All, string $order = ''): mixed
 {
-    public function __construct(string $name = 'blog')
-    {
-        $type = Env::get('DB_TYPE', 'sqlite');
-
-        if ($type === 'sqlite' && !Schema::exists($name)) {
-            $this->ensureDir($name);
-            Schema::init($name);
-        }
-
-        $dsn = match ($type) {
-            'sqlite' => 'sqlite:' . Schema::path($name),
-            default => sprintf('mysql:host=%s;port=%s;dbname=%s', ...),
-        };
-
-        parent::__construct($dsn, Env::get('DB_USER'), Env::get('DB_PASS'), self::OPTS);
-    }
+    $sql = "SELECT $cols FROM $table" . ($where ? " WHERE $where" : '') . ($order ? " $order" : '');
+    $stmt = $this->run($sql, $params);
+    return match ($type) {
+        QueryType::All => $stmt->fetchAll(),
+        QueryType::One => $stmt->fetch(),
+        QueryType::Col => $stmt->fetchColumn(),
+    };
 }
 ```
 
-The constructor handles database creation automatically. When using SQLite (the default), if the database file doesn't exist, it creates the directory structure and initializes the schema. This zero-configuration approach means the application works immediately without manual database setup.
-
-The CRUD methods provide a fluent interface for common operations:
+The `match` on `QueryType` chooses the fetch call. `create()`, `update()` and `delete()` build INSERT/UPDATE/DELETE the same way, and every one funnels through `run()`, which prepares the statement and binds each value **with its PHP type**:
 
 ```php
-// Create
-$id = $db->create('posts', ['title' => 'New Post', 'content' => '...']);
-
-// Read with QueryType enum
-$posts = $db->read('posts', '*', "type='post'", [], QueryType::All);
-$post = $db->read('posts', '*', 'id=:id', ['id' => 5], QueryType::One);
-$count = $db->read('posts', 'COUNT(*)', '', [], QueryType::Col);
-
-// Update
-$db->update('posts', ['title' => 'Updated'], 'id=:id', ['id' => 5]);
-
-// Delete
-$db->delete('posts', 'id=:id', ['id' => 5]);
+$stmt->bindValue(":$key", $value, match (true) {
+    is_int($value)  => PDO::PARAM_INT,
+    is_bool($value) => PDO::PARAM_BOOL,
+    is_null($value) => PDO::PARAM_NULL,
+    default         => PDO::PARAM_STR,
+});
 ```
 
-The `QueryType` enum eliminates magic strings for fetch modes:
+The write methods carry **`#[\NoDiscard]`** (PHP 8.5):
 
 ```php
-enum QueryType: string { case All = 'all'; case One = 'one'; case Col = 'col'; }
+#[\NoDiscard('the new row id tells you the insert succeeded')]
+public function create(string $table, array $data): int
 ```
 
-Using `QueryType::All` returns all matching rows as an array. `QueryType::One` returns a single row. `QueryType::Col` returns a single column value—useful for counts and aggregates.
+`#[\NoDiscard]` makes PHP warn if the return value is thrown away — you must either use the new id / success flag or explicitly write `(void)` to say "I know, I don't need it". It turns "forgot to check whether the write worked" into a visible warning. The one place the id is genuinely not needed — the docs seeder in chapter 09 — casts to `(void)` to say so on purpose.
 
-## Dynamic Navigation
+Note the boundary: the caller supplies the table name, column list and WHERE clause as literals in the plugin code; only *values* come from the request, and only through bound `:params`. Identifiers never come from user input.
 
-Previous chapters defined navigation as a static array in `Ctx`:
+### Posts — the first real CRUDL
 
-```php
-// Chapter 6: Static navigation
-public array $nav = [['🏠 Home', 'Home'], ['📖 About', 'About'], ['✉️ Contact', 'Contact']]
-```
-
-Chapter Seven builds navigation from the database:
+`PostsModel` (extending `Plugin`) implements all five verbs. `list()` reads every post ordered newest-first; `read()` fetches one by the validated integer `i`; `create()` and `update()` show a form on GET and, on a CSRF-checked POST, write and redirect to the saved post; `delete()` acts only on a POST and redirects. The write path is the chapter-06 pattern:
 
 ```php
-// Chapter 7: Dynamic navigation from pages
-$this->db = new Db('blog');
-$this->nav = array_map(
-    fn($r) => [trim(($r['icon'] ?? '') . ' ' . $r['title']), ucfirst($r['slug'])],
-    $this->db->read('posts', 'id,title,slug,icon', "type='page' ORDER BY id", [], QueryType::All)
-);
-$this->nav[] = ['📝 Blog', 'Blog'];
-```
-
-Pages stored with `type='page'` become navigation items. Each page's icon and title combine for the display text; the slug becomes the URL parameter. The Blog link appends at the end, providing access to the post listing.
-
-This approach means adding a new navigation item requires only creating a new page record—no code changes needed. Reordering navigation means updating the database. The application becomes data-driven rather than code-driven.
-
-## The Blog Plugin
-
-The Blog plugin handles all content management through `BlogModel` and `BlogView`:
-
-```php
-final class BlogModel {
-    public function create(): array {
-        if ($_POST) {
-            $this->ctx->db->create('posts', [
-                'title' => $this->f['title'],
-                'slug' => $this->f['slug'] ?: $this->slug($this->f['title']),
-                'content' => $content,
-                'type' => $this->f['type'],
-                // ...
-            ]);
-            $this->ctx->flash('msg', 'Post created successfully');
-            header('Location: ?o=Blog&edit');
-            exit;
-        }
-        return [];
-    }
+if ($p = $this->ctx->post()) {
+    $id = $this->ctx->db->create('posts', $this->fields($p));
+    $this->ctx->flash(Flash::Success, 'Post created.');
+    $this->redirect("?o=Posts&m=read&i=$id");
 }
 ```
 
-The model handles form processing. When `$_POST` contains data, it creates the record, sets a flash message for confirmation, and redirects to the edit listing. The slug auto-generates from the title if not provided, using a pipe chain:
+`Ctx` gains the validated integer `i` (`(int)` cast) and a shared `Db` handle so every plugin queries the same connection. The slug is generated by the application from the title, never taken from the request. `PostsView` renders the table, the single-post view, and the create/edit form, escaping every value with `e()`; the delete control is a small POST form with a confirm, not a link.
 
-```php
-private function slug(string $t): string {
-    return $t |> strtolower(...) |> (fn($s) => preg_replace('/[^a-z0-9]+/', '-', $s)) |> (fn($s) => trim($s, '-'));
-}
-```
+## PHP features introduced
 
-The view renders content with Markdown support:
+- **Backed and pure enums** — `QueryType` names the fetch shape; `match` on it selects the call.
+- **`#[\NoDiscard]` (8.5)** — the result of a write cannot be silently ignored.
+- **PDO prepared statements with typed binding** — every query is prepared; every value is bound with its type.
+- **`match(true)`** — used to pick the PDO parameter type per value.
 
-```php
-return "<div class='card mt-4'><h2>$ti</h2>
-    <div class='prose mt-2'>" . Util::md($a['content']) . "</div>
-    // ...
-</div>";
-```
+## Security
 
-The `Util::md()` method from the shared library parses GitHub-Flavored Markdown into HTML—headings, bold, italic, links, code blocks, lists, tables. This transforms plain text content into formatted pages without requiring HTML knowledge from content editors.
+Every SQL statement is a prepared statement, and request data reaches SQL only as bound parameters — so SQL injection has no foothold. Table and column names are literals in the code, never from input. Reads and writes both go through `Db`, which enforces real (non-emulated) prepares. The write path keeps chapter 06's guarantees: create, update and delete only act on a CSRF-checked POST, delete is never a GET, and slugs are generated rather than accepted. `#[\NoDiscard]` adds a static nudge that a failed write can't pass unnoticed.
 
-## Page Dispatch
-
-The `Init` class routes requests differently than Chapter Six:
-
-```php
-public function __construct(private Ctx $ctx) {
-    [$o, $m, $t] = [$ctx->in['o'], $ctx->in['m'], $ctx->in['t']];
-
-    if ($o === 'Blog') {
-        $model = self::NS . "Plugins\\Blog\\BlogModel";
-        $ary = class_exists($model) ? (new $model($ctx))->$m() : [];
-        $view = self::NS . "Plugins\\Blog\\BlogView";
-        $main = class_exists($view) ? (new $view($ctx, $ary))->$m() : '';
-    } else {
-        // Load page from database
-        $ary = $ctx->db->read('posts', '*', "slug=:s AND type='page'", ['s' => strtolower($o)], QueryType::One) ?: [];
-        $view = self::NS . "Plugins\\Blog\\BlogView";
-        $main = $ary ? (new $view($ctx, $ary))->page() : '<div class="card"><p>Page not found.</p></div>';
-    }
-
-    $this->out = [...$ctx->out, ...$ary, 'main' => $main];
-}
-```
-
-When `o=Blog`, the dispatcher loads the Blog plugin for CRUD operations. For any other value, it queries the database for a page with a matching slug. Found pages render through `BlogView::page()`; missing pages show an error. This eliminates the need for separate About, Contact, and Home plugins—they're all database pages now.
-
-## The Content Model
-
-The `posts` table stores both pages and blog posts:
-
-```sql
-CREATE TABLE posts (
-    id INTEGER PRIMARY KEY,
-    title TEXT NOT NULL,
-    slug TEXT UNIQUE NOT NULL,
-    content TEXT,
-    type TEXT DEFAULT 'post',  -- 'page', 'post', or 'doc'
-    icon TEXT,
-    author TEXT,
-    created TEXT,
-    updated TEXT
-);
-```
-
-The `type` field distinguishes content: pages appear in navigation, posts appear in the blog listing, docs provide reference material. The icon field stores emoji for visual identification. Slugs must be unique, serving as URL-friendly identifiers.
-
-This single-table approach simplifies the data model while supporting multiple content types. Later chapters extend this with categories, tags, and relationships, but the core structure remains clean and queryable.
-
-## Session Integration
-
-Chapter Seven inherits all session functionality from Chapter Six. Sticky URL parameters persist theme and navigation choices:
-
-```php
-session_status() === PHP_SESSION_NONE && session_start();
-
-$this->in = array_map(fn($k, $v) => $this->ses($k, $v), array_keys($in), $in)
-    |> (fn($v) => array_combine(array_keys($in), $v));
-```
-
-Flash messages confirm CRUD operations:
-
-```php
-$this->ctx->flash('msg', 'Post updated successfully');
-$this->ctx->flash('type', 'success');
-```
-
-The Theme base class renders these as toast notifications. Select TopNav theme once and it persists across all pages. Create a post and see the confirmation message. The session layer from Chapter Six integrates seamlessly with the database layer from Chapter Seven.
-
-## The Directory Structure
-
-Chapter Seven streamlines the structure by eliminating individual page plugins:
-
-```
-07-PDO/src/
-├── Core
-│   ├── Ctx.php      # Session + database initialization
-│   ├── Init.php     # Blog plugin or page dispatch
-│   ├── Plugin.php   # Abstract base (for Blog)
-│   ├── Theme.php    # Abstract base with nav/flash helpers
-│   └── View.php     # Base view class
-├── Plugins
-│   └── Blog
-│       ├── BlogModel.php   # CRUD operations
-│       └── BlogView.php    # List, read, edit forms
-└── Themes
-    ├── SideBar.php
-    ├── Simple.php
-    └── TopNav.php
-```
-
-Compare to Chapter Six's fifteen files across seven plugin directories. Chapter Seven has ten files in five directories—yet provides far more functionality. The Blog plugin replaces static page plugins; the database replaces hardcoded content. Fewer files, more capabilities.
-
-Notable differences from Chapter Six:
-- No `Core/Util.php`—uses `SPE\App\Util` instead
-- No Home, About, Contact plugins—content lives in database
-- `Ctx.php` adds database connection and dynamic navigation
-- `Init.php` handles page lookup from database
-
-## List and Edit Modes
-
-The blog listing provides two views: public display and edit management.
-
-Public view (`?o=Blog`) shows posts as cards with excerpts and metadata. The `Util::excerpt()` helper extracts the first 200 characters of content for preview. Each card links to the full post.
-
-Edit view (`?o=Blog&edit`) shows a searchable table with columns for title, type, updated date, and action links. The edit listing includes search filtering by title and content, type indicators (📝 post, 📄 page, 📚 doc), and pagination for large content collections.
-
-## Running the Application
+## Try it
 
 ```bash
-cd /path/to/spe
-composer install
-cd 07-PDO/public
-php -S localhost:8080
+php -S localhost:8007 -t 07-PDO/public
 ```
 
-Navigate to `http://localhost:8080`. The database creates automatically on first load—check `app/sqlite/blog.db` for the SQLite file. The Home page loads from the database. Click through navigation items—all database pages. Visit Blog to see posts. Click "Manage Posts" to access the edit interface.
+The database is created and seeded automatically. Add a post, edit it, delete it; try `?o=Posts&x=json` for the list as data. Delete `07-PDO/data/spe.db` to start fresh.
 
-Create a new post: title, slug (auto-generated if empty), icon, type, and Markdown content. Save and see the flash confirmation. Edit existing pages—change the Home content and watch the homepage update. Delete test posts. The full CRUD cycle works immediately.
+## Next
 
-Try the theme selector—your choice persists via sessions. Search within the edit listing—results filter in real-time. Navigate between pages—URLs stay clean while state persists. The session layer from Chapter Six combines with the database layer to create a responsive, stateful application.
-
-This chapter establishes the foundation for everything that follows. Chapter Eight adds user management with authentication. Chapter Nine builds a complete CMS with categories, tags, and access control. Chapter Ten integrates external APIs. But they all build on this core: PDO for database access, shared libraries for common code, sessions for state, and the plugin architecture for extensibility.
+Chapter 08 adds identity: a `Role` enum that *is* the access-control system, a `User` value object, login and logout (with `session_regenerate_id`), an admin-only Users CRUDL, and an optional remember-me cookie done properly. Posts writes become admin-only; reading stays public.
