@@ -15,8 +15,8 @@ If you want to deploy a real application, see **09-Blog** — it's the only chap
 
 ## Published Tutorials
 
-Watch the completed tutorials on YouTube:
-- [SPE Tutorial Playlist](https://www.youtube.com/playlist?list=PLbgfHjtE2wWS8ot1fRhgNGXuFtg4_QI0k)
+Watch the tutorials on YouTube:
+- [NetServa on YouTube](https://www.youtube.com/@NetServa)
 
 ## Requirements
 

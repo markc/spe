@@ -194,7 +194,7 @@ php -S localhost:8000
 
 ## Questions?
 
-- Check the [YouTube tutorials](https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B)
+- Check the [YouTube tutorials](https://www.youtube.com/@NetServa)
 - Open a [Question issue](https://github.com/markc/spe/issues/new?template=question.md)
 - Read the chapter README files
 
