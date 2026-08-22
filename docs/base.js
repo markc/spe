@@ -146,7 +146,7 @@ const Base = {
             const t = e.target;
 
             // Theme toggle
-            if (t.closest('.theme-toggle')) { this.toggleTheme(); return; }
+            if (t.closest('.theme-toggle')) { e.preventDefault(); this.toggleTheme(); return; }
 
             // Scheme selector
             const scheme = t.closest('[data-scheme]');

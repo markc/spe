@@ -11,22 +11,15 @@ final class ContactView extends View
     public function list(): string
     {
         return <<<HTML
-        <div class="card">
-            <h2>{$this->ary['head']}</h2>
-            <p>{$this->ary['main']}</p>
-            <form class="mt-2" onsubmit="return handleContact(this)">
-                <div class="form-group"><label for="subject">Subject</label><input type="text" id="subject" name="subject" required></div>
-                <div class="form-group"><label for="message">Message</label><textarea id="message" name="message" rows="4" required></textarea></div>
-                <div class="text-right"><button type="submit" class="btn">Send Message</button></div>
-            </form>
-        </div>
-        <script>
-        function handleContact(form) {
-            location.href = 'mailto:{$this->ctx->email}?subject=' + encodeURIComponent(form.subject.value) + '&body=' + encodeURIComponent(form.message.value);
-            showToast('Opening email client...', 'success');
-            return false;
-        }
-        </script>
-        HTML;
+<div class="card">
+    <h2>{$this->e($this->data['title'])}</h2>
+    <p>{$this->e($this->data['body'])}</p>
+    <form class="mt-2" onsubmit="location.href='mailto:{$this->e($this->data['email'])}?subject='+encodeURIComponent(this.subject.value)+'&body='+encodeURIComponent(this.message.value);return false">
+        <div class="form-group"><label for="subject">Subject</label><input type="text" id="subject" name="subject" required></div>
+        <div class="form-group"><label for="message">Message</label><textarea id="message" name="message" rows="4" required></textarea></div>
+        <div class="text-right"><button type="submit" class="btn">Send</button></div>
+    </form>
+</div>
+HTML;
     }
 }

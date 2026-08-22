@@ -1,157 +1,168 @@
 <?php declare(strict_types=1);
 // Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
-if (!class_exists('Ctx')) {
-    readonly class Ctx {
-        public function __construct(
-            public string $email = 'mc@netserva.org',
-            public array $in = ['o' => 'Home', 'm' => 'list', 'x' => ''],
-            public array $out = ['doc' => 'SPE::03', 'nav' => '', 'head' => '', 'main' => '', 'foot' => ''],
-            public array $nav = [['🏠 Home', 'Home'], ['📖 About', 'About'], ['✉️ Contact', 'Contact']]
-        ) {}
+final readonly class Ctx
+{
+    public array $in;
+
+    public function __construct(
+        public array $out = ['doc' => 'SPE::03', 'page' => '03 Plugins', 'main' => ''],
+        public array $nav = [['home', 'Home', 'Home'], ['book-open', 'About', 'About'], ['mail', 'Contact', 'Contact']],
+        public array $schemes = [['circle', 'Stone', 'default'], ['waves', 'Ocean', 'ocean'], ['trees', 'Forest', 'forest'], ['sunset', 'Sunset', 'sunset']],
+        public string $email = 'mc@netserva.org',
+    ) {
+        $this->in = [
+            'o' => self::get('o', 'Home', '/^[A-Z][A-Za-z]{0,31}$/'),
+            'm' => self::get('m', 'list', '/^(create|read|update|delete|list)$/'),
+            'x' => self::get('x', '', '/^json$/'),
+        ];
     }
 
-    readonly class Init {
-        private array $in;
-        private array $out;
+    private static function get(string $key, string $default, string $pattern): string
+    {
+        $v = $_GET[$key] ?? '';
+        return is_string($v) && preg_match($pattern, $v) ? $v : $default;
+    }
+}
 
-        public function __construct(private Ctx $ctx) {
-            $this->in = array_map(static fn($k, $v) => (isset($_GET[$k]) && is_string($_GET[$k]) ? $_GET[$k] : $v)
-                |> trim(...)
-                |> htmlspecialchars(...), array_keys($ctx->in), $ctx->in)
-                |> (static fn($v) => array_combine(array_keys($ctx->in), $v));
-            $this->out = [...$ctx->out, 'main' => $this->dispatch()];
+final readonly class Init
+{
+    private array $out;
+
+    public function __construct(private Ctx $ctx)
+    {
+        [$o, $m] = [$ctx->in['o'], $ctx->in['m']];
+        if (is_subclass_of($o, Plugin::class)) {
+            $main = new $o($ctx)->$m();
+        } else {
+            http_response_code(404);
+            $main = '<div class="card"><h2>Not found</h2><p>There is no such plugin.</p></div>';
         }
+        $this->out = [...$ctx->out, 'main' => $main];
+    }
 
-        private function dispatch(): string {
-            [$o, $m] = [$this->in['o'], $this->in['m']];
-            return match (true) {
-                !class_exists($o) => '<p>Error: plugin not found</p>',
-                !method_exists($o, $m) => '<p>Error: method not found</p>',
-                default => (new $o($this->ctx))->$m()
-            };
+    public function __toString(): string
+    {
+        if ($this->ctx->in['x'] === 'json') {
+            header('Content-Type: application/json');
+            return json_encode($this->out, JSON_THROW_ON_ERROR);
         }
+        return $this->html();
+    }
 
-        public function __toString(): string {
-            return match ($this->in['x']) {
-                'json' => (header('Content-Type: application/json') ? '' : '') . json_encode($this->out),
-                default => $this->html()
-            };
-        }
+    private function html(): string
+    {
+        $nav = $this->ctx->nav
+            |> (fn(array $items) => array_map(fn(array $n) => sprintf(
+                '<a href="?o=%s"%s><i data-lucide="%s"></i> %s</a>', $n[2], $n[2] === $this->ctx->in['o'] ? ' class="active"' : '', $n[0], $n[1]
+            ), $items))
+            |> (static fn(array $links) => implode('', $links));
 
-        private function html(): string {
-            $nav = $this->ctx->nav
-                |> (fn($n) => array_map(fn($p) => sprintf(
-                    '<a href="?o=%s"%s>%s</a>',
-                    $p[1], $this->in['o'] === $p[1] ? ' class="active"' : '', $p[0]
-                ), $n))
-                |> (static fn($a) => implode(' ', $a));
+        $schemes = $this->ctx->schemes
+            |> (static fn(array $items) => array_map(static fn(array $s) => sprintf(
+                '<a href="#" data-scheme="%s"><i data-lucide="%s"></i> %s</a>', $s[2], $s[0], $s[1]
+            ), $items))
+            |> (static fn(array $links) => implode('', $links));
 
-            return <<<HTML
+        return <<<HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="light dark">
-    <title>SPE::03 {$this->in['o']}</title>
+    <title>{$this->out['doc']} {$this->ctx->in['o']}</title>
     <link rel="stylesheet" href="../base.css">
     <link rel="stylesheet" href="../site.css">
-    <script>(function(){const t=localStorage.getItem("base-theme");document.documentElement.className=t||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")})();</script>
+    <script src="https://unpkg.com/lucide@1.33.0/dist/umd/lucide.min.js"></script>
+    <script>(function(){var s=JSON.parse(localStorage.getItem('base-state')||'{}'),t=s.theme,c=s.scheme,h=document.documentElement;h.className='preload '+(t||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))+(c&&c!=='default'?' scheme-'+c:'');})()</script>
 </head>
 <body>
-<div class="container">
-    <header class="mt-4"><h1><a class="brand" href="../">‹ <span>Plugins PHP Example</span></a></h1></header>
-    <nav class="card flex">{$nav}<span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span></nav>
-    <main class="mt-4 mb-4">{$this->out['main']}</main>
-    <footer class="text-center"><small>© 2015-2026 Mark Constable (MIT License)</small></footer>
-</div>
+<nav class="topnav">
+    <button class="menu-toggle" data-sidebar="left"><i data-lucide="menu"></i></button>
+    <h1><a class="brand" href="../"><span>{$this->out['page']}</span></a></h1>
+    <button class="menu-toggle" data-sidebar="right"><i data-lucide="menu"></i></button>
+</nav>
+<aside class="sidebar sidebar-left">
+    <div class="sidebar-header"><span><i data-lucide="compass"></i> Navigation</span><button class="pin-toggle" data-sidebar="left" title="Pin sidebar"><i data-lucide="pin"></i></button></div>
+    <nav>{$nav}</nav>
+</aside>
+<aside class="sidebar sidebar-right">
+    <div class="sidebar-header"><span><i data-lucide="sliders-horizontal"></i> Settings</span><button class="pin-toggle" data-sidebar="right" title="Pin sidebar"><i data-lucide="pin"></i></button></div>
+    <nav>{$schemes}<div class="sidebar-divider"></div><a href="#" class="theme-toggle"><i data-lucide="moon"></i> Toggle theme</a></nav>
+</aside>
+<main>{$this->out['main']}</main>
+<div class="overlay"></div>
 <script src="../base.js"></script>
 </body>
 </html>
 HTML;
-        }
     }
+}
 
-    abstract class Plugin {
-        public function __construct(protected Ctx $ctx) {}
-        public function create(): string { return '<p>Create: not implemented</p>'; }
-        public function read(): string { return '<p>Read: not implemented</p>'; }
-        public function update(): string { return '<p>Update: not implemented</p>'; }
-        public function delete(): string { return '<p>Delete: not implemented</p>'; }
-        public function list(): string { return '<p>List: not implemented</p>'; }
+abstract class Plugin
+{
+    public function __construct(protected Ctx $ctx) {}
+
+    public function create(): string { return $this->todo('create'); }
+    public function read(): string { return $this->todo('read'); }
+    public function update(): string { return $this->todo('update'); }
+    public function delete(): string { return $this->todo('delete'); }
+    public function list(): string { return $this->todo('list'); }
+
+    private function todo(string $m): string
+    {
+        return sprintf('<div class="card"><h2>%s</h2><p>%s::%s() is not implemented.</p></div>', ucfirst($m), static::class, $m);
     }
+}
 
-    final class Home extends Plugin {
-        #[\Override] public function list(): string {
-            return <<<'HTML'
-            <div class="card">
-                <h2>Plugin Architecture</h2>
-                <p>While this page looks similar to <a href="../02-Styled/">02-Styled</a>, the underlying PHP structure has been completely reorganized to use a <b>plugin-based architecture</b>.</p>
-
-                <h3 class="mt-4">What Changed?</h3>
-                <p>In 02-Styled, page content was stored in a simple array within an anonymous class. Here, each page is now a separate <b>Plugin class</b> that extends an abstract base class with standardized methods.</p>
-
-                <h3 class="mt-4">Core Classes</h3>
-                <ul class="mt-2" style="list-style:disc;padding-left:1.5rem">
-                    <li><b>Ctx</b> — Context class holding configuration: email, input parameters, output array, and navigation items</li>
-                    <li><b>Init</b> — Handles URL routing, plugin dispatch, and HTML/JSON rendering</li>
-                    <li><b>Plugin</b> — Abstract base class defining the CRUDL interface (Create, Read, Update, Delete, List)</li>
-                    <li><b>Home, About, Contact</b> — Concrete plugin classes that override the <code>list()</code> method</li>
-                </ul>
-
-                <h3 class="mt-4">CRUDL Pattern</h3>
-                <p>Each plugin inherits five methods: <code>create()</code>, <code>read()</code>, <code>update()</code>, <code>delete()</code>, and <code>list()</code>. By default, these return "not implemented" — plugins override only what they need. Try: <a href="?o=Home&m=create">?o=Home&m=create</a></p>
-
-                <h3 class="mt-4">URL Routing</h3>
-                <p>The URL parameter <code>?o=</code> selects the plugin (object), and <code>?m=</code> selects the method. Compare this to 02-Styled's simple <code>?m=page</code> approach.</p>
-
-                <h3 class="mt-4">JSON API</h3>
-                <p>Add <code>?x=json</code> to any URL to get JSON output instead of HTML. Try: <a href="?o=Home&x=json">?o=Home&x=json</a></p>
-
-                <h3 class="mt-4">Adding a New Plugin</h3>
-                <p>To add a new page: 1) Create a class extending <code>Plugin</code>, 2) Override the methods you need, 3) Add a nav entry in <code>Ctx::$nav</code>. That's it — no template files, no routing configuration.</p>
-            </div>
-            <div class="flex justify-center mt-4">
-                <button class="btn-hover btn-success" onclick="showToast('Success!', 'success')">Success</button>
-                <button class="btn-hover btn-danger" onclick="showToast('Error!', 'danger')">Danger</button>
-            </div>
-            HTML;
-        }
+final class Home extends Plugin
+{
+    #[\Override]
+    public function list(): string
+    {
+        return <<<'HTML'
+<div class="card">
+    <h2>Home</h2>
+    <p>The page looks exactly like chapter 02. Underneath, each page is now a <b>plugin</b>: a class with the five CRUDL methods, chosen by <code>?o=</code> and called by <code>?m=</code>. Try <a href="?o=Home&m=create">?o=Home&amp;m=create</a>, <a href="?o=Nope">?o=Nope</a> and <a href="?o=Home&x=json">?o=Home&amp;x=json</a>.</p>
+    <p class="mt-4">
+        <button class="btn btn-success" onclick="Base.toast('Saved.', 'success')">Success toast</button>
+        <button class="btn btn-danger" onclick="Base.toast('Something went wrong.', 'danger')">Danger toast</button>
+    </p>
+</div>
+HTML;
     }
+}
 
-    final class About extends Plugin {
-        #[\Override] public function list(): string {
-            return <<<HTML
-            <div class="card">
-                <h2>About Page</h2>
-                <p>This chapter adds the <b>plugin architecture</b> with CRUDL methods and JSON API output.</p>
-            </div>
-            HTML;
-        }
+final class About extends Plugin
+{
+    #[\Override]
+    public function list(): string
+    {
+        return <<<'HTML'
+<div class="card">
+    <h2>About</h2>
+    <p>Three classes do the work: <code>Ctx</code> reads and validates the request, <code>Init</code> picks the plugin and renders the page, and <code>Plugin</code> is what every page extends.</p>
+</div>
+HTML;
     }
+}
 
-    final class Contact extends Plugin {
-        #[\Override] public function list(): string {
-            return <<<HTML
-            <div class="card">
-                <h2>Contact Page</h2>
-                <p>Get in touch using the <b>email form</b> below.</p>
-                <form class="mt-2" onsubmit="return handleContact(this)">
-                    <div class="form-group"><label for="subject">Subject</label><input type="text" id="subject" name="subject" required></div>
-                    <div class="form-group"><label for="message">Message</label><textarea id="message" name="message" rows="4" required></textarea></div>
-                    <div class="text-right"><button type="submit" class="btn">Send Message</button></div>
-                </form>
-            </div>
-            <script>
-            function handleContact(form) {
-                location.href = 'mailto:{$this->ctx->email}?subject=' + encodeURIComponent(form.subject.value) + '&body=' + encodeURIComponent(form.message.value);
-                showToast('Opening email client...', 'success');
-                return false;
-            }
-            </script>
-            HTML;
-        }
+final class Contact extends Plugin
+{
+    #[\Override]
+    public function list(): string
+    {
+        return <<<HTML
+<div class="card">
+    <h2>Contact</h2>
+    <p>This form opens your email client. A form the server actually receives arrives in chapter 06.</p>
+    <form class="mt-2" onsubmit="location.href='mailto:{$this->ctx->email}?subject='+encodeURIComponent(this.subject.value)+'&body='+encodeURIComponent(this.message.value);return false">
+        <div class="form-group"><label for="subject">Subject</label><input type="text" id="subject" name="subject" required></div>
+        <div class="form-group"><label for="message">Message</label><textarea id="message" name="message" rows="4" required></textarea></div>
+        <div class="text-right"><button type="submit" class="btn">Send</button></div>
+    </form>
+</div>
+HTML;
     }
 }
 

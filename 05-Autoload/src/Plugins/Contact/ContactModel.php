@@ -10,6 +10,6 @@ final class ContactModel extends Plugin
     #[\Override]
     public function list(): array
     {
-        return ['head' => 'Contact Page', 'main' => 'Get in touch using the <b>email form</b> below.'];
+        return ['title' => 'Contact', 'body' => 'This form opens your email client. A form the server actually receives arrives in chapter 06.', 'email' => $this->ctx->email];
     }
 }

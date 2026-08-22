@@ -3,6 +3,6 @@
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-use SPE\Autoload\Core\{Init, Ctx};
+use SPE\Autoload\Core\{Ctx, Init};
 
 echo new Init(new Ctx);

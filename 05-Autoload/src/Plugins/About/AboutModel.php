@@ -10,6 +10,6 @@ final class AboutModel extends Plugin
     #[\Override]
     public function list(): array
     {
-        return ['head' => 'About Page', 'main' => 'This chapter adds <b>PSR-4 autoloading</b> via Composer to organize classes into separate files.'];
+        return ['title' => 'About', 'body' => 'About has a Model but no View, so the base View renders it as a card. Theme is the only class that knows what a whole HTML document looks like.'];
     }
 }

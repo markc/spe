@@ -10,9 +10,6 @@ final class HomeModel extends Plugin
     #[\Override]
     public function list(): array
     {
-        return [
-            'head' => 'PSR-4 Autoloading',
-            'main' => '<p>This chapter introduces <b>Composer</b> and <b>PSR-4 autoloading</b> to organize classes into separate files with proper namespaces.</p>',
-        ];
+        return ['title' => 'Home', 'body' => 'The page looks exactly like chapters 02, 03 and 04. The classes are the same too; each now lives in its own file and Composer finds it by its namespace, so nothing is ever required by hand again.'];
     }
 }

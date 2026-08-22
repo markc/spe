@@ -25,7 +25,7 @@
             ],
             "visible_change": true,
             "run": "php -S localhost:8001 -t 01-Simple/public",
-            "test": "vendor/bin/pest tests/01-Simple"
+            "test": "vendor/bin/pest tests/Simple"
         },
         {
             "id": "02",
@@ -40,7 +40,7 @@
             ],
             "visible_change": true,
             "run": "php -S localhost:8002 -t 02-Styled/public",
-            "test": "vendor/bin/pest tests/02-Styled"
+            "test": "vendor/bin/pest tests/Styled"
         },
         {
             "id": "03",
@@ -57,7 +57,7 @@
             ],
             "visible_change": false,
             "run": "php -S localhost:8003 -t 03-Plugins/public",
-            "test": "vendor/bin/pest tests/03-Plugins"
+            "test": "vendor/bin/pest tests/Plugins"
         },
         {
             "id": "04",
@@ -73,7 +73,7 @@
             ],
             "visible_change": false,
             "run": "php -S localhost:8004 -t 04-Views/public",
-            "test": "vendor/bin/pest tests/04-Views"
+            "test": "vendor/bin/pest tests/Views"
         },
         {
             "id": "05",
@@ -100,7 +100,7 @@
             ],
             "visible_change": false,
             "run": "php -S localhost:8005 -t 05-Autoload/public",
-            "test": "vendor/bin/pest tests/05-Autoload"
+            "test": "vendor/bin/pest tests/Autoload"
         },
         {
             "id": "06",
@@ -116,7 +116,7 @@
             ],
             "visible_change": true,
             "run": "php -S localhost:8006 -t 06-Session/public",
-            "test": "vendor/bin/pest tests/06-Session"
+            "test": "vendor/bin/pest tests/Session"
         },
         {
             "id": "07",
@@ -133,7 +133,7 @@
             ],
             "visible_change": true,
             "run": "php -S localhost:8007 -t 07-PDO/public",
-            "test": "vendor/bin/pest tests/07-PDO"
+            "test": "vendor/bin/pest tests/PDO"
         },
         {
             "id": "08",
@@ -150,7 +150,7 @@
             ],
             "visible_change": true,
             "run": "php -S localhost:8008 -t 08-Auth/public",
-            "test": "vendor/bin/pest tests/08-Auth"
+            "test": "vendor/bin/pest tests/Auth"
         },
         {
             "id": "09",
@@ -167,7 +167,7 @@
             ],
             "visible_change": true,
             "run": "php -S localhost:8009 -t 09-Blog/public",
-            "test": "vendor/bin/pest tests/09-Blog"
+            "test": "vendor/bin/pest tests/Blog"
         }
     ]
 }

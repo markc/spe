@@ -3,38 +3,57 @@
 
 echo new class {
     private const string DEFAULT = 'home';
-    private array $pages = [
-        'home'    => ['🏠 Home', 'Home Page', 'Welcome to the <b>Styled</b> example with external CSS and JavaScript.'],
-        'about'   => ['📋 About', 'About Page', 'This chapter adds <b>dark mode</b> theming and <b>toast</b> notifications.'],
-        'contact' => ['✉️ Contact', 'Contact Page', 'Get in touch using the <b>email form</b> below.'],
-    ];
-    public private(set) string $page;
-    public private(set) string $title;
-    public private(set) string $content;
 
-    public function __construct() {
-        $this->page = (isset($_GET['m']) && is_string($_GET['m']) ? $_GET['m'] : '')
+    private const array PAGES = [
+        'home'    => ['home', 'Home'],
+        'about'   => ['book-open', 'About'],
+        'contact' => ['mail', 'Contact'],
+    ];
+
+    private const array SCHEMES = [
+        'default' => ['circle', 'Stone'],
+        'ocean'   => ['waves', 'Ocean'],
+        'forest'  => ['trees', 'Forest'],
+        'sunset'  => ['sunset', 'Sunset'],
+    ];
+
+    public private(set) string $page;
+    public private(set) string $main;
+
+    public function __construct()
+    {
+        $o = $_GET['o'] ?? '';
+        $this->page = (is_string($o) ? $o : '')
             |> trim(...)
-            |> htmlspecialchars(...)
-            |> (fn($p) => $p && isset($this->pages[$p]) ? $p : self::DEFAULT);
-        $this->title = $this->pages[$this->page][1];
-        $this->content = $this->pages[$this->page][2];
+            |> strtolower(...)
+            |> (static fn(string $p) => $p === '' ? self::DEFAULT : $p);
+
+        if (!isset(self::PAGES[$this->page])) {
+            http_response_code(404);
+        }
+        $this->main = match ($this->page) {
+            'home' => $this->home(),
+            'about' => $this->about(),
+            'contact' => $this->contact(),
+            default => '<div class="card"><h2>Not found</h2><p>There is no such page.</p></div>',
+        };
     }
 
-    public function __toString(): string {
-        $nav = $this->pages
-            |> array_keys(...)
-            |> (fn($k) => array_map(fn($p) => sprintf(
-                '<a href="?m=%s"%s>%s</a>',
-                $p, $p === $this->page ? ' class="active"' : '', $this->pages[$p][0]
-            ), $k))
-            |> (static fn($a) => implode(' ', $a));
+    public function __toString(): string
+    {
+        $nav = self::PAGES
+            |> (fn(array $pages) => array_map(fn(string $k, array $p) => sprintf(
+                '<a href="?o=%s"%s><i data-lucide="%s"></i> %s</a>', $k, $k === $this->page ? ' class="active"' : '', $p[0], $p[1]
+            ), array_keys($pages), $pages))
+            |> (static fn(array $links) => implode('', $links));
 
-        $main = match($this->page) {
-            'home' => $this->homeContent(),
-            'contact' => $this->contactForm(),
-            default => "<p>{$this->content}</p>"
-        };
+        $schemes = self::SCHEMES
+            |> (static fn(array $schemes) => array_map(static fn(string $k, array $s) => sprintf(
+                '<a href="#" data-scheme="%s"><i data-lucide="%s"></i> %s</a>', $k, $s[0], $s[1]
+            ), array_keys($schemes), $schemes))
+            |> (static fn(array $links) => implode('', $links));
+
+        $title = self::PAGES[$this->page][1] ?? 'Not found';
 
         return <<<HTML
 <!DOCTYPE html>
@@ -42,70 +61,70 @@ echo new class {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="light dark">
-    <title>SPE::02 {$this->title}</title>
+    <title>SPE::02 {$title}</title>
     <link rel="stylesheet" href="../base.css">
     <link rel="stylesheet" href="../site.css">
-    <script>(function(){const t=localStorage.getItem("base-theme");document.documentElement.className=t||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")})();</script>
+    <script src="https://unpkg.com/lucide@1.33.0/dist/umd/lucide.min.js"></script>
+    <script>(function(){var s=JSON.parse(localStorage.getItem('base-state')||'{}'),t=s.theme,c=s.scheme,h=document.documentElement;h.className='preload '+(t||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))+(c&&c!=='default'?' scheme-'+c:'');})()</script>
 </head>
 <body>
-<div class="container">
-    <header class="mt-4"><h1><a class="brand" href="../">‹ <span>Styled PHP Example</span></a></h1></header>
-    <nav class="card flex">{$nav}<span class="ml-auto"><button class="theme-toggle" id="theme-icon">🌙</button></span></nav>
-    <main class="mt-4 mb-4">
-        <div class="card-hover">
-            <h2>{$this->title}</h2>
-            {$main}
-        </div>
-        <div class="flex justify-center mt-4">
-            <button class="btn-hover btn-success" onclick="showToast('Success!', 'success')">Success</button>
-            <button class="btn-hover btn-danger" onclick="showToast('Error!', 'danger')">Danger</button>
-        </div>
-    </main>
-    <footer class="text-center"><small>© 2015-2026 Mark Constable (MIT License)</small></footer>
-</div>
+<nav class="topnav">
+    <button class="menu-toggle" data-sidebar="left"><i data-lucide="menu"></i></button>
+    <h1><a class="brand" href="../"><span>02 Styled</span></a></h1>
+    <button class="menu-toggle" data-sidebar="right"><i data-lucide="menu"></i></button>
+</nav>
+<aside class="sidebar sidebar-left">
+    <div class="sidebar-header"><span><i data-lucide="compass"></i> Navigation</span><button class="pin-toggle" data-sidebar="left" title="Pin sidebar"><i data-lucide="pin"></i></button></div>
+    <nav>{$nav}</nav>
+</aside>
+<aside class="sidebar sidebar-right">
+    <div class="sidebar-header"><span><i data-lucide="sliders-horizontal"></i> Settings</span><button class="pin-toggle" data-sidebar="right" title="Pin sidebar"><i data-lucide="pin"></i></button></div>
+    <nav>{$schemes}<div class="sidebar-divider"></div><a href="#" class="theme-toggle"><i data-lucide="moon"></i> Toggle theme</a></nav>
+</aside>
+<main>{$this->main}</main>
+<div class="overlay"></div>
 <script src="../base.js"></script>
 </body>
 </html>
 HTML;
     }
 
-    private function homeContent(): string {
+    private function home(): string
+    {
         return <<<'HTML'
-<p>Welcome to the <b>Styled</b> chapter. While this page looks similar to <a href="../01-Simple/">01-Simple</a>, several key improvements have been made.</p>
-
-<h3 class="mt-4">What's New?</h3>
-<ul class="mt-2" style="list-style:disc;padding-left:1.5rem">
-    <li><b>External CSS</b> — Styles moved from inline <code>&lt;style&gt;</code> to <code>base.css</code> and <code>site.css</code> files</li>
-    <li><b>External JavaScript</b> — Script moved from inline to <code>base.js</code> for theme toggle and toast notifications</li>
-    <li><b>Dark Mode Toggle</b> — Click the 🌙 button to switch between light and dark themes (persists via localStorage)</li>
-    <li><b>Toast Notifications</b> — Try the Success/Danger buttons below to see toast messages</li>
-    <li><b>Card Hover Effects</b> — Cards lift on hover with smooth shadow transitions</li>
-</ul>
-
-<h3 class="mt-4">CSS Architecture</h3>
-<p><code>base.css</code> provides the color-agnostic framework (layouts, components, utilities). <code>site.css</code> defines all colors and themes. This separation allows themes to be swapped by just changing <code>site.css</code>.</p>
-
-<h3 class="mt-4">Same PHP Structure</h3>
-<p>The PHP code remains a single-file anonymous class like 01-Simple. The key difference is the move to external assets, preparing for the component-based approach in later chapters.</p>
+<div class="card">
+    <h2>Home</h2>
+    <p>The same three pages as chapter 01, now wearing the <b>app shell</b>: a top bar, a navigation sidebar on the left, a settings sidebar on the right, light and dark themes and four colour schemes. Everything visual lives in <code>base.css</code>, <code>site.css</code> and <code>base.js</code>, shared by every later chapter.</p>
+    <p class="mt-4">
+        <button class="btn btn-success" onclick="Base.toast('Saved.', 'success')">Success toast</button>
+        <button class="btn btn-danger" onclick="Base.toast('Something went wrong.', 'danger')">Danger toast</button>
+    </p>
+</div>
 HTML;
     }
 
-    private function contactForm(): string {
-        return <<<HTML
-<p>{$this->content}</p>
-<form class="mt-2" onsubmit="return handleContact(this)">
-    <div class="form-group"><label for="subject">Subject</label><input type="text" id="subject" name="subject" required></div>
-    <div class="form-group"><label for="message">Message</label><textarea id="message" name="message" rows="4" required></textarea></div>
-    <div class="text-right"><button type="submit" class="btn">Send Message</button></div>
-</form>
-<script>
-function handleContact(form) {
-    location.href = 'mailto:mc@netserva.org?subject=' + encodeURIComponent(form.subject.value) + '&body=' + encodeURIComponent(form.message.value);
-    showToast('Opening email client...', 'success');
-    return false;
-}
-</script>
+    private function about(): string
+    {
+        return <<<'HTML'
+<div class="card">
+    <h2>About</h2>
+    <p>This chapter adds presentation and nothing else. The PHP is still one anonymous class; only its <code>__toString()</code> grew, because the HTML it returns grew.</p>
+</div>
+HTML;
+    }
+
+    private function contact(): string
+    {
+        return <<<'HTML'
+<div class="card">
+    <h2>Contact</h2>
+    <p>This form opens your email client. A form the server actually receives arrives in chapter 06.</p>
+    <form class="mt-2" onsubmit="location.href='mailto:mc@netserva.org?subject='+encodeURIComponent(this.subject.value)+'&body='+encodeURIComponent(this.message.value);return false">
+        <div class="form-group"><label for="subject">Subject</label><input type="text" id="subject" name="subject" required></div>
+        <div class="form-group"><label for="message">Message</label><textarea id="message" name="message" rows="4" required></textarea></div>
+        <div class="text-right"><button type="submit" class="btn">Send</button></div>
+    </form>
+</div>
 HTML;
     }
 };
