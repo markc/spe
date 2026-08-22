@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License) -->
+<!-- Code lane for the tutorial capture. Fetches a file from GitHub raw and shows
+     it syntax-highlighted at 4K, with the narrated lines highlighted + scrolled
+     into view.  ?f=01-Simple/public/index.php&hl=18-22  (hl optional, N or N-M) -->
+<head>
+<meta charset="utf-8">
+<title>SPE code</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<style>
+  :root { color-scheme: dark; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: #0d1117; }
+  body { font: 40px/1.5 "JetBrains Mono", "DejaVu Sans Mono", monospace; padding: 64px 96px; }
+  .bar { color: #8b949e; font-size: 34px; margin-bottom: 32px; display: flex; gap: 20px; align-items: center; }
+  .dot { width: 20px; height: 20px; border-radius: 50%; background: #ff5f56; box-shadow: 36px 0 #ffbd2e, 72px 0 #27c93f; margin-right: 72px; }
+  .code { display: table; border-collapse: collapse; width: 100%; }
+  .line { display: table-row; }
+  .ln { display: table-cell; text-align: right; color: #6e7681; user-select: none; padding-right: 40px; white-space: nowrap; }
+  .src { display: table-cell; white-space: pre; color: #c9d1d9; }
+  .line.hl { background: #1f2937; }
+  .line.hl .src { box-shadow: inset 6px 0 #ffbd2e; }
+  .line.hl .ln { color: #ffbd2e; }
+</style>
+</head>
+<body>
+<div class="bar"><span class="dot"></span><span id="path"></span></div>
+<div class="code" id="code"></div>
+<script>
+(async () => {
+  const q = new URLSearchParams(location.search);
+  const f = q.get('f') || '01-Simple/public/index.php';
+  const hl = (q.get('hl') || '').split('-').map(Number);
+  const [a, b] = hl.length === 2 ? hl : [hl[0], hl[0]];
+  document.getElementById('path').textContent = 'spe/' + f;
+
+  const url = 'https://raw.githubusercontent.com/markc/spe/main/' + f;
+  const src = await (await fetch(url)).text();
+  const lang = f.endsWith('.php') ? 'php' : f.endsWith('.json') ? 'json' : f.endsWith('.sql') ? 'sql' : 'plaintext';
+
+  const code = document.getElementById('code');
+  src.replace(/\n$/, '').split('\n').forEach((line, i) => {
+    const n = i + 1;
+    const row = document.createElement('div');
+    row.className = 'line' + (a && n >= a && n <= b ? ' hl' : '');
+    const gutter = document.createElement('span'); gutter.className = 'ln'; gutter.textContent = n;
+    const s = document.createElement('span'); s.className = 'src';
+    s.innerHTML = line ? hljs.highlight(line, { language: lang }).value : '&nbsp;';
+    row.append(gutter, s); code.appendChild(row);
+  });
+
+  if (a) {
+    const first = code.querySelector('.line.hl');
+    if (first) first.scrollIntoView({ block: 'center' });
+  }
+  document.body.dataset.ready = '1';
+})();
+</script>
+</body>
+</html>
