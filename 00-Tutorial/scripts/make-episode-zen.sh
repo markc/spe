@@ -25,17 +25,21 @@ And this is the one security habit worth carrying with you from the very first c
 That is the entire engine in just fifty-seven lines, and every chapter from here builds on it by adding exactly one new idea, beginning with the next one, where we give the very same page a proper look with shared styling, dark mode and an application shell.
 EOF
 
-echo "synth (${#NARR[@]} lines)…"
-DURS="["
-for i in "${!NARR[@]}"; do
-  wav="$DIR/aud/$(printf '%02d' "$i").wav"
-  bash "$TTS" "${NARR[$i]}" "$wav" >/dev/null
-  d=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$wav")
-  DURS="$DURS$d,"
-  echo "  scene $i ${d}s"
-done
-DURS="${DURS%,}]"
-echo "$DURS" > "$DIR/durations.json"
+if [ -f "$DIR/durations.json" ] && [ "${RESYNTH:-0}" != 1 ]; then
+  echo "reusing cached narration (RESYNTH=1 to redo)"
+else
+  echo "synth (${#NARR[@]} lines)…"
+  DURS="["
+  for i in "${!NARR[@]}"; do
+    wav="$DIR/aud/$(printf '%02d' "$i").wav"
+    bash "$TTS" "${NARR[$i]}" "$wav" >/dev/null
+    d=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$wav")
+    DURS="$DURS$d,"
+    echo "  scene $i ${d}s"
+  done
+  DURS="${DURS%,}]"
+  echo "$DURS" > "$DIR/durations.json"
+fi
 
 php -S 127.0.0.1:8000 "$ROOT/index.php" >/tmp/php-ep.log 2>&1 &
 PHP=$!
@@ -61,7 +65,11 @@ gpu-screen-recorder -w portal -restore-portal-session yes \
 GSR=$!
 sleep 4   # let the portal/pipewire stream negotiate
 
-BASE=http://127.0.0.1:8000 ZOOM="$ZOOM" node "$HERE/real-zen.mjs"
+# kill any lingering Zen that would lock the profile, then drive (log the output)
+pkill -f zen-bin 2>/dev/null || true
+sleep 1
+echo "driving Zen (log: /tmp/driver.log)…"
+BASE=http://127.0.0.1:8000 ZOOM="$ZOOM" node "$HERE/real-zen.mjs" 2>&1 | tee /tmp/driver.log || true
 
 sleep 1
 kill -SIGINT "$GSR" 2>/dev/null || true
