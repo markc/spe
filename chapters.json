@@ -175,12 +175,26 @@
             "dir": "09-Blog",
             "idea": "The application: content types, markdown, tags, pagination, self-hosted docs",
             "entry": "09-Blog/public/index.php",
-            "adds": [],
+            "adds": [
+                "src/Core/Type.php",
+                "src/Core/Md.php",
+                "src/Core/Post.php",
+                "src/Core/Content.php",
+                "src/Core/ContentView.php",
+                "src/Plugins/Blog/BlogModel.php",
+                "src/Plugins/Blog/BlogView.php",
+                "src/Plugins/Docs/DocsModel.php",
+                "src/Plugins/Docs/DocsView.php",
+                "src/Plugins/Tags/TagsModel.php",
+                "src/Plugins/Tags/TagsView.php",
+                "bin/seed-docs.php"
+            ],
             "php": [
                 "property hooks",
                 "array_first() / array_last()",
-                "URI extension",
-                "pipe operator as a render pipeline"
+                "URI extension for safe link schemes",
+                "the pipe operator as a render pipeline",
+                "abstract base sharing (Content)"
             ],
             "visible_change": true,
             "run": "php -S localhost:8009 -t 09-Blog/public",

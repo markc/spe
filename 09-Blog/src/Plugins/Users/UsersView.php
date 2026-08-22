@@ -1,205 +1,79 @@
 <?php declare(strict_types=1);
-
 // Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Plugins\Users;
 
-use SPE\App\Util;
-use SPE\Blog\Core\Ctx;
+use SPE\Blog\Core\View;
 
-final class UsersView
+final class UsersView extends View
 {
-    public function __construct(
-        private Ctx $ctx,
-        private array $a,
-    ) {}
-
-    private function t(): string
-    {
-        return '&t=' . $this->ctx->in['t'];
-    }
-
-    public function create(): string
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST')
-            return '';
-        return $this->form();
-    }
-
-    public function read(): string
-    {
-        $a = $this->a;
-        if (empty($a))
-            return (
-                '<div class="card"><p>User not found.</p><a href="?o=Users'
-                . $this->t()
-                . '" class="btn"><i data-lucide="chevron-left" class="inline-icon"></i> Back</a></div>'
-            );
-        $t = $this->t();
-        $anote = Util::nlbr($a['anote'] ?? '');
-        return <<<HTML
-        <div class="card">
-            <h2><i data-lucide="user" class="inline-icon"></i> {$a['login']}</h2>
-            <div class="mt-2">
-                <p><strong>First Name:</strong> {$a['fname']}</p>
-                <p><strong>Last Name:</strong> {$a['lname']}</p>
-                <p><strong>Alt Email:</strong> {$a['altemail']}</p>
-                <p><strong>Group:</strong> {$a['grp']}</p>
-                <p><strong>ACL:</strong> {$a['acl']}</p>
-                <p><strong>Created:</strong> {$a['created']}</p>
-                <p><strong>Updated:</strong> {$a['updated']}</p>
-                <p><strong>Admin Note:</strong> $anote</p>
-            </div>
-            <div class="btn-group mt-3">
-                <a href="?o=Users$t" class="btn"><i data-lucide="chevron-left" class="inline-icon"></i> Back</a>
-                <a href="?o=Users&m=update&id={$a['id']}$t" class="btn">Edit</a>
-                <a href="?o=Users&m=delete&id={$a['id']}$t" class="btn btn-danger" onclick="return confirm('Delete this user?')">Delete</a>
-            </div>
-        </div>
-        HTML;
-    }
-
-    public function update(): string
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST')
-            return '';
-        return $this->form($this->a);
-    }
-
-    public function delete(): string
-    {
-        return '';
-    }
-
+    #[\Override]
     public function list(): string
     {
-        $a = $this->a;
-        $t = $this->t();
-        $q = htmlspecialchars($_GET['q'] ?? '');
-        $clear = $q ? "<a href=\"?o=Users$t\" class=\"btn\">Clear</a>" : '';
-
-        $html = <<<HTML
-        <div class="card">
-            <div class="list-header">
-                <form class="search-form">
-                    <input type="hidden" name="o" value="Users">
-                    <input type="hidden" name="t" value="{$this->ctx->in['t']}">
-                    <input type="search" name="q" placeholder="Search..." value="$q" class="search-input">
-                    <button type="submit" class="btn">Search</button>
-                    $clear
-                </form>
-                <a href="?o=Users&m=create$t" class="btn">+ Add User</a>
-            </div>
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Login</th>
-                        <th>Name</th>
-                        <th>Created</th>
-                        <th>Updated</th>
-                        <th class="text-right">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-        HTML;
-
-        foreach ($a['items'] as $item) {
-            $login = htmlspecialchars($item['login']);
-            $name = htmlspecialchars($item['fname'] . ' ' . $item['lname']);
-            $html .= <<<HTML
-                <tr>
-                    <td><a href="?o=Users&m=read&id={$item['id']}$t">$login</a></td>
-                    <td>$name</td>
-                    <td><small>{$item['created']}</small></td>
-                    <td><small>{$item['updated']}</small></td>
-                    <td class="text-right">
-                        <a href="?o=Users&m=update&id={$item['id']}$t" title="Edit" class="icon"><i data-lucide="edit" class="inline-icon"></i></a>
-                        <a href="?o=Users&m=delete&id={$item['id']}$t" title="Delete" class="icon" onclick="return confirm('Delete this user?')"><i data-lucide="trash-2" class="inline-icon"></i></a>
-                    </td>
-                </tr>
-            HTML;
-        }
-
-        $html .= '</tbody></table>';
-
-        // Pagination
-        $p = $a['pagination'];
-        if ($p['pages'] > 1) {
-            $sq = $q ? "&q=$q" : '';
-            $html .= '<div class="btn-group-center mt-4">';
-            if ($p['page'] > 1)
-                $html .= "<a href=\"?o=Users&page=" . ($p['page'] - 1) . "$sq$t\" class=\"btn\"><i data-lucide=\"chevron-left\" class=\"inline-icon\"></i> Prev</a>";
-            $html .= "<span class=\"p-2\">Page {$p['page']} of {$p['pages']}</span>";
-            if ($p['page'] < $p['pages'])
-                $html .= "<a href=\"?o=Users&page=" . ($p['page'] + 1) . "$sq$t\" class=\"btn\">Next <i data-lucide=\"chevron-right\" class=\"inline-icon\"></i></a>";
-            $html .= '</div>';
-        }
-
-        return $html . '</div>';
-    }
-
-    private function form(array $data = []): string
-    {
-        $id = $data['id'] ?? 0;
-        $t = $this->t();
-        $login = htmlspecialchars($data['login'] ?? '');
-        $fname = htmlspecialchars($data['fname'] ?? '');
-        $lname = htmlspecialchars($data['lname'] ?? '');
-        $altemail = htmlspecialchars($data['altemail'] ?? '');
-        $grp = (int) ($data['grp'] ?? 0);
-        $acl = (int) ($data['acl'] ?? 0);
-        $anote = htmlspecialchars($data['anote'] ?? '');
-        $action = $id ? "?o=Users&m=update&id=$id$t" : "?o=Users&m=create$t";
-        $heading = $id ? 'Edit User' : 'Create User';
-        $btnText = $id ? 'Update' : 'Create';
+        $rows = array_map(fn(array $u) => <<<HTML
+<tr>
+    <td><a href="?o=Users&m=read&i={$this->e($u['id'])}">{$this->e($u['name'])}</a></td>
+    <td>{$this->e($u['email'])}</td>
+    <td><span class="tag">{$this->e($u['role'])}</span></td>
+    <td class="text-right">
+        <a class="btn btn-sm" href="?o=Users&m=update&i={$this->e($u['id'])}"><i data-lucide="pencil"></i></a>
+        <form method="post" action="?o=Users&m=delete&i={$this->e($u['id'])}" style="display:inline" onsubmit="return confirm('Delete this user?')">{$this->csrf()}<button type="submit" class="btn btn-sm btn-danger"><i data-lucide="trash-2"></i></button></form>
+    </td>
+</tr>
+HTML, $this->data['items']);
+        $body = implode('', $rows);
 
         return <<<HTML
-        <div class="card">
-            <h2>$heading</h2>
-            <form method="post" action="$action">
-                <input type="hidden" name="id" value="$id">
-                <div class="form-group">
-                    <label for="login">Login (Email)</label>
-                    <input type="email" id="login" name="login" value="$login" required>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="fname">First Name</label>
-                        <input type="text" id="fname" name="fname" value="$fname">
-                    </div>
-                    <div class="form-group">
-                        <label for="lname">Last Name</label>
-                        <input type="text" id="lname" name="lname" value="$lname">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="altemail">Alternate Email</label>
-                    <input type="email" id="altemail" name="altemail" value="$altemail">
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="grp">Group</label>
-                        <input type="number" id="grp" name="grp" value="$grp">
-                    </div>
-                    <div class="form-group">
-                        <label for="acl">ACL</label>
-                        <input type="number" id="acl" name="acl" value="$acl">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="webpw">Password (leave blank to keep current)</label>
-                    <input type="password" id="webpw" name="webpw" autocomplete="new-password">
-                </div>
-                <div class="form-group">
-                    <label for="anote">Admin Note</label>
-                    <textarea id="anote" name="anote" rows="3">$anote</textarea>
-                </div>
-                <div class="text-right">
-                    <a href="?o=Users$t" class="btn btn-muted">Cancel</a>
-                    <button type="submit" class="btn">$btnText</button>
-                </div>
-            </form>
-        </div>
-        HTML;
+<div class="card">
+    <div class="list-header"><h2>Users</h2><a class="btn" href="?o=Users&m=create"><i data-lucide="plus"></i> New user</a></div>
+    <table class="data-table">
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th></th></tr></thead>
+        <tbody>$body</tbody>
+    </table>
+</div>
+HTML;
+    }
+
+    #[\Override]
+    public function read(): string
+    {
+        if (!isset($this->data['role'])) {
+            return $this->card();
+        }
+        return <<<HTML
+<article class="card">
+    <h2>{$this->e($this->data['name'])}</h2>
+    <p class="text-muted">{$this->e($this->data['email'])} · <span class="tag">{$this->e($this->data['role'])}</span> · joined {$this->e($this->data['created'])}</p>
+    <div class="btn-group mt-4"><a class="btn" href="?o=Users"><i data-lucide="arrow-left"></i> Back</a><a class="btn" href="?o=Users&m=update&i={$this->e($this->data['id'])}"><i data-lucide="pencil"></i> Edit</a></div>
+</article>
+HTML;
+    }
+
+    #[\Override]
+    public function create(): string { return $this->form(); }
+
+    #[\Override]
+    public function update(): string { return isset($this->data['user']) ? $this->form() : $this->card(); }
+
+    private function form(): string
+    {
+        $u = $this->data['user'];
+        $options = implode('', array_map(fn(string $r) => sprintf(
+            '<option value="%s"%s>%s</option>', $this->e($r), $r === ($u['role'] ?? 'User') ? ' selected' : '', $this->e($r)
+        ), $this->data['roles']));
+
+        return <<<HTML
+<div class="card">
+    <h2>{$this->e($this->data['title'])}</h2>
+    <form method="post" action="{$this->e($this->data['action'])}">
+        {$this->csrf()}
+        <div class="form-group"><label for="name">Name</label><input type="text" id="name" name="name" value="{$this->e($u['name'])}" required></div>
+        <div class="form-group"><label for="email">Email</label><input type="email" id="email" name="email" value="{$this->e($u['email'])}" required></div>
+        <div class="form-group"><label for="role">Role</label><select id="role" name="role">$options</select></div>
+        <div class="form-group"><label for="password">Password <small class="text-muted">(leave blank to keep)</small></label><input type="password" id="password" name="password"></div>
+        <div class="btn-group"><button type="submit" class="btn">Save</button><a class="btn btn-ghost" href="?o=Users">Cancel</a></div>
+    </form>
+</div>
+HTML;
     }
 }

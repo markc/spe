@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 // Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Plugins\Home;
@@ -11,20 +10,6 @@ final class HomeModel extends Plugin
     #[\Override]
     public function list(): array
     {
-        return [
-            'head' => 'Home Page',
-            'main' => <<<HTML
-            <p>This is an ultra simple single-file PHP8 plus custom CSS framework implementing the <strong>Method Template</strong> design pattern.</p>
-            <div class="card mt-2">
-                <p>The Method Template Pattern in PHP provides a framework for defining a rendering system while allowing specific steps to be deferred to subclasses. At its core, it establishes a base template method that controls the overall structure and flow of content generation, while individual methods handle specific rendering tasks.</p>
-                <p>What makes this pattern particularly powerful is its return-based nature, where each method returns content rather than directly outputting it. This allows rendered content to be collected, transformed, and manipulated before final output.</p>
-            </div>
-            <div class="btn-group-center mt-4">
-                <button class="btn" onclick="showToast('Everything is working great!', 'success');">Success Message</button>
-                <button class="btn btn-danger" onclick="showToast('Something went wrong!', 'danger');">Danger Message</button>
-            </div>
-            HTML,
-            'foot' => __METHOD__ . ' (action)<br>Using the ' . $this->ctx->in['t'] . ' theme',
-        ];
+        return ['title' => 'Simple PHP Engine', 'body' => 'The finished application: a small content engine. Posts and docs share one table and one set of code, bodies are written in Markdown, entries carry tags, lists paginate, and the whole thing runs on plain PHP 8.5 with no framework.'];
     }
 }

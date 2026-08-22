@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 // Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Plugins\About;
@@ -11,19 +10,6 @@ final class AboutModel extends Plugin
     #[\Override]
     public function list(): array
     {
-        return [
-            'head' => 'About Page',
-            'main' => <<<HTML
-            <p>This is an experimental PHP8 framework intended to provide a minimal, yet functional, structure for exploring framework design principles and the new features of PHP8. The aim is to create a learn-by-doing environment for developers interested in understanding how frameworks are built.</p>
-            <div class="card mt-2">
-                <p class="text-center"><em>The code is available on <a href="https://github.com/markc/spe">GitHub</a>, and contributions are most welcome. Feel free to contact me at <a href="mailto:{$this->ctx->email}">{$this->ctx->email}</a> or via the Issue Tracker with any questions or suggestions.</em></p>
-            </div>
-            <div class="btn-group-center mt-4">
-                <a href="https://github.com/markc/spe" class="btn">SPE Project Page</a>
-                <a href="https://github.com/markc/spe/issues" class="btn">SPE Issue Tracker</a>
-            </div>
-            HTML,
-            'foot' => __METHOD__ . ' (action)<br>Using the ' . $this->ctx->in['t'] . ' theme',
-        ];
+        return ['title' => 'About', 'body' => 'Blog and Docs are the same code with a different Type; Content holds the shared CRUDL. A Post exposes html and excerpt as property hooks — computed on read, never stored stale. Markdown is rendered by a pipe of pure steps that escapes first and only allows safe link schemes. Prev/next and first/last use array_first() and array_last().'];
     }
 }

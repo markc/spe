@@ -3,149 +3,38 @@
 
 namespace SPE\Blog\Core;
 
-use SPE\App\Acl;
-use SPE\App\Db;
-use SPE\App\QueryType;
-use SPE\App\Util;
-
 final readonly class Init
 {
-    private const string NS = 'SPE\\Blog\\';
+    private const string PLUGINS = 'SPE\\Blog\\Plugins\\';
+
     private array $out;
 
     public function __construct(private Ctx $ctx)
     {
-        Util::elog(__METHOD__);
+        [$o, $m] = [$ctx->in['o'], $ctx->in['m']];
+        [$model, $view] = [self::PLUGINS . "$o\\{$o}Model", self::PLUGINS . "$o\\{$o}View"];
 
-        // Restore session from "remember me" cookie
-        $usersDb = new Db('users');
-        Util::remember($usersDb);
-
-        [$o, $m, $i] = [$ctx->in['o'], $ctx->in['m'], $ctx->in['i']];
-
-        // Clean URL routing
-        $path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
-        $path = preg_replace('#^\d{2}-[^/]+/?#', '', $path);
-
-        // Route based on path (query string ?o= takes priority)
-        if (isset($_GET['o'])) {
-            $main = $this->routePlugin($o, $m, $i);
-            $ary = [];
-        } elseif (!$path || $path === 'index.php') {
-            $ary = $ctx->db->read('posts', '*', "slug='home' AND type='page'", [], QueryType::One)
-                ?: $ctx->db->read('posts', '*', 'id=1', [], QueryType::One) ?: [];
-            $view = self::NS . 'Plugins\\Blog\\BlogView';
-            $main = $ary ? new $view($ctx, $ary)->page() : '<div class="card"><p>No content found.</p></div>';
-        } elseif ($path === 'blog') {
-            $model = self::NS . 'Plugins\\Blog\\BlogModel';
-            $ary = new $model($ctx)->list();
-            $view = self::NS . 'Plugins\\Blog\\BlogView';
-            $main = new $view($ctx, $ary)->list();
+        if (!is_subclass_of($model, Plugin::class)) {
+            http_response_code(404);
+            $data = ['title' => 'Not found', 'body' => 'There is no such plugin.'];
+        } elseif (!$ctx->role()->can($model::guard($m))) {
+            $ctx->flash(Flash::Warning, 'Please sign in to continue.');
+            header('Location: ?o=Auth&m=create');
+            exit;
         } else {
-            $ary = $ctx->db->read('posts', '*', 'slug=:s', ['s' => $path], QueryType::One) ?: [];
-            $view = self::NS . 'Plugins\\Blog\\BlogView';
-            $main = $ary
-                ? ($ary['type'] === 'page' ? new $view($ctx, $ary)->page() : new $view($ctx, $ary)->read())
-                : '<div class="card"><p>Page not found.</p></div>';
+            $data = new $model($ctx)->$m();
         }
 
-        $this->out = [...$ctx->out, ...(is_array($ary) ? $ary : []), 'main' => $main];
-    }
-
-    private function routePlugin(string $o, string $m, int $i): string
-    {
-        $ctx = $this->ctx;
-
-        // Auth plugin - public and user methods
-        if ($o === 'Auth') {
-            $userMethods = ['profile', 'changepw'];
-            if (in_array($m, $userMethods) && !Util::is_usr()) {
-                Util::log('Please login');
-                header('Location: ?o=Auth&m=login');
-                exit();
-            }
-            $model = self::NS . 'Plugins\\Auth\\AuthModel';
-            $ary = new $model($ctx)->$m();
-            $view = self::NS . 'Plugins\\Auth\\AuthView';
-            return new $view($ctx, $ary)->$m();
-        }
-
-        // Users plugin - admin only
-        if ($o === 'Users') {
-            if (!Acl::check(Acl::Admin)) {
-                Util::log('Admin access required');
-                header('Location: ?o=Auth&m=login');
-                exit();
-            }
-            $model = self::NS . 'Plugins\\Users\\UsersModel';
-            $ary = new $model($ctx)->$m();
-            $view = self::NS . 'Plugins\\Users\\UsersView';
-            return new $view($ctx, $ary)->$m();
-        }
-
-        // Blog plugin - read is public, write requires admin
-        if ($o === 'Blog') {
-            $writeMethods = ['create', 'update', 'delete'];
-            if (in_array($m, $writeMethods) && !Acl::check(Acl::Admin)) {
-                Util::log('Admin access required');
-                header('Location: /blog');
-                exit();
-            }
-            $model = self::NS . 'Plugins\\Blog\\BlogModel';
-            $ary = new $model($ctx)->$m();
-            $view = self::NS . 'Plugins\\Blog\\BlogView';
-            return new $view($ctx, $ary)->$m();
-        }
-
-        // Posts plugin - admin only
-        if ($o === 'Posts') {
-            if (!Acl::check(Acl::Admin)) {
-                Util::log('Admin access required');
-                header('Location: ?o=Auth&m=login');
-                exit();
-            }
-            $model = self::NS . 'Plugins\\Posts\\PostsModel';
-            $ary = new $model($ctx)->$m();
-            $view = self::NS . 'Plugins\\Posts\\PostsView';
-            return new $view($ctx, $ary)->$m();
-        }
-
-        // Categories plugin - admin only
-        if ($o === 'Categories') {
-            if (!Acl::check(Acl::Admin)) {
-                Util::log('Admin access required');
-                header('Location: ?o=Auth&m=login');
-                exit();
-            }
-            $model = self::NS . 'Plugins\\Categories\\CategoriesModel';
-            $ary = new $model($ctx)->$m();
-            $view = self::NS . 'Plugins\\Categories\\CategoriesView';
-            return new $view($ctx, $ary)->$m();
-        }
-
-        return '<div class="card"><p>Plugin not found.</p></div>';
+        $view = is_a($view, View::class, true) ? $view : View::class;
+        $this->out = [...$ctx->out, ...$data, 'main' => new $view($ctx, $data)->$m()];
     }
 
     public function __toString(): string
     {
-        Util::elog(__METHOD__);
-
-        $x = $this->ctx->in['x'];
-
-        if ($x === 'text') {
-            return preg_replace('/^\h*\v+/m', '', strip_tags($this->out['main']));
-        }
-        if ($x === 'json') {
+        if ($this->ctx->in['x'] === 'json') {
             header('Content-Type: application/json');
-            return json_encode($this->out);
+            return json_encode($this->out, JSON_THROW_ON_ERROR);
         }
-        if ($x && isset($this->out[$x])) {
-            header('Content-Type: application/json');
-            return json_encode($this->out[$x], JSON_PRETTY_PRINT);
-        }
-
-        $html = new Theme($this->ctx, $this->out)->render();
-        Util::perfLog(__FILE__);
-        return $html;
+        return new Theme($this->ctx, $this->out)->render();
     }
 }

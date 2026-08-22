@@ -1,22 +1,21 @@
 <?php declare(strict_types=1);
-
 // Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Plugins\Home;
 
-use SPE\Blog\Core\Theme;
+use SPE\Blog\Core\View;
 
-final class HomeView extends Theme
+final class HomeView extends View
 {
+    #[\Override]
     public function list(): string
     {
-        extract($this->ctx->ary);
         return <<<HTML
-        <div class="card">
-            <h2><i data-lucide="home" class="inline-icon"></i> $head</h2>
-            <div>$main</div>
-            <footer class="text-muted mt-2"><small>$foot</small></footer>
-        </div>
-        HTML;
+<div class="card">
+    <h2>{$this->e($this->data['title'])}</h2>
+    <p>{$this->e($this->data['body'])}</p>
+    <p>Read the <a href="?o=Blog">Blog</a>, browse the <a href="?o=Docs">Docs</a> (this tutorial, served by the app it documents), and sign in as admin@example.com / admin to write. Every earlier chapter is a step towards this one.</p>
+</div>
+HTML;
     }
 }

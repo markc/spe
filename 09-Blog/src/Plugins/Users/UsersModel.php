@@ -1,148 +1,101 @@
 <?php declare(strict_types=1);
-
 // Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Plugins\Users;
 
-use SPE\App\Db;
-use SPE\App\QueryType;
-use SPE\Blog\Core\Ctx;
-use SPE\Blog\Core\Plugin;
+use SPE\Blog\Core\{Flash, Plugin, QueryType, Role};
 
+/** Managing users is admin-only, every method. */
 final class UsersModel extends Plugin
 {
-    private const int DEFAULT_PER_PAGE = 10;
-
-    private ?Db $dbh = null;
-    private array $in = [
-        'id' => 0,
-        'grp' => 0,
-        'acl' => 0,
-        'login' => '',
-        'fname' => '',
-        'lname' => '',
-        'altemail' => '',
-        'webpw' => '',
-        'otp' => '',
-        'otpttl' => 0,
-        'cookie' => '',
-        'anote' => '',
-    ];
-
-    public function __construct(
-        protected Ctx $ctx,
-    ) {
-        parent::__construct($ctx);
-        foreach ($this->in as $k => &$v)
-            $v = $_REQUEST[$k] ?? $v;
-        if (is_null($this->dbh)) {
-            $this->dbh = new Db('users');
-        }
-    }
-
     #[\Override]
-    public function create(): array
+    public static function guard(string $m): Role
     {
-        if ($_POST) {
-            $data = [
-                'grp' => (int) $this->in['grp'],
-                'acl' => (int) $this->in['acl'],
-                'login' => $this->in['login'],
-                'fname' => $this->in['fname'],
-                'lname' => $this->in['lname'],
-                'altemail' => $this->in['altemail'],
-                'webpw' => $this->in['webpw'] ? password_hash($this->in['webpw'], PASSWORD_DEFAULT) : '',
-                'otp' => $this->in['otp'],
-                'otpttl' => (int) $this->in['otpttl'],
-                'cookie' => $this->in['cookie'],
-                'anote' => $this->in['anote'],
-                'created' => date('Y-m-d H:i:s'),
-                'updated' => date('Y-m-d H:i:s'),
-            ];
-            $this->dbh->create('users', $data);
-            header('Location: ?o=Users&t=' . $this->ctx->in['t']);
-            exit();
-        }
-        return [];
-    }
-
-    #[\Override]
-    public function read(): array
-    {
-        $id = filter_var($this->in['id'], FILTER_VALIDATE_INT);
-        return $this->dbh->read('users', '*', 'id = :id', ['id' => $id], QueryType::One) ?: [];
-    }
-
-    #[\Override]
-    public function update(): array
-    {
-        $id = filter_var($this->in['id'], FILTER_VALIDATE_INT);
-        if ($_POST) {
-            $data = [
-                'grp' => (int) $this->in['grp'],
-                'acl' => (int) $this->in['acl'],
-                'login' => $this->in['login'],
-                'fname' => $this->in['fname'],
-                'lname' => $this->in['lname'],
-                'altemail' => $this->in['altemail'],
-                'otp' => $this->in['otp'],
-                'otpttl' => (int) $this->in['otpttl'],
-                'cookie' => $this->in['cookie'],
-                'anote' => $this->in['anote'],
-                'updated' => date('Y-m-d H:i:s'),
-            ];
-            if ($this->in['webpw'])
-                $data['webpw'] = password_hash($this->in['webpw'], PASSWORD_DEFAULT);
-            $this->dbh->update('users', $data, 'id = :id', ['id' => $id]);
-            header('Location: ?o=Users&m=read&id=' . $id . '&t=' . $this->ctx->in['t']);
-            exit();
-        }
-        return $this->dbh->read('users', '*', 'id = :id', ['id' => $id], QueryType::One) ?: [];
-    }
-
-    #[\Override]
-    public function delete(): array
-    {
-        $id = filter_var($this->in['id'], FILTER_VALIDATE_INT);
-        $this->dbh->delete('users', 'id = :id', ['id' => $id]);
-        header('Location: ?o=Users&t=' . $this->ctx->in['t']);
-        exit();
+        return Role::Admin;
     }
 
     #[\Override]
     public function list(): array
     {
-        $page = filter_var($_REQUEST['page'] ?? 1, FILTER_VALIDATE_INT) ?: 1;
-        $perPage = filter_var($_REQUEST['perpage'] ?? self::DEFAULT_PER_PAGE, FILTER_VALIDATE_INT)
-        ?: self::DEFAULT_PER_PAGE;
-        $offset = ($page - 1) * $perPage;
-        $searchQuery = trim($_GET['q'] ?? '');
-        $where = '1=1';
-        $params = [];
+        return ['title' => 'Users', 'items' => $this->ctx->db->read('users', 'id, email, name, role, created', order: 'ORDER BY id')];
+    }
 
-        if ($searchQuery !== '') {
-            $where = '(login LIKE :search OR fname LIKE :search OR lname LIKE :search)';
-            $params['search'] = '%' . $searchQuery . '%';
+    #[\Override]
+    public function read(): array
+    {
+        return $this->find($this->ctx->in['i']) ?: ['title' => 'Not found', 'body' => 'There is no such user.'];
+    }
+
+    #[\Override]
+    public function create(): array
+    {
+        if ($p = $this->ctx->post()) {
+            $fields = $this->fields($p);
+            if (($p['password'] ?? '') === '') {
+                $this->ctx->flash(Flash::Warning, 'A new user needs a password.');
+                $this->redirect('?o=Users&m=create');
+            }
+            $fields['password'] = password_hash((string) $p['password'], PASSWORD_DEFAULT);
+            $id = $this->ctx->db->create('users', $fields);
+            $this->ctx->flash(Flash::Success, 'User created.');
+            $this->redirect("?o=Users&m=read&i=$id");
         }
+        return ['title' => 'New user', 'user' => ['email' => '', 'name' => '', 'role' => 'User'], 'action' => '?o=Users&m=create', 'roles' => $this->roles()];
+    }
 
-        $total = $this->dbh->read('users', 'COUNT(*)', $where, $params, QueryType::Col);
-        $params['limit'] = $perPage;
-        $params['offset'] = $offset;
+    #[\Override]
+    public function update(): array
+    {
+        $user = $this->find($this->ctx->in['i']);
+        if (!$user) {
+            return ['title' => 'Not found', 'body' => 'There is no such user.'];
+        }
+        if ($p = $this->ctx->post()) {
+            $fields = $this->fields($p);
+            if (($p['password'] ?? '') !== '') {
+                $fields['password'] = password_hash((string) $p['password'], PASSWORD_DEFAULT);
+            }
+            $this->ctx->db->update('users', $fields, 'id = :id', ['id' => $user['id']]);
+            $this->ctx->flash(Flash::Success, 'User updated.');
+            $this->redirect("?o=Users&m=read&i={$user['id']}");
+        }
+        return ['title' => "Edit: {$user['name']}", 'user' => $user, 'action' => "?o=Users&m=update&i={$user['id']}", 'roles' => $this->roles()];
+    }
 
+    #[\Override]
+    public function delete(): array
+    {
+        if ($this->ctx->post()) {
+            if ($this->ctx->in['i'] === $this->ctx->user?->id) {
+                $this->ctx->flash(Flash::Warning, 'You cannot delete your own account.');
+            } else {
+                $this->ctx->db->delete('users', 'id = :id', ['id' => $this->ctx->in['i']])
+                    ? $this->ctx->flash(Flash::Success, 'User deleted.')
+                    : $this->ctx->flash(Flash::Warning, 'No such user.');
+            }
+        }
+        $this->redirect('?o=Users');
+    }
+
+    private function find(int $id): array|false
+    {
+        return $this->ctx->db->read('users', 'id, email, name, role, created', 'id = :id', ['id' => $id], QueryType::One);
+    }
+
+    /** @return array{email:string,name:string,role:string} */
+    private function fields(array $p): array
+    {
+        $role = Role::tryFrom((string) ($p['role'] ?? '')) ?? Role::User;
         return [
-            'items' => $this->dbh->read(
-                'users',
-                '*',
-                $where . ' ORDER BY updated DESC, created DESC LIMIT :limit OFFSET :offset',
-                $params,
-                QueryType::All,
-            ),
-            'pagination' => [
-                'page' => $page,
-                'perPage' => $perPage,
-                'total' => $total,
-                'pages' => ceil($total / $perPage),
-            ],
+            'email' => trim((string) ($p['email'] ?? '')),
+            'name' => trim((string) ($p['name'] ?? '')) ?: 'Unnamed',
+            'role' => $role->value,
         ];
+    }
+
+    /** @return list<string> */
+    private function roles(): array
+    {
+        return array_map(static fn(Role $r) => $r->value, [Role::User, Role::Admin]);
     }
 }

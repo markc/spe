@@ -1,37 +1,33 @@
 <?php declare(strict_types=1);
-
 // Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 
 namespace SPE\Blog\Core;
 
 abstract class Plugin
 {
-    public function __construct(
-        protected Ctx $ctx,
-    ) {}
+    public function __construct(protected Ctx $ctx) {}
 
-    public function create(): array
+    /** The minimum role allowed to call $m. Public by default; plugins tighten it. */
+    public static function guard(string $m): Role
     {
-        return ['head' => 'Create', 'main' => 'Plugin::create() not implemented yet!', 'foot' => __METHOD__];
+        return Role::Anon;
     }
 
-    public function read(): array
+    /** @return array{title: string, body: string} */
+    public function create(): array { return $this->todo('create'); }
+    public function read(): array { return $this->todo('read'); }
+    public function update(): array { return $this->todo('update'); }
+    public function delete(): array { return $this->todo('delete'); }
+    public function list(): array { return $this->todo('list'); }
+
+    protected function redirect(string $query): never
     {
-        return ['head' => 'Read', 'main' => 'Plugin::read() not implemented yet!', 'foot' => __METHOD__];
+        header("Location: $query");
+        exit;
     }
 
-    public function update(): array
+    private function todo(string $m): array
     {
-        return ['head' => 'Update', 'main' => 'Plugin::update() not implemented yet!', 'foot' => __METHOD__];
-    }
-
-    public function delete(): array
-    {
-        return ['head' => 'Delete', 'main' => 'Plugin::delete() not implemented yet!', 'foot' => __METHOD__];
-    }
-
-    public function list(): array
-    {
-        return ['head' => 'List', 'main' => 'Plugin::list() not implemented yet!', 'foot' => __METHOD__];
+        return ['title' => ucfirst($m), 'body' => static::class . "::$m() is not implemented."];
     }
 }
