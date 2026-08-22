@@ -14,11 +14,17 @@ mkdirSync(OUT, { recursive: true });
 
 const pause = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// Lay the page out at a VWxVH css viewport and paint it at deviceScaleFactor DSF,
+// so the video is captured at (VW*DSF)x(VH*DSF) device pixels — razor sharp.
+// Default = 4K: a 1280-wide browser at 3x -> 3840x2160. Override via env.
+const VW = Number(process.env.VW || 1280);
+const VH = Number(process.env.VH || 720);
+const DSF = Number(process.env.DSF || 3);
 const browser = await chromium.launch();
 const ctx = await browser.newContext({
-  viewport: { width: 1920, height: 1080 },
-  deviceScaleFactor: 2,
-  recordVideo: { dir: OUT, size: { width: 1920, height: 1080 } },
+  viewport: { width: VW, height: VH },
+  deviceScaleFactor: DSF,
+  recordVideo: { dir: OUT, size: { width: VW * DSF, height: VH * DSF } },
 });
 const page = await ctx.newPage();
 
