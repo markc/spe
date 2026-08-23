@@ -5,33 +5,39 @@
 // lane 'code' -> the native GitHub blob, lines highlighted.
 // gpu-screen-recorder captures externally; assembly syncs to the first change.
 //
-// Look is FORCED via prefs (below), not inherited from your live profile — the
-// driver's profile snapshot was stale (came up 120% + dark). By default we use a
-// clean, disposable profile so nothing touches your real ~/.zen, and GitHub renders
-// logged-out + light (a cleaner tutorial view).
+// PROFILE: a DEDICATED, PERSISTENT capture profile (default ~/.zen-capture) — set up
+// once (complete Zen's first-run wizard, hide its sidebar), reused every run. Not your
+// daily ~/.zen: no pollution, no lock-contention with your running Zen. We (re)seed its
+// user.js on every launch so the look below is always applied, whatever else is in it.
 //
-// ZOOM NOTE: layout.css.devPixelsPerPx sets the ABSOLUTE device-px-per-CSS-px ratio,
-// so effective CSS width = captured_framebuffer_px / DPR. This 4K desk captures at
-// 3840 px and the target is ~1024 CSS wide (the confirmed 150% fullscreen view:
-// 3840 /2.5 OS-scale /1.5 zoom = 1024x576), so DPR = 3840 / 1024 = 3.75. The driver
-// logs the resulting innerWidth to driver.log — nudge DPR if it's off (higher DPR =
-// narrower/bigger; lower = wider/smaller). Env:
+// KIOSK (default on): launch chromeless — no toolbar, no Zen sidebar, fullscreen. This
+// is what guarantees a clean capture; F11-style fullscreen() alone does NOT hide Zen's
+// sidebar. KIOSK=0 falls back to window fullscreen() (then hide the sidebar in-profile).
+//
+// ZOOM: layout.css.devPixelsPerPx is the ABSOLUTE device-px-per-CSS-px ratio, so
+// effective CSS width = captured_framebuffer_px / DPR. This 4K desk captures at 3840 px
+// and the target is 1024 CSS wide (confirmed 150% view: 3840 /2.5 OS /1.5 zoom = 1024x576),
+// so DPR = 3840/1024 = 3.75. Driver logs the resulting innerWidth to driver.log. Env:
 //   DPR=3.75             device-px per CSS-px (framebuffer_px / desired_CSS_width)
-//   USE_REAL_PROFILE=1   launch against $PROFILE instead of a fresh one
+//   KIOSK=0              use window fullscreen() instead of kiosk
+//   CAPTURE_PROFILE=dir  override the dedicated profile path
+//   USE_REAL_PROFILE=1   use your daily $PROFILE instead (not recommended)
 //
 //   BASE=http://127.0.0.1:8000 node real-zen.mjs <chapter>
 
 import { Builder } from 'selenium-webdriver';
 import firefox from 'selenium-webdriver/firefox.js';
-import { readFileSync } from 'fs';
+import { readFileSync, mkdirSync, writeFileSync } from 'fs';
 import { homedir } from 'os';
 
 const CHAP = process.argv[2] || '01-Simple';
 const BASE = process.env.BASE || 'http://127.0.0.1:8000';
 const REPO = process.env.REPO || 'markc/spe';
 const PROFILE = process.env.PROFILE || `${homedir()}/.zen/212lt933.Default Profile`;
+const CAPTURE_PROFILE = process.env.CAPTURE_PROFILE || `${homedir()}/.zen-capture`;
 const ZEN_BIN = process.env.ZEN_BIN || '/opt/zen-browser-bin/zen-bin';
 const DPR = process.env.DPR || '3.75';                        // 3840/1024 = 3.75 -> 1024 CSS wide
+const KIOSK = process.env.KIOSK !== '0';                      // default on: chromeless capture
 const USE_REAL_PROFILE = process.env.USE_REAL_PROFILE === '1';
 
 const root = new URL('..', import.meta.url).pathname;               // 00-Tutorial/
@@ -54,34 +60,42 @@ const EASE_ONTO = `
 `;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// The dedicated capture profile. Seed user.js so our look is (re)applied on every
+// launch, authoritative over anything geckodriver or the profile itself sets. user.js
+// only holds THESE keys — it does not touch the wizard/sidebar settings you set once.
+const profileDir = USE_REAL_PROFILE ? PROFILE : CAPTURE_PROFILE;
+mkdirSync(profileDir, { recursive: true });
+writeFileSync(`${profileDir}/user.js`, [
+  `user_pref("layout.css.devPixelsPerPx", "${DPR}");`,                      // 1024 CSS wide
+  `user_pref("layout.css.prefers-color-scheme.content-override", 1);`,      // 1 = light -> GitHub light
+  `user_pref("ui.systemUsesDarkTheme", 0);`,
+  `user_pref("browser.theme.content-theme", 1);`,
+  `user_pref("browser.aboutConfig.showWarning", false);`,
+  `user_pref("browser.startup.page", 0);`,
+  `user_pref("browser.sessionstore.resume_from_crash", false);`,
+  `user_pref("browser.shell.checkDefaultBrowser", false);`,
+  '',
+].join('\n'));
+
 const opts = new firefox.Options();
 opts.setBinary(ZEN_BIN);
-if (USE_REAL_PROFILE) opts.addArguments('-profile', PROFILE);  // else: clean, disposable profile
-opts.setPreference('browser.aboutConfig.showWarning', false);
-// Force the look deterministically (profile snapshots came up 120% + dark):
-opts.setPreference('layout.css.devPixelsPerPx', DPR);                      // OS_SCALE * PAGE_ZOOM
-opts.setPreference('layout.css.prefers-color-scheme.content-override', 1); // 1 = light -> GitHub light
-opts.setPreference('ui.systemUsesDarkTheme', 0);
-opts.setPreference('browser.theme.content-theme', 1);                      // light content theme
-// A fresh profile has no session to restore and no first-run tab to steal focus:
-opts.setPreference('browser.startup.page', 0);
-opts.setPreference('browser.aboutwelcome.enabled', false);
-opts.setPreference('browser.sessionstore.resume_from_crash', false);
+opts.addArguments('-profile', profileDir);
+if (KIOSK) opts.addArguments('-kiosk');   // chromeless: no toolbar, no Zen sidebar
 
 const driver = await new Builder().forBrowser('firefox').setFirefoxOptions(opts).build();
 
 try {
-  await driver.manage().window().fullscreen();   // F11: no chrome, no sidebar
+  if (!KIOSK) await driver.manage().window().fullscreen();   // kiosk is already chromeless+fullscreen
   await sleep(700);
-
-  // Report the effective layout so you can sanity-check the width in driver.log.
-  const w = await driver.executeScript('return window.innerWidth');
-  console.error(`look: devPixelsPerPx=${DPR} -> ${w} CSS px wide (target 1024), light forced`);
 
   // blank pre-roll while the recorder settles; the jump to scene 1 is the first
   // scene-change the assembler locks onto.
   await driver.get('about:blank');
   await sleep(2500);
+
+  // Report the effective layout (after a page is loaded, so innerWidth is real).
+  const w = await driver.executeScript('return window.innerWidth');
+  console.error(`look: kiosk=${KIOSK} devPixelsPerPx=${DPR} -> ${w} CSS px wide (target 1024), light forced`);
 
   for (let i = 0; i < ep.scenes.length; i++) {
     const s = ep.scenes[i];
