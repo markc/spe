@@ -10,14 +10,12 @@
 // clean, disposable profile so nothing touches your real ~/.zen, and GitHub renders
 // logged-out + light (a cleaner tutorial view).
 //
-// ZOOM NOTE: layout.css.devPixelsPerPx sets the ABSOLUTE device-px-per-CSS-px ratio
-// — it REPLACES the OS scaling, it does not stack on it. To reproduce a HiDPI desk
-// (e.g. 4K panel at 250% OS scaling + 150% browser zoom) the pref must be the PRODUCT
-// of both: 2.5 * 1.5 = 3.75. Then effective CSS width = physical_px / 3.75
-// (3840 / 3.75 = 1024 CSS), rendered crisp into the full physical width. So we take
-// the two real factors and multiply:
-//   OS_SCALE=2.5    your desktop/compositor scaling (1.0 on a non-HiDPI screen)
-//   PAGE_ZOOM=1.5   browser zoom on top (1.5=150% -> 1024 CSS; 1.2=120% -> 1280 CSS on 4K@250%)
+// ZOOM NOTE: layout.css.devPixelsPerPx sets the ABSOLUTE device-px-per-CSS-px ratio,
+// so effective CSS width = captured_framebuffer_px / DPR. This 4K desk captures at
+// 3840 px and the target is ~1280 CSS wide (the confirmed 150% fullscreen view), so
+// DPR = 3840 / 1280 = 3.0. The driver logs the resulting innerWidth to driver.log —
+// nudge DPR if it's off (higher DPR = narrower/bigger; lower = wider/smaller). Env:
+//   DPR=3.0              device-px per CSS-px (framebuffer_px / desired_CSS_width)
 //   USE_REAL_PROFILE=1   launch against $PROFILE instead of a fresh one
 //
 //   BASE=http://127.0.0.1:8000 node real-zen.mjs <chapter>
@@ -32,9 +30,7 @@ const BASE = process.env.BASE || 'http://127.0.0.1:8000';
 const REPO = process.env.REPO || 'markc/spe';
 const PROFILE = process.env.PROFILE || `${homedir()}/.zen/212lt933.Default Profile`;
 const ZEN_BIN = process.env.ZEN_BIN || '/opt/zen-browser-bin/zen-bin';
-const OS_SCALE = parseFloat(process.env.OS_SCALE || '2.5');   // desktop scaling (4K @ 250%)
-const PAGE_ZOOM = parseFloat(process.env.PAGE_ZOOM || '1.5'); // browser zoom on top
-const DPR = (OS_SCALE * PAGE_ZOOM).toFixed(4);                 // absolute devPixelsPerPx (2.5*1.5=3.75)
+const DPR = process.env.DPR || '3.0';                         // 3840/1280 = 3.0 -> 1280 CSS wide
 const USE_REAL_PROFILE = process.env.USE_REAL_PROFILE === '1';
 
 const root = new URL('..', import.meta.url).pathname;               // 00-Tutorial/
@@ -79,7 +75,7 @@ try {
 
   // Report the effective layout so you can sanity-check the width in driver.log.
   const w = await driver.executeScript('return window.innerWidth');
-  console.error(`look: devPixelsPerPx=${DPR} (OS_SCALE ${OS_SCALE} × PAGE_ZOOM ${PAGE_ZOOM}) -> ${w} CSS px wide, light forced`);
+  console.error(`look: devPixelsPerPx=${DPR} -> ${w} CSS px wide (target 1280), light forced`);
 
   // blank pre-roll while the recorder settles; the jump to scene 1 is the first
   // scene-change the assembler locks onto.
