@@ -111,7 +111,7 @@ body{font:16px/1.6 "JetBrains Mono","DejaVu Sans Mono",monospace;padding:28px 44
 <div class="bar">spe/${file}</div>
 <div class="code" id="code"></div>
 <script>
-const SRC=${JSON.stringify(src)}, LO=${lo}, HI=${hi}, LANG=${JSON.stringify(langOf(file))};
+const SRC=${JSON.stringify(src).replace(/<\//g, '<\\/')}, LO=${lo}, HI=${hi}, LANG=${JSON.stringify(langOf(file))};
 const code=document.getElementById('code');
 SRC.split('\\n').forEach((line,i)=>{const n=i+1;const row=document.createElement('div');row.className='line'+(n>=LO&&n<=HI?' hl':'');const g=document.createElement('span');g.className='ln';g.textContent=n;const s=document.createElement('span');s.className='src';s.innerHTML=line?hljs.highlight(line,{language:LANG}).value:'&nbsp;';row.append(g,s);code.appendChild(row);});
 const first=code.querySelector('.line.hl');
