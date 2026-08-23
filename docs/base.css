@@ -673,7 +673,7 @@
         .grid-3 { grid-template-columns: repeat(2, 1fr); }
     }
 
-    @media (min-width: 1280px) {
+    @media (min-width: 1024px) {
         .pin-toggle { display: block; }
         .sidebar-left.pinned { transform: translateX(0); position: fixed; }
         .sidebar-right.pinned { transform: translateX(0); position: fixed; }

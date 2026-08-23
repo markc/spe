@@ -23,11 +23,20 @@ const root = new URL('..', import.meta.url).pathname;               // 00-Tutori
 const ep = JSON.parse(readFileSync(`${root}episodes/${CHAP}.json`, 'utf8'));
 const durs = JSON.parse(readFileSync(`/tmp/ep/${CHAP}/durations.json`, 'utf8'));
 
+// Code lane = the native GitHub blob (light per your GitHub theme; sidebars auto-hide
+// at this zoom). The #L anchor highlights + jumps to the lines; we then ease onto them.
 const blob = (file, hl) => {
   const [a, b] = String(hl).split('-');
-  const anchor = b ? `#L${a}-L${b}` : `#L${a}`;
-  return `https://github.com/${REPO}/blob/main/${file}${anchor}`;
+  return `https://github.com/${REPO}/blob/main/${file}${b ? `#L${a}-L${b}` : `#L${a}`}`;
 };
+// Small eased "settle" onto the highlighted lines: nudge up, glide back down.
+const EASE_ONTO = `
+  const target = window.pageYOffset;
+  window.scrollTo(0, Math.max(0, target - 280));
+  const from = window.pageYOffset, dur = 1400, t0 = performance.now();
+  const ease = t => (t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2);
+  (function step(now){ const p = Math.min(1,(now-t0)/dur); window.scrollTo(0, from + (target-from)*ease(p)); if (p<1) requestAnimationFrame(step); })(performance.now());
+`;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const opts = new firefox.Options();
@@ -50,8 +59,9 @@ try {
     const s = ep.scenes[i];
     const start = Date.now();
     if (s.lane === 'code') {
-      await driver.get(blob(s.file, s.hl));
-      await sleep(1800);                          // GitHub renders + scrolls to the anchor
+      await driver.get(blob(s.file, s.hl));       // GitHub highlights + jumps to the lines
+      await sleep(1400);                          // let the heavy page render/settle
+      await driver.executeScript(EASE_ONTO);      // then glide onto the highlighted lines
     } else {
       await driver.get(`${BASE}/${CHAP}${s.app || '/'}`);
       await sleep(300);
