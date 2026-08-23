@@ -6,7 +6,6 @@
     {
       "lane": "app",
       "app": "/",
-      "js": "Base.pinSidebar('left');Base.pinSidebar('right');",
       "narr": "Chapter two takes the exact three pages from chapter one and dresses them in a complete application shell."
     },
     {
