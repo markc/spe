@@ -70,7 +70,7 @@ echo new class {
 <body>
 <nav class="topnav">
     <button class="menu-toggle" data-sidebar="left"><i data-lucide="menu"></i></button>
-    <h1><a class="brand" href="../"><span>02 Styled</span></a></h1>
+    <h1><a class="brand" href="../"><span>« 02 Styled</span></a></h1>
     <button class="menu-toggle" data-sidebar="right"><i data-lucide="menu"></i></button>
 </nav>
 <aside class="sidebar sidebar-left">
