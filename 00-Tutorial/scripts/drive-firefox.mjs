@@ -85,6 +85,10 @@ const scrollToLine = (first) => `
 // virtualization, no panes, no network to github.com. Written per scene to /tmp and
 // loaded via file://. highlight.js/theme come from the CDN (same as the old codeview).
 const repoRoot = `${root}..`;
+const scriptDir = new URL('.', import.meta.url).pathname;            // .../00-Tutorial/scripts/
+// Vendored (v11.9.0) and inlined into every code page — fully self-contained, no CDN/network.
+const HLJS_JS = readFileSync(`${scriptDir}vendor/highlight.min.js`, 'utf8');
+const HLJS_CSS = readFileSync(`${scriptDir}vendor/github.min.css`, 'utf8');
 const langOf = (f) => f.endsWith('.php') ? 'php' : f.endsWith('.json') ? 'json'
   : f.endsWith('.sql') ? 'sql' : f.endsWith('.css') ? 'css'
   : f.endsWith('.js') ? 'javascript' : 'plaintext';
@@ -95,8 +99,8 @@ const langOf = (f) => f.endsWith('.php') ? 'php' : f.endsWith('.json') ? 'json'
 const codePage = (file) => {
   const src = readFileSync(`${repoRoot}/${file}`, 'utf8').replace(/\n$/, '');
   const html = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>${file}</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<style>${HLJS_CSS}</style>
+<script>${HLJS_JS}</script>
 <style>
 :root{color-scheme:light}*{margin:0;padding:0;box-sizing:border-box}
 html,body{background:#fff}
@@ -115,7 +119,7 @@ body{font:16px/1.6 "JetBrains Mono","DejaVu Sans Mono",monospace;padding:28px 44
 <script>
 const SRC=${JSON.stringify(src).replace(/<\//g, '<\\/')}, LANG=${JSON.stringify(langOf(file))};
 const code=document.getElementById('code');
-SRC.split('\\n').forEach((line,i)=>{const n=i+1;const row=document.createElement('div');row.className='line';row.id='ln'+n;const g=document.createElement('span');g.className='ln';g.textContent=n;const s=document.createElement('span');s.className='src';s.innerHTML=line?hljs.highlight(line,{language:LANG}).value:'&nbsp;';row.append(g,s);code.appendChild(row);});
+SRC.split('\\n').forEach((line,i)=>{const n=i+1;const row=document.createElement('div');row.className='line';row.id='ln'+n;const g=document.createElement('span');g.className='ln';g.textContent=n;const s=document.createElement('span');s.className='src';s.innerHTML=line?(hljs.getLanguage(LANG)?hljs.highlight(line,{language:LANG}).value:line.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')):'&nbsp;';row.append(g,s);code.appendChild(row);});
 window.setHL=function(lo,hi){
   document.querySelectorAll('.line.hl').forEach(function(e){e.classList.remove('hl');});
   var first=null;
