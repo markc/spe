@@ -88,9 +88,11 @@ const repoRoot = `${root}..`;
 const langOf = (f) => f.endsWith('.php') ? 'php' : f.endsWith('.json') ? 'json'
   : f.endsWith('.sql') ? 'sql' : f.endsWith('.css') ? 'css'
   : f.endsWith('.js') ? 'javascript' : 'plaintext';
-const codePage = (file, hl) => {
-  const [a, b] = String(hl).split('-').map(Number);
-  const lo = a, hi = b || a;
+// One page PER FILE (full source, no baked highlight). window.setHL(lo,hi) moves the
+// highlight and eases from the CURRENT scroll to the new lines — so consecutive scenes
+// in the same file glide section-to-section with no reload/top-flash. The driver only
+// reloads when the file changes.
+const codePage = (file) => {
   const src = readFileSync(`${repoRoot}/${file}`, 'utf8').replace(/\n$/, '');
   const html = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>${file}</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
@@ -111,13 +113,21 @@ body{font:16px/1.6 "JetBrains Mono","DejaVu Sans Mono",monospace;padding:28px 44
 <div class="bar">spe/${file}</div>
 <div class="code" id="code"></div>
 <script>
-const SRC=${JSON.stringify(src).replace(/<\//g, '<\\/')}, LO=${lo}, HI=${hi}, LANG=${JSON.stringify(langOf(file))};
+const SRC=${JSON.stringify(src).replace(/<\//g, '<\\/')}, LANG=${JSON.stringify(langOf(file))};
 const code=document.getElementById('code');
-SRC.split('\\n').forEach((line,i)=>{const n=i+1;const row=document.createElement('div');row.className='line'+(n>=LO&&n<=HI?' hl':'');const g=document.createElement('span');g.className='ln';g.textContent=n;const s=document.createElement('span');s.className='src';s.innerHTML=line?hljs.highlight(line,{language:LANG}).value:'&nbsp;';row.append(g,s);code.appendChild(row);});
-const first=code.querySelector('.line.hl');
-if(first){const target=Math.max(0,first.offsetTop-innerHeight*0.35);const start=pageYOffset,dist=target-start,dur=1400,t0=performance.now();const ease=t=>(t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2);requestAnimationFrame(function step(now){const p=Math.min(1,(now-t0)/dur);scrollTo(0,start+dist*ease(p));if(p<1)requestAnimationFrame(step);});}
+SRC.split('\\n').forEach((line,i)=>{const n=i+1;const row=document.createElement('div');row.className='line';row.id='ln'+n;const g=document.createElement('span');g.className='ln';g.textContent=n;const s=document.createElement('span');s.className='src';s.innerHTML=line?hljs.highlight(line,{language:LANG}).value:'&nbsp;';row.append(g,s);code.appendChild(row);});
+window.setHL=function(lo,hi){
+  document.querySelectorAll('.line.hl').forEach(function(e){e.classList.remove('hl');});
+  var first=null;
+  for(var n=lo;n<=hi;n++){var r=document.getElementById('ln'+n);if(r){r.classList.add('hl');if(!first)first=r;}}
+  if(!first)return;
+  var target=Math.max(0,first.offsetTop-innerHeight*0.35);
+  var start=pageYOffset,dist=target-start,dur=1200,t0=performance.now();
+  var ease=function(t){return t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2;};
+  requestAnimationFrame(function step(now){var p=Math.min(1,(now-t0)/dur);scrollTo(0,start+dist*ease(p));if(p<1)requestAnimationFrame(step);});
+};
 </script></body></html>`;
-  const out = `/tmp/ep/${CHAP}/code-${lo}-${hi}.html`;
+  const out = `/tmp/ep/${CHAP}/code-${file.replace(/[^A-Za-z0-9]/g, '_')}.html`;
   writeFileSync(out, html);
   return `file://${out}`;
 };
@@ -173,22 +183,32 @@ try {
     'return [window.screen.width, window.screen.height, window.innerWidth, window.innerHeight]');
   console.error(`look: bin=${BIN} kiosk=${KIOSK} devPixelsPerPx=${DPR} -> screen ${dims[0]}x${dims[1]}, viewport ${dims[2]}x${dims[3]} (target 1024x576), light forced`);
 
+  let loadedCodeFile = null;   // reuse a code page across same-file scenes (no top-flash)
   for (let i = 0; i < ep.scenes.length; i++) {
     const s = ep.scenes[i];
     const start = Date.now();
     if (s.lane === 'code') {
+      const [a, b] = String(s.hl).split('-').map(Number);
+      const lo = a, hi = b || a;
       if (CODE_LANE === 'github') {
         await driver.get(blob(s.file, s.hl));         // native GitHub blob (opt-in)
         await sleep(1400);
         await driver.executeScript(HIDE_GH_CHROME);   // collapse left tree + right symbols pane
         await sleep(300);
-        await driver.executeScript(scrollToLine(String(s.hl).split('-')[0]));
+        await driver.executeScript(scrollToLine(String(lo)));
       } else {
-        await driver.get(codePage(s.file, s.hl));     // self-contained page: eases on, stays put
+        if (s.file !== loadedCodeFile) {
+          await driver.get(codePage(s.file));         // load the full-file page once
+          loadedCodeFile = s.file;
+          await sleep(400);                           // let it render
+        }
+        // move the highlight + ease from the current position (no reload for same file)
+        await driver.executeScript(`window.setHL(${lo}, ${hi})`);
         await sleep(300);
       }
     } else {
       await driver.get(`${BASE}/${CHAP}${s.app || '/'}`);
+      loadedCodeFile = null;                          // left the code page; next code scene reloads
       await sleep(300);
       // One pass: force the shell open (CSS, immune to base.js responsive un-pinning),
       // run any per-scene interaction (scheme/theme/toast), and report diagnostics.
