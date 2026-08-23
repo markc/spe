@@ -12,10 +12,11 @@
 //
 // ZOOM NOTE: layout.css.devPixelsPerPx sets the ABSOLUTE device-px-per-CSS-px ratio,
 // so effective CSS width = captured_framebuffer_px / DPR. This 4K desk captures at
-// 3840 px and the target is ~1280 CSS wide (the confirmed 150% fullscreen view), so
-// DPR = 3840 / 1280 = 3.0. The driver logs the resulting innerWidth to driver.log —
-// nudge DPR if it's off (higher DPR = narrower/bigger; lower = wider/smaller). Env:
-//   DPR=3.0              device-px per CSS-px (framebuffer_px / desired_CSS_width)
+// 3840 px and the target is ~1024 CSS wide (the confirmed 150% fullscreen view:
+// 3840 /2.5 OS-scale /1.5 zoom = 1024x576), so DPR = 3840 / 1024 = 3.75. The driver
+// logs the resulting innerWidth to driver.log — nudge DPR if it's off (higher DPR =
+// narrower/bigger; lower = wider/smaller). Env:
+//   DPR=3.75             device-px per CSS-px (framebuffer_px / desired_CSS_width)
 //   USE_REAL_PROFILE=1   launch against $PROFILE instead of a fresh one
 //
 //   BASE=http://127.0.0.1:8000 node real-zen.mjs <chapter>
@@ -30,7 +31,7 @@ const BASE = process.env.BASE || 'http://127.0.0.1:8000';
 const REPO = process.env.REPO || 'markc/spe';
 const PROFILE = process.env.PROFILE || `${homedir()}/.zen/212lt933.Default Profile`;
 const ZEN_BIN = process.env.ZEN_BIN || '/opt/zen-browser-bin/zen-bin';
-const DPR = process.env.DPR || '3.0';                         // 3840/1280 = 3.0 -> 1280 CSS wide
+const DPR = process.env.DPR || '3.75';                        // 3840/1024 = 3.75 -> 1024 CSS wide
 const USE_REAL_PROFILE = process.env.USE_REAL_PROFILE === '1';
 
 const root = new URL('..', import.meta.url).pathname;               // 00-Tutorial/
@@ -75,7 +76,7 @@ try {
 
   // Report the effective layout so you can sanity-check the width in driver.log.
   const w = await driver.executeScript('return window.innerWidth');
-  console.error(`look: devPixelsPerPx=${DPR} -> ${w} CSS px wide (target 1280), light forced`);
+  console.error(`look: devPixelsPerPx=${DPR} -> ${w} CSS px wide (target 1024), light forced`);
 
   // blank pre-roll while the recorder settles; the jump to scene 1 is the first
   // scene-change the assembler locks onto.
