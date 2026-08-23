@@ -58,7 +58,7 @@ fi
 
 gpu-screen-recorder -w portal -restore-portal-session yes \
   -portal-session-token-filepath "$HOME/.cache/gsr-spe.token" \
-  -f 30 -k h264 -q very_high -bm qp -cr full -cursor yes -o "$DIR/screen.mp4" >/tmp/gsr.log 2>&1 &
+  -f 30 -k h264 -q very_high -bm qp -cr full -cursor no -o "$DIR/screen.mp4" >/tmp/gsr.log 2>&1 &
 GSR=$!
 sleep 4
 
