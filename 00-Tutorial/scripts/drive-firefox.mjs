@@ -69,6 +69,23 @@ const EASE_ONTO = `
 `;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// Force the app shell OPEN for the capture. base.js hides pinned sidebars via a
+// responsive matchMedia(960) listener that can fire spuriously under the driven
+// browser (devPixelsPerPx + load-time width races), so we don't rely on pinSidebar;
+// this style pins both panels open and offsets main, immune to that listener. It's a
+// no-op on chapters with no sidebars (01-Simple) — the selectors simply match nothing.
+const FORCE_SHELL = `
+  if (document.querySelector('.sidebar-left')) {
+    var id = 'cap-force-shell';
+    if (!document.getElementById(id)) {
+      var st = document.createElement('style'); st.id = id;
+      st.textContent = '.sidebar-left,.sidebar-right{transform:translateX(0)!important;position:fixed!important}'
+        + 'main{margin-inline:var(--sidebar-width)!important}.overlay{display:none!important}';
+      document.head.appendChild(st);
+    }
+  }
+`;
+
 // Disposable geckodriver-managed profile (no -profile), so setPreference applies
 // cleanly. Firefox has no blocking wizard; we still silence the welcome/first-run.
 const opts = new firefox.Options();
@@ -114,20 +131,19 @@ try {
     } else {
       await driver.get(`${BASE}/${CHAP}${s.app || '/'}`);
       await sleep(300);
-      // Optional per-scene interaction (drive the app's own JS API), e.g. pin the
-      // sidebars, switch colour scheme, toggle dark mode, fire a toast. State persists
-      // in localStorage across the run, so pinning once holds for later app scenes.
-      // Wrapped so a bad snippet can't abort the run; diagnostics go to driver.log.
-      if (s.js) {
-        const info = await driver.executeScript(`
-          var out = { iw: window.innerWidth, base: !!window.Base };
-          try { ${s.js} out.ok = true; } catch (e) { out.ok = false; out.err = String(e); }
-          out.body = document.body.className;
-          return out;
-        `);
-        console.error(`scene ${i} app js -> iw=${info.iw} base=${info.base} ok=${info.ok}${info.err ? ' err=' + info.err : ''} body="${info.body}"`);
-        await sleep(500);
-      }
+      // One pass: force the shell open (CSS, immune to base.js responsive un-pinning),
+      // run any per-scene interaction (scheme/theme/toast), and report diagnostics.
+      const info = await driver.executeScript(`
+        ${FORCE_SHELL}
+        var out = { iw: window.innerWidth, base: !!window.Base,
+                    sbLeft: !!document.querySelector('.sidebar-left'),
+                    forced: !!document.getElementById('cap-force-shell') };
+        ${s.js ? `try { ${s.js} out.ok = true; } catch (e) { out.ok = false; out.err = String(e); }` : ''}
+        out.body = document.body.className;
+        return out;
+      `);
+      console.error(`scene ${i} app -> iw=${info.iw} base=${info.base} sbLeft=${info.sbLeft} forced=${info.forced}${s.js ? ` js.ok=${info.ok}${info.err ? ' err=' + info.err : ''}` : ''} body="${info.body}"`);
+      await sleep(500);
     }
     const left = durs[i] * 1000 - (Date.now() - start);
     if (left > 0) await sleep(left);
@@ -136,4 +152,4 @@ try {
 } finally {
   await driver.quit();
 }
-console.log(`zen driver done: ${CHAP}, ${ep.scenes.length} scenes`);
+console.log(`firefox driver done: ${CHAP}, ${ep.scenes.length} scenes`);
