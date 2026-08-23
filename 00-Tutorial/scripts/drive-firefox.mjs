@@ -89,9 +89,17 @@ const scriptDir = new URL('.', import.meta.url).pathname;            // .../00-T
 // Vendored (v11.9.0) and inlined into every code page — fully self-contained, no CDN/network.
 const HLJS_JS = readFileSync(`${scriptDir}vendor/highlight.min.js`, 'utf8');
 const HLJS_CSS = readFileSync(`${scriptDir}vendor/github.min.css`, 'utf8');
-const langOf = (f) => f.endsWith('.php') ? 'php' : f.endsWith('.json') ? 'json'
-  : f.endsWith('.sql') ? 'sql' : f.endsWith('.css') ? 'css'
-  : f.endsWith('.js') ? 'javascript' : 'plaintext';
+// Map file extension -> highlight.js language (the vendored common bundle covers all of
+// these, incl. Rust). Unknown extensions fall back to plaintext (and the page escapes it).
+const EXT_LANG = {
+  php: 'php', json: 'json', sql: 'sql', css: 'css', scss: 'scss',
+  js: 'javascript', mjs: 'javascript', cjs: 'javascript', ts: 'typescript',
+  rs: 'rust', go: 'go', py: 'python', rb: 'ruby', java: 'java', kt: 'kotlin',
+  c: 'c', h: 'c', cpp: 'cpp', cc: 'cpp', cs: 'csharp', swift: 'swift',
+  sh: 'bash', bash: 'bash', toml: 'ini', ini: 'ini', yml: 'yaml', yaml: 'yaml',
+  md: 'markdown', html: 'xml', xml: 'xml', lua: 'lua', diff: 'diff',
+};
+const langOf = (f) => EXT_LANG[f.split('.').pop().toLowerCase()] || 'plaintext';
 // One page PER FILE (full source, no baked highlight). window.setHL(lo,hi) moves the
 // highlight and eases from the CURRENT scroll to the new lines — so consecutive scenes
 // in the same file glide section-to-section with no reload/top-flash. The driver only
