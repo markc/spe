@@ -43,7 +43,7 @@ jobs:
         run: |
           missing=0
           for file in $(git ls-files '*.php'); do
-            if ! head -1 "$file" | grep -q 'declare(strict_types=1)'; then
+            if ! head -2 "$file" | grep -q 'declare(strict_types=1)'; then
               echo "Missing strict_types: $file"
               missing=$((missing + 1))
             fi
