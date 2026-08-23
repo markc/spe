@@ -119,7 +119,7 @@ HTML;
 
     private function pager(): string
     {
-        [$page, $pages, $o, $tag] = [$this->data['page'], $this->data['pages'], $this->o(), $this->data['tag']];
+        [$page, $pages, $o, $tag] = [$this->data['pageNo'], $this->data['pages'], $this->o(), $this->data['tag']];
         if ($pages < 2) {
             return '';
         }

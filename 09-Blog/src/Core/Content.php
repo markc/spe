@@ -46,7 +46,7 @@ abstract class Content extends Plugin
             'title' => $type->label(),
             'type' => $type,
             'items' => $items,
-            'page' => $page,
+            'pageNo' => $page,
             'pages' => $pages,
             'tag' => $tag,
             'allTags' => $this->ctx->db->read('tags', 'name, slug', order: 'ORDER BY name'),
