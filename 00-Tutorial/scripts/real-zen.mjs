@@ -2,9 +2,15 @@
 // Drive a fresh, FULLSCREEN Zen (Firefox) via geckodriver through a chapter's
 // scenes (from episodes/<chapter>.json), holding each for its narration length.
 // lane 'app'  -> the running page at BASE/<chapter><app-path>
-// lane 'code' -> the native GitHub blob, lines highlighted (light theme = your
-//                GitHub appearance setting).
+// lane 'code' -> the native GitHub blob, lines highlighted.
 // gpu-screen-recorder captures externally; assembly syncs to the first change.
+//
+// Look is FORCED via prefs (below), not inherited from your live profile — the
+// driver's profile snapshot was stale (came up 120% + dark). By default we use a
+// clean, disposable profile so nothing touches your real ~/.zen, and GitHub renders
+// logged-out + light (a cleaner tutorial view). Overrides via env:
+//   ZOOM=1.5              global page scale (150% == your manual zoom)
+//   USE_REAL_PROFILE=1    launch against $PROFILE instead of a fresh one
 //
 //   BASE=http://127.0.0.1:8000 node real-zen.mjs <chapter>
 
@@ -18,12 +24,14 @@ const BASE = process.env.BASE || 'http://127.0.0.1:8000';
 const REPO = process.env.REPO || 'markc/spe';
 const PROFILE = process.env.PROFILE || `${homedir()}/.zen/212lt933.Default Profile`;
 const ZEN_BIN = process.env.ZEN_BIN || '/opt/zen-browser-bin/zen-bin';
+const ZOOM = process.env.ZOOM || '1.5';                    // 1.5 = 150% everywhere
+const USE_REAL_PROFILE = process.env.USE_REAL_PROFILE === '1';
 
 const root = new URL('..', import.meta.url).pathname;               // 00-Tutorial/
 const ep = JSON.parse(readFileSync(`${root}episodes/${CHAP}.json`, 'utf8'));
 const durs = JSON.parse(readFileSync(`/tmp/ep/${CHAP}/durations.json`, 'utf8'));
 
-// Code lane = the native GitHub blob (light per your GitHub theme; sidebars auto-hide
+// Code lane = the native GitHub blob (forced light via prefs above; sidebars auto-hide
 // at this zoom). The #L anchor highlights + jumps to the lines; we then ease onto them.
 const blob = (file, hl) => {
   const [a, b] = String(hl).split('-');
@@ -41,8 +49,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const opts = new firefox.Options();
 opts.setBinary(ZEN_BIN);
-opts.addArguments('-profile', PROFILE);
+if (USE_REAL_PROFILE) opts.addArguments('-profile', PROFILE);  // else: clean, disposable profile
 opts.setPreference('browser.aboutConfig.showWarning', false);
+// Force the look deterministically (profile snapshots came up 120% + dark):
+opts.setPreference('layout.css.devPixelsPerPx', ZOOM);                     // global page scale (150%)
+opts.setPreference('layout.css.prefers-color-scheme.content-override', 1); // 1 = light -> GitHub light
+opts.setPreference('ui.systemUsesDarkTheme', 0);
+opts.setPreference('browser.theme.content-theme', 1);                      // light content theme
+// A fresh profile has no session to restore and no first-run tab to steal focus:
+opts.setPreference('browser.startup.page', 0);
+opts.setPreference('browser.aboutwelcome.enabled', false);
+opts.setPreference('browser.sessionstore.resume_from_crash', false);
 
 const driver = await new Builder().forBrowser('firefox').setFirefoxOptions(opts).build();
 
