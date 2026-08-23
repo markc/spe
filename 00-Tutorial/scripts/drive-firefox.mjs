@@ -38,34 +38,43 @@ const root = new URL('..', import.meta.url).pathname;               // 00-Tutori
 const ep = JSON.parse(readFileSync(`${root}episodes/${CHAP}.json`, 'utf8'));
 const durs = JSON.parse(readFileSync(`/tmp/ep/${CHAP}/durations.json`, 'utf8'));
 
-// Code lane = the native GitHub blob (forced light via prefs below; GitHub's own
-// sidebars auto-hide at this width). The #L anchor highlights + jumps; we ease onto it.
+// Code lane = the native GitHub blob (forced light via prefs below). The #L anchor
+// highlights + jumps to the lines; we hide GitHub's chrome then ease onto them.
 const blob = (file, hl) => {
   const [a, b] = String(hl).split('-');
   return `https://github.com/${REPO}/blob/main/${file}${b ? `#L${a}-L${b}` : `#L${a}`}`;
 };
-// GitHub's blob view can open a right-hand "Symbols" pane that eats width and
-// intrudes on the capture. Collapse it (click its toggle if expanded) and hide any
-// residual right pane so the code reclaims the full frame. Selectors are defensive —
-// GitHub's DOM shifts, so match on role/label/testid and structural position.
-const HIDE_RIGHT_PANE = `
+// The logged-out blob view shows a LEFT file-tree pane and can open a RIGHT "Symbols"
+// pane — both eat width and intrude. The capture profile is fresh (logged out, no saved
+// prefs) every run, so we can't rely on GitHub remembering them collapsed: collapse both
+// each time (click the toggles) and CSS-hide any residual pane. Selectors are defensive.
+const HIDE_GH_CHROME = `
   try {
-    [...document.querySelectorAll('button,[role="button"]')].forEach(b => {
-      const l = ((b.getAttribute('aria-label')||'') + ' ' + (b.title||'') + ' ' + (b.textContent||'')).toLowerCase();
-      if (l.includes('symbol') && (b.getAttribute('aria-expanded')==='true' || b.getAttribute('aria-pressed')==='true')) b.click();
+    [...document.querySelectorAll('button,[role="button"],a')].forEach(b => {
+      const l = ((b.getAttribute('aria-label')||'') + ' ' + (b.title||'')).toLowerCase();
+      if (l.includes('collapse file tree') || l.includes('hide file tree')) b.click();  // left tree
+      if (l.includes('symbol') && (b.getAttribute('aria-expanded')==='true' || b.getAttribute('aria-pressed')==='true')) b.click();  // right symbols
     });
   } catch (e) {}
-  const st = document.createElement('style');
-  st.textContent = '[data-testid="symbols-pane"],[data-testid="symbol-pane"],[class*="SymbolsPane"],[class*="symbols-pane"],[aria-label="Symbols"]{display:none!important}';
+  const st = document.createElement('style'); st.id = 'cap-hide-gh';
+  st.textContent = '.Layout-sidebar,[data-testid="file-tree"],[data-testid="repos-file-tree"],'
+    + '[class*="FileTree"],[data-testid="symbols-pane"],[data-testid="symbol-pane"],'
+    + '[class*="SymbolsPane"],[class*="symbols-pane"]{display:none!important}';
   document.head.appendChild(st);
 `;
-// Small eased "settle" onto the highlighted lines: nudge up, glide back down.
-const EASE_ONTO = `
-  const target = window.pageYOffset;
-  window.scrollTo(0, Math.max(0, target - 280));
-  const from = window.pageYOffset, dur = 1400, t0 = performance.now();
-  const ease = t => (t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2);
-  (function step(now){ const p = Math.min(1,(now-t0)/dur); window.scrollTo(0, from + (target-from)*ease(p)); if (p<1) requestAnimationFrame(step); })(performance.now());
+// Eased scroll ONTO the highlighted first line. Target the line element itself (GitHub
+// resets scroll to top during its React render, so reading pageYOffset was giving 0 and
+// easing "to the top"). Falls back to no-move if the element isn't found.
+const scrollToLine = (first) => `
+  (function(){
+    var el = document.querySelector('#L${first}, #LC${first}, [data-line-number="${first}"]');
+    var target = el ? (el.getBoundingClientRect().top + window.pageYOffset - window.innerHeight*0.35)
+                    : window.pageYOffset;
+    target = Math.max(0, target);
+    var from = window.pageYOffset, dur = 1400, t0 = performance.now();
+    var ease = function(t){ return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2; };
+    (function step(now){ var p = Math.min(1,(now-t0)/dur); window.scrollTo(0, from + (target-from)*ease(p)); if (p<1) requestAnimationFrame(step); })(performance.now());
+  })();
 `;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -123,11 +132,12 @@ try {
     const s = ep.scenes[i];
     const start = Date.now();
     if (s.lane === 'code') {
-      await driver.get(blob(s.file, s.hl));       // GitHub highlights + jumps to the lines
-      await sleep(1400);                          // let the heavy page render/settle
-      await driver.executeScript(HIDE_RIGHT_PANE);// kill the Symbols pane before we settle
-      await sleep(200);
-      await driver.executeScript(EASE_ONTO);      // then glide onto the highlighted lines
+      await driver.get(blob(s.file, s.hl));           // GitHub highlights + jumps to the lines
+      await sleep(1400);                              // let the heavy page render/settle
+      await driver.executeScript(HIDE_GH_CHROME);     // collapse left tree + right symbols pane
+      await sleep(300);                               // let the reflow settle before we scroll
+      const first = String(s.hl).split('-')[0];
+      await driver.executeScript(scrollToLine(first));// glide onto the highlighted first line
     } else {
       await driver.get(`${BASE}/${CHAP}${s.app || '/'}`);
       await sleep(300);

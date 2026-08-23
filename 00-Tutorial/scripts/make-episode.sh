@@ -76,7 +76,12 @@ cd "$DIR"
 T0=$(ffmpeg -hide_banner -i screen.mp4 -vf "select='gt(scene,0.3)',showinfo" -f null - 2>&1 \
       | grep -oP 'pts_time:\K[0-9.]+' | head -1)
 T0="${T0:-4.0}"
-echo "  scene-1 start at ${T0}s"
+# A/V sync: video was landing slightly AHEAD of the voice. Start the video SYNC seconds
+# earlier (smaller T0) so the visuals sit a touch later relative to the narration.
+# Tune with SYNC=<secs> (0 = off; larger = video later).
+SYNC="${SYNC:-0.2}"
+T0=$(awk -v a="$T0" -v b="$SYNC" 'BEGIN{t=a-b; if(t<0)t=0; print t}')
+echo "  scene-1 start at ${T0}s (SYNC ${SYNC}s)"
 
 : > audio.txt
 for i in "${!NARR[@]}"; do echo "file 'aud/$(printf '%03d' "$i").wav'" >> audio.txt; done
@@ -95,7 +100,5 @@ rm -f "episode-$CHAP.srt"
 
 echo "== done =="
 ffprobe -v error -show_entries stream=width,height,codec_name -show_entries format=duration -of default=nw=1 "episode-$CHAP.mp4"
-MP4="$DIR/episode-$CHAP.mp4"
 echo
-echo "MP4: $MP4"
-echo "watch: mpv $MP4"
+echo "MP4: $DIR/episode-$CHAP.mp4"
