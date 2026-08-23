@@ -93,9 +93,11 @@ try {
   await driver.get('about:blank');
   await sleep(2500);
 
-  // Report the effective layout (after a page is loaded, so innerWidth is real).
-  const w = await driver.executeScript('return window.innerWidth');
-  console.error(`look: kiosk=${KIOSK} devPixelsPerPx=${DPR} -> ${w} CSS px wide (target 1024), light forced`);
+  // Report the effective layout. screen.width is reliable regardless of page-load
+  // state; innerWidth confirms the actual viewport (0 => window never got sized).
+  const dims = await driver.executeScript(
+    'return [window.screen.width, window.screen.height, window.innerWidth, window.innerHeight]');
+  console.error(`look: kiosk=${KIOSK} devPixelsPerPx=${DPR} -> screen ${dims[0]}x${dims[1]}, viewport ${dims[2]}x${dims[3]} (target 1024x576), light forced`);
 
   for (let i = 0; i < ep.scenes.length; i++) {
     const s = ep.scenes[i];
