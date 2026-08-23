@@ -114,6 +114,10 @@ try {
     } else {
       await driver.get(`${BASE}/${CHAP}${s.app || '/'}`);
       await sleep(300);
+      // Optional per-scene interaction (drive the app's own JS API), e.g. pin the
+      // sidebars, switch colour scheme, toggle dark mode, fire a toast. State persists
+      // in localStorage across the run, so pinning once holds for later app scenes.
+      if (s.js) { await driver.executeScript(s.js); await sleep(500); }
     }
     const left = durs[i] * 1000 - (Date.now() - start);
     if (left > 0) await sleep(left);

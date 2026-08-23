@@ -1,0 +1,24 @@
+{
+  "chapter": "02-Styled",
+  "title": "SPE Chapter 02 — Styled",
+  "_comment": "VET THIS FILE before rendering. Each scene = one short narration beat (aim 5-10s) + one visual. lane 'app' shows the running page at app-relative path (optional 'js' runs the app's Base API after load: pin sidebars, set scheme, toggle theme, toast — state persists across the run). lane 'code' shows the native GitHub blob with lines hl highlighted. Rebuild: RESYNTH=1 bash scripts/make-episode-zen.sh 02-Styled",
+  "scenes": [
+    { "lane": "app", "app": "/", "js": "Base.pinSidebar('left');Base.pinSidebar('right');", "narr": "Chapter two takes the exact three pages from chapter one and dresses them in a complete application shell." },
+    { "lane": "app", "app": "/", "narr": "A bar across the top, a navigation panel on the left, and a settings panel on the right — and every pixel of that comes from shared CSS, not from the PHP." },
+    { "lane": "app", "app": "/", "js": "Base.setScheme('ocean');", "narr": "The settings panel restyles the whole page on the fly. This is the Ocean scheme." },
+    { "lane": "app", "app": "/", "js": "Base.setScheme('forest');", "narr": "And this is Forest — four schemes in all, each of them just a single class set on the root element." },
+    { "lane": "app", "app": "/", "js": "Base.setScheme('default');Base.toggleTheme();", "narr": "It also flips between light and dark, and your choice is remembered in local storage for the next visit." },
+    { "lane": "app", "app": "/", "js": "Base.toggleTheme();", "narr": "Back to light, and notice the layout never moved through any of that — only the colours changed." },
+    { "lane": "code", "file": "02-Styled/public/index.php", "hl": "4", "narr": "The remarkable part is the PHP, because it barely changed. This is still a single echo of a single anonymous class, exactly as before." },
+    { "lane": "code", "file": "02-Styled/public/index.php", "hl": "7-11", "narr": "The pages constant now pairs each page with an icon name, ready to become links in the navigation sidebar." },
+    { "lane": "code", "file": "02-Styled/public/index.php", "hl": "13-18", "narr": "A second constant lists the four colour schemes, again just an icon and a label for each one." },
+    { "lane": "code", "file": "02-Styled/public/index.php", "hl": "34-39", "narr": "The request selects a page exactly as it did before, and a match expression returns that page's content, or a clean 404 for anything unknown." },
+    { "lane": "code", "file": "02-Styled/public/index.php", "hl": "44-48", "narr": "The navigation links are built with the pipe operator, mapping every page to an anchor and marking the current one as active." },
+    { "lane": "code", "file": "02-Styled/public/index.php", "hl": "71-84", "narr": "And the entire shell — the top bar, both panels, and the main area — is one heredoc of plain HTML, with no templating engine in sight." },
+    { "lane": "code", "file": "02-Styled/public/index.php", "hl": "65-68", "narr": "It pulls in three shared files — the base styles, the site theme, and the script that runs the sidebars and themes — and every later chapter reuses exactly these." },
+    { "lane": "app", "app": "/?o=about", "narr": "The About page makes the lesson concrete: moving between pages swaps only the content, while the shell around it stays put." },
+    { "lane": "app", "app": "/?o=contact", "narr": "Contact is a plain mailto link with no JavaScript at all — a form the server genuinely receives waits until chapter six." },
+    { "lane": "app", "app": "/", "js": "Base.toast('Saved.', 'success');", "narr": "And small flourishes, like this toast notification, are a single shared JavaScript call." },
+    { "lane": "app", "app": "/", "narr": "That is chapter two: the very same engine, now presentable. Next, chapter three introduces plugins, and the code finally begins to grow." }
+  ]
+}
