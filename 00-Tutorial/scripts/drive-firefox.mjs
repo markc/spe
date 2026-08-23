@@ -25,7 +25,7 @@
 
 import { Builder } from 'selenium-webdriver';
 import firefox from 'selenium-webdriver/firefox.js';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 
 const CHAP = process.argv[2] || '01-Simple';
 const BASE = process.env.BASE || 'http://127.0.0.1:8000';
@@ -33,6 +33,7 @@ const REPO = process.env.REPO || 'markc/spe';
 const BIN = process.env.BIN || process.env.ZEN_BIN || '/usr/lib/firefox/firefox';
 const DPR = process.env.DPR || '3.75';                        // 3840/1024 = 3.75 -> 1024 CSS wide
 const KIOSK = process.env.KIOSK !== '0';                      // default on: chromeless capture
+const CODE_LANE = process.env.CODE_LANE || 'local';          // 'local' self-contained | 'github'
 
 const root = new URL('..', import.meta.url).pathname;               // 00-Tutorial/
 const ep = JSON.parse(readFileSync(`${root}episodes/${CHAP}.json`, 'utf8'));
@@ -76,6 +77,50 @@ const scrollToLine = (first) => `
     (function step(now){ var p = Math.min(1,(now-t0)/dur); window.scrollTo(0, from + (target-from)*ease(p)); if (p<1) requestAnimationFrame(step); })(performance.now());
   })();
 `;
+
+// Self-contained code page (CODE_LANE=local, the default). GitHub's React blob view
+// fights scripted scrolling (repeated scroll-to-top during hydration) and shows left/
+// right panes; this renders the real source ourselves as static HTML — GitHub-light
+// styling, syntax highlighting, one eased scroll that lands and STAYS. No React, no
+// virtualization, no panes, no network to github.com. Written per scene to /tmp and
+// loaded via file://. highlight.js/theme come from the CDN (same as the old codeview).
+const repoRoot = `${root}..`;
+const langOf = (f) => f.endsWith('.php') ? 'php' : f.endsWith('.json') ? 'json'
+  : f.endsWith('.sql') ? 'sql' : f.endsWith('.css') ? 'css'
+  : f.endsWith('.js') ? 'javascript' : 'plaintext';
+const codePage = (file, hl) => {
+  const [a, b] = String(hl).split('-').map(Number);
+  const lo = a, hi = b || a;
+  const src = readFileSync(`${repoRoot}/${file}`, 'utf8').replace(/\n$/, '');
+  const html = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>${file}</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<style>
+:root{color-scheme:light}*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:#fff}
+body{font:16px/1.6 "JetBrains Mono","DejaVu Sans Mono",monospace;padding:28px 44px;color:#1f2328}
+.bar{color:#656d76;font-size:14px;margin-bottom:18px;border-bottom:1px solid #d0d7de;padding-bottom:14px}
+.code{display:table;border-collapse:collapse;width:100%}
+.line{display:table-row}
+.ln{display:table-cell;text-align:right;color:#8c959f;user-select:none;padding:0 24px 0 0;white-space:nowrap;width:1%}
+.src{display:table-cell;white-space:pre}
+.line.hl{background:#fff8c5}
+.line.hl .ln{color:#59636e;box-shadow:inset 3px 0 #d4a72c}
+.hljs{background:transparent}
+</style></head><body>
+<div class="bar">spe/${file}</div>
+<div class="code" id="code"></div>
+<script>
+const SRC=${JSON.stringify(src)}, LO=${lo}, HI=${hi}, LANG=${JSON.stringify(langOf(file))};
+const code=document.getElementById('code');
+SRC.split('\\n').forEach((line,i)=>{const n=i+1;const row=document.createElement('div');row.className='line'+(n>=LO&&n<=HI?' hl':'');const g=document.createElement('span');g.className='ln';g.textContent=n;const s=document.createElement('span');s.className='src';s.innerHTML=line?hljs.highlight(line,{language:LANG}).value:'&nbsp;';row.append(g,s);code.appendChild(row);});
+const first=code.querySelector('.line.hl');
+if(first){const target=Math.max(0,first.offsetTop-innerHeight*0.35);const start=pageYOffset,dist=target-start,dur=1400,t0=performance.now();const ease=t=>(t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2);requestAnimationFrame(function step(now){const p=Math.min(1,(now-t0)/dur);scrollTo(0,start+dist*ease(p));if(p<1)requestAnimationFrame(step);});}
+</script></body></html>`;
+  const out = `/tmp/ep/${CHAP}/code-${lo}-${hi}.html`;
+  writeFileSync(out, html);
+  return `file://${out}`;
+};
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // Force the app shell OPEN for the capture. base.js hides pinned sidebars via a
@@ -132,12 +177,16 @@ try {
     const s = ep.scenes[i];
     const start = Date.now();
     if (s.lane === 'code') {
-      await driver.get(blob(s.file, s.hl));           // GitHub highlights + jumps to the lines
-      await sleep(1400);                              // let the heavy page render/settle
-      await driver.executeScript(HIDE_GH_CHROME);     // collapse left tree + right symbols pane
-      await sleep(300);                               // let the reflow settle before we scroll
-      const first = String(s.hl).split('-')[0];
-      await driver.executeScript(scrollToLine(first));// glide onto the highlighted first line
+      if (CODE_LANE === 'github') {
+        await driver.get(blob(s.file, s.hl));         // native GitHub blob (opt-in)
+        await sleep(1400);
+        await driver.executeScript(HIDE_GH_CHROME);   // collapse left tree + right symbols pane
+        await sleep(300);
+        await driver.executeScript(scrollToLine(String(s.hl).split('-')[0]));
+      } else {
+        await driver.get(codePage(s.file, s.hl));     // self-contained page: eases on, stays put
+        await sleep(300);
+      }
     } else {
       await driver.get(`${BASE}/${CHAP}${s.app || '/'}`);
       await sleep(300);
