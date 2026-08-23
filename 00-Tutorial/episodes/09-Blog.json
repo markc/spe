@@ -1,0 +1,23 @@
+{
+  "chapter": "09-Blog",
+  "title": "SPE Chapter 09 — Blog",
+  "_comment": "VET THIS FILE before rendering. lane 'app' = running page (optional 'js' Base API); lane 'code' = self-contained page from local source, lines hl highlighted. App routes assume seeded data (a post at i=1, a 'architecture' tag). Verify/adjust the tag and ids if seeds differ. Rebuild: RESYNTH=1 bash scripts/make-episode.sh 09-Blog",
+  "scenes": [
+    { "lane": "app", "app": "/?o=Blog", "narr": "Chapter nine is the finale: a complete content system — a blog, static pages, and the tutorial's own documentation — all built on the foundation of the last eight chapters." },
+    { "lane": "code", "file": "09-Blog/src/Core/Type.php", "hl": "7-27", "narr": "The trick that keeps it small is a single enum. Post, or Doc — that one value is the only thing that distinguishes the two kinds of content." },
+    { "lane": "code", "file": "09-Blog/src/Core/Content.php", "hl": "10-19", "narr": "Because one shared, abstract engine does all the work. It opens reading to everyone and restricts writing to admins, once, for every content type." },
+    { "lane": "code", "file": "09-Blog/src/Core/Content.php", "hl": "22-54", "narr": "Its list method filters by type, optionally by tag, and paginates — one implementation serving both the blog and the docs." },
+    { "lane": "code", "file": "09-Blog/src/Plugins/Blog/BlogModel.php", "hl": "8-15", "narr": "So the entire Blog plugin is this: extend the engine, and declare that its type is Post." },
+    { "lane": "code", "file": "09-Blog/src/Plugins/Docs/DocsModel.php", "hl": "8-15", "narr": "And Docs is the same engine again, declaring only that its type is Doc. Two features, almost no extra code." },
+    { "lane": "app", "app": "/?o=Docs", "narr": "Here are the docs — the very same list engine, showing a different kind of content." },
+    { "lane": "code", "file": "09-Blog/src/Core/Post.php", "hl": "12-24", "narr": "A post's rendered HTML and its excerpt are property hooks — computed from the stored Markdown the moment they are read, so they can never go stale." },
+    { "lane": "code", "file": "09-Blog/src/Core/Md.php", "hl": "19-26", "narr": "And the Markdown renderer is safe by construction: it escapes the input first, before parsing, so no raw HTML can ever slip through." },
+    { "lane": "app", "app": "/?o=Blog&m=read&i=1", "narr": "This post was written in Markdown and rendered to safe HTML — headings, emphasis, and links, with nothing dangerous allowed." },
+    { "lane": "code", "file": "09-Blog/src/Core/Md.php", "hl": "93-106", "narr": "Links are checked against an allow-list of schemes using PHP's new URI parser: http, https, and mailto pass; a javascript link is rejected outright." },
+    { "lane": "code", "file": "09-Blog/schema.sql", "hl": "21-42", "narr": "Underneath, one posts table carries the type column, and a pair of tag tables give proper many-to-many tagging." },
+    { "lane": "code", "file": "09-Blog/src/Core/Content.php", "hl": "142-155", "narr": "Saving a post rebuilds its tags, de-duplicated by slug, so the same tag written two different ways never doubles up." },
+    { "lane": "app", "app": "/?o=Blog&tag=architecture", "narr": "And a tag becomes a filter: the same list, narrowed to one subject with a join across those tables." },
+    { "lane": "code", "file": "09-Blog/src/Core/Ctx.php", "hl": "65-72", "narr": "The navigation adapts to who is looking: everyone sees Home, Blog, and Docs; admins also get Tags and Users." },
+    { "lane": "app", "app": "/?o=Blog", "narr": "And that is the Simple PHP Engine: nine short chapters, from a single statement to a complete content system — and never once reaching for a framework." }
+  ]
+}

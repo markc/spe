@@ -1,0 +1,20 @@
+{
+  "chapter": "05-Autoload",
+  "title": "SPE Chapter 05 — Autoload",
+  "_comment": "VET THIS FILE before rendering. lane 'app' = running page (optional 'js' Base API); lane 'code' = self-contained page from local source, lines hl highlighted. Rebuild: RESYNTH=1 bash scripts/make-episode.sh 05-Autoload",
+  "scenes": [
+    { "lane": "app", "app": "/", "narr": "Chapter five changes nothing you can see, and everything about how the code is organised. Every class now lives in its own file." },
+    { "lane": "code", "file": "05-Autoload/public/index.php", "hl": "4-8", "narr": "The front controller shrank to almost nothing: require Composer's autoloader once, then build the context and run Init." },
+    { "lane": "code", "file": "composer.json", "hl": "17-24", "narr": "That autoloader is configured here — a namespace prefix mapped to a directory. This is the PSR-4 standard, and it is the whole point of the chapter." },
+    { "lane": "code", "file": "05-Autoload/src/Core/Init.php", "hl": "14-17", "narr": "When a request arrives, Init builds a class name from that namespace and the requested plugin, and simply creates it." },
+    { "lane": "code", "file": "05-Autoload/src/Core/Init.php", "hl": "14-17", "narr": "Naming the class is enough — the autoloader turns that name into a file path and loads it, so there is not a single include statement anywhere." },
+    { "lane": "code", "file": "05-Autoload/src/Core/Init.php", "hl": "16-21", "narr": "The same guard as before protects it: if the name is not a real plugin, the request becomes a clean 404." },
+    { "lane": "code", "file": "05-Autoload/src/Core/Plugin.php", "hl": "11-19", "narr": "The abstract base still defines the five default actions, each returning a not-implemented stub — unchanged, just now in its own file." },
+    { "lane": "code", "file": "05-Autoload/src/Plugins/Home/HomeModel.php", "hl": "10-14", "narr": "A concrete plugin is tiny: Home's model overrides list and returns its data, living in its own namespaced folder." },
+    { "lane": "code", "file": "05-Autoload/src/Plugins/Home/HomeView.php", "hl": "10-24", "narr": "Its view sits right beside it, turning that data into the card you see on screen." },
+    { "lane": "code", "file": "05-Autoload/src/Core/Theme.php", "hl": "12-22", "narr": "And Theme still builds the navigation with the pipe operator, exactly as it did before the move." },
+    { "lane": "code", "file": "05-Autoload/src/Core/Init.php", "hl": "28-32", "narr": "The dual output survives the reorganisation too: ask for JSON, and Init answers before the theme ever runs." },
+    { "lane": "app", "app": "/?o=Home&x=json", "narr": "Same data, still available as JSON, from a codebase that is now properly filed away." },
+    { "lane": "app", "app": "/", "narr": "That is chapter five: identical behaviour, professionally organised, autoloaded by Composer. Next, chapter six adds sessions and flash messages." }
+  ]
+}

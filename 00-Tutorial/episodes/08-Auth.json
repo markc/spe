@@ -1,0 +1,22 @@
+{
+  "chapter": "08-Auth",
+  "title": "SPE Chapter 08 — Auth",
+  "_comment": "VET THIS FILE before rendering. lane 'app' = running page (optional 'js' Base API); lane 'code' = self-contained page from local source, lines hl highlighted. Capture runs logged-out, so /?o=Users redirects to login (demonstrates the guard). Rebuild: RESYNTH=1 bash scripts/make-episode.sh 08-Auth",
+  "scenes": [
+    { "lane": "app", "app": "/?o=Auth&m=create", "narr": "Chapter eight adds identity: real users, hashed passwords, logins, and roles. This is the sign-in form." },
+    { "lane": "code", "file": "08-Auth/schema.sql", "hl": "4-15", "narr": "A users table stores each account with a hashed password and a role, seeded with two demo accounts to log in as." },
+    { "lane": "code", "file": "08-Auth/src/Plugins/Auth/AuthModel.php", "hl": "18-24", "narr": "Logging in looks the user up by email and verifies the password against the stored hash — the plain password is never compared directly." },
+    { "lane": "code", "file": "08-Auth/src/Plugins/Auth/AuthModel.php", "hl": "26", "narr": "And notice: a wrong email and a wrong password give the exact same message, so an attacker learns nothing about which one was wrong." },
+    { "lane": "code", "file": "08-Auth/src/Core/Ctx.php", "hl": "75-82", "narr": "On success, the session id is regenerated before anything is stored — the standard defence against session fixation." },
+    { "lane": "code", "file": "08-Auth/src/Core/Role.php", "hl": "7-25", "narr": "Authorisation is a single ordered enum. Whether one role satisfies another is just a numeric comparison inside a match expression." },
+    { "lane": "code", "file": "08-Auth/src/Core/Plugin.php", "hl": "11-14", "narr": "By default, every method is public — anonymous visitors are welcome." },
+    { "lane": "code", "file": "08-Auth/src/Plugins/Users/UsersModel.php", "hl": "12-15", "narr": "A plugin tightens that by overriding one method. Here the entire Users plugin is locked to admins in a single line." },
+    { "lane": "code", "file": "08-Auth/src/Core/Init.php", "hl": "20-30", "narr": "This is the choke point every request passes through: anonymous visitors are sent to log in, and a signed-in but under-privileged user gets an honest 403." },
+    { "lane": "app", "app": "/?o=Users", "narr": "So visiting the admin-only users page while logged out lands you straight on the login form." },
+    { "lane": "app", "app": "/?o=Posts", "narr": "While reading posts stays open to everyone — but the create, edit, and delete controls only appear once an admin is signed in." },
+    { "lane": "code", "file": "08-Auth/src/Plugins/Users/UsersModel.php", "hl": "42", "narr": "When an admin creates a user, the password is hashed with the current best algorithm." },
+    { "lane": "code", "file": "08-Auth/src/Plugins/Users/UsersModel.php", "hl": "60-62", "narr": "And on update, it is only re-hashed when a new password was actually supplied." },
+    { "lane": "code", "file": "08-Auth/src/Core/Ctx.php", "hl": "103-134", "narr": "Even remember-me is done properly: a random selector with a separately hashed validator, compared in constant time and rotated on every use." },
+    { "lane": "app", "app": "/?o=Home", "narr": "That is chapter eight: hashing, sessions, roles, and access control. Next, the finale — chapter nine builds a complete blog and CMS on this foundation." }
+  ]
+}

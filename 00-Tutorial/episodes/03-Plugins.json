@@ -1,0 +1,21 @@
+{
+  "chapter": "03-Plugins",
+  "title": "SPE Chapter 03 — Plugins",
+  "_comment": "VET THIS FILE before rendering. Each scene = one short narration beat (aim 5-10s) + one visual. lane 'app' shows the running page at app-relative path (optional 'js' runs the app's Base API after load). lane 'code' shows a self-contained page built from the local source with lines hl highlighted. Rebuild: RESYNTH=1 bash scripts/make-episode.sh 03-Plugins",
+  "scenes": [
+    { "lane": "app", "app": "/", "narr": "Chapter three keeps the exact same look as before, but tears out the single class and replaces it with a real plugin architecture." },
+    { "lane": "code", "file": "03-Plugins/public/index.php", "hl": "34-40", "narr": "This is the whole idea in three lines: the request names a class and a method, and the code builds that plugin and calls that method." },
+    { "lane": "code", "file": "03-Plugins/public/index.php", "hl": "14-18", "narr": "Before any of that runs, a context object validates the three request parameters — which plugin, which method, which format — against strict allow-lists." },
+    { "lane": "code", "file": "03-Plugins/public/index.php", "hl": "21-25", "narr": "One small helper does the checking: read the parameter, test it against a pattern, and fall back to a safe default when it is missing or malformed." },
+    { "lane": "code", "file": "03-Plugins/public/index.php", "hl": "102-116", "narr": "Every plugin extends this abstract base, which defines the five basic actions — create, read, update, delete, and list — each defaulting to a friendly not-implemented stub." },
+    { "lane": "code", "file": "03-Plugins/public/index.php", "hl": "118-133", "narr": "A concrete plugin overrides only what it needs. Home implements just list, marked with the Override attribute so a typo can never silently create a new method." },
+    { "lane": "app", "app": "/?o=Home&m=create", "narr": "Ask a plugin for a method it has not implemented, and the inherited stub answers honestly instead of crashing." },
+    { "lane": "app", "app": "/?o=Nope", "narr": "Ask for a plugin that does not exist, and the dispatcher returns a genuine 404 rather than a broken page." },
+    { "lane": "code", "file": "03-Plugins/public/index.php", "hl": "44-51", "narr": "The same request can answer in two formats: ask for JSON, and the very same data comes back as JSON instead of an HTML document." },
+    { "lane": "app", "app": "/?o=Home&x=json", "narr": "So every page in the application is also an API endpoint, for free, with no extra code to write." },
+    { "lane": "code", "file": "03-Plugins/public/index.php", "hl": "150-162", "narr": "The Contact plugin shows a plugin reading shared state — the site's email address — straight from that one context object." },
+    { "lane": "app", "app": "/?o=Contact", "narr": "And there it is on the page: a working mailto link, built from that single shared value." },
+    { "lane": "code", "file": "03-Plugins/public/index.php", "hl": "165", "narr": "The entire program is still one expression — build the context, hand it to Init, and let it dispatch and render." },
+    { "lane": "app", "app": "/", "narr": "That is chapter three: the same three pages, now each a self-contained plugin. Next, chapter four splits every plugin cleanly into a model and a view." }
+  ]
+}

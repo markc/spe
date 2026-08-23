@@ -1,0 +1,21 @@
+{
+  "chapter": "04-Views",
+  "title": "SPE Chapter 04 — Views",
+  "_comment": "VET THIS FILE before rendering. lane 'app' = running page (optional 'js' Base API); lane 'code' = self-contained page from local source, lines hl highlighted. Rebuild: RESYNTH=1 bash scripts/make-episode.sh 04-Views",
+  "scenes": [
+    { "lane": "app", "app": "/", "narr": "Chapter four looks identical once more, but inside, every plugin has split cleanly into two halves: a model and a view." },
+    { "lane": "code", "file": "04-Views/public/index.php", "hl": "56-71", "narr": "The model's job shrank to one thing — return data. Each action now hands back a plain array, a title and a body, with no HTML at all." },
+    { "lane": "code", "file": "04-Views/public/index.php", "hl": "73-94", "narr": "The view's job is the other half: turn that data array into HTML. A base view supplies a generic card, so simple pages need no view of their own." },
+    { "lane": "code", "file": "04-Views/public/index.php", "hl": "34-44", "narr": "Init now assembles both halves — it asks the model for data, finds the matching view, and merges the rendered HTML into the output." },
+    { "lane": "code", "file": "04-Views/public/index.php", "hl": "42", "narr": "This single line is the fallback: if a plugin has no view of its own, it quietly uses the base view — so a view is always optional." },
+    { "lane": "app", "app": "/?o=About", "narr": "The About page proves it: it has a model but no view, so the base view renders it, and to the eye nothing has changed." },
+    { "lane": "code", "file": "04-Views/public/index.php", "hl": "90-93", "narr": "Here is the most important habit in the whole series: one escaping helper, run over every value before it ever reaches the page." },
+    { "lane": "code", "file": "04-Views/public/index.php", "hl": "149-175", "narr": "Watch it work. The Home body deliberately contains bold tags written as text, and because output is escaped, they show as characters, not markup." },
+    { "lane": "app", "app": "/", "narr": "There they are on the page: the angle brackets shown literally, never interpreted. That is a whole class of injection attacks closed off by default." },
+    { "lane": "code", "file": "04-Views/public/index.php", "hl": "96-147", "narr": "Theme is now the only class that knows a complete HTML document — the shell, the head, the two sidebars — lifted entirely out of Init." },
+    { "lane": "code", "file": "04-Views/public/index.php", "hl": "195-208", "narr": "Even a value placed inside an attribute, like the contact email in this mailto link, passes through the very same escape." },
+    { "lane": "app", "app": "/?o=Contact", "narr": "Escaping at the boundary, every single time, is the one habit that keeps every later chapter safe." },
+    { "lane": "app", "app": "/?o=Home&x=json", "narr": "And because the model returns pure data, that same page is still available as JSON, untouched by any of the view work." },
+    { "lane": "app", "app": "/", "narr": "That is chapter four: model for data, view for HTML, theme for the document, and escaping at the edge. Next, chapter five gives every class its own file." }
+  ]
+}

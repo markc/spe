@@ -1,0 +1,21 @@
+{
+  "chapter": "06-Session",
+  "title": "SPE Chapter 06 — Session",
+  "_comment": "VET THIS FILE before rendering. lane 'app' = running page (optional 'js' Base API); lane 'code' = self-contained page from local source, lines hl highlighted. The flash toast is illustrated with Base.toast (the driver can't POST a form); it's the exact toast a real flash produces. Rebuild: RESYNTH=1 bash scripts/make-episode.sh 06-Session",
+  "scenes": [
+    { "lane": "app", "app": "/?o=Contact", "narr": "Chapter six adds the first thing a real site needs: state that survives between requests — sessions, and the messages that ride on them." },
+    { "lane": "code", "file": "06-Session/src/Core/Ctx.php", "hl": "17-24", "narr": "The session starts with hardened cookies: http-only, same-site, strict mode, and secure whenever the connection is encrypted." },
+    { "lane": "code", "file": "06-Session/src/Core/Ctx.php", "hl": "25", "narr": "On the first visit it mints a single random CSRF token and keeps it for the life of the session." },
+    { "lane": "code", "file": "06-Session/src/Plugins/Contact/ContactView.php", "hl": "17-22", "narr": "Every form that writes carries that token in a hidden field." },
+    { "lane": "code", "file": "06-Session/src/Core/View.php", "hl": "24-27", "narr": "Rendered, of course, through the very same escaping helper as everything else." },
+    { "lane": "code", "file": "06-Session/src/Core/Ctx.php", "hl": "44-54", "narr": "And the server only accepts a write if the submitted token matches, compared in constant time. No valid token, no write." },
+    { "lane": "app", "app": "/?o=Contact", "narr": "So this contact form is a genuine, protected POST — the real form the server receives, first promised back in chapter two." },
+    { "lane": "code", "file": "06-Session/src/Plugins/Contact/ContactModel.php", "hl": "16-29", "narr": "On a valid submission the model checks the input, queues a message, and redirects — the post-redirect-get pattern that stops a refresh from sending twice." },
+    { "lane": "code", "file": "06-Session/src/Core/Plugin.php", "hl": "18-22", "narr": "That redirect helper is typed to return never, and it exits, so nothing can run after it." },
+    { "lane": "code", "file": "06-Session/src/Core/Ctx.php", "hl": "56-67", "narr": "The queued message is a flash: written to the session, then read exactly once on the next page and immediately removed." },
+    { "lane": "code", "file": "06-Session/src/Core/Flash.php", "hl": "6-19", "narr": "Each flash carries a level — success, warning, or danger — a backed enum that even maps itself to the right icon." },
+    { "lane": "code", "file": "06-Session/src/Core/Theme.php", "hl": "59-72", "narr": "On the next page, Theme drains that queue and replays each message as a toast." },
+    { "lane": "app", "app": "/?o=Contact", "js": "Base.toast('Thanks — your message is on its way.', 'success');", "narr": "Which looks like this: submit the form, and after the redirect your confirmation appears." },
+    { "lane": "app", "app": "/", "narr": "That is chapter six: sessions, CSRF-protected writes, and flash messages. Next, chapter seven gives the application a real database." }
+  ]
+}

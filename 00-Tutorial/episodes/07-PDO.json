@@ -1,0 +1,22 @@
+{
+  "chapter": "07-PDO",
+  "title": "SPE Chapter 07 — PDO",
+  "_comment": "VET THIS FILE before rendering. lane 'app' = running page (optional 'js' Base API); lane 'code' = self-contained page from local source, lines hl highlighted. App routes assume seeded posts (id 1 exists). Rebuild: RESYNTH=1 bash scripts/make-episode.sh 07-PDO",
+  "scenes": [
+    { "lane": "app", "app": "/?o=Posts", "narr": "Chapter seven gives the application a real database. This list of posts is coming straight out of SQLite." },
+    { "lane": "code", "file": "07-PDO/schema.sql", "hl": "4-15", "narr": "The schema is plain SQL, and it loads itself the first time the database file is created, seeded with a few rows to start." },
+    { "lane": "code", "file": "07-PDO/src/Core/Db.php", "hl": "9-15", "narr": "The database wrapper extends PDO and sets three defaults that matter: throw on error, fetch associative arrays, and use real prepared statements." },
+    { "lane": "code", "file": "07-PDO/src/Core/Db.php", "hl": "17-28", "narr": "Its constructor opens the SQLite file, turns on foreign keys, and runs that schema only when the file is brand new." },
+    { "lane": "code", "file": "07-PDO/src/Core/Db.php", "hl": "64-77", "narr": "This private method is the one place in the whole app where SQL is prepared and run — every query funnels through here, each value safely bound." },
+    { "lane": "code", "file": "07-PDO/src/Core/Db.php", "hl": "30-40", "narr": "Reads return different shapes depending on what you ask for, chosen by a match expression." },
+    { "lane": "code", "file": "07-PDO/src/Core/QueryType.php", "hl": "7-12", "narr": "And what you ask for is an enum: all rows, one row, or a single column — no magic strings to mistype." },
+    { "lane": "code", "file": "07-PDO/src/Plugins/Posts/PostsModel.php", "hl": "65-68", "narr": "So finding one post reads almost like English: read from posts, where the id matches, give me one." },
+    { "lane": "code", "file": "07-PDO/src/Core/Db.php", "hl": "42-62", "narr": "Create, update, and delete build their statements from array keys, and each is marked no-discard — so ignoring the result is a mistake the language itself catches." },
+    { "lane": "code", "file": "07-PDO/src/Plugins/Posts/PostsModel.php", "hl": "27-35", "narr": "Writes stay behind the same guard as before: only a valid, token-checked POST reaches the database, and then it redirects." },
+    { "lane": "app", "app": "/?o=Posts&m=create", "narr": "That is this form — a new post, saved with a prepared insert." },
+    { "lane": "code", "file": "07-PDO/src/Plugins/Posts/PostsModel.php", "hl": "81-85", "narr": "Even the URL slug is built with the pipe operator: lower-case it, strip it to word characters, and add a little randomness for uniqueness." },
+    { "lane": "app", "app": "/?o=Posts&m=read&i=1", "narr": "Read a single post, and it is fetched by id with a bound parameter — never glued into the query as text." },
+    { "lane": "app", "app": "/?o=Posts&x=json", "narr": "And the whole list is available as JSON, served straight from the database." },
+    { "lane": "app", "app": "/?o=Posts", "narr": "That is chapter seven: SQLite through a tiny, safe PDO wrapper. Next, chapter eight adds real users and logins." }
+  ]
+}
