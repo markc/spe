@@ -44,6 +44,21 @@ const blob = (file, hl) => {
   const [a, b] = String(hl).split('-');
   return `https://github.com/${REPO}/blob/main/${file}${b ? `#L${a}-L${b}` : `#L${a}`}`;
 };
+// GitHub's blob view can open a right-hand "Symbols" pane that eats width and
+// intrudes on the capture. Collapse it (click its toggle if expanded) and hide any
+// residual right pane so the code reclaims the full frame. Selectors are defensive —
+// GitHub's DOM shifts, so match on role/label/testid and structural position.
+const HIDE_RIGHT_PANE = `
+  try {
+    [...document.querySelectorAll('button,[role="button"]')].forEach(b => {
+      const l = ((b.getAttribute('aria-label')||'') + ' ' + (b.title||'') + ' ' + (b.textContent||'')).toLowerCase();
+      if (l.includes('symbol') && (b.getAttribute('aria-expanded')==='true' || b.getAttribute('aria-pressed')==='true')) b.click();
+    });
+  } catch (e) {}
+  const st = document.createElement('style');
+  st.textContent = '[data-testid="symbols-pane"],[data-testid="symbol-pane"],[class*="SymbolsPane"],[class*="symbols-pane"],[aria-label="Symbols"]{display:none!important}';
+  document.head.appendChild(st);
+`;
 // Small eased "settle" onto the highlighted lines: nudge up, glide back down.
 const EASE_ONTO = `
   const target = window.pageYOffset;
@@ -93,6 +108,8 @@ try {
     if (s.lane === 'code') {
       await driver.get(blob(s.file, s.hl));       // GitHub highlights + jumps to the lines
       await sleep(1400);                          // let the heavy page render/settle
+      await driver.executeScript(HIDE_RIGHT_PANE);// kill the Symbols pane before we settle
+      await sleep(200);
       await driver.executeScript(EASE_ONTO);      // then glide onto the highlighted lines
     } else {
       await driver.get(`${BASE}/${CHAP}${s.app || '/'}`);
