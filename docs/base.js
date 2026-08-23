@@ -113,7 +113,7 @@ const Base = {
     // Restore state on page load
     restore() {
         const s = this.state();
-        const desktop = window.innerWidth >= 1024;
+        const desktop = window.innerWidth >= 960;
 
         ['left', 'right'].forEach(side => {
             const sb = document.querySelector(`.sidebar-${side}`);
@@ -211,7 +211,7 @@ const Base = {
         });
 
         // Responsive: hide pinned sidebars when viewport shrinks to mobile
-        matchMedia('(min-width: 1024px)').addEventListener('change', e => {
+        matchMedia('(min-width: 960px)').addEventListener('change', e => {
             if (!e.matches) {
                 // Viewport went below desktop - close all sidebars
                 document.querySelectorAll('.sidebar.open').forEach(sb => {
