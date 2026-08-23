@@ -1,25 +1,108 @@
 {
   "chapter": "01-Simple",
   "title": "SPE Chapter 01 — Simple",
-  "_comment": "VET THIS FILE before rendering. Each scene = one short narration beat (aim 5-10s) + one visual. lane 'app' shows the running page at app-relative path; lane 'code' shows the native GitHub blob with lines hl highlighted. Rebuild: RESYNTH=1 bash scripts/make-episode-zen.sh 01-Simple",
+  "_comment": "VET THIS FILE before rendering. Each scene = one short narration beat (aim 5-10s) + one visual. lane 'app' shows the running page at app-relative path; lane 'code' shows the native GitHub blob with lines hl highlighted. Rebuild: RESYNTH=1 bash scripts/make-episode.sh 01-Simple",
   "scenes": [
-    { "lane": "app", "app": "/",        "narr": "This is a complete PHP web page: three pages, working navigation, and a real not-found response." },
-    { "lane": "app", "app": "/?o=about","narr": "And the whole thing is produced by a single PHP statement, with no framework and no configuration behind it." },
-    { "lane": "code", "file": "01-Simple/public/index.php", "hl": "4",     "narr": "The entire program is this — echo, then a new anonymous class." },
-    { "lane": "code", "file": "01-Simple/public/index.php", "hl": "4",     "narr": "PHP builds the object and prints it, and printing an object is what triggers its toString method." },
-    { "lane": "code", "file": "01-Simple/public/index.php", "hl": "7-11",  "narr": "The pages live in one typed constant, each name mapped to a title and its HTML." },
-    { "lane": "code", "file": "01-Simple/public/index.php", "hl": "7-11",  "narr": "Because it's a constant, it's fixed when the file is parsed and shared across every request." },
-    { "lane": "code", "file": "01-Simple/public/index.php", "hl": "13-14", "narr": "These two properties use asymmetric visibility, which arrived in PHP 8.4." },
-    { "lane": "code", "file": "01-Simple/public/index.php", "hl": "13-14", "narr": "Anyone can read them, but only the class itself can set them — no getter boilerplate." },
-    { "lane": "code", "file": "01-Simple/public/index.php", "hl": "18-22", "narr": "Here is the PHP 8.5 pipe operator handling the request." },
-    { "lane": "code", "file": "01-Simple/public/index.php", "hl": "18-22", "narr": "Read it top to bottom: take the query parameter, trim it, lower-case it, and fall back to home when nothing is left." },
-    { "lane": "app", "app": "/?o=%20ABOUT%20", "narr": "So a messy input like this — spaced and upper-cased — still resolves cleanly to the About page." },
-    { "lane": "code", "file": "01-Simple/public/index.php", "hl": "24-27", "narr": "Ask for a page that doesn't exist and the code returns a genuine 404, not a 200 that merely says not found." },
-    { "lane": "app", "app": "/?o=nope", "narr": "That status line is what browsers, search crawlers, and the test suite all rely on." },
-    { "lane": "code", "file": "01-Simple/public/index.php", "hl": "32-37", "narr": "Rendering is another pipe: the page names become links, and the current one is marked active." },
-    { "lane": "code", "file": "01-Simple/public/index.php", "hl": "39-55", "narr": "The whole document is a heredoc — HTML written plainly as HTML, with no concatenation and no templating engine." },
-    { "lane": "app", "app": "/?o=%3Cscript%3Ealert(1)%3C%2Fscript%3E", "narr": "One habit from the very first chapter: the input is only ever used to look a page up, never printed back into the document." },
-    { "lane": "app", "app": "/?o=%3Cscript%3Ealert(1)%3C%2Fscript%3E", "narr": "So even a deliberate script-injection attempt simply becomes an unknown page and returns a clean 404." },
-    { "lane": "app", "app": "/", "narr": "That is the entire engine in fifty-seven lines. Next, chapter 2 gives the very same page a proper look — shared styling, dark mode, and an app shell." }
+    {
+      "lane": "app",
+      "app": "/",
+      "narr": "This is a complete PHP web page: three pages, working navigation, and a real not-found response."
+    },
+    {
+      "lane": "app",
+      "app": "/?o=about",
+      "narr": "And the whole thing is produced by a single PHP statement, with no framework and no configuration behind it."
+    },
+    {
+      "lane": "code",
+      "file": "01-Simple/public/index.php",
+      "hl": "4",
+      "narr": "The entire program is this — echo, then a new anonymous class."
+    },
+    {
+      "lane": "code",
+      "file": "01-Simple/public/index.php",
+      "hl": "4",
+      "narr": "PHP builds the object and prints it, and printing an object is what triggers its toString method."
+    },
+    {
+      "lane": "code",
+      "file": "01-Simple/public/index.php",
+      "hl": "7-11",
+      "narr": "The pages live in one typed constant, each name mapped to a title and its HTML."
+    },
+    {
+      "lane": "code",
+      "file": "01-Simple/public/index.php",
+      "hl": "7-11",
+      "narr": "Because it's a constant, it's fixed when the file is parsed and shared across every request."
+    },
+    {
+      "lane": "code",
+      "file": "01-Simple/public/index.php",
+      "hl": "13-14",
+      "narr": "These two properties use asymmetric visibility, which arrived in PHP 8.4."
+    },
+    {
+      "lane": "code",
+      "file": "01-Simple/public/index.php",
+      "hl": "13-14",
+      "narr": "Anyone can read them, but only the class itself can set them — no getter boilerplate."
+    },
+    {
+      "lane": "code",
+      "file": "01-Simple/public/index.php",
+      "hl": "18-22",
+      "narr": "Here is the PHP 8.5 pipe operator handling the request."
+    },
+    {
+      "lane": "code",
+      "file": "01-Simple/public/index.php",
+      "hl": "18-22",
+      "narr": "Read it top to bottom: take the query parameter, trim it, lower-case it, and fall back to home when nothing is left."
+    },
+    {
+      "lane": "app",
+      "app": "/?o=%20ABOUT%20",
+      "narr": "So a messy input like this — spaced and upper-cased — still resolves cleanly to the About page."
+    },
+    {
+      "lane": "code",
+      "file": "01-Simple/public/index.php",
+      "hl": "24-27",
+      "narr": "Ask for a page that doesn't exist and the code returns a genuine 404, not a 200 that merely says not found."
+    },
+    {
+      "lane": "app",
+      "app": "/?o=nope",
+      "narr": "That status line is what browsers, search crawlers, and the test suite all rely on."
+    },
+    {
+      "lane": "code",
+      "file": "01-Simple/public/index.php",
+      "hl": "32-37",
+      "narr": "Rendering is another pipe: the page names become links, and the current one is marked active."
+    },
+    {
+      "lane": "code",
+      "file": "01-Simple/public/index.php",
+      "hl": "39-55",
+      "narr": "The whole document is a heredoc — HTML written plainly as HTML, with no concatenation and no templating engine."
+    },
+    {
+      "lane": "app",
+      "app": "/?o=%3Cscript%3Ealert(1)%3C%2Fscript%3E",
+      "narr": "One habit from the very first chapter: the input is only ever used to look a page up, never printed back into the document."
+    },
+    {
+      "lane": "app",
+      "app": "/?o=%3Cscript%3Ealert(1)%3C%2Fscript%3E",
+      "narr": "So even a deliberate script-injection attempt simply becomes an unknown page and returns a clean 404."
+    },
+    {
+      "lane": "app",
+      "app": "/",
+      "narr": "That is the entire engine in fifty-seven lines. Next, chapter 2 gives the very same page a proper look — shared styling, dark mode, and an app shell."
+    }
   ]
 }

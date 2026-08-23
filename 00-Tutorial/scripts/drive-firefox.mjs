@@ -21,7 +21,7 @@
 //   KIOSK=0              use window fullscreen() instead of kiosk
 //   BIN=/path/to/firefox override the browser binary (needs application.ini beside it)
 //
-//   BASE=http://127.0.0.1:8000 node real-zen.mjs <chapter>
+//   BASE=http://127.0.0.1:8000 node drive-firefox.mjs <chapter>
 
 import { Builder } from 'selenium-webdriver';
 import firefox from 'selenium-webdriver/firefox.js';
