@@ -2,7 +2,7 @@
 # Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 # Build a chapter episode hands-free: synth narration (Chirp 3 HD), drive a
 # chromeless kiosk Firefox (geckodriver) through the vetted scenes in
-# episodes/<chapter>.json, capture with gpu-screen-recorder, assemble a 4K MP4 + SRT.
+# episodes/<chapter>.json, capture with gpu-screen-recorder, assemble a 4K MP4 (no captions).
 # RUN IN YOUR OWN SESSION (opens fullscreen browser + screen capture):
 #   [RESYNTH=1] bash ~/Projects/spe/00-Tutorial/scripts/make-episode-zen.sh [chapter]
 set -uo pipefail
@@ -88,17 +88,11 @@ ffmpeg -y -loglevel error -ss "$T0" -t "$ALEN" -i screen.mp4 -i a.wav \
   -fps_mode cfr -r 30 -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p \
   -c:a aac -b:a 192k -movflags +faststart -shortest "episode-$CHAP.mp4"
 
-# accurate SRT from the script text + measured timings (no ASR needed)
-mapfile -t DUR < <(jq -r '.[]' "$DIR/durations.json")
-ts() { awk -v t="$1" 'BEGIN{ms=int(t*1000+0.5);h=int(ms/3600000);ms%=3600000;m=int(ms/60000);ms%=60000;s=int(ms/1000);ms%=1000;printf "%02d:%02d:%02d,%03d",h,m,s,ms}'; }
-: > "episode-$CHAP.srt"
-cum=0
-for i in "${!NARR[@]}"; do
-  start=$cum
-  cum=$(awk -v a="$cum" -v b="${DUR[$i]}" 'BEGIN{print a+b}')
-  printf '%d\n%s --> %s\n%s\n\n' "$((i+1))" "$(ts "$start")" "$(ts "$cum")" "${NARR[$i]}" >> "episode-$CHAP.srt"
-done
+# NO CAPTIONS: no SRT is generated (Mark: "NO CAPTIONS"). The MP4 carries video +
+# audio only; nothing is burned in and no sidecar is written. (mpv was auto-loading a
+# stale sidecar — remove any old episode-*.srt if one lingers.)
+rm -f "episode-$CHAP.srt"
 
 echo "== done =="
 ffprobe -v error -show_entries stream=width,height,codec_name -show_entries format=duration -of default=nw=1 "episode-$CHAP.mp4"
-ls -la "$DIR/episode-$CHAP.mp4" "$DIR/episode-$CHAP.srt"
+ls -la "$DIR/episode-$CHAP.mp4"

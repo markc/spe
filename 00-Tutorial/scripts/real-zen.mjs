@@ -100,7 +100,7 @@ try {
   // state; innerWidth confirms the actual viewport (0 => window never got sized).
   const dims = await driver.executeScript(
     'return [window.screen.width, window.screen.height, window.innerWidth, window.innerHeight]');
-  console.error(`look: kiosk=${KIOSK} devPixelsPerPx=${DPR} -> screen ${dims[0]}x${dims[1]}, viewport ${dims[2]}x${dims[3]} (target 1024x576), light forced`);
+  console.error(`look: bin=${BIN} kiosk=${KIOSK} devPixelsPerPx=${DPR} -> screen ${dims[0]}x${dims[1]}, viewport ${dims[2]}x${dims[3]} (target 1024x576), light forced`);
 
   for (let i = 0; i < ep.scenes.length; i++) {
     const s = ep.scenes[i];
@@ -117,7 +117,17 @@ try {
       // Optional per-scene interaction (drive the app's own JS API), e.g. pin the
       // sidebars, switch colour scheme, toggle dark mode, fire a toast. State persists
       // in localStorage across the run, so pinning once holds for later app scenes.
-      if (s.js) { await driver.executeScript(s.js); await sleep(500); }
+      // Wrapped so a bad snippet can't abort the run; diagnostics go to driver.log.
+      if (s.js) {
+        const info = await driver.executeScript(`
+          var out = { iw: window.innerWidth, base: !!window.Base };
+          try { ${s.js} out.ok = true; } catch (e) { out.ok = false; out.err = String(e); }
+          out.body = document.body.className;
+          return out;
+        `);
+        console.error(`scene ${i} app js -> iw=${info.iw} base=${info.base} ok=${info.ok}${info.err ? ' err=' + info.err : ''} body="${info.body}"`);
+        await sleep(500);
+      }
     }
     const left = durs[i] * 1000 - (Date.now() - start);
     if (left > 0) await sleep(left);
