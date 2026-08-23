@@ -95,4 +95,7 @@ rm -f "episode-$CHAP.srt"
 
 echo "== done =="
 ffprobe -v error -show_entries stream=width,height,codec_name -show_entries format=duration -of default=nw=1 "episode-$CHAP.mp4"
-ls -la "$DIR/episode-$CHAP.mp4"
+MP4="$DIR/episode-$CHAP.mp4"
+echo
+echo "MP4: $MP4"
+echo "watch: mpv $MP4"
