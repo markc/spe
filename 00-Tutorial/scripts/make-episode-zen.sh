@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
 # Build a chapter episode hands-free: synth narration (Chirp 3 HD), drive a
-# fullscreen Zen (geckodriver) through the vetted scenes in episodes/<chapter>.json,
-# capture with gpu-screen-recorder, assemble a 4K MP4 + accurate SRT captions.
+# chromeless kiosk Firefox (geckodriver) through the vetted scenes in
+# episodes/<chapter>.json, capture with gpu-screen-recorder, assemble a 4K MP4 + SRT.
 # RUN IN YOUR OWN SESSION (opens fullscreen browser + screen capture):
 #   [RESYNTH=1] bash ~/Projects/spe/00-Tutorial/scripts/make-episode-zen.sh [chapter]
 set -uo pipefail
@@ -62,9 +62,9 @@ gpu-screen-recorder -w portal -restore-portal-session yes \
 GSR=$!
 sleep 4
 
-pkill -f zen-bin 2>/dev/null || true
+pkill -f 'firefox.*marionette' 2>/dev/null || true   # clear any stale capture instance
 sleep 1
-echo "driving Zen (log: /tmp/driver.log)…"
+echo "driving kiosk Firefox (log: /tmp/driver.log)…"
 BASE=http://127.0.0.1:8000 node "$HERE/real-zen.mjs" "$CHAP" 2>&1 | tee /tmp/driver.log || true
 
 sleep 1
