@@ -53,10 +53,15 @@ else
   echo "Opening consent page (sign in as $ACCOUNT)…"
   echo "$URL"
   xdg-open "$URL" >/dev/null 2>&1 || true
-  # Catch the single redirect request; reply with a tiny page so the tab closes cleanly.
-  REQ=$(printf 'HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\n\r\n<h2>Authorised &mdash; you can close this tab.</h2>' \
-        | ncat -l 127.0.0.1 "$PORT" -w 600 2>/dev/null | head -1)
-  CODE=$(echo "$REQ" | grep -oP 'code=\K[^& ]+' || true)
+  # Catch the redirect request; reply with a tiny page so the tab closes cleanly.
+  # Firefox opens a speculative empty connection before the real request, which
+  # would consume a one-shot listener — so keep accepting until a request carries code=.
+  CODE=""; END=$((SECONDS + 600))
+  while [ -z "$CODE" ] && [ $SECONDS -lt $END ]; do
+    REQ=$(printf 'HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\n\r\n<h2>Authorised &mdash; you can close this tab.</h2>' \
+          | ncat -l 127.0.0.1 "$PORT" -w 600 2>/dev/null | head -1 || true)
+    CODE=$(echo "$REQ" | grep -oP 'code=\K[^& ]+' || true)
+  done
   [ -n "$CODE" ] || { echo "no code received. If the browser shows a 127.0.0.1:$PORT URL containing code=…, run: $0 code '<that URL>'"; exit 1; }
 fi
 
