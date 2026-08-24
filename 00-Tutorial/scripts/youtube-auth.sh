@@ -16,6 +16,7 @@ set -euo pipefail
 PWDB="${PWDB:-$HOME/.ns/_etc/secrets/secrets.db}"
 PORT=8765
 SCOPE="https://www.googleapis.com/auth/youtube"
+ACCOUNT="${ACCOUNT:-mc@netserva.org}"   # Google account that owns the channel (pre-selected at sign-in)
 
 secret() { sqlite3 "$PWDB" "SELECT password FROM secrets WHERE domain='googleapis.com' AND service='api' AND username='$1' LIMIT 1"; }
 secret_put() {   # name  json  notes   (upsert; value kept as compact JSON)
@@ -43,7 +44,7 @@ CLIENT_ID=$(jq -r '.installed.client_id // .web.client_id' <<<"$CLIENT")
 CLIENT_SECRET=$(jq -r '.installed.client_secret // .web.client_secret' <<<"$CLIENT")
 
 REDIRECT="http://127.0.0.1:$PORT"
-URL="https://accounts.google.com/o/oauth2/v2/auth?client_id=$CLIENT_ID&redirect_uri=$REDIRECT&response_type=code&scope=$SCOPE&access_type=offline&prompt=consent"
+URL="https://accounts.google.com/o/oauth2/v2/auth?client_id=$CLIENT_ID&redirect_uri=$REDIRECT&response_type=code&scope=$SCOPE&access_type=offline&prompt=consent&login_hint=$ACCOUNT"
 
 echo "Opening consent page (sign in as the channel owner)…"
 echo "$URL"
