@@ -5,13 +5,14 @@
 #
 #   bash youtube-auth.sh import <name> <file.json>   # store a JSON key, then shred the file
 #   bash youtube-auth.sh                             # one-time YouTube OAuth → youtube-refresh-token
+#   bash youtube-auth.sh code "<redirect URL>"       # finish the flow by hand if the listener missed it
 #
 # Names: google-tts-service-account · youtube-client-secret · youtube-refresh-token
 #
 # The OAuth flow needs `youtube-client-secret` already imported (a "Desktop app"
 # OAuth client from console.cloud.google.com with YouTube Data API v3 enabled). It
-# opens the consent page — sign in as the channel's account (mc@netserva.org) — and
-# catches Google's redirect on a loopback port. Run it in your own session.
+# opens the consent page — sign in as the channel's account (ACCOUNT) — and catches
+# Google's redirect on a loopback port (waits up to 10 min). Run it in your own session.
 set -euo pipefail
 PWDB="${PWDB:-$HOME/.ns/_etc/secrets/secrets.db}"
 PORT=8765
@@ -42,19 +43,22 @@ CLIENT=$(secret youtube-client-secret)
 [ -n "$CLIENT" ] || { echo "no youtube-client-secret in $PWDB — first: $0 import youtube-client-secret ~/Downloads/client_secret_*.json"; exit 1; }
 CLIENT_ID=$(jq -r '.installed.client_id // .web.client_id' <<<"$CLIENT")
 CLIENT_SECRET=$(jq -r '.installed.client_secret // .web.client_secret' <<<"$CLIENT")
-
 REDIRECT="http://127.0.0.1:$PORT"
-URL="https://accounts.google.com/o/oauth2/v2/auth?client_id=$CLIENT_ID&redirect_uri=$REDIRECT&response_type=code&scope=$SCOPE&access_type=offline&prompt=consent&login_hint=$ACCOUNT"
 
-echo "Opening consent page (sign in as the channel owner)…"
-echo "$URL"
-xdg-open "$URL" >/dev/null 2>&1 || true
-
-# Catch the single redirect request; reply with a tiny page so the tab closes cleanly.
-REQ=$(printf 'HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\n\r\n<h2>Authorised &mdash; you can close this tab.</h2>' \
-      | ncat -l 127.0.0.1 "$PORT" -w 120 2>/dev/null | head -1)
-CODE=$(echo "$REQ" | grep -oP 'code=\K[^& ]+' || true)
-[ -n "$CODE" ] || { echo "no code received (request was: $REQ)"; exit 1; }
+if [ "${1:-}" = code ]; then
+  CODE=$(grep -oP 'code=\K[^& ]+' <<<"${2:-}" || true); [ -n "$CODE" ] || CODE="${2:-}"
+  [ -n "$CODE" ] || { echo "usage: $0 code '<redirect URL or code>'"; exit 1; }
+else
+  URL="https://accounts.google.com/o/oauth2/v2/auth?client_id=$CLIENT_ID&redirect_uri=$REDIRECT&response_type=code&scope=$SCOPE&access_type=offline&prompt=consent&login_hint=$ACCOUNT"
+  echo "Opening consent page (sign in as $ACCOUNT)…"
+  echo "$URL"
+  xdg-open "$URL" >/dev/null 2>&1 || true
+  # Catch the single redirect request; reply with a tiny page so the tab closes cleanly.
+  REQ=$(printf 'HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\n\r\n<h2>Authorised &mdash; you can close this tab.</h2>' \
+        | ncat -l 127.0.0.1 "$PORT" -w 600 2>/dev/null | head -1)
+  CODE=$(echo "$REQ" | grep -oP 'code=\K[^& ]+' || true)
+  [ -n "$CODE" ] || { echo "no code received. If the browser shows a 127.0.0.1:$PORT URL containing code=…, run: $0 code '<that URL>'"; exit 1; }
+fi
 
 RESP=$(curl -s -m 30 -X POST https://oauth2.googleapis.com/token \
   -d "code=$CODE" -d "client_id=$CLIENT_ID" -d "client_secret=$CLIENT_SECRET" \
