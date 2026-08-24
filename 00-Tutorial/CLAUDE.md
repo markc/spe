@@ -632,8 +632,7 @@ Upload videos to YouTube with OAuth authentication and playlist management.
 ```
 
 #### Requirements
-- OAuth credentials in `~/.config/google/client_secret.json`
-- Refresh token in `~/.config/google/youtube_token.json`
+- OAuth client + refresh token in the `~/.ns` secrets DB (`youtube-client-secret`, `youtube-refresh-token`; see `youtube-auth.sh`) — never files in this repo
 - `jq` and `curl` installed
 
 #### Metadata JSON Format
