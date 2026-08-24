@@ -644,9 +644,7 @@ Each chapter should have a `youtube-metadata.json` file:
   "description": "Chapter description with links and timestamps...",
   "tags": ["php", "php 8.5", "pipe operator", "tutorial"],
   "categoryId": "28",
-  "privacyStatus": "public",
-  "playlistId": "PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B",
-  "playlistPosition": 1
+  "privacyStatus": "public"
 }
 ```
 

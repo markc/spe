@@ -1,9 +1,20 @@
 {
   "title": "SPE Chapter 09 - Blog: A Markdown Content Engine (Posts, Docs, Tags)",
   "description": "Chapter 09 of Simple PHP Engine - the finished application, built entirely from the pieces of the earlier chapters.\n\nThis tutorial covers:\n• One posts table + a Type enum (Post, Doc) — Blog and Docs share one Content plugin\n• A small, safe Markdown renderer (escape-before-parse, URL-scheme allowlist)\n• Post as a value object with property hooks (html and excerpt computed on read)\n• Many-to-many tags with filtering and pagination\n• Prev/next and oldest/newest via array_first() / array_last()\n• Self-hosted docs: the engine serves the very tutorial that describes it\n\n🔗 Links:\nGitHub: https://github.com/markc/spe/tree/main/09-Blog\nDocumentation: https://markc.github.io/spe/09-Blog/\n\n#PHP #PHP85 #Markdown #CMS #Blog #PropertyHooks #Tutorial #WebDevelopment",
-  "tags": ["php", "php 8.5", "blog", "cms", "markdown", "content engine", "property hooks", "tags", "pagination", "enum", "tutorial", "web development"],
+  "tags": [
+    "php",
+    "php 8.5",
+    "blog",
+    "cms",
+    "markdown",
+    "content engine",
+    "property hooks",
+    "tags",
+    "pagination",
+    "enum",
+    "tutorial",
+    "web development"
+  ],
   "categoryId": "28",
-  "privacyStatus": "public",
-  "playlistId": "PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B",
-  "playlistPosition": 9
+  "privacyStatus": "public"
 }
