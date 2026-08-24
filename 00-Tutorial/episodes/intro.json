@@ -1,0 +1,13 @@
+{
+  "card": "intro",
+  "title": "SPE — Introduction",
+  "_comment": "Narration beats for cards/intro.html (~35 s spoken; Chirp runs ~2.2 words/s, so keep each beat ≤ 15 words). Beat i runs while scene i is spoken; the page lays its animation out from the measured durations. Rebuild: RESYNTH=1 bash scripts/make-series.sh cards",
+  "scenes": [
+    { "narr": "Simple PHP Engine is a PHP 8.5 tutorial: one small web app, built nine times." },
+    { "narr": "Each chapter adds exactly one idea, as a strict diff of the one before it." },
+    { "narr": "No framework, no dependencies: plain modern PHP that people, and AI agents, can read." },
+    { "narr": "From chapter three, every request is four validated parameters: object, method, id, and export." },
+    { "narr": "It runs on PHP's built-in server, with SQLite from chapter seven. Nothing to install but PHP." },
+    { "narr": "Nine chapters, two minutes each. Let's start." }
+  ]
+}

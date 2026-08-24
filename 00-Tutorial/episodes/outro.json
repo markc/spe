@@ -1,0 +1,13 @@
+{
+  "card": "outro",
+  "title": "SPE — How this video was made",
+  "_comment": "Narration beats for cards/outro.html (~38 s spoken; keep each beat ≤ 18 words). Rebuild: RESYNTH=1 bash scripts/make-series.sh cards",
+  "scenes": [
+    { "narr": "This video was generated, not edited: each scene is one line of JSON, a narration beat plus a visual." },
+    { "narr": "The voice is Google Cloud Chirp 3 HD, and the clip lengths set all of the timing." },
+    { "narr": "The screens are a kiosk Firefox driven by geckodriver, captured at native 4K with gpu screen recorder." },
+    { "narr": "The intro, outro, and titles are HTML and CSS animations, rendered frame by frame in headless Chromium." },
+    { "narr": "ffmpeg stitched it together, and the whole pipeline was written with Claude Code." },
+    { "narr": "It's all in the repo. Thanks for watching." }
+  ]
+}

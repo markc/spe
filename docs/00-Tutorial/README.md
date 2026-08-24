@@ -18,6 +18,32 @@ If you want to deploy a real application, see **09-Blog** — it's the only chap
 Watch the tutorials on YouTube:
 - [NetServa on YouTube](https://www.youtube.com/@NetServa)
 
+## The current pipeline: episodes + series
+
+The scripts below supersede the `spe-tutorial.sh` / Piper workflow documented further
+down (kept for reference). Everything renders at 3840×2160, 30 fps, and lands in `/tmp/ep/`.
+
+| Piece | What it does |
+|-------|--------------|
+| `episodes/XX-Name.json` | One chapter's scenes: a narration beat + a visual (`app` path or `code` file + highlighted lines). Vet this before rendering. |
+| `scripts/make-episode.sh XX-Name` | Synthesises the narration (Google Chirp 3 HD), drives a chromeless kiosk Firefox through the scenes with geckodriver, captures the screen with `gpu-screen-recorder`, syncs and muxes → `/tmp/ep/XX-Name/episode-XX-Name.mp4`. Needs a live desktop session. |
+| `episodes/intro.json`, `episodes/outro.json` | Narration beats for the series intro (what SPE is) and outro (how the video was made). |
+| `cards/intro.html`, `cards/outro.html`, `cards/title.html` | The animated cards: plain HTML/CSS on a deterministic Web-Animations timeline (`cards.js`), laid out from the measured narration lengths. |
+| `scripts/render-card.mjs` | Renders a card page frame-by-frame in headless Chromium (`seek(t)` + screenshot, piped into ffmpeg/VAAPI). No screen capture, no desktop needed. |
+| `scripts/make-series.sh` | Builds the single tutorial: intro → (3 s title card dissolving into each episode, first second frozen to hide the desktop) ×9 → outro → `/tmp/ep/spe-tutorial.mp4`, plus `spe-tutorial-chapters.txt` with YouTube chapter timestamps. |
+
+```bash
+cd 00-Tutorial
+bash scripts/make-episode.sh 07-PDO        # one episode (in your own session)
+bash scripts/make-series.sh                # cards + segments + concat (headless)
+bash scripts/make-series.sh titles         # or one step: titles | intro-outro | chapters | cardsegs | concat
+RESYNTH=1 bash scripts/make-series.sh intro-outro   # after editing intro/outro narration
+PREVIEW=2,8,14 node scripts/render-card.mjs cards/intro.html /tmp/x   # PNG stills to check a card
+```
+
+Card rendering is the slow part (~3 fps at 4K; the intro and outro take ~6 min each, a
+title card ~30 s). Segments are encoded with `h264_vaapi` and joined with a stream copy.
+
 ## Requirements
 
 ### System Dependencies

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License) -->
+<!-- Series outro (~35 s): how the video was made. Six beats, one per narration
+     line in episodes/outro.json.  ?beats=0,5.1,…&lead=0.6&tail=1.0 -->
+<head>
+<meta charset="utf-8">
+<title>SPE outro</title>
+<link rel="stylesheet" href="cards.css">
+<style>
+  .scene { width: 2500px; font-size: 72px; }
+  .row { display: flex; align-items: center; gap: 70px; }
+  .big-ico { font-size: 300px; color: var(--php); }
+  .wave { display: flex; align-items: center; gap: 22px; height: 500px; }
+  .wave i { width: 34px; height: 100%; border-radius: 17px; background: var(--php); transform-origin: center; }
+  .voice { text-align: left; display: grid; gap: 28px; }
+  .voice b { font: 600 120px/1.1 var(--sans); }
+  .voice span { font: 400 72px/1.3 var(--sans); color: var(--fg2); }
+  .screen { width: 2200px; height: 1240px; border-radius: 40px; border: 3px solid var(--border); background: var(--bg2); overflow: hidden; position: relative; }
+  .screen .page { position: absolute; inset: 0; display: grid; grid-template-columns: 420px 1fr; }
+  .screen .side { background: var(--bg3); border-right: 3px solid var(--border); padding: 60px 40px; display: grid; gap: 34px; align-content: start; }
+  .screen .side i { display: block; height: 38px; border-radius: 19px; background: var(--border); }
+  .screen .main { padding: 70px 90px; display: grid; gap: 36px; align-content: start; }
+  .screen .main b { display: block; height: 70px; width: 55%; border-radius: 20px; background: var(--fg2); opacity: .8; }
+  .screen .main i { display: block; height: 34px; border-radius: 17px; background: var(--border); }
+  .screen .rec { position: absolute; right: 50px; bottom: 40px; display: flex; align-items: center; gap: 24px; font: 700 60px/1 var(--mono); color: var(--fg); background: oklch(0% 0 0 / .55); padding: 22px 40px; border-radius: 999px; }
+  .screen .rec::before { content: ''; width: 34px; height: 34px; border-radius: 50%; background: oklch(62% 0.22 25); }
+  .chips { display: flex; gap: 40px; }
+  .chip { display: flex; align-items: center; gap: 26px; font: 500 66px/1 var(--sans); color: var(--fg2); padding: 34px 54px; border-radius: 999px; border: 3px solid var(--border); background: var(--bg2); }
+  .chip .ico { font-size: 80px; color: var(--php); }
+  .strip { display: flex; gap: 40px; width: 3000px; overflow: hidden; }
+  .strip .f { flex: none; width: 560px; height: 315px; border-radius: 24px; border: 3px solid var(--border); background: linear-gradient(135deg, oklch(24% 0.05 285), oklch(16% 0.012 60)); display: grid; place-items: center; font: 500 48px/1 var(--mono); color: var(--mute); }
+  .flow { display: flex; align-items: center; gap: 46px; }
+  .node { display: grid; gap: 22px; justify-items: center; width: 520px; padding: 60px 30px; border-radius: 40px; border: 3px solid var(--border); background: var(--bg2); }
+  .node .ico { font-size: 130px; color: var(--php); }
+  .node b { font: 600 62px/1.15 var(--sans); text-align: center; }
+  .node span { font: 400 46px/1.25 var(--mono); font-feature-settings: var(--nolig); color: var(--mute); text-align: center; }
+  .arrow { font: 300 140px/1 var(--sans); color: var(--php); }
+  .claude { display: inline-flex; align-items: center; gap: 30px; font: 600 80px/1 var(--sans); padding: 44px 70px; border-radius: 999px; background: oklch(60% 0.16 45); color: oklch(12% 0.01 60); }
+  .links { display: grid; gap: 50px; font: 500 100px/1.2 var(--mono); }
+  .links .m { color: var(--mute); font: 400 70px/1.2 var(--sans); }
+  .mark { font: 800 400px/1 var(--sans); letter-spacing: -.04em; }
+  .mark .pipe { font: 700 330px/1 var(--mono); font-feature-settings: var(--nolig); color: var(--php); margin-left: 40px; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="bg"><div class="grid"></div><div class="wash w1"></div><div class="wash w2"></div></div>
+
+  <!-- 0: generated, not edited -->
+  <div class="beat">
+    <div class="stack" style="gap:100px">
+      <div class="kicker" data-in="0">How this video was made</div>
+      <div class="h2" data-in="0.2">Generated, not edited</div>
+      <div class="card code scene" data-in="0.8">{
+  <span class="s">"lane"</span>: <span class="s">"code"</span>,
+  <span class="s">"file"</span>: <span class="s">"07-PDO/src/Core/Db.php"</span>,
+  <span class="s">"hl"</span>:   <span class="s">"64-77"</span>,
+  <span class="s">"narr"</span>: <span class="s">"This private method is the one place in the
+           whole app where SQL is prepared and run…"</span>
+}</div>
+      <div class="cap" data-in="1.6">one scene = one narration beat + one visual &mdash; <span class="mono">episodes/*.json</span></div>
+    </div>
+  </div>
+
+  <!-- 1: the voice -->
+  <div class="beat">
+    <div class="stack" style="gap:120px">
+      <div class="row" data-in="0">
+        <svg class="ico big-ico" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+        <div class="voice"><b>Google Cloud Text-to-Speech</b><span>Chirp 3 HD &middot; Charon &middot; one WAV per beat</span></div>
+      </div>
+      <div class="wave" id="wave" data-in="0.4"></div>
+      <div class="cap" data-in="1.2">the clip lengths set the timing of every scene, and of this card</div>
+    </div>
+  </div>
+
+  <!-- 2: the screens -->
+  <div class="beat">
+    <div class="stack" style="gap:90px">
+      <div class="screen" data-in="0">
+        <div class="page">
+          <div class="side"><i style="width:80%"></i><i style="width:60%"></i><i style="width:70%"></i><i style="width:50%"></i><i style="width:65%"></i></div>
+          <div class="main"><b></b><i style="width:90%"></i><i style="width:84%"></i><i style="width:92%"></i><i style="width:60%"></i><i style="width:88%"></i><i style="width:76%"></i><i style="width:40%"></i></div>
+        </div>
+        <div class="rec" id="rec">REC 3840&times;2160 &middot; 30 fps</div>
+      </div>
+      <div class="chips">
+        <div class="chip" data-in="0.6"><svg class="ico" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Firefox <span class="mono">-kiosk</span></div>
+        <div class="chip" data-in="0.9"><svg class="ico" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>geckodriver</div>
+        <div class="chip" data-in="1.2"><svg class="ico" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>gpu-screen-recorder</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3: these cards -->
+  <div class="beat">
+    <div class="stack" style="gap:110px">
+      <div class="h2" data-in="0">HTML + CSS &rarr; headless Chromium &rarr; ffmpeg</div>
+      <div class="strip" id="strip" data-in="0.5"></div>
+      <div class="cap" data-in="1.2">one <span class="mono">seek(t)</span> + one screenshot per frame &mdash; 30 a second, piped straight into the encoder</div>
+    </div>
+  </div>
+
+  <!-- 4: the pipeline -->
+  <div class="beat">
+    <div class="stack" style="gap:120px">
+      <div class="flow">
+        <div class="node" data-in="0"><svg class="ico" viewBox="0 0 24 24"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg><b>scenes</b><span>episodes/*.json</span></div>
+        <div class="arrow" data-in="0.25">&rarr;</div>
+        <div class="node" data-in="0.35"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg><b>narration</b><span>Chirp 3 HD</span></div>
+        <div class="arrow" data-in="0.6">&rarr;</div>
+        <div class="node" data-in="0.7"><svg class="ico" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><b>screens</b><span>Firefox + gsr</span></div>
+        <div class="arrow" data-in="0.95">&rarr;</div>
+        <div class="node" data-in="1.05"><svg class="ico" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg><b>cards</b><span>headless Chromium</span></div>
+        <div class="arrow" data-in="1.3">&rarr;</div>
+        <div class="node" data-in="1.4" style="border-color:var(--php)"><svg class="ico" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><b>ffmpeg</b><span>spe-tutorial.mp4</span></div>
+      </div>
+      <div class="claude" data-in="2.4">written with Claude Code</div>
+    </div>
+  </div>
+
+  <!-- 5: end card -->
+  <div class="beat">
+    <div class="stack" style="gap:140px">
+      <div class="mark" data-in="0">SPE<span class="pipe">|&gt;</span></div>
+      <div class="links">
+        <div data-in="0.6">github.com/markc/spe</div>
+        <div data-in="0.85">markc.github.io/spe</div>
+        <div class="m" data-in="1.1">MIT licence &middot; Copyright &copy; 2015&ndash;2026 Mark Constable</div>
+      </div>
+      <div class="cap" data-in="1.8">Thanks for watching</div>
+    </div>
+  </div>
+</div>
+
+<script src="cards.js"></script>
+<script>
+  background();
+  beats();
+  const B = BEATS;
+
+  // 1: waveform — 48 bars, each with its own pseudo-random wobble across the beat
+  const wave = document.getElementById('wave');
+  let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  for (let i = 0; i < 48; i++) {
+    const bar = document.createElement('i'); wave.appendChild(bar);
+    const stops = []; const [s, e] = B[1];
+    for (let t = s; t <= e + 1; t += 0.18) stops.push([t, { transform: `scaleY(${(0.08 + rnd() * 0.92).toFixed(3)})` }]);
+    kf(bar, stops, 'ease-in-out');
+  }
+
+  // 2: the REC pill blinks
+  const rec = document.getElementById('rec'); const st = [];
+  for (let t = B[2][0]; t <= B[2][1] + 1; t += 0.5) st.push([t, { opacity: 1 }], [t + 0.49, { opacity: 0.55 }]);
+  kf(rec, st, 'steps(1,end)');
+
+  // 3: the filmstrip scrolls continuously
+  const strip = document.getElementById('strip');
+  for (let i = 0; i < 12; i++) { const f = document.createElement('div'); f.className = 'f'; f.textContent = `frame ${String(i * 37).padStart(4, '0')}`; strip.appendChild(f); }
+  const inner = document.createElement('div'); inner.style.cssText = 'display:flex;gap:40px'; [...strip.children].forEach((c) => inner.appendChild(c)); strip.appendChild(inner);
+  kf(inner, [[B[3][0], { transform: 'translateX(0)' }], [B[3][1] + 1, { transform: 'translateX(-3600px)' }]], 'linear');
+
+  ready();
+</script>
+</body>
+</html>

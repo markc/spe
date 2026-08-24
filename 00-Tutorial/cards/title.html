@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License) -->
+<!-- Chapter title card, ~3 s, silent. Dissolves into the episode's first frame.
+     ?n=07&name=PDO&idea=Persistence…&dur=3.2 -->
+<head>
+<meta charset="utf-8">
+<title>SPE title card</title>
+<link rel="stylesheet" href="cards.css">
+<style>
+  .beat { opacity: 1; }
+  .idea { max-width: 2700px; }
+  .dots { margin-top: 60px; }
+  .num { font: 500 84px/1 var(--mono); letter-spacing: .3em; color: var(--php); }
+  .name { font: 700 440px/1 var(--sans); letter-spacing: -.03em; }
+  .rule { width: 0; height: 6px; background: var(--php); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="bg"><div class="grid"></div><div class="wash w1"></div><div class="wash w2"></div></div>
+  <div class="beat">
+    <div class="stack">
+      <div class="num" id="num"></div>
+      <div class="name" id="name"></div>
+      <div class="rule" id="rule"></div>
+      <div class="lead idea" id="idea"></div>
+      <div class="dots" id="dots"></div>
+    </div>
+  </div>
+</div>
+<script src="cards.js"></script>
+<script>
+  const n = Number(Q.get('n') || 1), name = Q.get('name') || 'Simple';
+  const idea = Q.get('idea') || 'A request becomes a page: one self-rendering anonymous class';
+  document.getElementById('num').textContent = `CHAPTER ${String(n).padStart(2, '0')}`;
+  document.getElementById('name').textContent = name;
+  document.getElementById('idea').textContent = idea;
+  const dots = document.getElementById('dots');
+  for (let i = 1; i <= 9; i++) { const d = document.createElement('i'); d.className = i < n ? 'done' : i === n ? 'now' : ''; dots.appendChild(d); }
+
+  background();
+  reveal(document.getElementById('num'),  0.20, null, { dur: 0.6, from: 'translateY(40px)' });
+  reveal(document.getElementById('name'), 0.35, null, { dur: 0.8, from: 'translateY(120px)' });
+  kf(document.getElementById('rule'), [[0.6, { width: '0px', opacity: 0 }], [1.4, { width: '520px', opacity: 1 }]]);
+  reveal(document.getElementById('idea'), 0.85, null, { dur: 0.7 });
+  reveal(document.getElementById('dots'), 1.05, null, { dur: 0.6, from: 'translateY(30px)' });
+  ready();
+</script>
+</body>
+</html>

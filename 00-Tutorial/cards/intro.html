@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License) -->
+<!-- Series intro (~30 s): what SPE is and why it exists. Six beats, one per
+     narration line in episodes/intro.json.  ?beats=0,5.1,…&lead=0.6&tail=1.0 -->
+<head>
+<meta charset="utf-8">
+<title>SPE intro</title>
+<link rel="stylesheet" href="cards.css">
+<style>
+  .mark { display: flex; align-items: baseline; gap: 30px; font: 800 620px/1 var(--sans); letter-spacing: -.04em; }
+  .mark .pipe { font: 700 520px/1 var(--mono); font-feature-settings: var(--nolig); color: var(--php); letter-spacing: 0; margin-left: 60px; }
+  .pills { display: flex; gap: 60px; }
+  .pill { display: grid; gap: 40px; justify-items: center; width: 1000px; padding: 90px 60px; border-radius: 48px; background: var(--bg2); border: 3px solid var(--border); }
+  .pill .ico { font-size: 220px; color: var(--php); }
+  .pill b { font: 600 92px/1.15 var(--sans); text-align: center; }
+  .pill span { font: 400 64px/1.3 var(--sans); color: var(--mute); text-align: center; }
+  .req { font: 600 200px/1 var(--mono); letter-spacing: -.01em; }
+  .req .k { color: var(--php); }
+  .params { display: flex; gap: 60px; }
+  .param { width: 760px; padding: 60px 50px; border-radius: 40px; background: var(--bg2); border: 3px solid var(--border); text-align: left; }
+  .param b { display: block; font: 700 120px/1 var(--mono); color: var(--php); margin-bottom: 30px; }
+  .param i { display: block; font: 600 72px/1.1 var(--sans); font-style: normal; margin-bottom: 18px; }
+  .param span { font: 400 58px/1.3 var(--sans); color: var(--mute); }
+  .term { width: 3300px; }
+  .term .bar { display: flex; align-items: center; gap: 22px; padding: 40px 60px; border-bottom: 3px solid var(--border); color: var(--mute); font: 500 52px/1 var(--sans); }
+  .term .dot { width: 34px; height: 34px; border-radius: 50%; background: #ff5f56; box-shadow: 56px 0 #ffbd2e, 112px 0 #27c93f; margin-right: 120px; }
+  .term .code { font-size: 58px; }
+  .term .p { color: var(--php); }
+  .badges { display: flex; gap: 40px; }
+  .badge { font: 600 64px/1 var(--sans); padding: 34px 54px; border-radius: 999px; border: 3px solid var(--border); color: var(--fg2); }
+  .badge.php { border-color: var(--php); color: var(--php); }
+  .diff { font-size: 68px; }
+  .diff .h { color: var(--fg2); }
+  .diff .p { color: var(--ok); }
+  .tiles.small .tile { width: 300px; height: 230px; }
+  .tiles.small .tile b { font-size: 80px; }
+  .tiles.small .tile span { font-size: 50px; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="bg"><div class="grid"></div><div class="wash w1"></div><div class="wash w2"></div></div>
+
+  <!-- 0: wordmark -->
+  <div class="beat">
+    <div class="stack" style="gap:90px">
+      <div class="mark"><span class="l">S</span><span class="l">P</span><span class="l">E</span><span class="pipe">|&gt;</span></div>
+      <div class="h2" data-in="1.1">Simple PHP Engine</div>
+      <div class="lead" data-in="1.5" style="max-width:3400px">A progressive <span class="php">PHP 8.5</span> tutorial &mdash; one small web app, built nine times</div>
+    </div>
+  </div>
+
+  <!-- 1: nine chapters + a strict diff -->
+  <div class="beat">
+    <div class="stack" style="gap:110px">
+      <div class="tiles" id="tiles1"></div>
+      <div class="card code diff" data-in="1.6"><span class="h">$ diff -r 05-Autoload 06-Session</span>
+<span class="h">Only in 06-Session/src/Core: Flash.php</span>
+<span class="p">+ session_start([</span>
+<span class="p">+     'cookie_httponly' => true,</span>
+<span class="p">+     'cookie_samesite' => 'Lax',</span>
+<span class="p">+     'use_strict_mode' => true,</span>
+<span class="p">+ ]);</span>
+<span class="p">+ $this->token = $_SESSION['token'] ??= bin2hex(random_bytes(16));</span></div>
+      <div class="cap" data-in="2.6">each chapter = the previous chapter + exactly one idea</div>
+    </div>
+  </div>
+
+  <!-- 2: no framework, no deps, readable -->
+  <div class="beat">
+    <div class="stack" style="gap:120px">
+      <div class="h2" data-in="0">Plain, modern PHP</div>
+      <div class="pills">
+        <div class="pill" data-in="0.5">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5V8z"/><path d="m3 8 9 5 9-5"/><path d="M12 13v8"/></svg>
+          <b>No framework</b><span>no Laravel, no Symfony, no magic</span>
+        </div>
+        <div class="pill" data-in="0.85">
+          <svg class="ico" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <b>No runtime dependencies</b><span>Composer for autoloading, nothing else</span>
+        </div>
+        <div class="pill" data-in="1.2">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <b>Readable top to bottom</b><span>by people, and by AI agents</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3: the request contract -->
+  <div class="beat">
+    <div class="stack" style="gap:140px">
+      <div class="req" id="req">?<span class="k">o</span>=Blog&amp;<span class="k">m</span>=read&amp;<span class="k">i</span>=1&amp;<span class="k">x</span>=json</div>
+      <div class="params">
+        <div class="param" data-in="1.4"><b>o</b><i>object</i><span>the plugin, e.g. Blog</span></div>
+        <div class="param" data-in="1.7"><b>m</b><i>method</i><span>create · read · update · delete · list</span></div>
+        <div class="param" data-in="2.0"><b>i</b><i>id</i><span>an integer record id</span></div>
+        <div class="param" data-in="2.3"><b>x</b><i>export</i><span>html, or json</span></div>
+      </div>
+      <div class="cap" data-in="3.0">validated once, in <span class="mono php">Ctx</span> &mdash; escaped once, in the view</div>
+    </div>
+  </div>
+
+  <!-- 4: runs anywhere PHP runs -->
+  <div class="beat">
+    <div class="stack" style="gap:110px">
+      <div class="card term" data-in="0">
+        <div class="bar"><span class="dot"></span>spe</div>
+        <div class="code"><span class="p">$</span> <span id="cmd">php -S localhost:8000 index.php</span>
+<span id="out1">[Mon Aug 24 11:46:35 2026] PHP 8.5.9 Development Server (http://localhost:8000) started</span>
+<span id="out2"><span class="p">$</span> curl -s 'localhost:8000/09-Blog/?o=Blog&amp;m=read&amp;i=1&amp;x=json' | head -c 70</span>
+<span id="out3">{"doc":"SPE::09","page":"09 Blog","main":"&lt;article class=\"card prose\"&gt;</span></div>
+      </div>
+      <div class="badges" data-in="2.6">
+        <span class="badge php">PHP 8.5</span><span class="badge">built-in server</span><span class="badge">SQLite</span><span class="badge">Composer</span>
+      </div>
+      <div class="cap" data-in="3.0">nothing to install but PHP</div>
+    </div>
+  </div>
+
+  <!-- 5: let's begin -->
+  <div class="beat">
+    <div class="stack" style="gap:130px">
+      <div class="h1" data-in="0">Nine chapters.<br>One idea each.</div>
+      <div class="tiles small" id="tiles5"></div>
+    </div>
+  </div>
+</div>
+
+<script src="cards.js"></script>
+<script>
+  const CH = [['01','Simple'],['02','Styled'],['03','Plugins'],['04','Views'],['05','Autoload'],['06','Session'],['07','PDO'],['08','Auth'],['09','Blog']];
+  const tiles = (id) => { const w = document.getElementById(id); CH.forEach(([n, s]) => { const t = document.createElement('div'); t.className = 'tile'; t.innerHTML = `<b>${n}</b><span>${s}</span>`; w.appendChild(t); }); return [...w.children]; };
+
+  background();
+  beats();
+  const B = BEATS;
+
+  // 0: letters rise, pipe glyph slides in
+  document.querySelectorAll('.mark .l').forEach((l, i) => reveal(l, B[0][0] + 0.15 + i * 0.12, null, { dur: 0.7, from: 'translateY(140px)' }));
+  reveal(document.querySelector('.mark .pipe'), B[0][0] + 0.7, null, { dur: 0.6, from: 'translateX(-120px)' });
+
+  // 1: tiles cascade; then the diff
+  tiles('tiles1').forEach((t, i) => reveal(t, B[1][0] + 0.1 + i * 0.1, null, { dur: 0.5, from: 'translateY(60px) scale(.9)' }));
+
+  // 3: the request line types out
+  const req = document.getElementById('req');
+  reveal(req, B[3][0], null, { dur: 0.3, from: 'none' });
+  typeIn(req, B[3][0] + 0.1, 1.2);
+
+  // 4: terminal types and answers
+  const t4 = B[4][0] + 0.4;
+  typeIn(document.getElementById('cmd'), t4, 0.9);
+  ['out1', 'out2', 'out3'].forEach((id, i) => reveal(document.getElementById(id), t4 + 1.2 + i * 0.5, null, { dur: 0.25, from: 'none' }));
+
+  // 5: tiles again, first one lights up
+  const t5 = tiles('tiles5');
+  t5.forEach((t, i) => reveal(t, B[5][0] + 0.6 + i * 0.07, null, { dur: 0.45, from: 'translateY(50px)' }));
+  kf(t5[0], [[B[5][0] + 1.6, { backgroundColor: 'oklch(16% 0.012 60)', borderColor: 'oklch(30% 0.015 60)' }],
+             [B[5][0] + 2.1, { backgroundColor: 'oklch(24% 0.05 285)', borderColor: 'oklch(74% 0.13 285)' }]]);
+
+  ready();
+</script>
+</body>
+</html>
