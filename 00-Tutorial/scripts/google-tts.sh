@@ -7,14 +7,15 @@
 #
 # Prerequisites:
 #   1. Create service account: https://console.cloud.google.com/iam-admin/serviceaccounts
-#   2. Download JSON key to ~/.config/google/tts-service-account.json
+#   2. Store its JSON key in the secrets DB (never in this repo):
+#        bash youtube-auth.sh import google-tts-service-account /path/to/key.json
 #   3. Enable API: https://console.cloud.google.com/apis/library/texttospeech.googleapis.com
 
 set -euo pipefail
 
-# Configuration
-CONFIG_DIR="$HOME/.config/google"
-SERVICE_ACCOUNT="$CONFIG_DIR/tts-service-account.json"
+# Credentials live in the ~/.ns secrets DB (domain googleapis.com, service api).
+PWDB="${PWDB:-$HOME/.ns/_etc/secrets/secrets.db}"
+secret() { sqlite3 "$PWDB" "SELECT password FROM secrets WHERE domain='googleapis.com' AND service='api' AND username='$1' LIMIT 1"; }
 TTS_API="https://texttospeech.googleapis.com/v1/text:synthesize"
 
 # Default voice (Chirp 3 HD - most natural; chosen for the SPE series)
@@ -39,18 +40,19 @@ base64url() {
 
 # Get access token from service account
 get_access_token() {
-    [[ -f "$SERVICE_ACCOUNT" ]] || log_error "Missing service account key: $SERVICE_ACCOUNT
+    local sa; sa=$(secret google-tts-service-account)
+    [[ -n "$sa" ]] || log_error "No google-tts-service-account in $PWDB
 
 Setup instructions:
 1. Go to: https://console.cloud.google.com/iam-admin/serviceaccounts
 2. Create service account (any name)
 3. Click the account → Keys → Add Key → Create new key → JSON
-4. Save as: $SERVICE_ACCOUNT
+4. Import it: bash youtube-auth.sh import google-tts-service-account key.json
 5. Enable API: https://console.cloud.google.com/apis/library/texttospeech.googleapis.com"
 
     local client_email private_key
-    client_email=$(jq -r '.client_email' "$SERVICE_ACCOUNT")
-    private_key=$(jq -r '.private_key' "$SERVICE_ACCOUNT")
+    client_email=$(jq -r '.client_email' <<<"$sa")
+    private_key=$(jq -r '.private_key' <<<"$sa")
 
     # Create JWT header and claims
     local now exp

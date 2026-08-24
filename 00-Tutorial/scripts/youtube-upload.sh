@@ -7,9 +7,9 @@ set -euo pipefail
 VIDEO_FILE="${1:-}"
 METADATA_FILE="${2:-}"
 
-CONFIG_DIR="$HOME/.config/google"
-CLIENT_SECRET="$CONFIG_DIR/client_secret.json"
-TOKEN_FILE="$CONFIG_DIR/youtube_token.json"
+# Credentials live in the ~/.ns secrets DB (see youtube-auth.sh), never in this repo.
+PWDB="${PWDB:-$HOME/.ns/_etc/secrets/secrets.db}"
+secret() { sqlite3 "$PWDB" "SELECT password FROM secrets WHERE domain='googleapis.com' AND service='api' AND username='$1' LIMIT 1"; }
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -58,13 +58,13 @@ show_api_error() {
 [[ -f "$VIDEO_FILE" ]] || log_error "Video file not found: $VIDEO_FILE"
 [[ -z "$METADATA_FILE" ]] && METADATA_FILE="$(dirname "$VIDEO_FILE")/youtube-metadata.json"
 [[ -f "$METADATA_FILE" ]] || log_error "Metadata file not found: $METADATA_FILE"
-[[ -f "$CLIENT_SECRET" ]] || log_error "Client secret not found: $CLIENT_SECRET"
-[[ -f "$TOKEN_FILE" ]] || log_error "Token file not found: $TOKEN_FILE"
+CLIENT_JSON=$(secret youtube-client-secret); [[ -n "$CLIENT_JSON" ]] || log_error "no youtube-client-secret in $PWDB (see youtube-auth.sh import)"
+TOKEN_JSON=$(secret youtube-refresh-token);  [[ -n "$TOKEN_JSON" ]]  || log_error "no youtube-refresh-token in $PWDB (run youtube-auth.sh)"
 
 # Extract credentials
-CLIENT_ID=$(jq -r '.installed.client_id // .web.client_id' "$CLIENT_SECRET")
-CLIENT_SECRET_VALUE=$(jq -r '.installed.client_secret // .web.client_secret' "$CLIENT_SECRET")
-REFRESH_TOKEN=$(jq -r '.refresh_token' "$TOKEN_FILE")
+CLIENT_ID=$(jq -r '.installed.client_id // .web.client_id' <<<"$CLIENT_JSON")
+CLIENT_SECRET_VALUE=$(jq -r '.installed.client_secret // .web.client_secret' <<<"$CLIENT_JSON")
+REFRESH_TOKEN=$(jq -r '.refresh_token' <<<"$TOKEN_JSON")
 
 log_info "Refreshing access token..."
 
