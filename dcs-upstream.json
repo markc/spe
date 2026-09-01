@@ -1,0 +1,10 @@
+{
+  "repo": "markc/dcs.spa",
+  "commit": "12fbaa629f66029ceccd848e4516b1b2152d7fb8",
+  "note": "dcs.spa is the canonical DCS (Dual Carousel Sidebars) reference. These files are vendored byte-identical into docs/ (the root copies are symlinks). Never edit them here — change dcs.spa, then `_bin/dcs-sync --update <sha>`. SPE-specific CSS goes in spe.css; md.js is SPE's own and is not synced.",
+  "files": {
+    "docs/base.css": "docs/base.css",
+    "docs/base.js": "docs/base.js",
+    "docs/site.css": "docs/site.css"
+  }
+}

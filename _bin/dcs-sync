@@ -1,0 +1,68 @@
+#!/opt/cosmix/bin/mix
+-- dcs-sync — keep the vendored DCS (Dual Carousel Sidebars) files byte-identical to the
+-- dcs.spa commit pinned in dcs-upstream.json. Run from the repo root.
+--
+--   _bin/dcs-sync                 verify: every vendored file == upstream at the pinned commit
+--   _bin/dcs-sync --update <sha>  re-vendor every file from <sha> (full 40-hex), rewrite the pin
+--
+-- Exit 0 = in sync (or updated); 1 = drift — someone patched a vendored file locally, which the
+-- DCS policy forbids (fix it in dcs.spa, then --update); 2 = usage/fetch error.
+
+$root = "."
+if not exists($root .. "/dcs-upstream.json") then
+  eprint("dcs-sync: run from the repo root (dcs-upstream.json not found)")
+  exit(2)
+end
+$pin = json_parse(read_file($root .. "/dcs-upstream.json"))
+$argv = args()
+$update = len($argv) > 0 and $argv[0] == "--update"
+$sha = $pin["commit"]
+if $update then
+  if len($argv) < 2 then
+    eprint("usage: _bin/dcs-sync [--update <40-hex sha>]")
+    exit(2)
+  end
+  $sha = $argv[1]
+end
+if len($sha) != 40 then
+  eprint("dcs-sync: commit must be a full 40-hex sha, got '" .. $sha .. "'")
+  exit(2)
+end
+
+$base = "https://raw.githubusercontent.com/" .. $pin["repo"] .. "/" .. $sha .. "/"
+$drift = 0
+for each $local in keys($pin["files"])
+  $remote = $pin["files"][$local]
+  $r = run_argv(["curl", "-fsSL", $base .. $remote], {timeout: 30})
+  if not $r["ok"] then
+    eprint("dcs-sync: fetch failed for " .. $remote .. " at " .. $sha .. ": " .. trim($r["stderr"]))
+    exit(2)
+  end
+  $path = $root .. "/" .. $local
+  if $update then
+    write_file($path, $r["stdout"])
+    print("vendored " .. $local)
+  else
+    $have = exists($path) ? read_file($path) : ""
+    if $have == $r["stdout"] then
+      print("ok    " .. $local)
+    else
+      $drift = $drift + 1
+      print("DRIFT " .. $local)
+      $d = run_argv(["diff", "-u", "--label", "upstream/" .. $remote, "--label", "vendored/" .. $local, "-", $path], {stdin: $r["stdout"]})
+      print($d["stdout"])
+    end
+  end
+end
+
+if $update then
+  $pin["commit"] = $sha
+  write_file($root .. "/dcs-upstream.json", json_encode($pin, true) .. "\n")
+  print("pinned " .. $pin["repo"] .. "@" .. $sha)
+  exit(0)
+end
+if $drift > 0 then
+  eprint("dcs-sync: vendored file(s) differ from " .. $pin["repo"] .. "@" .. $sha .. " — never patch these locally: change dcs.spa, then _bin/dcs-sync --update <sha>")
+  exit(1)
+end
+print("in sync with " .. $pin["repo"] .. "@" .. $sha)

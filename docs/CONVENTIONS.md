@@ -109,7 +109,7 @@ Navigation, colour schemes and other configuration live in `Ctx` as plain arrays
 
 ## Assets
 
-`docs/base.css`, `docs/site.css` and `docs/base.js` are the only shared files and they are not PHP. `base.css` is colour-agnostic structure; `site.css` is every colour. Chapters link them by relative path (`../base.css`). The canonical way to run the project is the root router — `php -S localhost:8000 index.php`, then visit `/XX-Name/` — which serves those assets (they live symlinked at the repo root). A chapter also runs standalone with `php -S localhost:8000 -t XX-Name/public` for reading the PHP, though the shared CSS/JS only resolve through the root router. They are shared because they are an asset, not code, and because the whole point of chapters 03–05 is that the page does not change.
+`docs/base.css`, `docs/site.css`, `docs/base.js` and `docs/spe.css` are the only shared files and they are not PHP. The first three are vendored unchanged from dcs.spa at the revision pinned in `dcs-upstream.json`; `_bin/dcs-sync` verifies them, and SPE-specific CSS belongs in `spe.css`. Chapters link the stylesheets by relative path (`../base.css`, `../site.css`, `../spe.css`). The canonical way to run the project is the root router — `php -S localhost:8000 index.php`, then visit `/XX-Name/` — which serves those assets (they live symlinked at the repo root). A chapter also runs standalone with `php -S localhost:8000 -t XX-Name/public` for reading the PHP, though the shared CSS/JS only resolve through the root router. They are shared because they are assets, not code, and because the whole point of chapters 03–05 is that the page does not change.
 
 ## Documentation contract
 

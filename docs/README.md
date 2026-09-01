@@ -109,7 +109,7 @@ Each chapter has its own Pest suite under `tests/<Name>/` that starts the chapte
 
 ## Styling
 
-No CSS framework. `base.css` is colour-agnostic structure (layout, components, utilities); `site.css` defines every colour in OKLCH for light, dark and four schemes; `base.js` handles theme, sidebars and toasts. They are shared by every chapter so the look stays fixed while the code evolves.
+No CSS framework. `base.css`, `site.css` and `base.js` are vendored unchanged from dcs.spa at the revision pinned in `dcs-upstream.json`, and `_bin/dcs-sync` verifies them. SPE-specific CSS lives in `spe.css`. The assets provide the layout, six OKLCH colour schemes, dual sidebar carousels, themes and toasts shared by every chapter.
 
 ## Documentation
 

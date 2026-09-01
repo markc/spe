@@ -29,7 +29,10 @@ composer check      # bin/check-chapters.php + mago lint + pest
 composer test       # pest
 composer lint       # mago
 composer format     # mago format
+_bin/dcs-sync       # verify vendored DCS files
 ```
+
+`base.css`, `site.css` and `base.js` are vendored from dcs.spa at the revision pinned in `dcs-upstream.json`; SPE-specific CSS lives in `spe.css`.
 
 Later chapters seed a login: `admin@example.com` / `admin`, `user@example.com` / `user`.
 
@@ -101,7 +104,7 @@ Chapters 01–04 are a single `public/index.php` each. PSR-4 namespace per chapt
 
 ## Styling
 
-`base.css` (colour-agnostic structure) + `site.css` (all colours, OKLCH, light/dark + four schemes) + `base.js` (theme, sidebars, toasts). Shared by every chapter so the look stays fixed while the code evolves. Referenced by relative path (`../base.css`).
+`base.css` (colour-agnostic structure) + `site.css` (all colours, OKLCH, light/dark + six schemes) + `base.js` (theme, sidebars, carousels, toasts), with SPE additions in `spe.css`. Shared by every chapter so the look stays fixed while the code evolves. Referenced by relative paths (`../base.css`, `../site.css`, `../spe.css`).
 
 ## ai.txt
 

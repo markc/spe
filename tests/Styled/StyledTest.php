@@ -7,7 +7,7 @@ test('home renders inside the app shell', function () {
     $r = $this->c->get();
     expect($r->status)->toBe(200)
         ->and($r->body)->toContain('<title>SPE::02 Home</title>', 'href="../base.css"', 'href="../site.css"', 'src="../base.js"')
-        ->and($r->body)->toContain('class="sidebar sidebar-left"', 'class="sidebar sidebar-right"', 'data-scheme="ocean"', 'class="theme-toggle"')
+        ->and($r->body)->toContain('class="sidebar sidebar-left"', 'class="sidebar sidebar-right"', 'data-scheme="forest"', 'class="carousel-header"', 'class="theme-toggle"')
         ->and($r->body)->toContain('<a href="?o=home" class="active"><i data-lucide="home"></i> Home</a>');
 });
 

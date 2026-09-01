@@ -156,7 +156,7 @@ const FORCE_SHELL = `
     if (!document.getElementById(id)) {
       var st = document.createElement('style'); st.id = id;
       st.textContent = '.sidebar-left,.sidebar-right{transform:translateX(0)!important;position:fixed!important}'
-        + 'main{margin-inline:var(--sidebar-width)!important}.overlay{display:none!important}';
+        + 'main,.topnav{margin-inline:var(--sw-l) var(--sw-r)!important}';
       document.head.appendChild(st);
     }
   }

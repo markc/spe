@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Full DCS app shell.** `base.css`, `site.css` and `base.js` are now vendored byte-identical from [dcs.spa](https://dcs.spa) (pinned in `dcs-upstream.json`, guarded by `_bin/dcs-sync`); SPE's own CSS is the small `spe.css`. Every chapter from 02 on, the root index and the docs site wear the same shell: two off-canvas sidebars, each a two-panel carousel (Navigation · About / Chapters on the left, Appearance · Settings on the right), six OKLCH colour schemes, light/dark, slide/fade, per-side width. The PHP being taught is unchanged; only `Theme` markup and the `$schemes` data moved. 09-Blog's Home page (`?o=Home`) is the one place the DCS marketing components (hero, section header, service cards, CTAs) are used.
 - **Rebuilt as a coherent nine-chapter tutorial (01–09).** Each chapter is now a strict diff of the previous one following `docs/CONVENTIONS.md`, with one new idea per chapter and stable class names throughout. Chapters 04 and 08 renamed to `04-Views` and `08-Auth`.
 - Every chapter README rewritten from the actual code (opening · what changed · walkthrough · PHP features · security · try it · next); top-level `README.md`, `CONTEXT.md` and `ai.txt` brought in line.
 - CI now runs on PHP 8.5 and actually runs Mago and Pest; added `chapters.json` manifest + `bin/check-chapters.php`, run by `composer check` and CI.

@@ -13,7 +13,7 @@ final readonly class Ctx
 
     public function __construct(
         public array $out = ['doc' => 'SPE::08', 'page' => '08 Auth', 'main' => ''],
-        public array $schemes = [['circle', 'Stone', 'default'], ['waves', 'Ocean', 'ocean'], ['trees', 'Forest', 'forest'], ['sunset', 'Sunset', 'sunset']],
+        public array $schemes = [['oklch(50% 0.12 220)', 'Ocean', 'default'], ['oklch(47% 0.2 25)', 'Crimson', 'crimson'], ['oklch(45% 0.05 60)', 'Stone', 'stone'], ['oklch(49% 0.12 150)', 'Forest', 'forest'], ['oklch(52% 0.16 45)', 'Sunset', 'sunset'], ['oklch(50% 0 0)', 'Mono', 'mono']],
         public string $email = 'mc@netserva.org',
     ) {
         if (session_status() !== PHP_SESSION_ACTIVE) {

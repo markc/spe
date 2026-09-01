@@ -1,193 +1,1168 @@
-/* SPE Theme - OKLCH Color System
- * Perceptually uniform colors with consistent lightness across schemes
- * L: lightness (0-100%), C: chroma (0-0.4), H: hue (0-360)
- * Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
+/*
+ * DCS Site Theme - Marketing Layer
+ * Ocean (H=220) default with Crimson, Stone, Forest, Sunset schemes
+ * Copyright © 2026 Mark Constable <mc@dcs.spa> (MIT License)
  */
 
-/* === Light Theme (Stone - Default) === */
-:root {
-    /* Hue: 60 (warm neutral) | Chroma: 0.02 (subtle) */
-    --bg-primary:   oklch(98% 0.005 60);
-    --bg-secondary: oklch(96% 0.008 60);
-    --bg-tertiary:  oklch(92% 0.012 60);
-    --fg-primary:   oklch(25% 0.02 60);
-    --fg-secondary: oklch(45% 0.02 60);
-    --fg-muted:     oklch(55% 0.015 60);
-    --accent:       oklch(45% 0.05 60);
-    --accent-hover: oklch(35% 0.06 60);
-    --accent-fg:    oklch(98% 0.005 60);
-    --accent-subtle:oklch(92% 0.015 60);
-    --border:       oklch(85% 0.01 60);
-    --border-muted: oklch(90% 0.008 60);
-    /* Semantic (fixed hues) */
-    --success:      oklch(45% 0.15 145);
-    --danger:       oklch(55% 0.2 25);
-    --warning:      oklch(70% 0.15 85);
-    /* Effects */
-    --glass:        oklch(98% 0.005 60 / 0.8);
-    --glass-border: oklch(85% 0.01 60 / 0.5);
-    /* Brand */
-    --php:          oklch(55% 0.1 285);
-}
+/* ============================================
+   LAYER DECLARATION
+   Must cascade after base.css layers
+   ============================================ */
 
-/* === Dark Theme (System Preference) === */
-@media (prefers-color-scheme: dark) {
-    :root:not(.light) {
+@layer site-tokens, site-components, site-utilities;
+
+/* ============================================
+   SITE TOKENS - Extended for Marketing
+   ============================================ */
+
+@layer site-tokens {
+    :root {
+        /* Scale tokens (spacing/type/transitions/fonts/container-xl) now live in the
+           canonical base.css @layer tokens. site.css overrides a token only where this
+           site genuinely differs; below is just the per-site marketing set. */
+
+        /* Content-width column — Narrow/Normal/Wide drive this as a fraction of the
+           VIEWPORT (screen) width: narrow 50vw, normal 75vw, wide = fill. Each section
+           caps at it (centred) and, living inside the sidebar-offset main, is clamped to
+           the area between the pinned sidebars — so narrow is always 50% of the screen,
+           while normal/wide fill the available area when the sidebars leave less. */
+        --content-max: 75vw;   /* normal */
+
+        /* Marketing tokens (per-site: hero image path is site-relative) */
+        --hero-bg: url('Server_Room_Dark.webp');
+        --particle-opacity: 0.3;
+    }
+
+    /* ============================================
+       OCEAN (CYAN-BLUE) - Default Theme (H=220)
+       ============================================ */
+
+    /* Light Theme (Ocean - Default) */
+    :root {
+        /* H=220 (cyan-blue) */
+        --bg-primary:   oklch(98% 0.008 220);
+        --bg-secondary: oklch(96% 0.012 220);
+        --bg-tertiary:  oklch(92% 0.018 220);
+        --fg-primary:   oklch(25% 0.06 220);
+        --fg-secondary: oklch(40% 0.08 220);
+        --fg-muted:     oklch(50% 0.06 220);
+        --accent:       oklch(50% 0.12 220);
+        --accent-hover: oklch(45% 0.14 220);
+        --accent-fg:    oklch(98% 0.01 220);
+        --accent-subtle:oklch(92% 0.025 220);
+        --accent-glow:  oklch(50% 0.12 220 / 0.3);
+        /* Over the dark hero image, adopt this scheme's dark-mode accent — see .hero-bg */
+        --accent-on-image:       oklch(75% 0.12 220);
+        --accent-on-image-hover: oklch(85% 0.1 220);
+        --accent-on-image-fg:    oklch(15% 0.04 220);
+        --accent-on-image-glow:  oklch(75% 0.12 220 / 0.4);
+        --border:       oklch(85% 0.02 220);
+        --border-muted: oklch(90% 0.015 220);
+        /* Semantic */
+        --success:      oklch(45% 0.15 145);
+        /* 52%, not 55%: --danger is also read as text on --bg-tertiary (92%) */
+        --danger:       oklch(52% 0.2 25);
+        --warning:      oklch(70% 0.15 85);
+        /* Glass */
+        --glass:        oklch(98% 0.008 220);
+        --glass-border: oklch(85% 0.02 220 / 0.5);
+        --nav-scrolled-bg: oklch(100% 0 0 / 0.95);
+    }
+
+    /* High-contrast: hard border (a11y). In the colour layer so it wins over the
+       --border default above when the user opts in. */
+    @media (prefers-contrast: more) {
+        :root { --border: currentColor; }
+    }
+
+    /* Dark Theme (System Preference) */
+    @media (prefers-color-scheme: dark) {
+        :root:not(.light) {
+            --bg-primary:   oklch(12% 0.015 220);
+            --bg-secondary: oklch(16% 0.02 220);
+            --bg-tertiary:  oklch(22% 0.025 220);
+            --fg-primary:   oklch(95% 0.02 220);
+            --fg-secondary: oklch(75% 0.05 220);
+            --fg-muted:     oklch(61% 0.04 220);
+            --accent:       oklch(75% 0.12 220);
+            --accent-hover: oklch(85% 0.1 220);
+            --accent-fg:    oklch(15% 0.04 220);
+            --accent-subtle:oklch(25% 0.04 220);
+            --accent-glow:  oklch(75% 0.12 220 / 0.4);
+            /* Already a dark-ground accent; the image needs no substitution */
+            --accent-on-image:       oklch(75% 0.12 220);
+            --accent-on-image-hover: oklch(85% 0.1 220);
+            --accent-on-image-fg:    oklch(15% 0.04 220);
+            --accent-on-image-glow:  oklch(75% 0.12 220 / 0.4);
+            --border:       oklch(30% 0.03 220);
+            --border-muted: oklch(22% 0.02 220);
+            --success:      oklch(70% 0.15 145);
+            --danger:       oklch(70% 0.18 25);
+            --warning:      oklch(80% 0.15 85);
+            --glass:        oklch(16% 0.02 220 / 0.85);
+            --glass-border: oklch(30% 0.03 220 / 0.5);
+            --nav-scrolled-bg: oklch(12% 0.015 220 / 0.9);
+            --particle-opacity: 0.3;
+            --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+        }
+    }
+
+    /* Dark Theme (Toggle Override) */
+    html.dark {
+        --bg-primary:   oklch(12% 0.015 220);
+        --bg-secondary: oklch(16% 0.02 220);
+        --bg-tertiary:  oklch(22% 0.025 220);
+        --fg-primary:   oklch(95% 0.02 220);
+        --fg-secondary: oklch(75% 0.05 220);
+        --fg-muted:     oklch(61% 0.04 220);
+        --accent:       oklch(75% 0.12 220);
+        --accent-hover: oklch(85% 0.1 220);
+        --accent-fg:    oklch(15% 0.04 220);
+        --accent-subtle:oklch(25% 0.04 220);
+        --accent-glow:  oklch(75% 0.12 220 / 0.4);
+        /* Already a dark-ground accent; the image needs no substitution */
+        --accent-on-image:       oklch(75% 0.12 220);
+        --accent-on-image-hover: oklch(85% 0.1 220);
+        --accent-on-image-fg:    oklch(15% 0.04 220);
+        --accent-on-image-glow:  oklch(75% 0.12 220 / 0.4);
+        --border:       oklch(30% 0.03 220);
+        --border-muted: oklch(22% 0.02 220);
+        --success:      oklch(70% 0.15 145);
+        --danger:       oklch(70% 0.18 25);
+        --warning:      oklch(80% 0.15 85);
+        --glass:        oklch(16% 0.02 220 / 0.85);
+        --glass-border: oklch(30% 0.03 220 / 0.5);
+        --nav-scrolled-bg: oklch(12% 0.015 220 / 0.9);
+        --particle-opacity: 0.3;
+        --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+    }
+
+    /* Light Theme (Toggle Override) */
+    html.light {
+        --bg-primary:   oklch(98% 0.008 220);
+        --bg-secondary: oklch(96% 0.012 220);
+        --bg-tertiary:  oklch(92% 0.018 220);
+        --fg-primary:   oklch(25% 0.06 220);
+        --fg-secondary: oklch(40% 0.08 220);
+        --fg-muted:     oklch(50% 0.06 220);
+        --accent:       oklch(50% 0.12 220);
+        --accent-hover: oklch(45% 0.14 220);
+        --accent-fg:    oklch(98% 0.01 220);
+        --accent-subtle:oklch(92% 0.025 220);
+        --accent-glow:  oklch(50% 0.12 220 / 0.3);
+        /* Over the dark hero image, adopt this scheme's dark-mode accent — see .hero-bg */
+        --accent-on-image:       oklch(75% 0.12 220);
+        --accent-on-image-hover: oklch(85% 0.1 220);
+        --accent-on-image-fg:    oklch(15% 0.04 220);
+        --accent-on-image-glow:  oklch(75% 0.12 220 / 0.4);
+        --border:       oklch(85% 0.02 220);
+        --border-muted: oklch(90% 0.015 220);
+        --glass:        oklch(98% 0.008 220);
+        --glass-border: oklch(85% 0.02 220 / 0.5);
+        --nav-scrolled-bg: oklch(100% 0 0 / 0.95);
+        --particle-opacity: 0.15;
+    }
+
+    /* Content-width toggle (Appearance panel): --content-max is a fraction of the
+       VIEWPORT width — narrow 50vw, normal 75vw, wide fill — so narrow is 50% of the
+       screen regardless of sidebar width. Each section caps at it; clamped to the area
+       between the pinned sidebars. Only applies in the >=960px pinned layout. */
+    html.narrow { --content-max: 50vw; }
+    html.wide   { --content-max: none; }
+
+    /* ============================================
+       COLOR SCHEMES - Crimson, Stone, Forest, Sunset
+       ============================================ */
+
+    /* Crimson (H=25 red) */
+    .scheme-crimson:not(.dark) {
+        --bg-primary:   oklch(98% 0.008 25);
+        --bg-secondary: oklch(96% 0.012 25);
+        --bg-tertiary:  oklch(92% 0.018 25);
+        --fg-primary:   oklch(25% 0.04 25);
+        --fg-secondary: oklch(40% 0.06 25);
+        --fg-muted:     oklch(50% 0.04 25);
+        --accent:       oklch(47% 0.2 25);
+        --accent-hover: oklch(42% 0.22 25);
+        --accent-fg:    oklch(98% 0.01 25);
+        --accent-subtle:oklch(92% 0.04 25);
+        --accent-glow:  oklch(47% 0.2 25 / 0.3);
+        /* Over the dark hero image, adopt this scheme's dark-mode accent — see .hero-bg */
+        --accent-on-image:       oklch(63% 0.23 25);
+        --accent-on-image-hover: oklch(70% 0.25 25);
+        --accent-on-image-fg:    oklch(15% 0.04 25);
+        --accent-on-image-glow:  oklch(63% 0.23 25 / 0.4);
+        --border:       oklch(85% 0.02 25);
+        --border-muted: oklch(90% 0.015 25);
+        --glass:        oklch(98% 0.008 25);
+        --glass-border: oklch(85% 0.02 25 / 0.5);
+        --nav-scrolled-bg: oklch(98% 0.008 25 / 0.9);
+    }
+    .scheme-crimson.dark {
+        --bg-primary:   oklch(10% 0.015 25);
+        --bg-secondary: oklch(14% 0.02 25);
+        --bg-tertiary:  oklch(20% 0.025 25);
+        --fg-primary:   oklch(95% 0.02 25);
+        --fg-secondary: oklch(75% 0.04 25);
+        --fg-muted:     oklch(61% 0.03 25);
+        /* Crimson dark is the only dark scheme authored with a LIGHT --accent-fg.
+           No lightness exists at which a mid crimson both reads as link text on
+           bg1-3 and hosts a 98%-L label, so the label flips dark and the accent
+           lifts to clear the backgrounds. */
+        --accent:       oklch(63% 0.23 25);
+        --accent-hover: oklch(70% 0.25 25);
+        --accent-fg:    oklch(15% 0.04 25);
+        --accent-subtle:oklch(20% 0.05 25);
+        --accent-glow:  oklch(63% 0.23 25 / 0.4);
+        /* Already a dark-ground accent; the image needs no substitution */
+        --accent-on-image:       oklch(63% 0.23 25);
+        --accent-on-image-hover: oklch(70% 0.25 25);
+        --accent-on-image-fg:    oklch(15% 0.04 25);
+        --accent-on-image-glow:  oklch(63% 0.23 25 / 0.4);
+        --border:       oklch(28% 0.03 25);
+        --border-muted: oklch(20% 0.02 25);
+        --glass:        oklch(14% 0.02 25 / 0.85);
+        --glass-border: oklch(28% 0.03 25 / 0.5);
+        --nav-scrolled-bg: oklch(10% 0.015 25 / 0.9);
+    }
+
+    /* Stone (H=60 warm neutral) */
+    .scheme-stone:not(.dark) {
+        --bg-primary:   oklch(98% 0.005 60);
+        --bg-secondary: oklch(96% 0.008 60);
+        --bg-tertiary:  oklch(92% 0.012 60);
+        --fg-primary:   oklch(25% 0.02 60);
+        --fg-secondary: oklch(45% 0.02 60);
+        --fg-muted:     oklch(50% 0.015 60);
+        --accent:       oklch(45% 0.05 60);
+        --accent-hover: oklch(35% 0.06 60);
+        --accent-fg:    oklch(98% 0.005 60);
+        --accent-subtle:oklch(92% 0.015 60);
+        --accent-glow:  oklch(45% 0.05 60 / 0.3);
+        /* Over the dark hero image, adopt this scheme's dark-mode accent — see .hero-bg */
+        --accent-on-image:       oklch(80% 0.03 60);
+        --accent-on-image-hover: oklch(90% 0.02 60);
+        --accent-on-image-fg:    oklch(20% 0.02 60);
+        --accent-on-image-glow:  oklch(80% 0.03 60 / 0.3);
+        --border:       oklch(85% 0.01 60);
+        --border-muted: oklch(90% 0.008 60);
+        --glass:        oklch(98% 0.005 60);
+        --glass-border: oklch(85% 0.01 60 / 0.5);
+        --nav-scrolled-bg: oklch(98% 0.005 60 / 0.9);
+    }
+    .scheme-stone.dark {
         --bg-primary:   oklch(12% 0.01 60);
         --bg-secondary: oklch(16% 0.012 60);
         --bg-tertiary:  oklch(22% 0.015 60);
         --fg-primary:   oklch(95% 0.01 60);
         --fg-secondary: oklch(75% 0.015 60);
-        --fg-muted:     oklch(55% 0.015 60);
+        --fg-muted:     oklch(61% 0.015 60);
         --accent:       oklch(80% 0.03 60);
         --accent-hover: oklch(90% 0.02 60);
         --accent-fg:    oklch(20% 0.02 60);
         --accent-subtle:oklch(25% 0.02 60);
+        --accent-glow:  oklch(80% 0.03 60 / 0.3);
+        /* Already a dark-ground accent; the image needs no substitution */
+        --accent-on-image:       oklch(80% 0.03 60);
+        --accent-on-image-hover: oklch(90% 0.02 60);
+        --accent-on-image-fg:    oklch(20% 0.02 60);
+        --accent-on-image-glow:  oklch(80% 0.03 60 / 0.3);
         --border:       oklch(30% 0.015 60);
         --border-muted: oklch(22% 0.012 60);
-        --success:      oklch(70% 0.15 145);
-        --danger:       oklch(70% 0.18 25);
-        --warning:      oklch(80% 0.15 85);
         --glass:        oklch(16% 0.012 60 / 0.85);
         --glass-border: oklch(30% 0.015 60 / 0.5);
-        /* Shadows need higher opacity on dark backgrounds */
-        --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
-        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
-        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+        --nav-scrolled-bg: oklch(12% 0.01 60 / 0.9);
+    }
+
+    /* Forest (H=150 green) */
+    .scheme-forest:not(.dark) {
+        --bg-primary:   oklch(98% 0.008 150);
+        --bg-secondary: oklch(96% 0.012 150);
+        --bg-tertiary:  oklch(92% 0.018 150);
+        --fg-primary:   oklch(25% 0.06 150);
+        --fg-secondary: oklch(40% 0.08 150);
+        --fg-muted:     oklch(50% 0.06 150);
+        --accent:       oklch(49% 0.12 150);
+        --accent-hover: oklch(44% 0.14 150);
+        --accent-fg:    oklch(98% 0.01 150);
+        --accent-subtle:oklch(92% 0.025 150);
+        --accent-glow:  oklch(49% 0.12 150 / 0.3);
+        /* Over the dark hero image, adopt this scheme's dark-mode accent — see .hero-bg */
+        --accent-on-image:       oklch(70% 0.12 150);
+        --accent-on-image-hover: oklch(80% 0.1 150);
+        --accent-on-image-fg:    oklch(15% 0.04 150);
+        --accent-on-image-glow:  oklch(70% 0.12 150 / 0.3);
+        --border:       oklch(85% 0.02 150);
+        --border-muted: oklch(90% 0.015 150);
+        --glass:        oklch(98% 0.008 150);
+        --glass-border: oklch(85% 0.02 150 / 0.5);
+        --nav-scrolled-bg: oklch(98% 0.008 150 / 0.9);
+    }
+    .scheme-forest.dark {
+        --bg-primary:   oklch(12% 0.015 150);
+        --bg-secondary: oklch(16% 0.02 150);
+        --bg-tertiary:  oklch(22% 0.025 150);
+        --fg-primary:   oklch(95% 0.02 150);
+        --fg-secondary: oklch(75% 0.05 150);
+        --fg-muted:     oklch(61% 0.04 150);
+        --accent:       oklch(70% 0.12 150);
+        --accent-hover: oklch(80% 0.1 150);
+        --accent-fg:    oklch(15% 0.04 150);
+        --accent-subtle:oklch(25% 0.04 150);
+        --accent-glow:  oklch(70% 0.12 150 / 0.3);
+        /* Already a dark-ground accent; the image needs no substitution */
+        --accent-on-image:       oklch(70% 0.12 150);
+        --accent-on-image-hover: oklch(80% 0.1 150);
+        --accent-on-image-fg:    oklch(15% 0.04 150);
+        --accent-on-image-glow:  oklch(70% 0.12 150 / 0.3);
+        --border:       oklch(30% 0.03 150);
+        --border-muted: oklch(22% 0.02 150);
+        --glass:        oklch(16% 0.02 150 / 0.85);
+        --glass-border: oklch(30% 0.03 150 / 0.5);
+        --nav-scrolled-bg: oklch(12% 0.015 150 / 0.9);
+    }
+
+    /* Sunset (H=45 orange-amber) */
+    .scheme-sunset:not(.dark) {
+        --bg-primary:   oklch(98% 0.01 45);
+        --bg-secondary: oklch(96% 0.015 45);
+        --bg-tertiary:  oklch(92% 0.02 45);
+        --fg-primary:   oklch(30% 0.08 45);
+        --fg-secondary: oklch(42% 0.1 45);
+        --fg-muted:     oklch(50% 0.08 45);
+        --accent:       oklch(52% 0.16 45);
+        --accent-hover: oklch(46% 0.18 45);
+        --accent-fg:    oklch(98% 0.01 45);
+        --accent-subtle:oklch(92% 0.03 45);
+        --accent-glow:  oklch(52% 0.16 45 / 0.3);
+        /* Over the dark hero image, adopt this scheme's dark-mode accent — see .hero-bg */
+        --accent-on-image:       oklch(72% 0.14 45);
+        --accent-on-image-hover: oklch(82% 0.12 45);
+        --accent-on-image-fg:    oklch(15% 0.05 45);
+        --accent-on-image-glow:  oklch(72% 0.14 45 / 0.3);
+        --border:       oklch(85% 0.025 45);
+        --border-muted: oklch(90% 0.02 45);
+        --glass:        oklch(98% 0.01 45);
+        --glass-border: oklch(85% 0.025 45 / 0.5);
+        --nav-scrolled-bg: oklch(98% 0.01 45 / 0.9);
+    }
+    .scheme-sunset.dark {
+        --bg-primary:   oklch(12% 0.02 45);
+        --bg-secondary: oklch(16% 0.025 45);
+        --bg-tertiary:  oklch(22% 0.03 45);
+        --fg-primary:   oklch(95% 0.025 45);
+        --fg-secondary: oklch(75% 0.06 45);
+        --fg-muted:     oklch(61% 0.05 45);
+        --accent:       oklch(72% 0.14 45);
+        --accent-hover: oklch(82% 0.12 45);
+        --accent-fg:    oklch(15% 0.05 45);
+        --accent-subtle:oklch(25% 0.05 45);
+        --accent-glow:  oklch(72% 0.14 45 / 0.3);
+        /* Already a dark-ground accent; the image needs no substitution */
+        --accent-on-image:       oklch(72% 0.14 45);
+        --accent-on-image-hover: oklch(82% 0.12 45);
+        --accent-on-image-fg:    oklch(15% 0.05 45);
+        --accent-on-image-glow:  oklch(72% 0.14 45 / 0.3);
+        --border:       oklch(30% 0.035 45);
+        --border-muted: oklch(22% 0.025 45);
+        --glass:        oklch(16% 0.025 45 / 0.85);
+        --glass-border: oklch(30% 0.035 45 / 0.5);
+        --nav-scrolled-bg: oklch(12% 0.02 45 / 0.9);
+    }
+
+    /* Mono (C=0 pure grayscale; status colors inherited from :root defaults) */
+    .scheme-mono:not(.dark) {
+        --bg-primary:   oklch(98% 0 0);
+        --bg-secondary: oklch(96% 0 0);
+        --bg-tertiary:  oklch(92% 0 0);
+        --fg-primary:   oklch(20% 0 0);
+        --fg-secondary: oklch(40% 0 0);
+        --fg-muted:     oklch(50% 0 0);
+        --accent:       oklch(25% 0 0);
+        --accent-hover: oklch(35% 0 0);
+        --accent-fg:    oklch(98% 0 0);
+        --accent-subtle:oklch(90% 0 0);
+        --accent-glow:  oklch(25% 0 0 / 0.2);
+        /* Over the dark hero image, adopt this scheme's dark-mode accent — see .hero-bg */
+        --accent-on-image:       oklch(85% 0 0);
+        --accent-on-image-hover: oklch(92% 0 0);
+        --accent-on-image-fg:    oklch(12% 0 0);
+        --accent-on-image-glow:  oklch(85% 0 0 / 0.3);
+        --border:       oklch(85% 0 0);
+        --border-muted: oklch(90% 0 0);
+        --glass:        oklch(98% 0 0);
+        --glass-border: oklch(85% 0 0 / 0.5);
+        --nav-scrolled-bg: oklch(100% 0 0 / 0.95);
+    }
+    .scheme-mono.dark {
+        --bg-primary:   oklch(10% 0 0);
+        --bg-secondary: oklch(15% 0 0);
+        --bg-tertiary:  oklch(22% 0 0);
+        --fg-primary:   oklch(95% 0 0);
+        --fg-secondary: oklch(75% 0 0);
+        --fg-muted:     oklch(61% 0 0);
+        --accent:       oklch(85% 0 0);
+        --accent-hover: oklch(92% 0 0);
+        --accent-fg:    oklch(12% 0 0);
+        --accent-subtle:oklch(25% 0 0);
+        --accent-glow:  oklch(85% 0 0 / 0.3);
+        /* Already a dark-ground accent; the image needs no substitution */
+        --accent-on-image:       oklch(85% 0 0);
+        --accent-on-image-hover: oklch(92% 0 0);
+        --accent-on-image-fg:    oklch(12% 0 0);
+        --accent-on-image-glow:  oklch(85% 0 0 / 0.3);
+        --border:       oklch(30% 0 0);
+        --border-muted: oklch(22% 0 0);
+        --glass:        oklch(15% 0 0 / 0.85);
+        --glass-border: oklch(30% 0 0 / 0.5);
+        --nav-scrolled-bg: oklch(10% 0 0 / 0.9);
     }
 }
 
-/* === Dark Theme (Toggle Override) === */
-html.dark {
-    --bg-primary:   oklch(12% 0.01 60);
-    --bg-secondary: oklch(16% 0.012 60);
-    --bg-tertiary:  oklch(22% 0.015 60);
-    --fg-primary:   oklch(95% 0.01 60);
-    --fg-secondary: oklch(75% 0.015 60);
-    --fg-muted:     oklch(55% 0.015 60);
-    --accent:       oklch(80% 0.03 60);
-    --accent-hover: oklch(90% 0.02 60);
-    --accent-fg:    oklch(20% 0.02 60);
-    --accent-subtle:oklch(25% 0.02 60);
-    --border:       oklch(30% 0.015 60);
-    --border-muted: oklch(22% 0.012 60);
-    --success:      oklch(70% 0.15 145);
-    --danger:       oklch(70% 0.18 25);
-    --warning:      oklch(80% 0.15 85);
-    --glass:        oklch(16% 0.012 60 / 0.85);
-    --glass-border: oklch(30% 0.015 60 / 0.5);
-    /* Shadows need higher opacity on dark backgrounds */
-    --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+/* ============================================
+   SITE COMPONENTS - Marketing Layout
+   ============================================ */
+
+@layer site-components {
+    /* ============================================
+       TYPOGRAPHY - Heading Fonts
+       ============================================ */
+
+    h1, h2, h3, h4, h5, h6,
+    .section-title,
+    .footer-brand {
+        font-family: var(--font-heading);
+    }
+
+    /* ============================================
+       LAYOUT OVERRIDES - Edge-to-Edge Marketing
+       ============================================ */
+
+    /* Content-width column: the Appearance Narrow/Normal/Wide buttons drive
+       --content-max; main#content caps at it (margin-inline auto) so the whole content
+       column narrows/widens. The hero's fixed background still spans full-bleed. */
+    main {
+        padding: 0;
+    }
+
+    /* Content-width column: cap each SECTION at --content-max (centered), NOT main
+       itself — main keeps base.css's pinned-sidebar margins, so pinning still restricts
+       the available width and the two compose (content width = min(--content-max, the
+       area between pinned sidebars)). The Appearance Narrow/Normal/Wide toggle drives
+       --content-max; the hero's fixed background stays full-bleed. */
+    @media (min-width: 960px) {
+        main > section {
+            max-width: var(--content-max);
+            margin-inline: auto;
+        }
+    }
+
+    /* Overlay visible on mobile when sidebar open (base.css controls visibility) */
+
+    /* ============================================
+       APP SHELL - Translucent Sidebars
+       ============================================ */
+
+    .sidebar {
+        background: var(--glass);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+
+    .carousel-header {
+        border-block-end-color: var(--glass-border);
+    }
+
+    .sidebar nav a {
+        color: var(--fg-secondary);
+    }
+
+    .sidebar nav a:hover {
+        color: var(--accent);
+        background: var(--accent-subtle);
+    }
+
+    .sidebar nav a.active {
+        color: var(--accent);
+        background: var(--accent-subtle);
+        border-color: var(--accent);
+    }
+
+    /* Topnav styling */
+    .topnav {
+        background: var(--glass);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-block-end: 1px solid var(--glass-border);
+    }
+
+    .topnav .brand {
+        font-family: var(--font-heading);
+        font-weight: 700;
+        color: var(--fg-primary);
+    }
+
+    .topnav .brand span {
+        color: var(--accent);
+    }
+
+    /* ============================================
+       GLOBAL BACKGROUND IMAGE
+       ============================================ */
+
+    body {
+        background: var(--hero-bg) center/cover fixed;
+        background-attachment: fixed;
+        min-height: 100vh;
+    }
+
+    /* ============================================
+       HERO SECTION
+       ============================================ */
+
+    .hero {
+        text-align: center;
+        padding: var(--space-16) var(--space-4);
+    }
+
+    .hero-bg {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    /* No hero scrim: Server_Room_Dark.webp is already darkened (it bakes in its own
+       overlay), so a ::before scrim doubled it. The pre-darkened image carries the
+       white hero text on its own. */
+
+    html.light .hero-bg p { color: #fff; }
+
+    /* The hero and the image sections sit on Server_Room_Dark.webp, which bakes in
+       its own darkening — a dark ground in every scheme and both modes. A light
+       mode's --accent is tuned for a near-white surface and loses contrast there,
+       so each context declares what its accent becomes over the image (light modes
+       nominate their own dark-mode accent; dark modes nominate themselves).
+
+       --accent-fg moves WITH --accent: .cta-btn.primary lives inside .hero-bg and
+       pairs them. The hand-authored mono rule this replaces moved --accent and
+       --accent-fg only, and only for mono — every other light scheme kept a
+       light-tuned accent over the dark photo. */
+    .hero-bg,
+    .bg-image-section {
+        --accent:       var(--accent-on-image);
+        --accent-hover: var(--accent-on-image-hover);
+        --accent-fg:    var(--accent-on-image-fg);
+        --accent-glow:  var(--accent-on-image-glow);
+    }
+
+    .hero-bg > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-bg h1 {
+        color: #fff;
+        font-size: clamp(2.5rem, 2rem + 5vw, 5rem);
+        line-height: 1.1;
+        margin-block-end: var(--space-4);
+    }
+
+    .hero-bg p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: var(--text-xl);
+        max-width: 600px;
+        margin-inline: auto;
+    }
+
+    .hero-content {
+        text-align: center;
+        max-width: var(--container-lg);
+        animation: fade-in-up 1s var(--ease-out);
+    }
+
+    /* Hero badge */
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        background: rgb(255 255 255 / 0.1);
+        border: 1px solid rgb(255 255 255 / 0.2);
+        padding: var(--space-2) var(--space-5);
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
+        color: #fff;
+        margin-block-end: var(--space-8);
+        backdrop-filter: blur(10px);
+    }
+
+    /* Gradient text - uses accent color */
+    .gradient-text {
+        color: var(--accent);
+    }
+
+    /* Shimmer gradient text */
+    .shimmer-text {
+        background: linear-gradient(
+            90deg,
+            var(--accent) 0%,
+            var(--accent) 35%,
+            oklch(95% 0.05 200) 50%,
+            var(--accent) 65%,
+            var(--accent) 100%
+        );
+        background-size: 200% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shimmer 10s linear infinite;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    /* Page hero (shorter) */
+    .page-hero {
+        min-height: 50vh;
+    }
+
+    /* ============================================
+       SECTIONS
+       ============================================ */
+
+    /* Content section */
+    .content-section {
+        background: var(--bg-secondary);
+        padding: var(--space-16) var(--space-4);
+    }
+
+    /* Section with background image visible (no solid bg) */
+    .bg-image-section {
+        position: relative;
+        min-height: 30vh;
+        padding: var(--space-16) var(--space-4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* No dark scrim: the background image is already darkened, and with the content
+       column capped (main max-width) a centered overlay block would read as a dark
+       rectangle on the full-bleed body image — so it's removed in both modes. */
+
+    .bg-image-section > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .bg-image-section .section-title,
+    .bg-image-section .section-subtitle { color: #fff; }
+
+    .bg-image-section .section-tag { color: var(--accent); }
+
+    .bg-image-section .section-header { margin-block-end: 0; }
+
+    /* Section header */
+    .section-header {
+        text-align: center;
+        margin-block-end: var(--space-12);
+    }
+
+    .section-tag {
+        display: inline-block;
+        color: var(--accent);
+        font-weight: 600;
+        font-size: var(--text-sm);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-block-end: var(--space-4);
+    }
+
+    .section-title {
+        font-size: var(--text-4xl);
+        font-weight: 700;
+        margin-block-end: var(--space-4);
+        color: var(--fg-primary);
+    }
+
+    .section-subtitle {
+        color: var(--fg-secondary);
+        font-size: var(--text-lg);
+        max-width: 600px;
+        margin-inline: auto;
+    }
+
+    .section-lede {
+        max-width: 720px;
+        margin: 0 auto var(--space-12);
+        text-align: center;
+        font-size: var(--text-lg);
+        line-height: 1.7;
+        color: var(--fg-secondary);
+    }
+
+    .section-lede code {
+        background: var(--bg-tertiary);
+        padding: 0.1em 0.4em;
+        border-radius: var(--radius-sm);
+        font-size: 0.9em;
+        color: var(--fg-primary);
+    }
+
+    .section-lede strong {
+        color: var(--fg-primary);
+    }
+
+    /* ============================================
+       SERVICE CARDS
+       ============================================ */
+
+    .services-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+        max-width: none;
+        margin-inline: auto;
+    }
+
+    .service-card {
+        background: var(--glass);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        padding: var(--space-6);
+        border-radius: var(--radius-xl);
+        position: relative;
+        overflow: hidden;
+        /* Initial transparent shadow for smooth transition */
+        box-shadow: 0 20px 40px rgb(0 0 0 / 0), 0 0 20px transparent;
+        /* Explicit transition properties for reliable hover */
+        transition:
+            transform var(--transition-medium),
+            box-shadow var(--transition-medium),
+            border-color var(--transition-medium);
+    }
+
+    .service-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--accent);
+        opacity: 0;
+        transition: opacity var(--transition-medium);
+    }
+
+    .service-card:hover,
+    .service-card.reveal.active:hover {
+        transform: translateY(-4px) scale(1);
+        border-color: var(--accent);
+        box-shadow: 0 20px 40px rgb(0 0 0 / 0.15), 0 0 20px var(--accent-glow);
+    }
+
+    .service-card:hover::before { opacity: 1; }
+
+    .service-icon {
+        font-size: 2rem;
+        margin-block-end: var(--space-4);
+        display: block;
+        color: var(--accent);
+        transition: transform var(--transition-medium);
+    }
+
+    .service-icon .lucide,
+    .service-icon [data-lucide] {
+        width: 2rem;
+        height: 2rem;
+        color: var(--accent);
+        stroke: var(--accent);
+    }
+
+    .service-card:hover .service-icon { transform: scale(1.1); }
+
+    .service-card h3 {
+        font-size: var(--text-lg);
+        font-weight: 600;
+        margin-block-end: var(--space-3);
+        color: var(--fg-primary);
+    }
+
+    .service-card ul { list-style: none; }
+
+    .service-card li {
+        padding: 0.3rem 0;
+        padding-inline-start: var(--space-5);
+        position: relative;
+        color: var(--fg-secondary);
+        font-size: var(--text-sm);
+    }
+
+    .service-card li::before {
+        content: "\2713";
+        position: absolute;
+        left: 0;
+        color: var(--accent);
+        font-weight: bold;
+    }
+
+    /* "6 Color Schemes" cards — each card IS its scheme: bg = scheme bg, text =
+       scheme fg, icon + hover top-border + checkmarks = scheme accent. Theme-aware
+       (light/dark). The card's own rules already read --glass / --accent / --fg-*,
+       so we just remap those from the per-scheme --sw-* tokens below. Values mirror
+       the .scheme-* blocks above. */
+    .service-card[data-card-scheme] {
+        --glass: var(--sw-bg);
+        --glass-border: color-mix(in oklch, var(--sw-fg) 14%, transparent);
+        --accent: var(--sw-ac);
+        --accent-glow: color-mix(in oklch, var(--sw-ac) 30%, transparent);
+        --fg-primary: var(--sw-fg);
+        --fg-secondary: color-mix(in oklch, var(--sw-fg) 68%, var(--sw-bg));
+    }
+
+    /* per-scheme colours — light */
+    .service-card[data-card-scheme="ocean"]   { --sw-bg: oklch(98% 0.008 220); --sw-fg: oklch(25% 0.06 220); --sw-ac: oklch(50% 0.12 220); }
+    .service-card[data-card-scheme="crimson"] { --sw-bg: oklch(98% 0.008 25);  --sw-fg: oklch(25% 0.04 25);  --sw-ac: oklch(47% 0.2 25); }
+    .service-card[data-card-scheme="stone"]   { --sw-bg: oklch(98% 0.005 60);  --sw-fg: oklch(25% 0.02 60);  --sw-ac: oklch(45% 0.05 60); }
+    .service-card[data-card-scheme="forest"]  { --sw-bg: oklch(98% 0.008 150); --sw-fg: oklch(25% 0.06 150); --sw-ac: oklch(49% 0.12 150); }
+    .service-card[data-card-scheme="sunset"]  { --sw-bg: oklch(98% 0.01 45);   --sw-fg: oklch(30% 0.08 45);  --sw-ac: oklch(52% 0.16 45); }
+    .service-card[data-card-scheme="mono"]    { --sw-bg: oklch(98% 0 0);       --sw-fg: oklch(20% 0 0);      --sw-ac: oklch(25% 0 0); }
+
+    /* per-scheme colours — dark */
+    html.dark .service-card[data-card-scheme="ocean"]   { --sw-bg: oklch(12% 0.015 220); --sw-fg: oklch(95% 0.02 220); --sw-ac: oklch(75% 0.12 220); }
+    html.dark .service-card[data-card-scheme="crimson"] { --sw-bg: oklch(10% 0.015 25);  --sw-fg: oklch(95% 0.02 25);  --sw-ac: oklch(63% 0.23 25); }
+    html.dark .service-card[data-card-scheme="stone"]   { --sw-bg: oklch(12% 0.01 60);   --sw-fg: oklch(95% 0.01 60);  --sw-ac: oklch(80% 0.03 60); }
+    html.dark .service-card[data-card-scheme="forest"]  { --sw-bg: oklch(12% 0.015 150); --sw-fg: oklch(95% 0.02 150); --sw-ac: oklch(70% 0.12 150); }
+    html.dark .service-card[data-card-scheme="sunset"]  { --sw-bg: oklch(12% 0.02 45);   --sw-fg: oklch(95% 0.025 45); --sw-ac: oklch(72% 0.14 45); }
+    html.dark .service-card[data-card-scheme="mono"]    { --sw-bg: oklch(10% 0 0);       --sw-fg: oklch(95% 0 0);      --sw-ac: oklch(85% 0 0); }
+
+    .services-grid-2col { grid-template-columns: 1fr; }
+
+    /* ============================================
+       PRICING TABLES
+       ============================================ */
+
+    .pricing-tables-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-6);
+        max-width: none;
+        margin-inline: auto;
+    }
+
+    .pricing-table {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+    }
+
+    .pricing-table-header {
+        background: var(--accent);
+        color: var(--accent-fg);
+        padding: var(--space-4);
+        text-align: center;
+        font-family: var(--font-heading);
+        font-size: var(--text-lg);
+        font-weight: 600;
+    }
+
+    .pricing-table-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--space-3) var(--space-4);
+        border-bottom: 1px solid var(--glass-border);
+        transition: background-color var(--transition-base);
+    }
+
+    .pricing-table-row:last-child { border-bottom: none; }
+    .pricing-table-row:hover { background: var(--accent-subtle); }
+    .pricing-table-row span:first-child { color: var(--fg-secondary); }
+    .pricing-table-row span:first-child strong { color: var(--fg-primary); }
+    .pricing-table-row span:last-child { color: var(--accent); font-weight: 600; }
+
+    /* ============================================
+       CTA BUTTONS
+       ============================================ */
+
+    .cta-group {
+        display: flex;
+        gap: var(--space-4);
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: var(--space-8);
+    }
+
+    .cta-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-3) var(--space-6);
+        border-radius: var(--radius-lg);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: var(--text-base);
+        transition:
+            background-color var(--transition-base),
+            transform var(--transition-base),
+            box-shadow var(--transition-base);
+    }
+
+    .cta-btn.primary {
+        background: var(--accent);
+        color: var(--accent-fg);
+        box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    .cta-btn.primary:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px var(--accent-glow);
+        text-decoration: none;
+    }
+
+    /* The outlined CTA was authored white-on-10%-white for the hero, but it is also
+       used in #build, an opaque .content-section (--bg-secondary, 96% L in light
+       mode) — white on 96% white is invisible text, not low contrast. So the base
+       rule is base.css's own .btn-outline treatment (transparent + --border +
+       --fg-primary) and the always-dark grounds keep the frosted white explicitly.
+       Same principle as --accent-on-image: the element does not guess its ground,
+       the ground declares itself.
+
+       --border does not itself clear the 1.4.11 3:1 non-text floor in any of the
+       twelve contexts (85% L over a 96% L --bg-secondary in light modes). That is a
+       palette-wide gap, not this button's — it is deliberately spent through the
+       token rather than patched here with a bespoke mix, so that raising --border
+       fixes this control along with every other bordered one. The label itself
+       clears AA, so the control stays identifiable meanwhile. */
+    .cta-btn.secondary {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--fg-primary);
+    }
+
+    /* .cta-btn.secondary is transparent, so its resting background IS whatever
+       surface it sits on; hovering to --bg-secondary would be invisible inside
+       #build, which is exactly what .content-section paints. --bg-tertiary differs
+       from both --bg-primary and --bg-secondary, so the hover reads on either.
+       This matches base.css, which had the same flaw in .btn-outline/.btn-ghost
+       until v1.0.2 fixed it framework-wide; .cta-btn is a site class, so it still
+       needs its own rule. */
+    .cta-btn.secondary:hover {
+        background: var(--bg-tertiary);
+        border-color: var(--fg-muted);
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+
+    .hero-bg .cta-btn.secondary,
+    .bg-image-section .cta-btn.secondary {
+        background: rgb(255 255 255 / 0.1);
+        border-color: rgb(255 255 255 / 0.3);
+        color: #fff;
+        backdrop-filter: blur(10px);
+    }
+
+    .hero-bg .cta-btn.secondary:hover,
+    .bg-image-section .cta-btn.secondary:hover {
+        background: rgb(255 255 255 / 0.2);
+        border-color: #fff;
+    }
+
+    /* ============================================
+       PARTICLES
+       ============================================ */
+
+    .particles {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        overflow: hidden;
+    }
+
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: var(--accent);
+        border-radius: var(--radius-full);
+        opacity: var(--particle-opacity);
+        animation: float-up 15s linear infinite;
+    }
+
+    @keyframes float-up {
+        0% { transform: translateY(100vh) scale(0); opacity: 0; }
+        10%, 90% { opacity: var(--particle-opacity); }
+        100% { transform: translateY(-100vh) scale(1); opacity: 0; }
+    }
+
+    /* ============================================
+       FOOTER
+       ============================================ */
+
+    .footer-main {
+        background: var(--bg-secondary);
+        border-block-start: 1px solid var(--glass-border);
+        padding: var(--space-12) var(--space-4) var(--space-8);
+    }
+
+    .footer-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-8);
+        max-width: none;
+        margin-inline: auto;
+    }
+
+    .footer-col .footer-brand {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-block-end: var(--space-4);
+        color: var(--fg-primary);
+    }
+
+    .footer-col .footer-brand span { color: var(--accent); }
+
+    .footer-col h4 {
+        font-size: var(--text-base);
+        font-weight: 600;
+        color: var(--fg-primary);
+        margin-block-end: var(--space-4);
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+    }
+
+    .footer-col h4 .lucide,
+    .footer-col h4 [data-lucide] {
+        color: var(--accent);
+        stroke: var(--accent);
+    }
+
+    .footer-col p {
+        color: var(--fg-secondary);
+        font-size: var(--text-sm);
+        margin-block-end: var(--space-2);
+    }
+
+    .footer-col .contact-line {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        margin-block-end: var(--space-2);
+        font-size: var(--text-sm);
+        color: var(--fg-secondary);
+    }
+
+    .footer-col .contact-line .lucide,
+    .footer-col .contact-line [data-lucide] {
+        color: var(--accent);
+        stroke: var(--accent);
+        flex-shrink: 0;
+    }
+
+    .footer-col .contact-line a {
+        color: var(--fg-secondary);
+        text-decoration: none;
+        transition: color var(--transition-fast);
+    }
+
+    .footer-col .contact-line a:hover { color: var(--accent); }
+
+    .footer-copyright {
+        border-block-start: 1px solid var(--glass-border);
+        margin-block-start: var(--space-8);
+        padding-block-start: var(--space-6);
+        text-align: center;
+        color: var(--fg-muted);
+        font-size: var(--text-xs);
+    }
+
+    /* ============================================
+       ANIMATIONS
+       ============================================ */
+
+    @keyframes fade-in-up {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+        opacity: 0;
+        transform: translateY(100px) scale(0.95);
+        transition: opacity var(--transition-long), transform var(--transition-long);
+    }
+
+    /* Anything already on screen at load is snapped visible with no slide-up.
+       initScrollReveal does that by suppressing this transition for one frame and
+       then handing it straight back, NOT with a `.reveal-instant { transition:none }`
+       class — that class was permanent, so it also killed the hover lift on every
+       card that happened to be above the fold. Only sections scrolled into view
+       afterwards animate their entrance. */
+
+    .reveal.active {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    /* ============================================
+       RESPONSIVE - Standardized breakpoints
+       600px, 900px, 1200px
+       ============================================ */
+
+    @media (min-width: 600px) {
+        .services-grid { grid-template-columns: repeat(2, 1fr); }
+        .pricing-tables-grid { grid-template-columns: repeat(2, 1fr); }
+        .services-grid-2col { grid-template-columns: repeat(2, 1fr); }
+        .footer-grid { grid-template-columns: repeat(2, 1fr); }
+        .service-card { padding: var(--space-8); }
+    }
+
+    @media (min-width: 900px) {
+        .pricing-tables-3col,
+        .services-grid-3col { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (min-width: 1200px) {
+        .bg-image-section { min-height: 40vh; }
+        .services-grid { grid-template-columns: repeat(4, 1fr); }
+        .services-grid-2col { grid-template-columns: repeat(2, 1fr); }
+        .services-grid-3col { grid-template-columns: repeat(3, 1fr); }
+        .footer-grid { grid-template-columns: repeat(4, 1fr); }
+    }
 }
 
-/* === Color Schemes ===
- * Same lightness structure, only hue changes:
- * Stone: H=60 | Ocean: H=220 | Forest: H=150 | Sunset: H=45
- */
+/* ============================================
+   SITE UTILITIES - Site-specific only
+   No duplicates from base.css
+   ============================================ */
 
-/* Ocean (H=220 cyan-blue, higher chroma for vibrancy) */
-.scheme-ocean:not(.dark) {
-    --bg-primary:   oklch(98% 0.008 220);
-    --bg-secondary: oklch(96% 0.012 220);
-    --bg-tertiary:  oklch(92% 0.018 220);
-    --fg-primary:   oklch(25% 0.06 220);
-    --fg-secondary: oklch(40% 0.08 220);
-    --fg-muted:     oklch(50% 0.06 220);
-    --accent:       oklch(55% 0.12 220);
-    --accent-hover: oklch(60% 0.14 220);
-    --accent-fg:    oklch(98% 0.01 220);
-    --accent-subtle:oklch(92% 0.025 220);
-    --border:       oklch(85% 0.02 220);
-    --border-muted: oklch(90% 0.015 220);
-    --glass:        oklch(98% 0.008 220 / 0.8);
-    --glass-border: oklch(85% 0.02 220 / 0.5);
-}
-.scheme-ocean.dark {
-    --bg-primary:   oklch(12% 0.015 220);
-    --bg-secondary: oklch(16% 0.02 220);
-    --bg-tertiary:  oklch(22% 0.025 220);
-    --fg-primary:   oklch(95% 0.02 220);
-    --fg-secondary: oklch(75% 0.05 220);
-    --fg-muted:     oklch(55% 0.04 220);
-    --accent:       oklch(75% 0.12 220);
-    --accent-hover: oklch(85% 0.1 220);
-    --accent-fg:    oklch(15% 0.04 220);
-    --accent-subtle:oklch(25% 0.04 220);
-    --border:       oklch(30% 0.03 220);
-    --border-muted: oklch(22% 0.02 220);
-    --glass:        oklch(16% 0.02 220 / 0.85);
-    --glass-border: oklch(30% 0.03 220 / 0.5);
-}
+@layer site-utilities {
+    /* Marketing-specific spacing (larger than base.css --space-8) */
+    .mt-8 { margin-block-start: var(--space-8); }
+    .mb-8 { margin-block-end: var(--space-8); }
+    .mt-12 { margin-block-start: var(--space-12); }
+    .mb-12 { margin-block-end: var(--space-12); }
 
-/* Forest (H=150 green) */
-.scheme-forest:not(.dark) {
-    --bg-primary:   oklch(98% 0.008 150);
-    --bg-secondary: oklch(96% 0.012 150);
-    --bg-tertiary:  oklch(92% 0.018 150);
-    --fg-primary:   oklch(25% 0.06 150);
-    --fg-secondary: oklch(40% 0.08 150);
-    --fg-muted:     oklch(50% 0.06 150);
-    --accent:       oklch(50% 0.12 150);
-    --accent-hover: oklch(55% 0.14 150);
-    --accent-fg:    oklch(98% 0.01 150);
-    --accent-subtle:oklch(92% 0.025 150);
-    --border:       oklch(85% 0.02 150);
-    --border-muted: oklch(90% 0.015 150);
-    --glass:        oklch(98% 0.008 150 / 0.8);
-    --glass-border: oklch(85% 0.02 150 / 0.5);
-}
-.scheme-forest.dark {
-    --bg-primary:   oklch(12% 0.015 150);
-    --bg-secondary: oklch(16% 0.02 150);
-    --bg-tertiary:  oklch(22% 0.025 150);
-    --fg-primary:   oklch(95% 0.02 150);
-    --fg-secondary: oklch(75% 0.05 150);
-    --fg-muted:     oklch(55% 0.04 150);
-    --accent:       oklch(70% 0.12 150);
-    --accent-hover: oklch(80% 0.1 150);
-    --accent-fg:    oklch(15% 0.04 150);
-    --accent-subtle:oklch(25% 0.04 150);
-    --border:       oklch(30% 0.03 150);
-    --border-muted: oklch(22% 0.02 150);
-    --glass:        oklch(16% 0.02 150 / 0.85);
-    --glass-border: oklch(30% 0.03 150 / 0.5);
-}
+    /* Marketing-specific spacing utilities */
+    .mb-1 { margin-block-end: var(--space-4); }
+    .p-large { padding: var(--space-8); }
 
-/* Sunset (H=45 orange-amber) */
-.scheme-sunset:not(.dark) {
-    --bg-primary:   oklch(98% 0.01 45);
-    --bg-secondary: oklch(96% 0.015 45);
-    --bg-tertiary:  oklch(92% 0.02 45);
-    --fg-primary:   oklch(30% 0.08 45);
-    --fg-secondary: oklch(42% 0.1 45);
-    --fg-muted:     oklch(52% 0.08 45);
-    --accent:       oklch(60% 0.16 45);
-    --accent-hover: oklch(65% 0.18 45);
-    --accent-fg:    oklch(98% 0.01 45);
-    --accent-subtle:oklch(92% 0.03 45);
-    --border:       oklch(85% 0.025 45);
-    --border-muted: oklch(90% 0.02 45);
-    --glass:        oklch(98% 0.01 45 / 0.8);
-    --glass-border: oklch(85% 0.025 45 / 0.5);
-}
-.scheme-sunset.dark {
-    --bg-primary:   oklch(12% 0.02 45);
-    --bg-secondary: oklch(16% 0.025 45);
-    --bg-tertiary:  oklch(22% 0.03 45);
-    --fg-primary:   oklch(95% 0.025 45);
-    --fg-secondary: oklch(75% 0.06 45);
-    --fg-muted:     oklch(55% 0.05 45);
-    --accent:       oklch(72% 0.14 45);
-    --accent-hover: oklch(82% 0.12 45);
-    --accent-fg:    oklch(15% 0.05 45);
-    --accent-subtle:oklch(25% 0.05 45);
-    --border:       oklch(30% 0.035 45);
-    --border-muted: oklch(22% 0.025 45);
-    --glass:        oklch(16% 0.025 45 / 0.85);
-    --glass-border: oklch(30% 0.035 45 / 0.5);
-}
+    /* Container variant */
+    .container-md { max-width: 800px; }
 
-/* === Brand === */
-.btn-php { background: var(--php); color: oklch(98% 0 0); }
+    /* Article text styling */
+    .article-heading { margin-block: var(--space-4) var(--space-2); }
+    .article-text { color: var(--fg-secondary); line-height: var(--leading-relaxed); }
+    .icon-header { display: flex; align-items: center; gap: var(--space-2); }
+}

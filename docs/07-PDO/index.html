@@ -7,18 +7,33 @@
     <link rel="icon" href="../favicon.ico">
     <link rel="stylesheet" href="../base.css">
     <link rel="stylesheet" href="../site.css">
+    <link rel="stylesheet" href="../spe.css">
     <script src="https://unpkg.com/lucide@1.33.0/dist/umd/lucide.min.js"></script>
-    <script>(function(){var s=JSON.parse(localStorage.getItem('base-state')||'{}'),t=s.theme,c=s.scheme,h=document.documentElement;h.className='preload '+(t||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))+(c&&c!=='default'?' scheme-'+c:'');})()</script>
+    <script>(function(){var s=JSON.parse(localStorage.getItem('base-state')||'{}'),t=s.theme,c=s.scheme,h=document.documentElement;h.className='preload '+(t||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))+(c&&c!=='default'?' scheme-'+c:'')+(s.width==='wide'?' wide':(s.width==='narrow'?' narrow':''));})()</script>
 </head>
 <body>
+<button class="menu-toggle" data-sidebar="left"><i data-lucide="menu"></i></button>
+<button class="menu-toggle" data-sidebar="right"><i data-lucide="menu"></i></button>
 <nav class="topnav">
-    <button class="menu-toggle" data-sidebar="left"><i data-lucide="menu"></i></button>
     <h1><a class="brand" href="../"><span>📚 SPE Documentation</span></a></h1>
-    <button class="menu-toggle" data-sidebar="right"><i data-lucide="menu"></i></button>
 </nav>
 <aside class="sidebar sidebar-left">
-    <div class="sidebar-header"><span><i data-lucide="book-open"></i> Chapters</span><button class="pin-toggle" data-sidebar="left" title="Pin sidebar"><i data-lucide="pin"></i></button></div>
-    <nav>
+    <div class="carousel-header">
+        <div class="carousel-nav">
+            <button class="carousel-chevron" data-sidebar="left" data-dir="prev"><i data-lucide="chevron-left"></i></button>
+            <div class="carousel-dots">
+                <button class="carousel-dot active" data-sidebar="left" data-panel="0"></button>
+                <button class="carousel-dot" data-sidebar="left" data-panel="1"></button>
+            </div>
+            <button class="carousel-chevron" data-sidebar="left" data-dir="next"><i data-lucide="chevron-right"></i></button>
+        </div>
+        <button class="pin-toggle" data-sidebar="left" title="Pin sidebar"><i data-lucide="pin"></i></button>
+    </div>
+    <div class="panel-viewport">
+        <div class="panel-track">
+            <div class="panel">
+                <div class="panel-title">Chapters</div>
+                <div class="panel-content"><nav>
         <a href="../" data-icon="home"><i data-lucide="home"></i> SPE Overview</a>
         <a href="../conventions/" data-icon="ruler"><i data-lucide="ruler"></i> Conventions</a>
         <a href="../00-Tutorial/" data-icon="video"><i data-lucide="video"></i> 00 Tutorial</a>
@@ -31,21 +46,83 @@
         <a href="../07-PDO/" class="active" data-icon="database"><i data-lucide="database"></i> 07 PDO</a>
         <a href="../08-Auth/" data-icon="users"><i data-lucide="users"></i> 08 Auth</a>
         <a href="../09-Blog/" data-icon="newspaper"><i data-lucide="newspaper"></i> 09 Blog</a>
-    </nav>
+                </nav></div>
+            </div>
+            <div class="panel">
+                <div class="panel-title">About</div>
+                <div class="panel-content"><nav>
+                    <a href="../../"><i data-lucide="layout-grid"></i> Run the chapters</a>
+                    <div class="sidebar-divider"></div>
+                    <a href="https://github.com/markc/spe"><i data-lucide="code"></i> SPE on GitHub</a>
+                    <a href="https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B"><i data-lucide="video"></i> Video tutorials</a>
+                    <a href="https://dcs.spa"><i data-lucide="panels-left-right"></i> DCS — this interface</a>
+                </nav></div>
+            </div>
+        </div>
+    </div>
 </aside>
 <aside class="sidebar sidebar-right">
-    <div class="sidebar-header"><span><i data-lucide="sliders-horizontal"></i> Settings</span><button class="pin-toggle" data-sidebar="right" title="Pin sidebar"><i data-lucide="pin"></i></button></div>
-    <nav>
-        <a href="#" data-scheme="default" data-icon="circle"><i data-lucide="circle"></i> Stone</a>
-        <a href="#" data-scheme="ocean" data-icon="waves"><i data-lucide="waves"></i> Ocean</a>
-        <a href="#" data-scheme="forest" data-icon="trees"><i data-lucide="trees"></i> Forest</a>
-        <a href="#" data-scheme="sunset" data-icon="sunset"><i data-lucide="sunset"></i> Sunset</a>
-        <div class="sidebar-divider"></div>
-        <a href="#" onclick="Base.toggleTheme();return false" data-icon="moon"><i data-lucide="moon"></i> Toggle Theme</a>
-    </nav>
+    <div class="carousel-header">
+        <button class="pin-toggle" data-sidebar="right" title="Pin sidebar"><i data-lucide="pin"></i></button>
+        <div class="carousel-nav">
+            <button class="carousel-chevron" data-sidebar="right" data-dir="prev"><i data-lucide="chevron-left"></i></button>
+            <div class="carousel-dots">
+                <button class="carousel-dot active" data-sidebar="right" data-panel="0"></button>
+                <button class="carousel-dot" data-sidebar="right" data-panel="1"></button>
+            </div>
+            <button class="carousel-chevron" data-sidebar="right" data-dir="next"><i data-lucide="chevron-right"></i></button>
+        </div>
+    </div>
+    <div class="panel-viewport">
+        <div class="panel-track">
+            <div class="panel">
+                <div class="panel-title">Appearance</div>
+                <div class="panel-content">
+                    <div class="appearance-section">
+                        <div class="toggle-group">
+                            <button class="toggle-btn" data-theme="light">Light</button>
+                            <button class="toggle-btn" data-theme="dark">Dark</button>
+                        </div>
+                        <div class="toggle-group">
+                            <button class="toggle-btn" data-carousel="slide">Slide</button>
+                            <button class="toggle-btn" data-carousel="fade">Fade</button>
+                        </div>
+                        <div class="toggle-group">
+                            <button class="toggle-btn" data-width="narrow">Narrow</button>
+                            <button class="toggle-btn" data-width="normal">Normal</button>
+                            <button class="toggle-btn" data-width="wide">Wide</button>
+                        </div>
+                        <div class="sidebar-width-controls">
+                            <div class="sidebar-width-control">
+                                <label for="sidebar-width-left-input">Left %</label>
+                                <input id="sidebar-width-left-input" type="number" class="sidebar-width-spinner" data-side="left" min="10" max="100" value="15" step="5">
+                            </div>
+                            <div class="sidebar-width-control">
+                                <label for="sidebar-width-right-input">Right %</label>
+                                <input id="sidebar-width-right-input" type="number" class="sidebar-width-spinner" data-side="right" min="10" max="100" value="15" step="5">
+                            </div>
+                        </div>
+                        <div class="scheme-list">
+                            <button class="scheme-item" data-scheme="default"><span class="scheme-dot" style="background:oklch(50% 0.12 220)"></span><span class="scheme-name">Ocean</span></button>
+                            <button class="scheme-item" data-scheme="crimson"><span class="scheme-dot" style="background:oklch(47% 0.2 25)"></span><span class="scheme-name">Crimson</span></button>
+                            <button class="scheme-item" data-scheme="stone"><span class="scheme-dot" style="background:oklch(45% 0.05 60)"></span><span class="scheme-name">Stone</span></button>
+                            <button class="scheme-item" data-scheme="forest"><span class="scheme-dot" style="background:oklch(49% 0.12 150)"></span><span class="scheme-name">Forest</span></button>
+                            <button class="scheme-item" data-scheme="sunset"><span class="scheme-dot" style="background:oklch(52% 0.16 45)"></span><span class="scheme-name">Sunset</span></button>
+                            <button class="scheme-item" data-scheme="mono"><span class="scheme-dot" style="background:oklch(50% 0 0)"></span><span class="scheme-name">Mono</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-title">Settings</div>
+                <div class="panel-content"><nav>
+                    <a href="#" class="theme-toggle"><i id="theme-icon" data-lucide="moon"></i> Toggle theme</a>
+                </nav></div>
+            </div>
+        </div>
+    </div>
 </aside>
 <main id="content" class="prose" data-md="README.md" data-root="../">Loading…</main>
-<div class="overlay"></div>
 <script src="../base.js"></script>
 <script src="../md.js"></script>
 </body>

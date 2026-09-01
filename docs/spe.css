@@ -1,0 +1,59 @@
+/* SPE additions on top of the vendored DCS files (base.css / site.css / base.js from
+ * https://dcs.spa — never edit those here, see dcs-upstream.json + _bin/dcs-sync).
+ * Copyright (C) 2015-2026 Mark Constable <mc@netserva.org> (MIT License)
+ *
+ * Load order: base.css, site.css, spe.css. OKLCH only. */
+
+@layer site-tokens {
+    :root {
+        /* Brand: the PHP purple, used by the tutorial cards and the Blog hero. */
+        --php: oklch(55% 0.1 285);
+        --php-deep: oklch(30% 0.08 285);
+        --php-night: oklch(16% 0.04 285);
+    }
+    html.dark {
+        --php: oklch(70% 0.1 285);
+    }
+}
+
+@layer site-components {
+    /* dcs.spa paints its server-room photo behind everything; SPE has no image, so the
+       page is simply the scheme's primary surface. */
+    body {
+        background: var(--bg-primary);
+    }
+
+    /* dcs.spa zeroes main's padding for edge-to-edge marketing sections; SPE's pages are
+       cards and prose, so the base padding comes back. The Blog hero is the one full-bleed
+       section: it cancels the padding on its three outer sides. */
+    main {
+        padding: var(--space-4);
+    }
+    main > .hero-bg:first-child {
+        margin: calc(-1 * var(--space-4)) calc(-1 * var(--space-4)) 0;
+    }
+
+    /* The Blog home hero: a dark PHP-purple gradient instead of the photo, so the white
+       hero text and the shimmer accent keep their contrast in every scheme and mode. */
+    .hero-bg {
+        background: linear-gradient(135deg, var(--php-deep), var(--php-night));
+    }
+    .hero-bg::before {
+        background: rgb(0 0 0 / 0.25);
+    }
+
+    .btn-php {
+        background: var(--php);
+        color: oklch(98% 0 0);
+    }
+
+    /* Signed-in name in the Settings panel (chapters 08-09). */
+    .sidebar-user {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-2) var(--space-4);
+        color: var(--fg-secondary);
+        font-weight: 500;
+    }
+}

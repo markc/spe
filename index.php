@@ -60,10 +60,12 @@ namespace SPE\Router {
                 ['video', 'Tutorials', 'https://www.youtube.com/playlist?list=PLM0Did14jsitwKl7RYaVrUWnG1GkRBO4B'],
             ],
             public array $colors = [
-                ['circle', 'Stone', 'default'],
-                ['waves', 'Ocean', 'ocean'],
-                ['trees', 'Forest', 'forest'],
-                ['sunset', 'Sunset', 'sunset'],
+                ['oklch(50% 0.12 220)', 'Ocean', 'default'],
+                ['oklch(47% 0.2 25)', 'Crimson', 'crimson'],
+                ['oklch(45% 0.05 60)', 'Stone', 'stone'],
+                ['oklch(49% 0.12 150)', 'Forest', 'forest'],
+                ['oklch(52% 0.16 45)', 'Sunset', 'sunset'],
+                ['oklch(50% 0 0)', 'Mono', 'mono'],
             ],
             public array $chapters = [
                 ['01', 'Simple', 'Single-file anonymous class demonstrating PHP 8.5 pipe operator with first-class callables'],
@@ -83,8 +85,114 @@ namespace SPE\Router {
         public function __construct(private Ctx $ctx) {}
 
         public function render(): string {
-            $body = $this->topnav() . $this->sidebar('left') . $this->sidebar('right') . $this->main();
-            return $this->html($body);
+            $nav = $this->navLinks();
+            $chapters = $this->chapterLinks();
+            $schemes = $this->schemeButtons();
+            $main = $this->main();
+
+            return <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{$this->ctx->out['doc']}</title>
+    <link rel="stylesheet" href="base.css">
+    <link rel="stylesheet" href="site.css">
+    <link rel="stylesheet" href="spe.css">
+    <script src="https://unpkg.com/lucide@1.33.0/dist/umd/lucide.min.js"></script>
+    <script>(function(){var s=JSON.parse(localStorage.getItem('base-state')||'{}'),t=s.theme,c=s.scheme,h=document.documentElement;h.className='preload '+(t||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))+(c&&c!=='default'?' scheme-'+c:'')+(s.width==='wide'?' wide':(s.width==='narrow'?' narrow':''));})()</script>
+</head>
+<body>
+<button class="menu-toggle" data-sidebar="left"><i data-lucide="menu"></i></button>
+<button class="menu-toggle" data-sidebar="right"><i data-lucide="menu"></i></button>
+<nav class="topnav">
+    <h1><a class="brand" href="./"><span>{$this->ctx->out['page']}</span></a></h1>
+</nav>
+<aside class="sidebar sidebar-left">
+    <div class="carousel-header">
+        <div class="carousel-nav">
+            <button class="carousel-chevron" data-sidebar="left" data-dir="prev"><i data-lucide="chevron-left"></i></button>
+            <div class="carousel-dots">
+                <button class="carousel-dot active" data-sidebar="left" data-panel="0"></button>
+                <button class="carousel-dot" data-sidebar="left" data-panel="1"></button>
+            </div>
+            <button class="carousel-chevron" data-sidebar="left" data-dir="next"><i data-lucide="chevron-right"></i></button>
+        </div>
+        <button class="pin-toggle" data-sidebar="left" title="Pin sidebar"><i data-lucide="pin"></i></button>
+    </div>
+    <div class="panel-viewport">
+        <div class="panel-track">
+            <div class="panel">
+                <div class="panel-title">Navigation</div>
+                <div class="panel-content"><nav>{$nav}</nav></div>
+            </div>
+            <div class="panel">
+                <div class="panel-title">Chapters</div>
+                <div class="panel-content"><nav>{$chapters}</nav></div>
+            </div>
+        </div>
+    </div>
+</aside>
+<aside class="sidebar sidebar-right">
+    <div class="carousel-header">
+        <button class="pin-toggle" data-sidebar="right" title="Pin sidebar"><i data-lucide="pin"></i></button>
+        <div class="carousel-nav">
+            <button class="carousel-chevron" data-sidebar="right" data-dir="prev"><i data-lucide="chevron-left"></i></button>
+            <div class="carousel-dots">
+                <button class="carousel-dot active" data-sidebar="right" data-panel="0"></button>
+                <button class="carousel-dot" data-sidebar="right" data-panel="1"></button>
+            </div>
+            <button class="carousel-chevron" data-sidebar="right" data-dir="next"><i data-lucide="chevron-right"></i></button>
+        </div>
+    </div>
+    <div class="panel-viewport">
+        <div class="panel-track">
+            <div class="panel">
+                <div class="panel-title">Appearance</div>
+                <div class="panel-content">
+                    <div class="appearance-section">
+                        <div class="toggle-group">
+                            <button class="toggle-btn" data-theme="light">Light</button>
+                            <button class="toggle-btn" data-theme="dark">Dark</button>
+                        </div>
+                        <div class="toggle-group">
+                            <button class="toggle-btn" data-carousel="slide">Slide</button>
+                            <button class="toggle-btn" data-carousel="fade">Fade</button>
+                        </div>
+                        <div class="toggle-group">
+                            <button class="toggle-btn" data-width="narrow">Narrow</button>
+                            <button class="toggle-btn" data-width="normal">Normal</button>
+                            <button class="toggle-btn" data-width="wide">Wide</button>
+                        </div>
+                        <div class="sidebar-width-controls">
+                            <div class="sidebar-width-control">
+                                <label for="sidebar-width-left-input">Left %</label>
+                                <input id="sidebar-width-left-input" type="number" class="sidebar-width-spinner" data-side="left" min="10" max="100" value="15" step="5">
+                            </div>
+                            <div class="sidebar-width-control">
+                                <label for="sidebar-width-right-input">Right %</label>
+                                <input id="sidebar-width-right-input" type="number" class="sidebar-width-spinner" data-side="right" min="10" max="100" value="15" step="5">
+                            </div>
+                        </div>
+                        <div class="scheme-list">{$schemes}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-title">Settings</div>
+                <div class="panel-content"><nav>
+                    <a href="#" class="theme-toggle"><i id="theme-icon" data-lucide="moon"></i> Toggle theme</a>
+                </nav></div>
+            </div>
+        </div>
+    </div>
+</aside>
+{$main}
+<script src="base.js"></script>
+</body>
+</html>
+HTML;
         }
 
         private function chapterList(): string {
@@ -106,42 +214,22 @@ namespace SPE\Router {
                 |> (fn($a) => implode('', $a));
         }
 
-        private function colorLinks(): string {
-            return $this->ctx->colors
-                |> (fn($c) => array_map(fn($p) => sprintf(
-                    '<a href="#" data-scheme="%s" data-icon="%s"><i data-lucide="%s"></i> %s</a>',
-                    $p[2], $p[0], $p[0], $p[1]
+        private function chapterLinks(): string {
+            return $this->ctx->chapters
+                |> (fn($c) => array_map(fn($ch) => sprintf(
+                    '<a href="%s-%s/"><i data-lucide="file-code"></i> %s %s</a>',
+                    $ch[0], $ch[1], $ch[0], $ch[1]
                 ), $c))
                 |> (fn($a) => implode('', $a));
         }
 
-        private function topnav(): string {
-            return <<<HTML
-<nav class="topnav">
-    <button class="menu-toggle" data-sidebar="left"><i data-lucide="menu"></i></button>
-    <h1><a class="brand" href="./"><span>{$this->ctx->out['page']}</span></a></h1>
-    <button class="menu-toggle" data-sidebar="right"><i data-lucide="menu"></i></button>
-</nav>
-HTML;
-        }
-
-        private function sidebar(string $side): string {
-            $nav = $side === 'left'
-                ? $this->navLinks()
-                : $this->colorLinks()
-                  . '<div class="sidebar-divider"></div>'
-                  . '<a href="#" onclick="Base.toggleTheme();return false" data-icon="moon"><i data-lucide="moon"></i> Toggle Theme</a>';
-            $title = $side === 'left' ? 'Navigation' : 'Settings';
-            $icon = $side === 'left' ? 'compass' : 'sliders-horizontal';
-            return <<<HTML
-<aside class="sidebar sidebar-{$side}">
-    <div class="sidebar-header">
-        <span><i data-lucide="{$icon}"></i> {$title}</span>
-        <button class="pin-toggle" data-sidebar="{$side}" title="Pin sidebar"><i data-lucide="pin"></i></button>
-    </div>
-    <nav>{$nav}</nav>
-</aside>
-HTML;
+        private function schemeButtons(): string {
+            return $this->ctx->colors
+                |> (fn($c) => array_map(fn($p) => sprintf(
+                    '<button class="scheme-item" data-scheme="%s"><span class="scheme-dot" style="background:%s"></span><span class="scheme-name">%s</span></button>',
+                    $p[2], $p[0], $p[1]
+                ), $c))
+                |> (fn($a) => implode('', $a));
         }
 
         private function main(): string {
@@ -154,29 +242,6 @@ HTML;
         $list
     </div>
 </main>
-<div class="overlay"></div>
-HTML;
-        }
-
-        private function html(string $body): string {
-            $doc = $this->ctx->out['doc'];
-            return <<<HTML
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{$doc}</title>
-    <link rel="stylesheet" href="base.css">
-    <link rel="stylesheet" href="site.css">
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <script>(function(){var s=JSON.parse(localStorage.getItem('base-state')||'{}'),t=s.theme,c=s.scheme,h=document.documentElement;h.className='preload '+(t||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))+(c&&c!=='default'?' scheme-'+c:'');})()</script>
-</head>
-<body>
-{$body}
-<script src="base.js"></script>
-</body>
-</html>
 HTML;
         }
     }
